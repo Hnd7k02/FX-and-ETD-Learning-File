@@ -374,7 +374,7 @@ export default function GreeksLab({ lang, mode = 'delta-gamma' }: GreeksLabProps
   })();
 
   const ghostLabel = t('gl.head.ghost', {
-    weeks: weeksText(LAB_CONFIG.defaults.weeks),
+    months: EXAMPLE.months,
     vol: fmtPctValue(LAB_CONFIG.defaults.volPct, lang, 0),
   });
 
@@ -547,6 +547,7 @@ export default function GreeksLab({ lang, mode = 'delta-gamma' }: GreeksLabProps
           <g clip-path={`url(#${clipId})`}>
             {spec.payoff && <path d={P(spec.payoff)} class="gl-payoff" />}
             {spec.ghost && <path d={P(spec.ghost)} class="gl-ghost" />}
+            {spec.ghost && <GhostLabel pts={spec.ghost} x={x} y={y} text={ghostLabel} />}
             <path d={P(spec.points)} class="gl-curve" style={{ stroke: head.color }} />
             {spec.peak && (
               <circle cx={x(spec.peak[0])} cy={y(spec.peak[1])} r={5} class="gl-peak" />
@@ -605,13 +606,12 @@ export default function GreeksLab({ lang, mode = 'delta-gamma' }: GreeksLabProps
     );
   };
 
-  const panelHead = (head: Head, extra?: JSX.Element) => (
+  const panelHead = (head: Head) => (
     <div class="gl-head">
       <span class="gl-legend">
         <span aria-hidden="true" class="gl-swatch" style={{ borderTopColor: head.color }} />
         <span>{greek(head.title)}</span>
       </span>
-      {extra}
       <span class="gl-pill" style={{ background: head.pillBg }}>
         <span aria-hidden="true" class={head.tangent ? 'gl-pill-line' : 'gl-pill-dot'} />
         <span>
@@ -646,7 +646,7 @@ export default function GreeksLab({ lang, mode = 'delta-gamma' }: GreeksLabProps
               [<i>V</i>(σ + <i>h</i>) − <i>V</i>(σ − <i>h</i>)] / 2<i>h</i>{' '}
               <span class="gl-nowrap">= {chf(n.check.vegaChf, 2)}</span>
             </span>
-            <span>{t('gl.check.vega', { notional, v: chf(n.vegaChf, 2) })}</span>
+            <span>{greek(t('gl.check.vega', { notional, v: chf(n.vegaChf, 2) }))}</span>
           </>
         );
       case 'theta':
@@ -657,10 +657,12 @@ export default function GreeksLab({ lang, mode = 'delta-gamma' }: GreeksLabProps
               <span class="gl-nowrap">= {chf(n.check.thetaChf, 2)}</span>
             </span>
             <span>
-              {t('gl.check.theta', {
-                v: chf(n.thetaAnalyticChf, 2),
-                day: chf(n.thetaDayChf, 2),
-              })}
+              {greek(
+                t('gl.check.theta', {
+                  v: chf(n.thetaAnalyticChf, 2),
+                  day: chf(n.thetaDayChf, 2),
+                }),
+              )}
             </span>
           </>
         );
@@ -694,7 +696,7 @@ export default function GreeksLab({ lang, mode = 'delta-gamma' }: GreeksLabProps
             <span class="gl-check-f math">
               [Δ(<i>S</i> + <i>h</i>) − Δ(<i>S</i> − <i>h</i>)] / 2<i>h</i> = {num(n.check.gamma, 2)}
             </span>
-            <span>{t('gl.check.gamma', { v: num(n.gamma, 2) })}</span>
+            <span>{greek(t('gl.check.gamma', { v: num(n.gamma, 2) }))}</span>
           </>
         );
     }
@@ -716,7 +718,7 @@ export default function GreeksLab({ lang, mode = 'delta-gamma' }: GreeksLabProps
     delta: num(n.delta, 3),
     gamma: num(n.gamma, 2),
     vega: chf(n.vegaChf),
-    theta: chf(n.thetaDayChf),
+    theta: chf(n.thetaDayChf, 0, true),
     rhoD: chf(n.rhoDChf, 0, true),
     rhoF: chf(n.rhoFChf, 0, true),
   });
@@ -750,15 +752,7 @@ export default function GreeksLab({ lang, mode = 'delta-gamma' }: GreeksLabProps
         <div class="ff-lab-main gl-main" ref={box}>
           {panelHead(heads[0])}
           {chart('top', top, heads[0], topGeo)}
-          {panelHead(
-            heads[1],
-            bottom.ghost ? (
-              <span class="gl-ghost-key">
-                <span aria-hidden="true" class="gl-ghost-swatch" />
-                {ghostLabel}
-              </span>
-            ) : undefined,
-          )}
+          {panelHead(heads[1])}
           {chart('bottom', bottom, heads[1], botGeo)}
           <p class="gl-hint">
             <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
@@ -870,7 +864,7 @@ export default function GreeksLab({ lang, mode = 'delta-gamma' }: GreeksLabProps
                 symbol="Θ"
                 label={t('gl.name.theta')}
                 sub={t('gl.unit.perDay')}
-                value={chf(n.thetaDayChf)}
+                value={chf(n.thetaDayChf, 0, true)}
                 highlight={highlight.theta}
               />
               <StatRow
@@ -933,6 +927,16 @@ export default function GreeksLab({ lang, mode = 'delta-gamma' }: GreeksLabProps
         {interacted && aha ? `${t(`gl.aha.${aha.key}.t`)}: ${t(`gl.aha.${aha.key}.d`)}` : ''}
       </div>
     </div>
+  );
+}
+
+/** Label of the example curve, centred above its highest point. */
+function GhostLabel(p: { pts: Point[]; x: Scale; y: Scale; text: string }): JSX.Element {
+  const top = p.pts.reduce((a, b) => (b[1] > a[1] ? b : a));
+  return (
+    <text x={p.x(top[0])} y={p.y(top[1]) - 8} class="gl-label" text-anchor="middle">
+      {p.text}
+    </text>
   );
 }
 

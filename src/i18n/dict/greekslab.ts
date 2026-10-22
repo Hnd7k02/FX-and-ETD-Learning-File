@@ -21,7 +21,7 @@ export const greekslab = defineDict({
     'gl.head.theta': 'Theta Θ(t) in CHF pro Tag',
     'gl.head.priceRd': 'Preis in Pips je CHF-Zins',
     'gl.head.priceRf': 'Preis in Pips je USD-Zins',
-    'gl.head.ghost': 'Beispiel: {weeks}, Vola {vol}',
+    'gl.head.ghost': 'Beispiel: {months}M, Vola {vol}',
     'gl.pill.slope': 'Steigung der Tangente',
     'gl.pill.slopeShort': 'Steigung',
 
@@ -60,11 +60,11 @@ export const greekslab = defineDict({
     'gl.check.title': 'Numerischer Check',
     'gl.check.gamma': 'mit h = 1 Pip. Deckt sich mit der Formel Γ = {v}.',
     'gl.check.vega':
-      'mit h = 0.01 Vola-Punkte, je Vola-Punkt auf {notional}: Deckt sich mit der Formel ν = {v}.',
+      'je Vola-Punkt auf {notional}, mit h = 0.01 Vola-Punkte. Deckt sich mit der Formel ν = {v}.',
     'gl.check.theta':
       'pro Tag, mit h = 0.0001 Jahre (knapp eine Stunde). Deckt sich mit der Formel Θ / 365 = {v}. Die Tabelle zeigt den ganzen Tag, V(T − 1 Tag) − V(T) = {day}.',
     'gl.check.rho':
-      'mit h = 0.01 %, je +1 % auf {notional}: Deckt sich mit den Formeln für Rho CHF ({d}) und Rho USD ({f}).',
+      'je +1 % auf {notional}, mit h = 0.01 %. Deckt sich mit den Formeln für Rho CHF ({d}) und Rho USD ({f}).',
 
     'gl.axis.spot': 'Spot USD/CHF',
     'gl.axis.vol': 'Implizite Vola',
@@ -133,7 +133,7 @@ export const greekslab = defineDict({
     'gl.head.theta': 'Theta Θ(t) in CHF per day',
     'gl.head.priceRd': 'Price in pips vs CHF rate',
     'gl.head.priceRf': 'Price in pips vs USD rate',
-    'gl.head.ghost': 'Example: {weeks}, vol {vol}',
+    'gl.head.ghost': 'Example: {months}M, vol {vol}',
     'gl.pill.slope': 'Slope of the tangent',
     'gl.pill.slopeShort': 'Slope',
 
@@ -172,11 +172,11 @@ export const greekslab = defineDict({
     'gl.check.title': 'Numerical check',
     'gl.check.gamma': 'with h = 1 pip. Matches the formula Γ = {v}.',
     'gl.check.vega':
-      'with h = 0.01 vol points, per vol point on {notional}: matches the formula ν = {v}.',
+      'per vol point on {notional}, with h = 0.01 vol points. Matches the formula ν = {v}.',
     'gl.check.theta':
       'per day, with h = 0.0001 years (just under an hour). Matches the formula Θ / 365 = {v}. The table shows the full day, V(T − 1 day) − V(T) = {day}.',
     'gl.check.rho':
-      'with h = 0.01%, per +1% on {notional}: matches the formulas for rho CHF ({d}) and rho USD ({f}).',
+      'per +1% on {notional}, with h = 0.01%. Matches the formulas for rho CHF ({d}) and rho USD ({f}).',
 
     'gl.axis.spot': 'Spot USD/CHF',
     'gl.axis.vol': 'Implied vol',
