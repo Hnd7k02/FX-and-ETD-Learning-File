@@ -1,0 +1,53 @@
+{/* 05 Greeks · Abschnitt 2 · Delta und Gamma. Zahlen nur über <Num />, Registry src/lib/nums/m05.ts. */}
+
+Delta sagt, wie viel der Call gewinnt, wenn USD/CHF ein kleines Stück steigt. Bei einem Delta von 0.50 bewegt sich der Optionswert etwa halb so stark wie der Kurs.
+
+Gamma sagt, wie schnell sich dieses Delta selbst verändert. Weit aus dem Geld ist Delta fast null, tief im Geld fast eins. Rund um den Strike ändert es sich am schnellsten: Dort ist Gamma am grössten.
+
+Für den Importeur heisst das: Sein Call über <Num of="ex.notional" /> verhält sich heute wie ein Forward über etwa die Hälfte des Betrags. Steigt der Dollar, wächst dieser Anteil, fällt er, schrumpft er. Genau diese Anpassung misst Gamma.
+
+{/* GreeksLabFigure mode="delta-gamma" — added in phase 3 */}
+
+### Gamma im Beispiel
+
+Mit <i>S</i> = <Num of="ex.spot" />, σ = <Num of="ex.vol" />, <i>T</i> = <Num of="m05.T" /> und <i>r</i><sub>f</sub> = <Num of="ex.rf" /> liegt <i>d</i><sub>1</sub> bei etwa <Num of="m05.d1" />. Delta ist <i>e</i><sup>−<i>r</i><sub>f</sub><i>T</i></sup> · <i>N</i>(<i>d</i><sub>1</sub>) = <Num of="m05.dff" /> · <Num of="m05.nd1" /> ≈ <Num of="m05.delta" />. Für Gamma kommt die Dichte φ(<i>d</i><sub>1</sub>) = <Num of="m05.phiD1" /> ins Spiel:
+
+<Formula variant="accent"><span>Γ = <Num of="m05.dff" /> · <Num of="m05.phiD1" /> / (<Num of="ex.spot" digits={1} /> · <Num of="m05.volFrac" /> · <Num of="m05.sqrtT" />) = <b><Num of="m05.gamma" /></b></span></Formula>
+
+Steigt USD/CHF um eine Big Figure (0.0100), steigt Delta um rund <Num of="m05.deltaChangeApprox" digits={2} sign={false} />: von <Num of="m05.delta" /> auf etwa <Num of="m05.deltaUp" />. Das Labor rechnet denselben Wert numerisch nach.
+
+<Callout variant="good" title="Numerischer Check">
+  Delta je einen Pip über und unter dem Spot, Differenz durch zwei Pips: Γ ≈ <Num of="m05.gammaNumeric" />. Formel und Differenzenquotient stimmen überein. Die genaue Delta-Änderung für eine ganze Big Figure ist <Num of="m05.deltaChangeActual" />, etwas weniger als Γ · 0.01, weil Gamma unterwegs schon wieder abnimmt.
+</Callout>
+
+<Derivation title="Herleitung in vier Schritten">
+
+**1.** Delta ist die Steigung der Preiskurve, also die erste Ableitung des Preises nach dem Spot.
+
+<Formula><span>Δ = ∂<i>V</i> / ∂<i>S</i></span></Formula>
+
+**2.** Gamma ist die Steigung der Delta-Kurve. Damit ist Gamma die Ableitung von Delta und die zweite Ableitung des Preises.
+
+<Formula><span>Γ = ∂Δ / ∂<i>S</i> = ∂²<i>V</i> / ∂<i>S</i>²</span></Formula>
+
+**3.** Im Garman-Kohlhagen-Modell gilt für den Call Δ = <i>e</i><sup>−<i>r</i><sub>f</sub><i>T</i></sup> · <i>N</i>(<i>d</i><sub>1</sub>). Nach dem Spot abgeleitet wird nur <i>N</i>(<i>d</i><sub>1</sub>), mit der Kettenregel. φ ist die Dichte der Standardnormalverteilung.
+
+<Formula><span>∂<i>d</i><sub>1</sub> / ∂<i>S</i> = 1 / (<i>S</i> · σ · √<i>T</i>)</span><span>⇒ Γ = <i>e</i><sup>−<i>r</i><sub>f</sub><i>T</i></sup> · φ(<i>d</i><sub>1</sub>) / (<i>S</i> · σ · √<i>T</i>)</span></Formula>
+
+**4.** Einsetzen der Beispielwerte (<i>S</i> = <Num of="ex.spot" />, σ = <Num of="ex.vol" />, <i>T</i> = <Num of="m05.T" />, <i>r</i><sub>f</sub> = <Num of="ex.rf" />, <i>d</i><sub>1</sub> ≈ <Num of="m05.d1" />) liefert Γ = <Num of="m05.gamma" />, den Wert aus dem Rechenbeispiel oben. Gamma hat die Einheit «Delta pro Kurseinheit»: Pro 0.01 Kursbewegung ändert sich Delta um rund <Num of="m05.deltaChangeApprox" digits={2} sign={false} />.
+
+</Derivation>
+
+<Desk title="Gamma gegen Theta">
+
+Wer eine Option kauft, ist long Gamma. Beim Delta-Hedging verkauft er nach Anstiegen und kauft nach Rückgängen: Bewegung bringt Gewinn. Dafür bezahlt er jeden Tag Zeitwert.
+
+<Formula variant="dark"><span>P&L ≈ ½ · Γ · [(Δ<i>S</i>)² − σ²<i>S</i>² · Δ<i>t</i>]</span></Formula>
+
+Break-even pro Tag: σ · <i>S</i> / √365 = <Num of="ex.spot" /> · <Num of="ex.vol" /> / √365 ≈ <b><Num of="m05.breakEvenPips" /> Pips</b>. Bewegt sich USD/CHF stärker als die implizite Tagesvola, verdient der delta-gehedgte Gamma-Käufer. Der Gamma-Anteil des Thetas beträgt rund <Num of="m05.thetaGammaDay" /> pro Tag; das Theta im Labor (<Num of="m05.thetaDay" />) enthält zusätzlich den Zins-Carry von rund <Num of="m05.thetaCarryDay" /> pro Tag.
+
+</Desk>
+
+<Takeaway>
+  Delta ist die Steigung, Gamma die Krümmung. Rund um den Strike ist Gamma am grössten, und genau dort kostet jeder Tag am meisten Zeitwert.
+</Takeaway>
