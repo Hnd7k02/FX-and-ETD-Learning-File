@@ -55,27 +55,23 @@ const title = `${entry?.data.title ?? sec.title[lang]} · ${m.n} ${m.title[lang]
       eyebrow={t('module.section', { n: section, total: SECTION_KEYS.length })}
       title={entry?.data.title ?? sec.title[lang]}
     />
-    {
-      Content ? (
-        <div class="prose" data-section-content>
-          <Content components={mdxComponents} />
-        </div>
-      ) : (
-        <ComingSoon lang={lang} variant="section" />
-      )
-    }
+    {Content ? (
+      <div class="prose" data-section-content>
+        <Content components={mdxComponents} />
+      </div>
+    ) : (
+      <ComingSoon lang={lang} variant="section" />
+    )}
     <SectionEnd lang={lang} slug={slug} section={section} />
-    {
-      check && (
-        <Quiz
-          client:visible
-          lang={lang}
-          mode="check"
-          slug={slug}
-          questions={[viewQuestion(check, lang)]}
-        />
-      )
-    }
+    {check && (
+      <Quiz
+        client:visible
+        lang={lang}
+        mode="check"
+        slug={slug}
+        questions={[viewQuestion(check, lang)]}
+      />
+    )}
     <Pager lang={lang} module={m} current={section} />
   </ModuleMain>
 </BaseLayout>

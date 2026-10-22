@@ -46,19 +46,17 @@ const title = `${heading} · ${m.n} ${m.title[lang]} · ${t('site.name')}`;
       title={heading}
       lead={t('quiz.lead')}
     />
-    {
-      quiz ? (
-        <Quiz
-          client:load
-          lang={lang}
-          mode="quiz"
-          slug={slug}
-          questions={quiz.quiz.map((q) => viewQuestion(q, lang))}
-        />
-      ) : (
-        <ComingSoon lang={lang} variant="quiz" />
-      )
-    }
+    {quiz ? (
+      <Quiz
+        client:load
+        lang={lang}
+        mode="quiz"
+        slug={slug}
+        questions={quiz.quiz.map((q) => viewQuestion(q, lang))}
+      />
+    ) : (
+      <ComingSoon lang={lang} variant="quiz" />
+    )}
     <Pager lang={lang} module={m} current="quiz" />
   </ModuleMain>
 </BaseLayout>

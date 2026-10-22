@@ -30,12 +30,20 @@ interface Card {
 const back: Card =
   idx === 0
     ? { href: pathHref, small: t('module.back'), big: t('module.home') }
-    : { href: modulePath(lang, m.slug, SECTION_KEYS[idx - 1]!), small: t('module.back'), big: label(idx - 1) };
+    : {
+        href: modulePath(lang, m.slug, SECTION_KEYS[idx - 1]!),
+        small: t('module.back'),
+        big: label(idx - 1),
+      };
 
 const nextModule = MODULES[moduleIndex(m.slug) + 1];
 const next: Card =
   current !== 'quiz'
-    ? { href: modulePath(lang, m.slug, SECTION_KEYS[idx + 1]!), small: t('module.next'), big: label(idx + 1) }
+    ? {
+        href: modulePath(lang, m.slug, SECTION_KEYS[idx + 1]!),
+        small: t('module.next'),
+        big: label(idx + 1),
+      }
     : nextModule
       ? {
           href: modulePath(lang, nextModule.slug, '1'),

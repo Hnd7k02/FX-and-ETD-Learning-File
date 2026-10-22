@@ -38,31 +38,29 @@ const items = SECTION_KEYS.map((key, i) => ({
   data-sr-done={tm('stepper.done')}
   data-sr-current={tm('stepper.current')}
 >
-  {
-    items.map((it) => (
-      <li class="step-item">
-        <a
-          class="step"
-          href={it.href}
-          data-step={it.key}
-          data-state={it.current ? 'current' : 'open'}
-          aria-current={it.current ? 'step' : undefined}
-        >
-          <span class="bar" aria-hidden="true" />
-          <span class="label">
-            <span class="n">{it.n}</span>
-            <span class="sep" aria-hidden="true">
-              {' · '}
-            </span>
-            <span class="txt">{it.label}</span>
-            <span class="sr-only" data-step-sr>
-              {it.current ? ` · ${tm('stepper.current')}` : ''}
-            </span>
+  {items.map((it) => (
+    <li class="step-item">
+      <a
+        class="step"
+        href={it.href}
+        data-step={it.key}
+        data-state={it.current ? 'current' : 'open'}
+        aria-current={it.current ? 'step' : undefined}
+      >
+        <span class="bar" aria-hidden="true" />
+        <span class="label">
+          <span class="n">{it.n}</span>
+          <span class="sep" aria-hidden="true">
+            {' · '}
           </span>
-        </a>
-      </li>
-    ))
-  }
+          <span class="txt">{it.label}</span>
+          <span class="sr-only" data-step-sr>
+            {it.current ? ` · ${tm('stepper.current')}` : ''}
+          </span>
+        </span>
+      </a>
+    </li>
+  ))}
 </ol>
 
 <script>
@@ -81,9 +79,7 @@ const items = SECTION_KEYS.map((key, i) => ({
       root.querySelectorAll<HTMLElement>('[data-step]').forEach((a) => {
         const key = a.dataset.step ?? '';
         const done =
-          key === 'quiz'
-            ? isQuizPassed(p, slug)
-            : isSectionDone(p, slug, key as ContentSection);
+          key === 'quiz' ? isQuizPassed(p, slug) : isSectionDone(p, slug, key as ContentSection);
         const current = a.getAttribute('aria-current') === 'step';
         a.dataset.state = current ? 'current' : done ? 'done' : 'open';
         a.dataset.done = done ? 'true' : 'false';
