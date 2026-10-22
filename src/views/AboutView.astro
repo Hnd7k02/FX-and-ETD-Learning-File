@@ -537,7 +537,12 @@ const sid = (i: number) => toc[i]!.id;
                 </div>
               ))}
             </div>
-            <div class="ab-table-wrap">
+            <div
+              class="ab-table-wrap"
+              role="region"
+              tabindex="0"
+              aria-label={t('about.example.tableCaption')}
+            >
               <table class="ab-table ab-table--example">
                 <caption class="sr-only">{t('about.example.tableCaption')}</caption>
                 <thead>
@@ -668,7 +673,12 @@ const sid = (i: number) => toc[i]!.id;
                   })}
                 </p>
               </div>
-              <div class="ab-table-wrap">
+              <div
+                class="ab-table-wrap"
+                role="region"
+                tabindex="0"
+                aria-label={t('about.risk.thresholdsH')}
+              >
                 <table class="ab-table ab-table--thresholds">
                   <caption class="sr-only">{t('about.risk.thresholdsH')}</caption>
                   <thead>
@@ -736,7 +746,7 @@ const sid = (i: number) => toc[i]!.id;
             {t('about.conv.h')}
           </h2>
           <p class="ab-lead2">{t('about.conv.lead')}</p>
-          <div class="ab-table-wrap card">
+          <div class="ab-table-wrap card" role="region" tabindex="0" aria-label={t('about.conv.h')}>
             <table class="ab-table ab-table--conv">
               <caption class="sr-only">{t('about.conv.h')}</caption>
               <thead>
@@ -1205,6 +1215,11 @@ const sid = (i: number) => toc[i]!.id;
   .ab-table-wrap {
     overflow-x: auto;
     max-width: 100%;
+    border-radius: var(--ff-r-card);
+  }
+  .ab-table-wrap:focus-visible {
+    outline: 2px solid var(--ff-long);
+    outline-offset: 2px;
   }
   .ab-table {
     width: 100%;
@@ -1692,6 +1707,42 @@ const sid = (i: number) => toc[i]!.id;
     }
     .ab-table--example .ab-note:empty {
       display: none;
+    }
+    .ab-table--conv thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+    }
+    .ab-table--conv tr {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-areas: 'topic sample' 'rule rule';
+      gap: 4px 12px;
+      padding: 12px 16px;
+      border-top: 1px solid var(--ff-row);
+    }
+    .ab-table--conv tbody tr:first-child {
+      border-top: 0;
+    }
+    .ab-table--conv th,
+    .ab-table--conv td {
+      display: block;
+      padding: 0;
+      border: 0;
+    }
+    .ab-table--conv tbody th {
+      grid-area: topic;
+    }
+    .ab-table--conv td:nth-child(2) {
+      grid-area: rule;
+      font-size: 13px;
+    }
+    .ab-table--conv .ab-sample {
+      grid-area: sample;
+      text-align: right;
+      white-space: normal;
     }
     .ab-table--thresholds th,
     .ab-table--thresholds td {

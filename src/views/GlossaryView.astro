@@ -155,6 +155,7 @@ const familyCounts = Object.fromEntries(
                 <dd class="gl-meta">
                   <a
                     class="chip chip-family gl-chip"
+                    data-family={r.family}
                     href={r.href}
                     title={`${r.moduleN} ${r.moduleTitle} · ${t('glossary.sectionShort', { n: r.section })}: ${r.sectionTitle}`}
                   >
@@ -421,8 +422,7 @@ const familyCounts = Object.fromEntries(
     font-weight: 600;
   }
   .gl-chip-sec {
-    font-weight: 700;
-    opacity: 0.85;
+    font-weight: 600;
   }
   .gl-chip :global(svg) {
     margin-left: 2px;
