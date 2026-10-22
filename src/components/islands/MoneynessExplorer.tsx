@@ -16,7 +16,7 @@ import { useElementWidth, usePrefersReducedMotion, useTween } from '@/components
 import { m04 as dict } from '@/i18n/dict/m04';
 import { translator, type Lang } from '@/i18n/types';
 import { areaPath, clamp, linePath, niceTicks, scaleLinear, type Point } from '@/lib/chart';
-import { EXAMPLE, EXAMPLE_STRIKE } from '@/lib/fx/example';
+import { EXAMPLE, EXAMPLE_FORWARD } from '@/lib/fx/example';
 import type { OptionType } from '@/lib/fx/vanilla';
 import { fmtMoney, fmtNumber, fmtPct, fmtPips, fmtRate } from '@/lib/format';
 import {
@@ -53,6 +53,8 @@ const KS = Array.from(
   (_, i) => K_RANGE[0] + ((K_RANGE[1] - K_RANGE[0]) * i) / SAMPLES,
 );
 const Y_DOMAIN: [number, number] = [0, 600];
+/** Slider and drag snap onto a desk strike within this distance (2 pips). */
+const SNAP = 2e-4;
 
 function layoutFor(w: number) {
   const width = Math.max(280, Math.round(w));
@@ -78,7 +80,7 @@ export default function MoneynessExplorer(props: MoneynessExplorerProps): JSX.El
   const uid = useId().replace(/[^A-Za-z0-9_-]/g, '');
   const rm = usePrefersReducedMotion();
   const [type, setType] = useState<OptionType>(props.type === 'put' ? 'put' : 'call');
-  const [K, setK] = useState<number>(EXAMPLE_STRIKE);
+  const [K, setK] = useState<number>(EXAMPLE_FORWARD);
   const [dragging, setDragging] = useState(false);
   const [how, setHow] = useState<'init' | 'slider' | 'jump'>('init');
   const box = useRef<HTMLDivElement>(null);
@@ -97,7 +99,7 @@ export default function MoneynessExplorer(props: MoneynessExplorerProps): JSX.El
     instant,
   );
   const money = moneyness(K, split.F, type);
-  const near = markerAt(K, MARKERS);
+  const near = markerAt(K, MARKERS, 1e-9);
 
   const sx = scaleLinear([K_RANGE[0], K_RANGE[1]], [L.left, L.width - L.right]);
   const sy = scaleLinear(Y_DOMAIN, [L.plotBottom, L.top]);
@@ -111,7 +113,8 @@ export default function MoneynessExplorer(props: MoneynessExplorerProps): JSX.El
 
   const setStrike = (v: number, mode: 'slider' | 'jump') => {
     setHow(mode);
-    setK(clamp(v, K_RANGE[0], K_RANGE[1]));
+    const snap = mode === 'slider' ? markerAt(v, MARKERS, SNAP) : null;
+    setK(clamp(snap ? snap.K : v, K_RANGE[0], K_RANGE[1]));
   };
   const toStrike = (clientX: number) => {
     const el = svgRef.current;

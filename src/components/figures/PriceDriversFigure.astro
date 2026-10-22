@@ -34,6 +34,12 @@ const lang = pageLang(Astro.currentLocale);
   .pd p {
     margin: 0;
   }
+  /* the Legend is a <ul>; keep the .prose list styles away from it */
+  .pd .ff-legend {
+    flex-direction: row;
+    padding-left: 0;
+    gap: 8px 20px;
+  }
   .pd .ff-legend li {
     font-size: 13px;
     line-height: 1.5;

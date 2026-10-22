@@ -20,3 +20,17 @@ const lang = pageLang(Astro.currentLocale);
 <Figure caption={caption}>
   <WowChart client:visible lang={lang} initialPhase={initialPhase} autoplay={autoplay} />
 </Figure>
+
+<style is:global>
+  /* the Legend is a <ul>; keep the .prose list styles away from it */
+  .figure [data-wow] .ff-legend {
+    flex-direction: row;
+    padding-left: 0;
+    gap: 8px 20px;
+  }
+  .figure [data-wow] .ff-legend li {
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--ff-ink-2);
+  }
+</style>

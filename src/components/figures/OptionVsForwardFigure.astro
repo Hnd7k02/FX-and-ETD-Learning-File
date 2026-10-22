@@ -36,6 +36,12 @@ const lang = pageLang(Astro.currentLocale);
     color: var(--ff-options-text);
     font-weight: 800;
   }
+  /* the Legend is a <ul>; keep the .prose list styles away from it */
+  .ovf .ff-legend {
+    flex-direction: row;
+    padding-left: 0;
+    gap: 8px 20px;
+  }
   .ovf .ff-legend li {
     font-size: 13px;
     line-height: 1.5;

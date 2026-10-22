@@ -138,6 +138,12 @@ const lang = pageLang(Astro.currentLocale);
     border-color: var(--ff-ink);
     color: #fff;
   }
+  /* the Legend is a <ul>; keep the .prose list styles away from it */
+  .pb .ff-legend {
+    flex-direction: row;
+    padding-left: 0;
+    gap: 8px 20px;
+  }
   .pb .ff-legend li {
     font-size: 13px;
     line-height: 1.5;

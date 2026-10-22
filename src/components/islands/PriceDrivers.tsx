@@ -42,7 +42,7 @@ const SAMPLES = 80;
 function layoutFor(w: number) {
   const width = Math.max(280, Math.round(w));
   const compact = width < 560;
-  const height = compact ? 260 : Math.round(clamp(width * 0.52, 290, 360));
+  const height = compact ? 280 : Math.round(clamp(width * 0.52, 300, 370));
   return {
     width,
     height,
@@ -51,7 +51,7 @@ function layoutFor(w: number) {
     left: compact ? 40 : 48,
     right: compact ? 12 : 18,
     top: 28,
-    bottom: height - 34,
+    bottom: height - 50,
   };
 }
 
@@ -262,11 +262,17 @@ export default function PriceDrivers({ lang }: PriceDriversProps): JSX.Element {
               <AxisX
                 x={sx}
                 ticks={xTicks}
-                y={L.height - 6}
+                y={L.bottom + L.font + 10}
                 format={(x) => fmtX(active, x, active === 'S' || active === 'K' ? 2 : 0)}
                 fontSize={L.font}
-                title={t(`pd.x${active}`, { pair: PAIR })}
               />
+              <text
+                x={L.width - L.right}
+                y={L.height - 4}
+                style={{ fontSize: fs, fontWeight: 600, fill: 'var(--ff-muted)', textAnchor: 'end' }}
+              >
+                {t(`pd.x${active}`, { pair: PAIR })}
+              </text>
             </svg>
           </div>
           <p class="pd-bump" data-bump>
