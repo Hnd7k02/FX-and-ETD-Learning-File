@@ -1,25 +1,15 @@
 ---
-import { getCollection, render } from 'astro:content';
-import BaseLayout from '@/layouts/BaseLayout.astro';
-import { mdxComponents } from '@/components/content/mdx-components';
+/** German section pages: /module/{slug}/1/ … /4/ for every module, with or without MDX. */
+import ModuleSectionView from '@/views/ModuleSectionView.astro';
+import { MODULES } from '@/data/modules';
+import { CONTENT_SECTIONS, type ContentSection } from '@/lib/progress';
 
-export async function getStaticPaths() {
-  const entries = await getCollection('sections');
-  return entries
-    .filter((e) => e.id.split('/')[1] === 'de')
-    .map((e) => {
-      const [slug, , section] = e.id.split('/');
-      return { params: { slug, section }, props: { entry: e } };
-    });
+export function getStaticPaths() {
+  return MODULES.flatMap((m) =>
+    CONTENT_SECTIONS.map((section) => ({ params: { slug: m.slug, section } })),
+  );
 }
-const { entry } = Astro.props;
-const { Content } = await render(entry);
+const { slug, section } = Astro.params;
 ---
 
-<BaseLayout lang="de" title="Spike" nav="modules" family="options">
-  <main class="container-module">
-    <article class="prose">
-      <Content components={mdxComponents} />
-    </article>
-  </main>
-</BaseLayout>
+<ModuleSectionView lang="de" slug={slug!} section={section as ContentSection} />

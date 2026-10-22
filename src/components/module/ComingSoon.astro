@@ -1,0 +1,48 @@
+---
+/** Calm placeholder for a section (or quiz) whose content is not written yet. */
+import ArrowIcon from '@/components/layout/ArrowIcon.astro';
+import { moduleui } from '@/i18n/dict/moduleui';
+import { homePath } from '@/i18n/routes';
+import { translator, type Lang } from '@/i18n/types';
+
+interface Props {
+  lang: Lang;
+  variant?: 'section' | 'quiz';
+}
+const { lang, variant = 'section' } = Astro.props;
+const tm = translator(moduleui, lang);
+---
+
+<div class="coming card" data-coming={variant}>
+  <span class="chip chip-family">{tm('coming.chip')}</span>
+  <h3 class="h3">{variant === 'quiz' ? tm('coming.quizTitle') : tm('coming.title')}</h3>
+  <p class="coming-text">{variant === 'quiz' ? tm('coming.quizText') : tm('coming.text')}</p>
+  <a class="btn btn-light" href={`${homePath(lang)}#lernpfad`}>
+    {tm('coming.cta')}
+    <ArrowIcon color="#0E1116" />
+  </a>
+</div>
+
+<style>
+  .coming {
+    max-width: var(--ff-measure);
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .coming-text {
+    font-size: 16px;
+    line-height: 1.65;
+    color: var(--ff-ink-2);
+  }
+  .coming .btn {
+    margin-top: 4px;
+  }
+  @media (max-width: 640px) {
+    .coming {
+      padding: 22px 20px;
+    }
+  }
+</style>
