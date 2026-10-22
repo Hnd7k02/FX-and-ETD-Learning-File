@@ -1,0 +1,121 @@
+---
+/**
+ * End-of-section marker and progress tracker (MASTER_PROMPT §5). On every astro:page-load the
+ * script records the last visited section (setLast) and observes this element with an
+ * IntersectionObserver; once it has been visible the section counts as done (markSection) and
+ * a calm "Abschnitt erledigt" chip appears. Already-done sections show the chip right away.
+ */
+import { common } from '@/i18n/dict/common';
+import { translator, type Lang } from '@/i18n/types';
+import type { ContentSection } from '@/lib/progress';
+
+interface Props {
+  lang: Lang;
+  slug: string;
+  section: ContentSection;
+}
+const { lang, slug, section } = Astro.props;
+const t = translator(common, lang);
+---
+
+<div class="section-end" data-section-end data-slug={slug} data-section={section} role="status">
+  <span class="done-chip" data-section-done hidden>
+    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+      <path d="M3.5 8.4L6.6 11.4L12.5 4.8"></path>
+    </svg>
+    {t('module.sectionDone')}
+  </span>
+</div>
+
+<script>
+  import {
+    isSectionDone,
+    loadProgress,
+    markSection,
+    setLast,
+    updateProgress,
+    type ContentSection,
+  } from '@/lib/progress';
+
+  let observer: IntersectionObserver | null = null;
+
+  function wire() {
+    observer?.disconnect();
+    observer = null;
+    const el = document.querySelector<HTMLElement>('[data-section-end]');
+    if (!el) return;
+    const slug = el.dataset.slug ?? '';
+    const section = (el.dataset.section ?? '1') as ContentSection;
+    updateProgress((p) => setLast(p, slug, section));
+
+    const chip = el.querySelector<HTMLElement>('[data-section-done]');
+    const show = () => {
+      el.dataset.done = 'true';
+      if (chip) chip.hidden = false;
+    };
+    if (isSectionDone(loadProgress(), slug, section)) {
+      show();
+      return;
+    }
+    if (!('IntersectionObserver' in window)) return;
+    observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((e) => e.isIntersecting)) return;
+        updateProgress((p) => markSection(p, slug, section));
+        show();
+        observer?.disconnect();
+        observer = null;
+      },
+      { threshold: 0 },
+    );
+    observer.observe(el);
+  }
+
+  document.addEventListener('astro:page-load', wire);
+</script>
+
+<style>
+  .section-end {
+    display: flex;
+    align-items: center;
+    min-height: 36px;
+    max-width: var(--ff-measure);
+  }
+  .done-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px 6px 10px;
+    border-radius: var(--ff-r-pill);
+    background: var(--ff-good-soft);
+    color: var(--ff-good-text-strong);
+    font-size: 13px;
+    font-weight: 700;
+    animation: done-in 360ms ease-out both;
+  }
+  .done-chip[hidden] {
+    display: none;
+  }
+  .done-chip svg path {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  @keyframes done-in {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .done-chip {
+      animation: none;
+    }
+  }
+</style>
