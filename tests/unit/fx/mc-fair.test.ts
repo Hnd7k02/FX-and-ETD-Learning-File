@@ -14,7 +14,7 @@ import {
   SOLVED_PARAM,
   type ZeroCostKind,
 } from '@/lib/fx/mc/products';
-import { withParam } from '@/lib/fx/mc/value';
+import { price, withParam } from '@/lib/fx/mc/value';
 import * as mc from '@/lib/fx/mc';
 
 const ZERO_COST = Object.keys(SOLVED_PARAM) as ZeroCostKind[];
@@ -62,6 +62,17 @@ describe('mc-products.json', () => {
     const pv = MC_PRODUCTS.products.pivotTarf;
     expect(pv.lowerStrike).toBeCloseTo(0.8 - pv.fairWidth!, 6);
     expect(pv.upperStrike).toBeCloseTo(0.8 + pv.fairWidth!, 6);
+  });
+
+  it('stored fair values give PV ≈ 0 on fresh paths (another seed, out of sample)', () => {
+    // The solver's own PV ≈ 0 is in-sample (same paths). Here every stored product is priced on
+    // independent paths; the bound combines the fresh SE and the stored parameter's error
+    // (pvStdErr = slope · SE of the parameter). Seed and paths are fixed: deterministic.
+    for (const kind of ZERO_COST) {
+      const r = price(fairProduct(kind), DEFAULT_MARKET, { paths: 40_000, seed: 987_654 });
+      const bound = 4 * Math.hypot(r.stdErr, MC_PRODUCTS.products[kind].pvStdErr);
+      expect(Math.abs(r.pv), kind).toBeLessThan(bound);
+    }
   });
 
   it('double no-touch by Monte Carlo agrees with the BGK-shifted closed form', () => {

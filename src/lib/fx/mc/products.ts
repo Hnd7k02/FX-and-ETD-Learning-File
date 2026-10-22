@@ -553,7 +553,13 @@ export function buildProduct<K extends ProductKind>(
     default:
       throw new RangeError(`buildProduct: unknown product kind ${String(kind)}`);
   }
-  const product = { ...base, ...(overrides as object) } as Product;
+  let product = { ...base, ...(overrides as object) } as Product;
+  // An overridden window barrier level decides its direction (up if at or above spot), unless
+  // the direction itself is overridden: a level below spot must not stay an 'up' barrier,
+  // which would knock out every path on the first window day.
+  if (product.kind === 'windowBarrier' && 'barrier' in overrides && !('direction' in overrides)) {
+    product = { ...product, direction: product.barrier >= S ? 'up' : 'down' };
+  }
   return withConsistentDays(product, overrides as object) as ProductOf<K>;
 }
 

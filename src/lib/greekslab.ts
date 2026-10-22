@@ -678,3 +678,63 @@ export function weeksLabel(weeks: number): 'one' | 'threeMonths' | 'year' | 'n' 
   if (weeks === 52) return 'year';
   return 'n';
 }
+
+/** Decimals for a percent value on a 0.25 grid: 3 → 0, 3.5 → 1, 3.25 → 2. */
+export function pctDigits(v: number): number {
+  if (Math.abs(v - Math.round(v)) < 1e-9) return 0;
+  if (Math.abs(v * 2 - Math.round(v * 2)) < 1e-9) return 1;
+  return 2;
+}
+
+/* ---------- Callout placement ---------- */
+
+export interface Box {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+/**
+ * Places a callout box of size w × h next to an anchor (the dot) so that it covers as few
+ * obstacle points (curve, tangent) as possible and stays inside the plot. Pixel units.
+ * Candidates: right/left × below/above the anchor, `gap` away from it.
+ */
+export function placeCallout(
+  anchor: Point,
+  size: { w: number; h: number },
+  plot: { x0: number; x1: number; y0: number; y1: number },
+  obstacles: Point[],
+  gap = 12,
+): Box {
+  const [ax, ay] = anchor;
+  const { w, h } = size;
+  const candidates: Box[] = [
+    { x: ax + gap, y: ay + gap, w, h },
+    { x: ax + gap, y: ay - gap - h, w, h },
+    { x: ax - gap - w, y: ay + gap, w, h },
+    { x: ax - gap - w, y: ay - gap - h, w, h },
+  ];
+  let best = candidates[0]!;
+  let bestScore = Infinity;
+  candidates.forEach((b, i) => {
+    const overflow =
+      Math.max(0, plot.x0 - b.x) +
+      Math.max(0, b.x + b.w - plot.x1) +
+      Math.max(0, plot.y0 - b.y) +
+      Math.max(0, b.y + b.h - plot.y1);
+    let hits = 0;
+    for (const [px, py] of obstacles) {
+      if (px >= b.x - 4 && px <= b.x + b.w + 4 && py >= b.y - 4 && py <= b.y + b.h + 4) hits++;
+    }
+    const score = overflow * 10 + hits * 4 + i * 0.5;
+    if (score < bestScore) {
+      bestScore = score;
+      best = b;
+    }
+  });
+  // keep it inside the plot even if every candidate overflowed
+  const x = Math.min(Math.max(best.x, plot.x0), Math.max(plot.x0, plot.x1 - w));
+  const y = Math.min(Math.max(best.y, plot.y0), Math.max(plot.y0, plot.y1 - h));
+  return { x, y, w, h };
+}

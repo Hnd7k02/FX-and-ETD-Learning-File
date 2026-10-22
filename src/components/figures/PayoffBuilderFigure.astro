@@ -1,0 +1,341 @@
+---
+/**
+ * Payoff builder for MDX (modules 04 and 06).
+ *
+ * Props
+ * - templates?: string[]  Template ids for the chip row, in this order. Known ids:
+ *     long-call, short-call, long-put, short-put, synthetic-forward, long-forward,
+ *     call-spread, put-spread, risk-reversal, straddle, strangle, butterfly, seagull.
+ *   Default: all of them except long-forward (DEFAULT_TEMPLATES in src/lib/payoff.ts).
+ * - initial?: string      Template shown first (default: the first of `templates`).
+ * - view?: 'value'|'pnl'  Start view: value today + payoff at expiry, or P&L after premium.
+ * - smile?: boolean       Value option legs on the example smile (EXAMPLE_SMILE), sticky strike.
+ * - caption?: string      Figure caption.
+ *
+ * Example (module 06):
+ *   <PayoffBuilderFigure templates={['call-spread', 'put-spread', 'risk-reversal']}
+ *     initial="risk-reversal" caption="…" />
+ */
+import PayoffBuilder from '@/components/islands/PayoffBuilder';
+import Figure from '@/components/content/Figure.astro';
+import { pageLang } from '@/components/content/lang';
+
+interface Props {
+  templates?: string[];
+  initial?: string;
+  view?: 'value' | 'pnl';
+  smile?: boolean;
+  caption?: string;
+}
+const { templates, initial, view, smile, caption } = Astro.props;
+const lang = pageLang(Astro.currentLocale);
+---
+
+<Figure caption={caption}>
+  <PayoffBuilder
+    client:visible
+    lang={lang}
+    templates={templates}
+    initial={initial}
+    view={view}
+    smile={smile}
+  />
+</Figure>
+
+<style is:global>
+  .pb {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    color: var(--ff-ink);
+    min-width: 0;
+  }
+  .pb .ff-lab-head {
+    margin-bottom: 0;
+  }
+  .pb-head-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+  .pb-chips-status {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+  .pb-name {
+    font-weight: 700;
+  }
+  .pb-zero {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: var(--ff-r-pill);
+    background: var(--ff-good-soft);
+    color: var(--ff-good-text-strong);
+    font-size: 13px;
+    font-weight: 800;
+    animation: pb-pop 420ms cubic-bezier(0.2, 0.9, 0.3, 1.25) both;
+  }
+  .pb-aha {
+    animation: pb-fade 360ms ease-out both;
+  }
+  @keyframes pb-pop {
+    0% {
+      opacity: 0;
+      transform: scale(0.7);
+    }
+    70% {
+      opacity: 1;
+      transform: scale(1.06);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  @keyframes pb-fade {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .pb-templates {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .pb-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 0 14px 0 10px;
+    border: 1px solid var(--ff-line-input);
+    border-radius: var(--ff-r-pill);
+    background: var(--ff-surface);
+    color: var(--ff-ink-2);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition:
+      background-color 160ms ease,
+      color 160ms ease,
+      border-color 160ms ease;
+  }
+  .pb-chip:hover {
+    border-color: var(--ff-ref);
+    color: var(--ff-ink);
+  }
+  .pb-chip[aria-pressed='true'] {
+    background: var(--ff-ink);
+    border-color: var(--ff-ink);
+    color: #fff;
+  }
+  .pb-desc {
+    max-width: 760px;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--ff-ink-2);
+    min-height: 3.1em;
+  }
+  .pb-legend-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px 16px;
+  }
+  .pb .segmented > button {
+    min-height: 44px;
+  }
+  .pb-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    font-family: var(--ff-font-ui);
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .pb-handle {
+    cursor: grab;
+    touch-action: none;
+  }
+  .pb-handle.is-active {
+    cursor: grabbing;
+  }
+  .pb-handle rect + rect {
+    transition: transform 160ms ease;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  .pb-handle:hover rect + rect,
+  .pb-handle.is-active rect + rect {
+    transform: scale(1.12);
+  }
+  .pb-hint {
+    font-size: 12px;
+    color: var(--ff-muted);
+  }
+  .pb-legs {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(232px, 1fr));
+    gap: 12px;
+    margin-top: 6px;
+  }
+  .pb-leg {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px;
+    border-radius: var(--ff-r-box);
+    background: var(--ff-surface-2);
+    border-top: 3px solid var(--pb-leg, var(--ff-line));
+    min-width: 0;
+  }
+  .pb-leg .segmented {
+    display: flex;
+    width: 100%;
+  }
+  .pb-leg .segmented > button {
+    flex: 1 1 0;
+    padding: 0 8px;
+  }
+  .pb-leg-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 32px;
+  }
+  .pb-leg-tag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 30px;
+    height: 22px;
+    padding: 0 8px;
+    border-radius: var(--ff-r-pill);
+    background: var(--pb-leg, var(--ff-ink));
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+  }
+  .pb-leg-name {
+    flex: 1 1 auto;
+    font-size: 14px;
+    font-weight: 800;
+  }
+  .pb-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    margin: -6px -8px -6px 0;
+    border: 0;
+    border-radius: var(--ff-r-pill);
+    background: transparent;
+    color: var(--ff-muted);
+    cursor: pointer;
+  }
+  .pb-icon-btn:hover {
+    background: var(--ff-chip);
+    color: var(--ff-ink);
+  }
+  .pb-leg-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .pb-leg-label {
+    font-size: 13px;
+    color: var(--ff-ink-2);
+  }
+  .pb-stepper {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .pb-stepper > button {
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--ff-line-input);
+    border-radius: var(--ff-r-pill);
+    background: var(--ff-surface);
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .pb-stepper > button:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+  .pb-stepper .mono {
+    min-width: 92px;
+    text-align: center;
+    font-size: 13px;
+  }
+  .pb-lock {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 0 14px;
+    border: 1px dashed var(--ff-ref);
+    border-radius: var(--ff-r-pill);
+    background: transparent;
+    color: var(--ff-ink-2);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .pb-lock[aria-pressed='true'] {
+    border-style: solid;
+    border-color: transparent;
+    background: var(--ff-good-soft);
+    color: var(--ff-good-text-strong);
+  }
+  .pb-note {
+    font-size: 12px;
+    line-height: 1.45;
+    color: var(--ff-good-text-strong);
+  }
+  .pb-note--warn {
+    color: var(--ff-warn-text);
+  }
+  .pb-add {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 120px;
+    border: 1.5px dashed var(--ff-line-strong);
+    border-radius: var(--ff-r-box);
+    background: transparent;
+    color: var(--ff-ink-2);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .pb-add:hover {
+    background: var(--ff-surface-2);
+    color: var(--ff-ink);
+  }
+  @media (max-width: 640px) {
+    .pb-chip {
+      padding: 0 12px 0 8px;
+    }
+    .pb-add {
+      min-height: 56px;
+    }
+  }
+</style>

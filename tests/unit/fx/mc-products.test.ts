@@ -93,6 +93,14 @@ describe('MC_CONFIG and §8.7 defaults', () => {
     expect([acc.strike, acc.notional]).toEqual([0.77, 1]);
     const wb = buildProduct('windowBarrier', DEFAULT_MARKET, { windowEndDay: 10, expiryDay: 20 });
     expect(wb.fixingDays).toEqual([...dailyDays(1, 10), 20]);
+    // An overridden barrier level sets the direction (below spot → down), unless given.
+    expect(buildProduct('windowBarrier', DEFAULT_MARKET, { barrier: 0.776 }).direction).toBe(
+      'down',
+    );
+    expect(buildProduct('windowBarrier', DEFAULT_MARKET, { barrier: 0.83 }).direction).toBe('up');
+    expect(
+      buildProduct('windowBarrier', DEFAULT_MARKET, { barrier: 0.776, direction: 'up' }).direction,
+    ).toBe('up');
     const dnt = buildProduct('doubleNoTouch', DEFAULT_MARKET, { expiryDay: 5 });
     expect(dnt.fixingDays).toEqual([1, 2, 3, 4, 5]);
     const fixed = buildProduct('doubleNoTouch', DEFAULT_MARKET, { expiryDay: 5, fixingDays: [5] });

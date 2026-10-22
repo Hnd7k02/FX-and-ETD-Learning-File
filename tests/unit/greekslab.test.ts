@@ -15,6 +15,8 @@ import {
   moneyness,
   niceDomain,
   panels,
+  pctDigits,
+  placeCallout,
   paramFromX,
   sameParams,
   sharedX,
@@ -286,5 +288,34 @@ describe('greeks lab: layout and ticks', () => {
     expect(niceDomain(65, 73, { minSpan: 100 }).domain[1] - niceDomain(65, 73, { minSpan: 100 }).domain[0]).toBeGreaterThanOrEqual(100);
     expect(niceDomain(5, 5).domain[1]).toBeGreaterThan(5);
     expect(niceDomain(10, 20, { withZero: true, minSpan: 40 }).domain).toEqual([0, 40]);
+  });
+});
+
+describe('greeks lab: callout placement and percent digits', () => {
+  const plot = { x0: 0, x1: 400, y0: 0, y1: 200 };
+  it('prefers right-below and avoids the curve', () => {
+    expect(placeCallout([100, 50], { w: 120, h: 40 }, plot, [])).toEqual({
+      x: 112,
+      y: 62,
+      w: 120,
+      h: 40,
+    });
+    // a curve running right-below pushes the box to the right-above
+    const curve: [number, number][] = Array.from({ length: 50 }, (_, i) => [100 + i * 4, 50 + i * 2]);
+    const b = placeCallout([100, 50], { w: 120, h: 30 }, plot, curve);
+    expect(b.y + b.h).toBeLessThanOrEqual(50);
+  });
+  it('stays inside the plot near the edges', () => {
+    const b = placeCallout([395, 195], { w: 120, h: 40 }, plot, []);
+    expect(b.x + b.w).toBeLessThanOrEqual(400);
+    expect(b.y + b.h).toBeLessThanOrEqual(200);
+    const tight = placeCallout([10, 10], { w: 500, h: 300 }, plot, []);
+    expect(tight.x).toBe(0);
+    expect(tight.y).toBe(0);
+  });
+  it('picks decimals for percent values', () => {
+    expect(pctDigits(0)).toBe(0);
+    expect(pctDigits(3.5)).toBe(1);
+    expect(pctDigits(3.25)).toBe(2);
   });
 });

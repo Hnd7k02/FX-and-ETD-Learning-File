@@ -3,6 +3,7 @@
  * (docs/reference/gk_reference.py), and the quiz file's numeric options.
  */
 import { describe, expect, it } from 'vitest';
+import { MINUS, NBSP } from '@/lib/format';
 import { NUMS, formatNum, getNum } from '@/lib/nums';
 import { M05 } from '@/lib/nums/m05';
 import { quiz } from '@/content/quiz/05-greeks';
@@ -31,10 +32,10 @@ describe('m05 numbers', () => {
     expect(formatNum(getNum('m05.delta'), 'de')).toBe('0.504');
     expect(formatNum(getNum('m05.deltaChangeApprox'), 'de')).toBe('+0.124');
     expect(formatNum(getNum('m05.breakEvenPips'), 'de')).toBe('33.5');
-    expect(formatNum(getNum('m05.thetaGammaDay'), 'de')).toBe('CHF −69');
-    expect(formatNum(getNum('m05.thetaDay'), 'de')).toBe('CHF −31');
-    expect(formatNum(getNum('m05.vegaPoint'), 'de')).toBe('CHF 1’582');
-    expect(formatNum(getNum('m05.vegaPoint'), 'en')).toBe('CHF 1,582');
+    expect(formatNum(getNum('m05.thetaGammaDay'), 'de')).toBe(`CHF${NBSP}${MINUS}69`);
+    expect(formatNum(getNum('m05.thetaDay'), 'de')).toBe(`CHF${NBSP}${MINUS}31`);
+    expect(formatNum(getNum('m05.vegaPoint'), 'de')).toBe(`CHF${NBSP}1’582`);
+    expect(formatNum(getNum('m05.vegaPoint'), 'en')).toBe(`CHF${NBSP}1,582`);
   });
 });
 
