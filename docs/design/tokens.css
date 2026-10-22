@@ -1,0 +1,98 @@
+/* Forward First – Design-Tokens (Richtung B "Lernpfad")
+   Quelle: Design-Canvas, Oktober 2026. Werte 1:1 aus den .dc.html-Referenzen.
+   Hell, minimalistisch, Finance. Akzentfarben nur zum Hervorheben. Kein Dark Mode in V1. */
+
+:root {
+  /* Flächen */
+  --ff-plane: #F4F5F7;        /* Seitenhintergrund */
+  --ff-surface: #FFFFFF;      /* Karten */
+  --ff-surface-2: #F7F8FA;    /* Boxen in Karten, Slider-Panel */
+  --ff-chip: #F1F2F4;         /* neutrale Chips, aktive Nav, Segmented Controls */
+
+  /* Linien */
+  --ff-line: #E7E9ED;         /* Kartenrand */
+  --ff-line-strong: #D5D9DF;  /* Button-Outline, offene Lernpfad-Station */
+  --ff-line-input: #E1E4E8;
+  --ff-row: #F0F1F3;          /* Tabellenzeilen-Trenner */
+  --ff-grid: #EEF0F3;         /* Chart-Gridlines (1px, durchgezogen) */
+  --ff-axis: #C9CDD4;         /* Nulllinie / Achse */
+  --ff-ref: #9AA1AC;          /* Strike-Linie (gestrichelt 4 5) */
+
+  /* Text */
+  --ff-ink: #0E1116;          /* Primärtext, Primär-Button, Forward-Linie, Tangenten */
+  --ff-ink-2: #3F4652;        /* Sekundärtext */
+  --ff-body: #2B313A;         /* Fliesstext in Artikeln */
+  --ff-muted: #5F6673;        /* Labels, Achsenbeschriftung (>= 4.5:1 auf Weiss und Plane) */
+  --ff-on-dark-muted: #C9CDD4;
+  --ff-on-dark-body: #D6D9DE;
+
+  /* Familien (Module) – Mark / Soft / Text */
+  --ff-linear: #2563EB;   --ff-linear-soft: #EAF0FE;   --ff-linear-text: #1D4ED8;
+  --ff-options: #7C3AED;  --ff-options-soft: #F2ECFE;  --ff-options-text: #6D28D9;
+  --ff-exotics: #EA580C;  --ff-exotics-soft: #FFF0E6;  --ff-exotics-text: #C2410C;
+  --ff-apply: #0D9488;    --ff-apply-soft: #E6F6F4;    --ff-apply-text: #0F766E;
+
+  /* Chart-Semantik */
+  --ff-long: #2563EB;                    /* Long / Call / Optionswert */
+  --ff-short: #EA580C;                   /* Short / Put verkauft */
+  --ff-forward: #0E1116;                 /* Forward, Summe, Tangenten */
+  --ff-timevalue: rgba(37, 99, 235, .10);/* Zeitwert-Fläche */
+  --ff-payoff: #5F6673;                  /* Auszahlung bei Verfall, gestrichelt 6 6 */
+  --ff-delta-curve: #7C3AED;             /* Delta-Kurve im Greeks-Labor */
+
+  /* Status */
+  --ff-good: #16A34A;  --ff-good-soft: #E8F6EC;  --ff-good-text: #15803D;  --ff-good-text-strong: #14532D;
+  --ff-bad: #DC2626;   --ff-bad-soft: #FDECEC;   --ff-bad-text: #B91C1C;   --ff-bad-text-strong: #7F1D1D;
+  --ff-warn: #D97706;  --ff-warn-soft: #FEF3C7;  --ff-warn-text: #92400E;
+
+  /* Riskometer-Stufen (immer mit Label, nie Farbe allein) */
+  --ff-level-1: #16A34A; /* Ruhig  */
+  --ff-level-2: #84CC16; /* Normal */
+  --ff-level-3: #EAB308; /* Erhöht */
+  --ff-level-4: #F97316; /* Hoch   */
+  --ff-level-5: #DC2626; /* Extrem */
+
+  /* Typografie */
+  --ff-font-ui: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --ff-font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace; /* Kurse, Tabellenwerte */
+  --ff-font-math: 'STIX Two Text', 'Times New Roman', serif;                       /* Formeln, Variablen kursiv */
+  /* Selbst gehostet: Plus Jakarta Sans 400–800, JetBrains Mono 500–600, STIX Two Text 400–500 (+ italic) */
+
+  --ff-h1: clamp(40px, 6vw, 68px);  /* 800, letter-spacing -0.04em, line-height 1.02 */
+  --ff-h1-module: clamp(34px, 4.6vw, 52px);
+  --ff-h2: 34px;                    /* 800, -0.03em */
+  --ff-h3: 24px;                    /* 800, -0.02em */
+  --ff-lead: 19px;                  /* line-height 1.55 */
+  --ff-article: 17px;               /* line-height 1.7, Farbe --ff-body, Spaltenbreite max. 680px */
+  --ff-ui: 14px;
+  --ff-small: 13px;
+  --ff-label: 12px;
+  --ff-formula: 22px;
+
+  /* Radien */
+  --ff-r-hero: 28px;
+  --ff-r-card: 24px;
+  --ff-r-box: 16px;
+  --ff-r-formula: 14px;
+  --ff-r-control: 12px;
+  --ff-r-pill: 999px;
+
+  /* Schatten (nur Hero- und Figure-Karten) */
+  --ff-shadow-hero: 0 1px 2px rgba(14, 17, 22, .04), 0 16px 40px rgba(14, 17, 22, .06);
+  --ff-shadow-control: 0 1px 2px rgba(14, 17, 22, .08);
+
+  /* Layout */
+  --ff-container: 1240px;   /* Startseite */
+  --ff-container-module: 1080px; /* Modulseiten: Figures in voller Breite */
+  --ff-measure: 680px;      /* Lesespalte */
+  --ff-gutter: 32px;        /* Phone: 16px */
+  --ff-touch: 44px;         /* Mindestgrösse Touch-Ziele */
+
+  /* Bewegung */
+  --ff-morph: 900ms;        /* Wow-Moment: Kurven-Morph, easeInOutCubic */
+  --ff-needle: 1400ms;      /* Riskometer-Nadel, easeOutCubic */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --ff-morph: 0ms; --ff-needle: 0ms; }
+}

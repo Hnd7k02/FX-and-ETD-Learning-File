@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Riskometer EUR/CHF</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@500;600&amp;family=STIX+Two+Text:ital,wght@0,400;0,500;1,400;1,500&amp;display=swap">
+<style>
+body{margin:0;background:#F4F5F7}
+a{color:#1D4ED8;text-decoration:none}
+a:hover{color:#1E40AF}
+.ev:hover .ev-dot{transform:scale(1.25)}
+button:focus-visible,a:focus-visible{outline:2px solid #2563EB;outline-offset:2px}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: #F4F5F7; font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif; color: #0E1116">
+  <main style="max-width: 1240px; margin: 0 auto; box-sizing: border-box; padding: 40px 32px 56px; display: flex; flex-direction: column; gap: 24px">
+
+    <header style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px 24px">
+      <div style="display: flex; flex-direction: column; gap: 10px; max-width: 720px">
+        <span style="align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px; background: #FEF3C7; color: #92400E; font-size: 12px; font-weight: 800">
+          <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 11.5A5.5 5.5 0 0 1 13.5 11.5" style="fill: none; stroke: #92400E; stroke-width: 1.8; stroke-linecap: round"></path><path d="M8 11.5L10.6 7.4" style="fill: none; stroke: #92400E; stroke-width: 1.8; stroke-linecap: round"></path></svg>
+          Riskometer
+        </span>
+        <h1 style="margin: 0; font-size: clamp(32px, 4.4vw, 46px); line-height: 1.06; font-weight: 800; letter-spacing: -0.035em">Wie nervös ist der Franken?</h1>
+        <p style="margin: 0; font-size: 16px; line-height: 1.6; color: #3F4652">Die realisierte 1-Monats-Vola von EUR/CHF, berechnet aus Tageskursen. Tipp auf einen Ausschlag: Die Karte darunter erklärt, was passiert ist und was es für Forwards, Optionen und Barrieren hiess.</p>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 10px">
+        <div role="group" aria-label="Währungspaar" style="display: inline-flex; flex-wrap: wrap; gap: 4px; padding: 4px; border-radius: 999px; background: #FFFFFF; border: 1px solid #E7E9ED">
+          <button type="button" aria-pressed="true" style="height: 38px; padding: 0 14px; border: 0; border-radius: 999px; background: #0E1116; color: #FFFFFF; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; font-weight: 600">EUR/CHF</button>
+          <button type="button" disabled="disabled" style="height: 38px; padding: 0 14px; border: 0; border-radius: 999px; background: transparent; color: #5F6673; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; font-weight: 600">USD/CHF</button>
+          <button type="button" disabled="disabled" style="height: 38px; padding: 0 14px; border: 0; border-radius: 999px; background: transparent; color: #5F6673; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; font-weight: 600">EUR/USD</button>
+          <button type="button" disabled="disabled" style="height: 38px; padding: 0 14px; border: 0; border-radius: 999px; background: transparent; color: #5F6673; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; font-weight: 600">USD/JPY</button>
+        </div>
+        <span style="font-size: 13px; color: #5F6673">Weitere Paare folgen im Build · Stand 16.10.2026</span>
+      </div>
+    </header>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: stretch">
+      <section aria-labelledby="heute-h" style="flex: 1 1 320px; min-width: 0; box-sizing: border-box; padding: 28px; background: #FFFFFF; border: 1px solid #E7E9ED; border-radius: 24px; display: flex; flex-direction: column; align-items: center; gap: 10px">
+        <div style="align-self: stretch; display: flex; justify-content: space-between; align-items: center; gap: 12px">
+          <h2 id="heute-h" style="margin: 0; font-size: 15px; font-weight: 700">Heute</h2>
+          <span style="font-size: 13px; color: #5F6673">EUR/CHF · 1 Monat</span>
+        </div>
+        <svg viewBox="0 0 320 190" role="img" aria-label="Tacho: Stufe Erhöht, Perzentil 76" style="display: block; width: 100%; max-width: 320px; height: auto">
+          <path d="M30.00,170.00A130,130 0 0 1 53.77,95.06" style="fill: none; stroke: #16A34A; stroke-width: 24"></path>
+          <path d="M55.90,92.13A130,130 0 0 1 118.11,46.94" style="fill: none; stroke: #84CC16; stroke-width: 24"></path>
+          <path d="M121.56,45.81A130,130 0 0 1 198.44,45.81" style="fill: none; stroke: #EAB308; stroke-width: 24"></path>
+          <path d="M201.89,46.94A130,130 0 0 1 264.10,92.13" style="fill: none; stroke: #F97316; stroke-width: 24"></path>
+          <path d="M266.23,95.06A130,130 0 0 1 290.00,170.00" style="fill: none; stroke: #DC2626; stroke-width: 24"></path>
+          <g transform="rotate({{ needle }} 160 170)">
+            <path d="M160,170L262,170" style="fill: none; stroke: #0E1116; stroke-width: 5; stroke-linecap: round"></path>
+          </g>
+          <circle cx="160" cy="170" r="11" style="fill: #0E1116; stroke: #FFFFFF; stroke-width: 3"></circle>
+        </svg>
+        <span style="font-size: 54px; font-weight: 800; letter-spacing: -0.03em; line-height: 1">6.0 %</span>
+        <span style="display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 999px; background: #FEF3C7; color: #92400E; font-size: 13px; font-weight: 800">
+          <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M6 10V2M2.5 5.5L6 2L9.5 5.5" style="fill: none; stroke: #92400E; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"></path></svg>
+          Erhöht
+        </span>
+        <p style="margin: 0; font-size: 13px; line-height: 1.5; color: #3F4652; text-align: center">Höher als an 76 % aller Handelstage seit 2006.</p>
+        <div style="align-self: stretch; display: flex; flex-direction: column; gap: 2px; margin-top: 8px; padding-top: 14px; border-top: 1px solid #F0F1F3">
+          <sc-for list="{{ levels }}" as="lv" hint-placeholder-count="5">
+            <div style="display: grid; grid-template-columns: 12px minmax(0, 1fr) auto; align-items: center; gap: 10px; min-height: 30px; padding: 0 10px; border-radius: 10px; background: {{ lv.bg }}; font-size: 13px">
+              <span aria-hidden="true" style="width: 10px; height: 10px; border-radius: 3px; background: {{ lv.c }}"></span>
+              <span style="font-weight: {{ lv.w }}">{{ lv.name }}</span>
+              <span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: #3F4652">{{ lv.range }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+
+      <section aria-labelledby="hist-h" style="flex: 3 1 600px; min-width: 0; box-sizing: border-box; padding: 28px; background: #FFFFFF; border: 1px solid #E7E9ED; border-radius: 24px; display: flex; flex-direction: column; gap: 14px">
+        <div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px">
+          <h2 id="hist-h" style="margin: 0; font-size: 18px; font-weight: 800">20 Jahre EUR/CHF: realisierte 1-Monats-Vola</h2>
+          <span style="font-size: 13px; color: #5F6673">Wochenwerte 2006 bis 2026 · Punkte antippen</span>
+        </div>
+        <div onPointerMove="{{ onMove }}" onPointerLeave="{{ onLeave }}" style="position: relative; width: 100%">
+          <svg viewBox="0 0 1000 340" role="img" aria-label="Linienchart der realisierten Vola von EUR/CHF seit 2006 mit sechs markierten Ereignissen" style="display: block; width: 100%; height: auto; overflow: visible; font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif">
+            <path d="M44,44H984M44,129.33H984M44,214.67H984" style="fill: none; stroke: #EEF0F3; stroke-width: 1"></path>
+            <path d="M44,300H984" style="fill: none; stroke: #C9CDD4; stroke-width: 1"></path>
+            <text x="36" y="48" style="font-size: 12px; fill: #5F6673; text-anchor: end">60 %</text>
+            <text x="36" y="133" style="font-size: 12px; fill: #5F6673; text-anchor: end">40 %</text>
+            <text x="36" y="219" style="font-size: 12px; fill: #5F6673; text-anchor: end">20 %</text>
+            <text x="36" y="304" style="font-size: 12px; fill: #5F6673; text-anchor: end">0 %</text>
+            <text x="44" y="326" style="font-size: 12px; fill: #5F6673; text-anchor: middle">2006</text>
+            <text x="224.4" y="326" style="font-size: 12px; fill: #5F6673; text-anchor: middle">2010</text>
+            <text x="405.4" y="326" style="font-size: 12px; fill: #5F6673; text-anchor: middle">2014</text>
+            <text x="586.3" y="326" style="font-size: 12px; fill: #5F6673; text-anchor: middle">2018</text>
+            <text x="767.3" y="326" style="font-size: 12px; fill: #5F6673; text-anchor: middle">2022</text>
+            <text x="948.4" y="326" style="font-size: 12px; fill: #5F6673; text-anchor: middle">2026</text>
+            <path d="{{ areaD }}" style="fill: #2563EB; fill-opacity: 0.1; stroke: none"></path>
+            <path d="{{ lineD }}" style="fill: none; stroke: #2563EB; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round"></path>
+            <path d="{{ stemD }}" style="fill: none; stroke: #0E1116; stroke-width: 1.25; stroke-dasharray: 3 4"></path>
+            <path d="{{ hoverD }}" style="fill: none; stroke: #0E1116; stroke-width: 1; opacity: {{ hoverO }}"></path>
+            <circle cx="{{ hoverX }}" cy="{{ hoverY }}" r="5" style="fill: #2563EB; stroke: #FFFFFF; stroke-width: 2; opacity: {{ hoverO }}"></circle>
+            <circle cx="984" cy="{{ lastY }}" r="5" style="fill: #0E1116; stroke: #FFFFFF; stroke-width: 2"></circle>
+          </svg>
+
+          <sc-for list="{{ events }}" as="e" hint-placeholder-count="6">
+            <button class="ev" type="button" onClick="{{ e.pick }}" aria-pressed="{{ e.on }}" aria-label="{{ e.aria }}" style="position: absolute; left: {{ e.left }}%; top: {{ e.top }}%; width: 40px; height: 40px; margin: -20px 0 0 -20px; padding: 0; border: 0; border-radius: 999px; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center">
+              <span style="position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); padding: 2px 6px; border-radius: 6px; background: {{ e.tagBg }}; color: {{ e.tagFg }}; font-size: 12px; font-weight: 800; white-space: nowrap">{{ e.year }}</span>
+              <span class="ev-dot" style="display: block; width: {{ e.size }}px; height: {{ e.size }}px; border-radius: 999px; background: {{ e.fill }}; box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 4px {{ e.ring }}; transition: transform 150ms ease"></span>
+            </button>
+          </sc-for>
+
+          <span style="position: absolute; right: 0; top: {{ lastTop }}%; transform: translate(0, -150%); padding: 2px 8px; border-radius: 6px; background: #0E1116; color: #FFFFFF; font-size: 12px; font-weight: 800; white-space: nowrap">Heute 6.0 %</span>
+
+          <sc-if value="{{ hovering }}" hint-placeholder-val="{{ false }}">
+            <div style="position: absolute; top: 0; left: {{ tipLeft }}%; transform: translateX({{ tipShift }}%); padding: 6px 10px; border-radius: 10px; background: #FFFFFF; border: 1px solid #E1E4E8; box-shadow: 0 6px 16px rgba(14,17,22,0.08); font-size: 13px; white-space: nowrap; pointer-events: none">
+              <span style="color: #5F6673">{{ tipDate }}</span>
+              <b style="margin-left: 8px">{{ tipVal }} %</b>
+            </div>
+          </sc-if>
+        </div>
+      </section>
+    </div>
+
+    <section aria-live="polite" aria-labelledby="case-h" style="box-sizing: border-box; padding: 32px; background: #FFFFFF; border: 1px solid #E7E9ED; border-radius: 24px; display: flex; flex-wrap: wrap; gap: 28px 40px">
+      <div style="flex: 2 1 460px; min-width: 0; display: flex; flex-direction: column; gap: 14px">
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px">
+          <span style="display: inline-flex; padding: 4px 10px; border-radius: 8px; background: #0E1116; color: #FFFFFF; font-size: 13px; font-weight: 800">{{ ev.year }}</span>
+          <span style="font-size: 14px; color: #5F6673">{{ ev.date }}</span>
+        </div>
+        <h2 id="case-h" style="margin: 0; font-size: 30px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1">{{ ev.title }}</h2>
+        <p style="margin: 0; font-size: 16px; line-height: 1.65; color: #2B313A; max-width: 680px">{{ ev.what }}</p>
+        <h3 style="margin: 6px 0 0; font-size: 14px; font-weight: 800">Was es bedeutet</h3>
+        <ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; max-width: 680px">
+          <sc-for list="{{ ev.means }}" as="mm" hint-placeholder-count="2">
+            <li style="display: grid; grid-template-columns: 8px minmax(0, 1fr); gap: 12px; align-items: baseline; font-size: 15px; line-height: 1.6; color: #2B313A">
+              <span aria-hidden="true" style="width: 8px; height: 8px; border-radius: 999px; background: #2563EB; transform: translateY(-2px)"></span>
+              <span>{{ mm.t }}</span>
+            </li>
+          </sc-for>
+        </ul>
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding-top: 6px">
+          <span style="font-size: 13px; color: #5F6673">Vertiefen in</span>
+          <sc-for list="{{ ev.mods }}" as="mo" hint-placeholder-count="2">
+            <a href="#" style="display: inline-flex; align-items: center; min-height: 36px; padding: 0 12px; border-radius: 999px; background: #F1F2F4; color: #0E1116; font-size: 13px; font-weight: 700">{{ mo.t }}</a>
+          </sc-for>
+        </div>
+      </div>
+      <div style="flex: 1 1 260px; min-width: 0; display: flex; flex-direction: column; gap: 14px">
+        <div style="padding: 20px; border-radius: 18px; background: #F7F8FA; display: flex; flex-direction: column; gap: 6px">
+          <span style="font-size: 13px; font-weight: 700; color: #5F6673">EUR/CHF</span>
+          <span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 24px; font-weight: 600; letter-spacing: -0.01em">{{ ev.move }}</span>
+          <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: #3F4652">
+            <sc-if value="{{ ev.down }}" hint-placeholder-val="{{ true }}">
+              <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M6 2V10M2.5 6.5L6 10L9.5 6.5" style="fill: none; stroke: #3F4652; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"></path></svg>
+            </sc-if>
+            <sc-if value="{{ ev.up }}" hint-placeholder-val="{{ false }}">
+              <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M6 10V2M2.5 5.5L6 2L9.5 5.5" style="fill: none; stroke: #3F4652; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"></path></svg>
+            </sc-if>
+            {{ ev.moveNote }}
+          </span>
+        </div>
+        <div style="padding: 20px; border-radius: 18px; background: #0E1116; color: #FFFFFF; display: flex; flex-direction: column; gap: 6px">
+          <span style="font-size: 13px; font-weight: 700; color: #C9CDD4">Spitze der 1-Monats-Vola</span>
+          <span style="font-size: 40px; font-weight: 800; letter-spacing: -0.03em; line-height: 1">{{ ev.peak }}</span>
+          <span style="font-size: 13px; color: #C9CDD4">{{ ev.peakDate }} · heute 6.0 %</span>
+        </div>
+      </div>
+    </section>
+
+    <p style="margin: 0; font-size: 12px; line-height: 1.6; color: #5F6673; max-width: 900px">Daten: Federal Reserve H.10 (Mittagskurse New York) über datahub.io. EUR/CHF als Kreuzkurs aus USD/CHF und EUR/USD. Realisierte Vola: Standardabweichung der täglichen Log-Renditen über 21 Handelstage, annualisiert mit √252, im Chart als Wochenwerte. Stufen nach Perzentilen seit 2006. Nur zu Bildungszwecken, keine Anlageberatung.</p>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1180}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.V = [31,30,24,25,21,20,20,22,22,26,31,29,32,28,23,28,40,40,44,41,43,35,36,33,33,27,25,26,22,26,26,24,23,18,17,17,18,37,39,40,39,40,23,22,22,19,22,26,25,25,23,26,25,27,27,29,26,36,35,36,38,43,39,40,37,30,27,27,29,29,25,23,21,23,28,30,33,32,31,27,26,35,41,52,58,60,55,46,43,39,38,40,37,35,37,37,40,43,39,47,48,45,45,41,44,42,45,68,67,69,70,64,66,70,74,81,84,79,77,77,76,77,74,74,62,58,62,50,47,52,48,42,50,46,40,40,39,44,46,56,71,92,90,93,122,146,178,185,193,173,158,122,107,101,102,108,112,113,106,96,97,95,96,102,87,81,123,120,122,122,61,58,52,39,41,39,30,30,32,28,33,55,54,54,51,25,37,38,41,40,38,32,29,24,23,27,30,30,30,26,17,17,16,17,15,16,32,34,33,36,37,24,27,33,33,33,32,19,12,31,34,44,46,43,34,20,66,84,114,121,129,103,94,80,99,95,102,104,101,100,119,123,108,119,125,130,124,115,98,98,85,80,100,89,98,105,116,98,102,103,105,118,128,123,103,97,86,81,86,93,84,103,99,92,88,79,81,83,76,85,84,93,101,100,123,126,133,152,147,145,151,158,230,249,251,264,351,300,302,279,65,62,59,58,57,72,73,67,66,44,53,52,52,46,45,24,17,17,16,15,17,15,10,28,27,27,28,9,9,9,6,4,3,8,8,8,8,8,3,3,3,3,3,2,3,3,3,3,16,23,28,29,28,24,17,12,12,12,11,11,12,20,28,28,28,24,24,51,59,63,68,54,45,48,47,48,50,41,33,34,24,36,37,46,50,68,77,83,82,72,54,47,45,45,43,38,32,32,31,33,35,32,32,30,29,27,28,28,28,26,24,23,24,23,22,25,23,24,27,29,35,38,36,35,33,21,23,25,25,26,20,20,20,19,17,17,16,15,15,17,14,13,12,13,12,13,12,12,11,14,15,18,17,21,24,22,23,21,20,15,15,13,9,9,9,11,11,14,14,13,12,551,566,578,581,582,144,106,88,84,78,79,70,71,62,64,69,74,75,64,59,71,74,81,81,70,78,64,64,65,60,66,69,64,69,73,77,81,69,58,48,36,46,54,54,56,50,63,60,59,57,53,44,48,43,47,41,46,50,57,64,61,53,44,35,28,27,26,27,31,40,39,42,42,48,58,73,81,77,71,61,55,46,42,42,35,30,30,26,31,33,34,34,32,32,29,29,36,34,33,39,36,39,41,39,32,30,32,28,31,30,32,32,36,39,40,39,36,29,25,51,54,59,62,43,39,32,35,26,28,31,36,40,72,81,86,93,83,71,58,55,46,56,55,50,53,40,42,41,39,45,45,46,47,50,48,40,45,46,52,47,53,51,47,45,50,37,35,33,25,28,34,33,32,37,50,56,69,73,66,60,42,33,37,36,35,31,47,54,54,64,66,59,57,63,55,46,46,44,40,41,41,40,43,41,42,40,41,37,39,39,41,42,40,41,39,35,36,26,35,34,33,35,35,36,36,36,37,32,40,41,39,47,40,42,43,44,38,43,52,53,49,50,43,43,50,51,51,52,48,42,37,29,36,35,35,40,34,31,31,26,25,26,26,29,29,29,31,29,37,37,39,46,39,37,32,27,20,22,21,40,41,50,60,52,49,46,37,43,43,49,51,44,53,42,50,49,44,40,29,26,28,24,24,27,40,38,40,37,21,27,27,33,33,33,29,30,25,25,24,42,51,54,58,55,47,40,38,28,28,27,26,30,31,29,27,27,23,26,35,36,35,37,23,27,35,38,44,44,39,44,37,38,38,31,39,37,38,40,43,33,37,37,34,31,34,38,40,40,68,67,75,85,115,114,116,114,97,66,61,62,56,59,63,68,64,60,63,96,95,100,104,103,74,71,66,63,64,50,61,69,67,92,102,106,111,103,86,48,54,60,62,65,65,50,51,47,45,55,71,67,70,70,57,49,54,50,73,80,81,81,55,54,41,46,47,45,43,45,32,42,46,45,43,48,49,49,55,49,43,39,36,30,35,36,33,33,48,53,61,63,63,48,46,49,49,49,48,58,47,48,51,51,43,45,45,44,42,38,29,47,55,63,70,61,54,55,43,41,36,45,50,62,68,69,61,59,48,55,62,80,79,75,70,48,51,50,51,55,50,51,44,40,47,45,46,45,32,36,37,40,42,44,38,39,43,45,54,51,45,89,91,90,89,62,61,63,70,65,56,56,50,49,47,46,42,38,37,31,28,25,30,34,36,36,37,33,34,27,24,22,17,23,24,29,33,41,41,42,37,33,31,28,28,26,22,27,37,42,45,41,36,33,29,35,38,45,48,47,46,41,37,35,34,33,26,28,29,29,30,29,35,31,37,39,35,44,40,41,41,31,34,59,59,60];
+    const n = this.V.length;
+    let line = '';
+    for (let i = 0; i < n; i++) line += (i ? 'L' : 'M') + this.X(i).toFixed(1) + ',' + this.Y(this.V[i] / 10).toFixed(1);
+    this.lineD = line;
+    this.areaD = line + 'L' + this.X(n - 1).toFixed(1) + ',300L' + this.X(0).toFixed(1) + ',300Z';
+    this.state = { sel: 2, hover: null, needle: -85.25 };
+  }
+
+  componentDidMount() {
+    let rm = false;
+    try { rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { rm = false; }
+    if (rm) return;
+    const target = -85.25, start = -180, dur = 1400;
+    const t0 = performance.now();
+    this.setState({ needle: start });
+    const tick = (now) => {
+      if (this.dead) return;
+      const k = Math.min(1, (now - t0) / dur);
+      const e = 1 - Math.pow(1 - k, 3);
+      this.setState({ needle: start + (target - start) * e });
+      if (k < 1) this.raf = requestAnimationFrame(tick);
+    };
+    this.raf = requestAnimationFrame(tick);
+  }
+
+  componentWillUnmount() {
+    this.dead = true;
+    if (this.raf) cancelAnimationFrame(this.raf);
+  }
+
+  X(i) { return 44 + i / (this.V.length - 1) * 940; }
+  Y(v) { return 300 - Math.max(0, Math.min(60, v)) / 60 * 256; }
+
+  dateLabel(i) {
+    const months = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
+    const d = new Date(Date.UTC(2006, 0, 6) + 7 * i * 86400000);
+    return months[d.getUTCMonth()] + ' ' + d.getUTCFullYear();
+  }
+
+  events() {
+    return [
+      { i: 148, year: '2008', title: 'Finanzkrise', date: 'Herbst 2008', move: '1.6076 → 1.4413', moveNote: '−10.3 % vom 02.09. bis 27.10.2008', down: true, peak: '19.5 %', peakDate: 'Spitze am 06.11.2008',
+        what: 'Nach dem Konkurs von Lehman Brothers am 15.09.2008 suchen Anleger Sicherheit im Franken. Der Euro verliert innert acht Wochen rund 10 % gegenüber dem Franken.',
+        means: ['Die Vola steigt: Optionen werden teurer, Absicherung kostet mehr Prämie (Vega).', 'Safe Haven: In Krisen wertet der Franken typischerweise auf.'],
+        mods: ['05 Greeks', '01 FX-Markt & Spot'] },
+      { i: 296, year: '2011', title: 'Mindestkurs 1.20', date: 'August bis September 2011', move: '1.0355 → 1.2030', moveNote: '+16.2 % vom 10.08. bis 06.09.2011', down: false, peak: '36.8 %', peakDate: 'Spitze am 07.09.2011',
+        what: 'Im August 2011 nähert sich EUR/CHF der Parität. Am 06.09.2011 führt die SNB einen Mindestkurs von 1.20 ein; EUR/CHF springt an einem Tag um rund 8 %.',
+        means: ['Ein einziger Tagessprung hält die 1-Monats-Vola vier Wochen lang hoch: So wirkt ein Fenster von 21 Handelstagen.', 'Danach liegt die Vola bis Ende 2014 meist sehr tief. Der Mindestkurs wirkt wie eine Barriere.'],
+        mods: ['07 Barrier & Binary'] },
+      { i: 475, year: '2015', title: 'Frankenschock', date: '15. Januar 2015', move: '1.2009 → 0.9775', moveNote: '−18.6 % vom 14.01. bis 16.01.2015', down: true, peak: '58.2 %', peakDate: 'Spitze am 13.02.2015',
+        what: 'Die SNB hebt den Mindestkurs von 1.20 auf und senkt den Zins auf Sichtguthaben auf −0.75 %. Der Franken wertet innert Minuten massiv auf.',
+        means: ['Forward: Wer EUR/CHF auf Termin verkauft hatte, war geschützt. Ungesicherte Positionen verloren in zwei Tagen fast 19 %.', 'Optionen: Die Vola springt auf den höchsten Wert der ganzen Reihe, Prämien steigen sprunghaft.', 'Barrieren und Stops: Der Kurs überspringt viele Niveaus (Gap). Stop-Loss-Orders werden deutlich schlechter ausgeführt, Barrieren nahe 1.20 auf einen Schlag gerissen.'],
+        mods: ['02 Forward', '07 Barrier & Binary', '08 Strukturierte Produkte'] },
+      { i: 845, year: '2022', title: 'Krieg in der Ukraine', date: 'Februar bis März 2022', move: '1.0520 → 1.0021', moveNote: '−4.7 % vom 15.02. bis 04.03.2022', down: true, peak: '11.7 %', peakDate: 'Spitze am 15.03.2022',
+        what: 'Nach dem russischen Angriff auf die Ukraine am 24.02.2022 fliesst Geld in den Franken. EUR/CHF fällt im März 2022 erstmals seit 2015 unter die Parität.',
+        means: ['Safe Haven: Geopolitische Schocks stärken den Franken.', 'Die Vola steigt deutlich, bleibt aber weit unter 2011 und 2015.'],
+        mods: ['01 FX-Markt & Spot'] },
+      { i: 971, year: '2024', title: 'Carry-Unwind', date: 'August 2024', move: '0.9586 → 0.9324', moveNote: '−2.7 % vom 29.07. bis 06.08.2024', down: true, peak: '8.1 %', peakDate: 'Spitze am 14.08.2024',
+        what: 'Anfang August 2024 werden Carry-Trades aufgelöst, die in tief verzinsten Währungen finanziert waren. Am 05.08.2024 fallen die Börsen weltweit stark; Yen und Franken werten auf.',
+        means: ['Carry: Wer eine Tiefzinswährung leiht, um eine höher verzinste zu kaufen, verdient die Zinsdifferenz, solange der Kurs stillhält.', 'Kippt die Stimmung, schliessen viele gleichzeitig: Die Finanzierungswährung wertet sprunghaft auf.'],
+        mods: ['02 Forward', '03 FX Swap'] },
+      { i: 1001, year: '2025', title: 'Deutsches Fiskalpaket', date: 'März 2025', move: '0.9372 → 0.9644', moveNote: '+2.9 % vom 25.02. bis 12.03.2025', down: false, peak: '9.3 %', peakDate: 'Spitze am 12.03.2025',
+        what: 'Deutschland will die Schuldenbremse für Verteidigungsausgaben lockern und einen Infrastrukturfonds von 500 Mrd. Euro schaffen. Die Rendite 10-jähriger Bundesanleihen steigt am 05.03.2025 so stark wie seit 1990 nicht mehr; der Euro legt kräftig zu.',
+        means: ['Zinsdifferenzen bewegen Währungen: Steigen die Euro-Zinsen, wird der Euro attraktiver.', 'Sie verschieben auch die Forward Points, über die Zinsparität.'],
+        mods: ['02 Forward'] }
+    ];
+  }
+
+  renderVals() {
+    const st = this.state;
+    const n = this.V.length;
+    const evs = this.events();
+    const events = evs.map((e, k) => {
+      const on = st.sel === k;
+      return {
+        year: e.year, on: on,
+        aria: e.year + ': ' + e.title + ', Vola-Spitze ' + e.peak,
+        left: (this.X(e.i) / 10).toFixed(2),
+        top: (this.Y(this.V[e.i] / 10) / 340 * 100).toFixed(2),
+        size: on ? 16 : 12,
+        fill: on ? '#0E1116' : '#2563EB',
+        ring: on ? '#0E1116' : 'transparent',
+        tagBg: on ? '#0E1116' : '#FFFFFF',
+        tagFg: on ? '#FFFFFF' : '#0E1116',
+        pick: () => this.setState({ sel: k })
+      };
+    });
+    const s = evs[st.sel];
+    const ev = {
+      year: s.year, title: s.title, date: s.date, move: s.move, moveNote: s.moveNote,
+      down: s.down, up: !s.down, peak: s.peak, peakDate: s.peakDate, what: s.what,
+      means: s.means.map((t) => ({ t: t })),
+      mods: s.mods.map((t) => ({ t: t }))
+    };
+    const sx = this.X(s.i), sy = this.Y(this.V[s.i] / 10);
+
+    const h = st.hover;
+    const hovering = h !== null && h >= 0 && h < n;
+    const hx = hovering ? this.X(h) : 0;
+    const hy = hovering ? this.Y(this.V[h] / 10) : 0;
+    const tipLeft = hovering ? hx / 10 : 0;
+
+    const levelDefs = [
+      ['Ruhig', '#16A34A', 'unter 2.8 %'],
+      ['Normal', '#84CC16', '2.8 bis 4.6 %'],
+      ['Erhöht', '#EAB308', '4.6 bis 7.5 %'],
+      ['Hoch', '#F97316', '7.5 bis 12.3 %'],
+      ['Extrem', '#DC2626', 'über 12.3 %']
+    ];
+    const levels = levelDefs.map((l, k) => ({
+      name: l[0], c: l[1], range: l[2],
+      bg: k === 2 ? '#FEF3C7' : 'transparent',
+      w: k === 2 ? 800 : 600
+    }));
+
+    return {
+      needle: st.needle.toFixed(2),
+      levels: levels,
+      lineD: this.lineD,
+      areaD: this.areaD,
+      stemD: 'M' + sx.toFixed(1) + ',' + sy.toFixed(1) + 'V300',
+      events: events,
+      ev: ev,
+      lastY: this.Y(this.V[n - 1] / 10).toFixed(1),
+      lastTop: (this.Y(this.V[n - 1] / 10) / 340 * 100).toFixed(2),
+      hovering: hovering,
+      hoverO: hovering ? 1 : 0,
+      hoverD: hovering ? 'M' + hx.toFixed(1) + ',44V300' : 'M0,0',
+      hoverX: hx.toFixed(1),
+      hoverY: hy.toFixed(1),
+      tipLeft: tipLeft.toFixed(2),
+      tipShift: tipLeft < 12 ? 0 : (tipLeft > 88 ? -100 : -50),
+      tipDate: hovering ? this.dateLabel(h) : '',
+      tipVal: hovering ? (this.V[h] / 10).toFixed(1) : '',
+      onMove: (e) => {
+        const r = e.currentTarget.getBoundingClientRect();
+        const fx = (e.clientX - r.left) / r.width * 1000;
+        const i = Math.round((fx - 44) / 940 * (n - 1));
+        if (i < 0 || i >= n) { if (this.state.hover !== null) this.setState({ hover: null }); return; }
+        if (i !== this.state.hover) this.setState({ hover: i });
+      },
+      onLeave: () => this.setState({ hover: null })
+    };
+  }
+}
+</script>
+</body>
+</html>

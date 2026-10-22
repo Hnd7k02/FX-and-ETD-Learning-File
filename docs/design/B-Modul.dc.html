@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>B · Lernpfad – Modul 05 Greeks</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@500;600&amp;family=STIX+Two+Text:ital,wght@0,400;0,500;1,400;1,500&amp;display=swap">
+<style>
+body{margin:0;background:#F4F5F7}
+a{color:#1D4ED8;text-decoration:none}
+a:hover{color:#1E40AF}
+.top-link:hover{background:#F1F2F4}
+.btn-dark:hover{background:#262B33}
+.btn-light:hover{background:#F1F2F4}
+.opt:hover{border-color:#9AA1AC}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #2563EB;outline-offset:2px}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: #F4F5F7; font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif; color: #0E1116">
+
+  <header style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px; padding: 14px 32px; background: #FFFFFF; border-bottom: 1px solid #E7E9ED">
+    <a href="B-Home.dc.html" style="display: flex; align-items: center; gap: 10px; color: #0E1116">
+      <span style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; flex: 0 0 36px; border-radius: 11px; background: #0E1116">
+        <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 14.5H9.5L17 5" style="fill: none; stroke: #FFFFFF; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round"></path></svg>
+      </span>
+      <span style="font-size: 16px; font-weight: 800; letter-spacing: -0.01em">Forward First</span>
+    </a>
+    <nav aria-label="Hauptnavigation" style="display: flex; flex-wrap: wrap; gap: 4px">
+      <a class="top-link" href="B-Home.dc.html" style="display: inline-flex; align-items: center; height: 40px; padding: 0 14px; border-radius: 999px; background: #F1F2F4; color: #0E1116; font-size: 14px; font-weight: 800">Module</a>
+      <a class="top-link" href="Riskometer.dc.html" style="display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px; border-radius: 999px; color: #3F4652; font-size: 14px; font-weight: 600">Riskometer<span aria-hidden="true" style="width: 7px; height: 7px; border-radius: 999px; background: #D97706"></span></a>
+      <a class="top-link" href="#" style="display: inline-flex; align-items: center; height: 40px; padding: 0 14px; border-radius: 999px; color: #3F4652; font-size: 14px; font-weight: 600">Glossar</a>
+    </nav>
+    <div role="group" aria-label="Sprache" style="display: inline-flex; padding: 3px; border-radius: 999px; background: #F1F2F4">
+      <button type="button" aria-pressed="true" style="min-width: 44px; height: 38px; border: 0; border-radius: 999px; background: #FFFFFF; font-family: inherit; font-size: 12px; font-weight: 800; color: #0E1116; box-shadow: 0 1px 2px rgba(14,17,22,0.08); cursor: pointer">DE</button>
+      <button type="button" aria-pressed="false" style="min-width: 44px; height: 38px; border: 0; border-radius: 999px; background: transparent; font-family: inherit; font-size: 12px; font-weight: 700; color: #5F6673; cursor: pointer">EN</button>
+    </div>
+  </header>
+
+  <div style="background: #FFFFFF; border-bottom: 1px solid #E7E9ED">
+    <div style="max-width: 1080px; margin: 0 auto; box-sizing: border-box; padding: 36px 32px 28px; display: flex; flex-direction: column; gap: 18px">
+      <nav aria-label="Pfad" style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13px; color: #5F6673">
+        <a href="B-Home.dc.html" style="color: #5F6673">Lernpfad</a>
+        <span aria-hidden="true">/</span>
+        <span style="font-weight: 700; color: #0E1116">05 Greeks</span>
+      </nav>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px">
+        <span style="display: inline-flex; padding: 5px 12px; border-radius: 999px; background: #F2ECFE; color: #6D28D9; font-size: 12px; font-weight: 800">05 · Optionen</span>
+        <span style="display: inline-flex; padding: 5px 12px; border-radius: 999px; border: 1px solid #E7E9ED; color: #3F4652; font-size: 12px; font-weight: 700">Aufbau · 35 min</span>
+      </div>
+      <h1 style="margin: 0; font-size: clamp(34px, 4.6vw, 52px); line-height: 1.04; font-weight: 800; letter-spacing: -0.035em; text-wrap: balance">Greeks: wie der Optionspreis reagiert</h1>
+      <ol aria-label="Abschnitte" style="margin: 8px 0 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; max-width: 760px">
+        <sc-for list="{{ sections }}" as="sec" hint-placeholder-count="5">
+          <li aria-current="{{ sec.aria }}" style="display: flex; flex-direction: column; gap: 8px">
+            <span aria-hidden="true" style="display: block; height: 4px; border-radius: 999px; background: {{ sec.bar }}"></span>
+            <span style="font-size: 12px; font-weight: {{ sec.weight }}; color: {{ sec.fg }}">{{ sec.n }} · {{ sec.label }}</span>
+          </li>
+        </sc-for>
+      </ol>
+    </div>
+  </div>
+
+  <main style="max-width: 1080px; margin: 0 auto; box-sizing: border-box; padding: 48px 32px 64px; display: flex; flex-direction: column; gap: 32px">
+    <article style="display: flex; flex-direction: column; gap: 32px">
+      <div style="max-width: 680px; display: flex; flex-direction: column; gap: 16px">
+        <span style="font-size: 13px; font-weight: 700; color: #6D28D9">Abschnitt 2 von 5</span>
+        <h2 style="margin: 0; font-size: 32px; font-weight: 800; letter-spacing: -0.03em">Delta und Gamma</h2>
+        <p style="margin: 0; font-size: 17px; line-height: 1.7; color: #2B313A">Delta sagt, wie viel der Call gewinnt, wenn USD/CHF ein kleines Stück steigt. Bei einem Delta von 0.50 bewegt sich der Optionswert etwa halb so stark wie der Kurs.</p>
+        <p style="margin: 0; font-size: 17px; line-height: 1.7; color: #2B313A">Gamma sagt, wie schnell sich dieses Delta selbst verändert. Weit aus dem Geld ist Delta fast null, tief im Geld fast eins. Rund um den Strike ändert es sich am schnellsten: Dort ist Gamma am grössten.</p>
+      </div>
+
+      <figure style="margin: 0; display: flex; flex-direction: column; gap: 12px">
+        <div style="box-sizing: border-box; padding: 28px; background: #FFFFFF; border: 1px solid #E7E9ED; border-radius: 28px; box-shadow: 0 1px 2px rgba(14,17,22,0.04), 0 16px 40px rgba(14,17,22,0.06)">
+          <div style="width: 100%">
+            <dc-import name="GreeksLab" pad="0" hint-size="100%,660px"></dc-import>
+          </div>
+        </div>
+        <figcaption style="font-size: 14px; line-height: 1.5; color: #5F6673; max-width: 680px">Zieh am Spot-Regler: Die schwarze Tangente oben hat die Steigung Delta, die Tangente unten die Steigung Gamma.</figcaption>
+      </figure>
+
+      <div style="max-width: 680px; display: flex; flex-direction: column; gap: 18px">
+        <h3 style="margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.02em">Herleitung in vier Schritten</h3>
+        <p style="margin: 0; font-size: 17px; line-height: 1.7; color: #2B313A"><b>1.</b> Delta ist die Steigung der Preiskurve, also die erste Ableitung des Preises nach dem Spot.</p>
+        <div style="align-self: flex-start; padding: 12px 20px; border-radius: 14px; background: #FFFFFF; border: 1px solid #E7E9ED; font-family: 'STIX Two Text', 'Times New Roman', serif; font-size: 23px">Δ = ∂<i>V</i> / ∂<i>S</i></div>
+        <p style="margin: 0; font-size: 17px; line-height: 1.7; color: #2B313A"><b>2.</b> Gamma ist die Steigung der Delta-Kurve. Damit ist Gamma die Ableitung von Delta und die zweite Ableitung des Preises.</p>
+        <div style="align-self: flex-start; padding: 12px 20px; border-radius: 14px; background: #FFFFFF; border: 1px solid #E7E9ED; font-family: 'STIX Two Text', 'Times New Roman', serif; font-size: 23px">Γ = ∂Δ / ∂<i>S</i> = ∂²<i>V</i> / ∂<i>S</i>²</div>
+        <p style="margin: 0; font-size: 17px; line-height: 1.7; color: #2B313A"><b>3.</b> Im Garman-Kohlhagen-Modell gilt für den Call Δ = <i>e</i><sup>−<i>r</i><sub>f</sub><i>T</i></sup> · <i>N</i>(<i>d</i><sub>1</sub>). Nach dem Spot abgeleitet wird nur <i>N</i>(<i>d</i><sub>1</sub>), mit der Kettenregel. φ ist die Dichte der Standardnormalverteilung.</p>
+        <div style="align-self: flex-start; display: flex; flex-direction: column; gap: 6px; padding: 14px 20px; border-radius: 14px; background: #FFFFFF; border: 1px solid #E7E9ED; font-family: 'STIX Two Text', 'Times New Roman', serif; font-size: 21px">
+          <span>∂<i>d</i><sub>1</sub> / ∂<i>S</i> = 1 / (<i>S</i> · σ · √<i>T</i>)</span>
+          <span>⇒ Γ = <i>e</i><sup>−<i>r</i><sub>f</sub><i>T</i></sup> · φ(<i>d</i><sub>1</sub>) / (<i>S</i> · σ · √<i>T</i>)</span>
+        </div>
+        <p style="margin: 0; font-size: 17px; line-height: 1.7; color: #2B313A"><b>4.</b> Mit dem Beispiel (<i>S</i> = 0.8000, σ = 8 %, <i>T</i> = 0.25, <i>r</i><sub>f</sub> = 3.5 %, <i>d</i><sub>1</sub> ≈ 0.021):</p>
+        <div style="align-self: flex-start; padding: 12px 20px; border-radius: 14px; background: #F2ECFE; font-family: 'STIX Two Text', 'Times New Roman', serif; font-size: 23px">Γ = 0.9913 · 0.3989 / (0.8 · 0.08 · 0.5) = <b>12.36</b></div>
+        <p style="margin: 0; font-size: 17px; line-height: 1.7; color: #2B313A">Steigt USD/CHF um eine Big Figure (0.0100), steigt Delta um rund 0.12: von 0.504 auf etwa 0.62. Das Labor oben rechnet denselben Wert numerisch nach.</p>
+      </div>
+
+      <aside aria-labelledby="desk-h" style="max-width: 680px; box-sizing: border-box; padding: 28px; border-radius: 24px; background: #0E1116; color: #FFFFFF; display: flex; flex-direction: column; gap: 14px">
+        <span style="align-self: flex-start; display: inline-flex; padding: 5px 12px; border-radius: 999px; background: #3A2214; color: #FDBA8C; font-size: 12px; font-weight: 800">Am Desk</span>
+        <h3 id="desk-h" style="margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.02em">Gamma gegen Theta</h3>
+        <p style="margin: 0; font-size: 16px; line-height: 1.65; color: #D6D9DE">Wer eine Option kauft, ist long Gamma. Beim Delta-Hedging verkauft er nach Anstiegen und kauft nach Rückgängen: Bewegung bringt Gewinn. Dafür bezahlt er jeden Tag Zeitwert.</p>
+        <div style="align-self: flex-start; padding: 12px 20px; border-radius: 14px; background: #1B2027; font-family: 'STIX Two Text', 'Times New Roman', serif; font-size: 22px">P&amp;L ≈ ½ · Γ · [(Δ<i>S</i>)² − σ²<i>S</i>² · Δ<i>t</i>]</div>
+        <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #D6D9DE">Break-even pro Tag: σ · S / √365 = 0.8000 · 8 % / √365 ≈ <b style="color: #FFFFFF">33.5 Pips</b>. Bewegt sich USD/CHF stärker als die implizite Tagesvola, verdient der delta-gehedgte Gamma-Käufer. Der Gamma-Anteil des Zeitwertverlusts beträgt rund CHF 69 pro Tag; das Theta im Labor (CHF −31) enthält zusätzlich den Zins-Carry.</p>
+      </aside>
+
+      <section aria-labelledby="quiz-h" style="max-width: 680px; box-sizing: border-box; padding: 28px; border-radius: 24px; background: #FFFFFF; border: 1px solid #E7E9ED; display: flex; flex-direction: column; gap: 16px">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+          <h3 id="quiz-h" style="margin: 0; font-size: 14px; font-weight: 800; color: #6D28D9">Kurz geprüft · Frage 1 von 4</h3>
+        </div>
+        <p style="margin: 0; font-size: 19px; line-height: 1.5; font-weight: 700">USD/CHF steigt um eine Big Figure (0.0100). Um wie viel ändert sich das Delta des Calls aus dem Beispiel ungefähr?</p>
+        <div role="group" aria-label="Antworten" style="display: flex; flex-direction: column; gap: 10px">
+          <sc-for list="{{ options }}" as="o" hint-placeholder-count="3">
+            <button class="opt" type="button" onClick="{{ o.pick }}" aria-pressed="{{ o.on }}" style="display: flex; align-items: center; gap: 14px; min-height: 56px; padding: 0 18px; border-radius: 16px; border: 2px solid {{ o.border }}; background: {{ o.bg }}; font-family: inherit; text-align: left; cursor: pointer; color: #0E1116">
+              <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; flex: 0 0 28px; border-radius: 999px; background: {{ o.dotBg }}; color: {{ o.dotFg }}; font-size: 13px; font-weight: 800">{{ o.key }}</span>
+              <span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 16px; font-weight: 600">{{ o.label }}</span>
+            </button>
+          </sc-for>
+        </div>
+        <sc-if value="{{ answered }}" hint-placeholder-val="{{ false }}">
+          <p role="status" style="margin: 0; padding: 14px 16px; border-radius: 14px; background: {{ fbBg }}; color: {{ fbFg }}; font-size: 15px; line-height: 1.55">{{ feedback }}</p>
+        </sc-if>
+      </section>
+
+      <nav aria-label="Weiter" style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; padding-top: 8px; border-top: 1px solid #E1E4E8">
+        <a class="btn-light" href="#" style="display: inline-flex; flex-direction: column; gap: 2px; min-width: 220px; padding: 16px 20px; border-radius: 18px; border: 1px solid #E1E4E8; background: #FFFFFF; color: #0E1116">
+          <span style="font-size: 12px; font-weight: 700; color: #5F6673">Zurück</span>
+          <span style="font-size: 15px; font-weight: 800">1 · Intuition</span>
+        </a>
+        <a class="btn-dark" href="#" style="display: inline-flex; flex-direction: column; align-items: flex-end; gap: 2px; min-width: 220px; padding: 16px 20px; border-radius: 18px; background: #0E1116; color: #FFFFFF">
+          <span style="font-size: 12px; font-weight: 700; color: #C9CDD4">Weiter</span>
+          <span style="font-size: 15px; font-weight: 800">3 · Vega</span>
+        </a>
+      </nav>
+    </article>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":2160}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { picked: null };
+  }
+
+  renderVals() {
+    const secDefs = [['Intuition', 'done'], ['Delta & Gamma', 'cur'], ['Vega', 'open'], ['Theta & Rho', 'open'], ['Quiz', 'open']];
+    const sections = secDefs.map((s, i) => ({
+      n: String(i + 1), label: s[0],
+      aria: s[1] === 'cur' ? 'step' : 'false',
+      bar: s[1] === 'done' ? '#16A34A' : (s[1] === 'cur' ? '#7C3AED' : '#E1E4E8'),
+      fg: s[1] === 'open' ? '#5F6673' : '#0E1116',
+      weight: s[1] === 'cur' ? 800 : 600
+    }));
+
+    const correct = 1;
+    const picked = this.state.picked;
+    const answered = picked !== null;
+    const defs = [['A', '+0.012'], ['B', '+0.124'], ['C', '+1.236']];
+    const options = defs.map((d, i) => {
+      let border = '#E1E4E8', bg = '#FFFFFF', dotBg = '#F1F2F4', dotFg = '#0E1116';
+      if (answered && i === correct) { border = '#16A34A'; bg = '#E8F6EC'; dotBg = '#15803D'; dotFg = '#FFFFFF'; }
+      else if (answered && i === picked) { border = '#DC2626'; bg = '#FDECEC'; dotBg = '#B91C1C'; dotFg = '#FFFFFF'; }
+      return {
+        key: d[0], label: d[1], on: picked === i,
+        border: border, bg: bg, dotBg: dotBg, dotFg: dotFg,
+        pick: () => this.setState({ picked: i })
+      };
+    });
+    const right = picked === correct;
+    return {
+      sections: sections,
+      options: options,
+      answered: answered,
+      feedback: right
+        ? 'Richtig. Delta ändert sich um Gamma mal Kursänderung: 12.36 · 0.01 ≈ 0.124. Weil Gamma selbst wandert, landet Delta tatsächlich bei etwa 0.62.'
+        : 'Nicht ganz. Delta ändert sich um Gamma mal Kursänderung: 12.36 · 0.01 ≈ 0.124.',
+      fbBg: right ? '#E8F6EC' : '#FDECEC',
+      fbFg: right ? '#14532D' : '#7F1D1D'
+    };
+  }
+}
+</script>
+</body>
+</html>

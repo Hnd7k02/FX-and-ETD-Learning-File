@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Wow-Moment: vom Forward zur Option</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@500;600&amp;family=STIX+Two+Text:ital,wght@0,400;0,500;1,400;1,500&amp;display=swap">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 100%; box-sizing: border-box; padding: {{ pad }}px; display: flex; flex-direction: column; gap: 16px; background: #FFFFFF; font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif; color: #0E1116">
+  <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px">
+    <div role="group" aria-label="Vier Schritte vom Forward zur Option" style="display: flex; flex-wrap: wrap; gap: 4px; padding: 4px; background: #F1F2F4; border-radius: 999px">
+      <sc-for list="{{ steps }}" as="s" hint-placeholder-count="4">
+        <button type="button" onClick="{{ s.pick }}" aria-pressed="{{ s.on }}" style="position: relative; overflow: hidden; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 18px 0 8px; border: 0; border-radius: 999px; font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; background: {{ s.bg }}; color: {{ s.fg }}">
+          <span style="display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 999px; font-size: 12px; font-weight: 800; background: {{ s.numBg }}; color: {{ s.numFg }}">{{ s.n }}</span>
+          <span>{{ s.label }}</span>
+          <span aria-hidden="true" style="position: absolute; left: 0; bottom: 0; height: 3px; width: {{ s.prog }}%; background: #60A5FA"></span>
+        </button>
+      </sc-for>
+    </div>
+    <div style="display: flex; align-items: center; gap: 12px">
+      <span style="font-size: 13px; color: #5F6673">Beispiel USD/CHF · Spot 0.8000 · Forward 3M 0.7930 · Vola 8 %</span>
+      <button type="button" onClick="{{ togglePlay }}" aria-label="{{ playLabel }}" style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; flex: 0 0 44px; border: 1px solid #E1E4E8; border-radius: 999px; background: #FFFFFF; color: #0E1116; cursor: pointer">
+        <sc-if value="{{ playing }}" hint-placeholder-val="{{ true }}">
+          <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3.5V12.5M11 3.5V12.5" style="fill: none; stroke: #0E1116; stroke-width: 2; stroke-linecap: round"></path></svg>
+        </sc-if>
+        <sc-if value="{{ paused }}" hint-placeholder-val="{{ false }}">
+          <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3.2L12.5 8L5 12.8Z" style="fill: #0E1116; stroke: #0E1116; stroke-width: 1.5; stroke-linejoin: round"></path></svg>
+        </sc-if>
+      </button>
+    </div>
+  </div>
+
+  <div style="display: flex; flex-wrap: wrap; gap: 8px 20px; min-height: 20px; font-size: 13px; color: #3F4652">
+    <sc-for list="{{ legend }}" as="l" hint-placeholder-count="2">
+      <span style="display: inline-flex; align-items: center; gap: 8px">
+        <span aria-hidden="true" style="display: inline-block; width: 22px; height: 0; border-top: {{ l.border }}"></span>
+        <span>{{ l.label }}</span>
+      </span>
+    </sc-for>
+  </div>
+
+  <div style="width: 100%">
+    <svg viewBox="0 0 1000 410" role="img" aria-label="{{ ariaLabel }}" style="display: block; width: 100%; height: auto; overflow: visible; font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif">
+      <path d="M64,24H976M64,111H976M64,285H976M64,372H976" style="fill: none; stroke: #EEF0F3; stroke-width: 1"></path>
+      <path d="M64,198H976" style="fill: none; stroke: #C9CDD4; stroke-width: 1"></path>
+      <text x="64" y="12" style="font-size: 13px; font-weight: 600; fill: #5F6673">Gewinn / Wert in Pips</text>
+      <text x="54" y="28" style="font-size: 13px; fill: #5F6673; text-anchor: end">+800</text>
+      <text x="54" y="115" style="font-size: 13px; fill: #5F6673; text-anchor: end">+400</text>
+      <text x="54" y="202" style="font-size: 13px; fill: #5F6673; text-anchor: end">0</text>
+      <text x="54" y="289" style="font-size: 13px; fill: #5F6673; text-anchor: end">−400</text>
+      <text x="54" y="376" style="font-size: 13px; fill: #5F6673; text-anchor: end">−800</text>
+      <path d="M520,24V372" style="fill: none; stroke: #9AA1AC; stroke-width: 1; stroke-dasharray: 4 5"></path>
+      <text x="528" y="42" style="font-size: 13px; font-weight: 600; fill: #3F4652">Strike = Forward 0.7930</text>
+
+      <path d="{{ areaD }}" style="fill: #2563EB; fill-opacity: 0.1; stroke: none; opacity: {{ o2 }}"></path>
+      <path d="{{ payD }}" style="fill: none; stroke: #5F6673; stroke-width: 1.75; stroke-dasharray: 6 6; opacity: {{ o2 }}"></path>
+      <path d="{{ ghostD }}" style="fill: none; stroke: #0E1116; stroke-width: 1.75; stroke-dasharray: 6 6; opacity: {{ o1g }}"></path>
+      <path d="{{ lcD }}" style="fill: none; stroke: #2563EB; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; opacity: {{ o3 }}"></path>
+      <path d="{{ spD }}" style="fill: none; stroke: #EA580C; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; opacity: {{ o3 }}"></path>
+      <path d="{{ mainD }}" style="fill: none; stroke: {{ mainStroke }}; stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; transition: stroke 600ms ease"></path>
+
+      <g style="opacity: {{ o2 }}">
+        <path d="{{ tvLineD }}" style="fill: none; stroke: #0E1116; stroke-width: 1.5"></path>
+        <circle cx="520" cy="{{ tvY }}" r="6" style="fill: #2563EB; stroke: #FFFFFF; stroke-width: 2.5"></circle>
+        <text x="534" y="{{ tvTextY }}" style="font-size: 16px; font-weight: 700; fill: #0E1116">Zeitwert {{ tvPips }} Pips</text>
+      </g>
+
+      <text x="104" y="398" style="font-size: 13px; fill: #5F6673; text-anchor: middle">0.72</text>
+      <text x="218" y="398" style="font-size: 13px; fill: #5F6673; text-anchor: middle">0.74</text>
+      <text x="332" y="398" style="font-size: 13px; fill: #5F6673; text-anchor: middle">0.76</text>
+      <text x="446" y="398" style="font-size: 13px; fill: #5F6673; text-anchor: middle">0.78</text>
+      <text x="560" y="398" style="font-size: 13px; fill: #5F6673; text-anchor: middle">0.80</text>
+      <text x="674" y="398" style="font-size: 13px; fill: #5F6673; text-anchor: middle">0.82</text>
+      <text x="788" y="398" style="font-size: 13px; fill: #5F6673; text-anchor: middle">0.84</text>
+      <text x="902" y="398" style="font-size: 13px; fill: #5F6673; text-anchor: middle">0.86</text>
+      <text x="976" y="380" style="font-size: 13px; font-weight: 600; fill: #5F6673; text-anchor: end">{{ xLabel }}</text>
+    </svg>
+  </div>
+
+  <div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px 32px; min-height: 108px">
+    <div style="flex: 1 1 420px; min-width: 0; display: flex; flex-direction: column; gap: 6px">
+      <div style="font-size: 22px; font-weight: 800; letter-spacing: -0.01em; line-height: 1.25">{{ capTitle }}</div>
+      <div style="font-size: 15px; line-height: 1.55; color: #3F4652; max-width: 660px">{{ capText }}</div>
+    </div>
+    <div style="flex: 0 1 auto; display: flex; flex-direction: column; align-items: flex-end; gap: 12px">
+      <sc-if value="{{ showSlider }}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; flex-direction: column; gap: 6px; width: 280px; max-width: 100%">
+          <label for="wow-days" style="display: flex; justify-content: space-between; gap: 12px; font-size: 13px; color: #3F4652">
+            <span>Laufzeit bis Verfall</span>
+            <span style="font-weight: 700; color: #0E1116">{{ daysLabel }}</span>
+          </label>
+          <input id="wow-days" type="range" min="0" max="365" step="1" value="{{ days }}" onChange="{{ onDays }}" style="width: 100%; height: 28px; margin: 0; accent-color: #2563EB">
+        </div>
+      </sc-if>
+      <div style="display: inline-flex; align-items: center; padding: 10px 16px; border-radius: 14px; background: {{ kpiBg }}; font-family: 'STIX Two Text', 'Times New Roman', serif; font-size: 21px; color: #0E1116; white-space: nowrap">{{ kpi }}</div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"pad":{"editor":null,"default":28,"tsType":"number"},"$preview":{"width":1200,"height":780}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { phase: 0, prev: 0, t: 1, days: 91, playing: true, prog: 0 };
+  }
+
+  componentDidMount() {
+    let rm = false;
+    try { rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { rm = false; }
+    this.rm = rm;
+    if (rm) { this.setState({ playing: false }); return; }
+    this.t0 = performance.now();
+    this.lastNow = this.t0;
+    const tick = (now) => {
+      if (this.dead) return;
+      const s = this.state;
+      const dt = Math.max(0, now - this.lastNow);
+      this.lastNow = now;
+      const up = {};
+      let changed = false;
+      if (s.t < 1) { up.t = Math.min(1, s.t + dt / 900); changed = true; }
+      if (s.playing) {
+        const el = now - this.t0;
+        const dur = s.phase === 2 ? 6400 : 5200;
+        up.prog = Math.min(1, el / dur);
+        changed = true;
+        if (s.phase === 2) {
+          const k = Math.min(1, Math.max(0, (el - 900) / 3200));
+          up.days = Math.round(365 - (365 - 91) * this.ease(k));
+        }
+        if (el >= dur) {
+          this.t0 = now;
+          const next = (s.phase + 1) % 4;
+          up.prev = s.phase;
+          up.phase = next;
+          up.t = 0;
+          up.prog = 0;
+          if (next === 2) up.days = 365;
+        }
+      }
+      if (changed) this.setState(up);
+      this.raf = requestAnimationFrame(tick);
+    };
+    this.raf = requestAnimationFrame(tick);
+  }
+
+  componentWillUnmount() {
+    this.dead = true;
+    if (this.raf) cancelAnimationFrame(this.raf);
+  }
+
+  ease(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+
+  N(x) {
+    const z = x / Math.SQRT2, sg = z < 0 ? -1 : 1, a = Math.abs(z);
+    const t = 1 / (1 + 0.3275911 * a);
+    const y = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-a * a);
+    return 0.5 * (1 + sg * y);
+  }
+
+  b76(F, K, T, v) {
+    if (T <= 0) return Math.max(F - K, 0);
+    const sd = v * Math.sqrt(T);
+    const d1 = (Math.log(F / K) + 0.5 * sd * sd) / sd;
+    const d2 = d1 - sd;
+    return F * this.N(d1) - K * this.N(d2);
+  }
+
+  curve(ph, S, T) {
+    const K = 0.793;
+    if (ph === 0 || ph === 3) return (S - K) * 1e4;
+    if (ph === 1) return Math.max(S - K, 0) * 1e4;
+    return this.b76(S, K, T, 0.08) * 1e4;
+  }
+
+  X(S) { return 64 + (S - 0.713) / 0.16 * 912; }
+  Y(p) { const c = Math.max(-800, Math.min(800, p)); return 24 + (800 - c) / 1600 * 348; }
+
+  pts(fn) {
+    const out = [];
+    for (let i = 0; i <= 120; i++) {
+      const S = 0.713 + 0.16 * i / 120;
+      out.push([this.X(S), this.Y(fn(S))]);
+    }
+    return out;
+  }
+
+  d(points) {
+    let s = '';
+    for (let i = 0; i < points.length; i++) s += (i ? 'L' : 'M') + points[i][0].toFixed(1) + ',' + points[i][1].toFixed(1);
+    return s;
+  }
+
+  go(p) {
+    const s = this.state;
+    if (p === s.phase) { this.setState({ playing: false, prog: 0 }); return; }
+    this.setState({ prev: s.phase, phase: p, t: this.rm ? 1 : 0, playing: false, prog: 0 });
+  }
+
+  renderVals() {
+    const s = this.state;
+    const pad = this.props.pad != null ? Number(this.props.pad) : 28;
+    const e = this.ease(s.t);
+    const K = 0.793;
+    const T = s.days / 365;
+    const w = (ph) => (s.phase === ph ? e : 0) + (s.prev === ph && s.phase !== ph ? 1 - e : 0);
+
+    const main = this.pts((S) => this.curve(s.prev, S, T) * (1 - e) + this.curve(s.phase, S, T) * e);
+    const val = this.pts((S) => this.b76(S, K, T, 0.08) * 1e4);
+    const pay = this.pts((S) => Math.max(S - K, 0) * 1e4);
+    const area = this.d(val) + 'L' + pay.slice().reverse().map((p) => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join('L') + 'Z';
+
+    const tvP = this.b76(K, K, T, 0.08) * 1e4;
+    const tvY = this.Y(tvP);
+
+    const labels = ['Forward', 'Call', 'Zeitwert', 'Parität'];
+    const steps = labels.map((label, i) => {
+      const on = s.phase === i;
+      return {
+        n: String(i + 1), label: label, on: on,
+        bg: on ? '#0E1116' : 'transparent',
+        fg: on ? '#FFFFFF' : '#3F4652',
+        numBg: '#FFFFFF', numFg: '#0E1116',
+        prog: on && s.playing ? Math.round(s.prog * 100) : 0,
+        pick: () => this.go(i)
+      };
+    });
+
+    const legends = [
+      [{ label: 'Forward: Gewinn und Verlust bei Verfall', border: '3px solid #0E1116' }],
+      [{ label: 'Long Call bei Verfall', border: '3px solid #2563EB' }, { label: 'Forward zum Vergleich', border: '2px dashed #0E1116' }],
+      [{ label: 'Optionswert vor Verfall', border: '3px solid #2563EB' }, { label: 'Auszahlung bei Verfall', border: '2px dashed #5F6673' }, { label: 'Zeitwert', border: '10px solid #DCE6FD' }],
+      [{ label: 'Long Call', border: '3px solid #2563EB' }, { label: 'Short Put', border: '3px solid #EA580C' }, { label: 'Summe = Forward', border: '3px solid #0E1116' }]
+    ];
+    const titles = [
+      '1 · Forward: linear',
+      '2 · Call: asymmetrisch',
+      '3 · Vor Verfall: der Zeitwert',
+      '4 · Long Call + Short Put = Forward'
+    ];
+    const texts = [
+      'Der Forward fixiert heute den Kurs für später. Gewinn und Verlust sind symmetrisch: Jede Bewegung zählt 1:1. Weil der USD-Zins über dem CHF-Zins liegt, notiert der Forward 70 Pips unter dem Spot.',
+      'Die Option behält nur die gute Seite: ein Recht, keine Pflicht. Unter dem Strike verfällt sie wertlos, der Verlust ist auf die bezahlte Prämie begrenzt.',
+      'Vor Verfall liegt der Optionswert über dem Knick. Die Differenz ist der Zeitwert: am Strike am grössten, bis zum Verfall schmilzt er auf null. Zieh am Regler.',
+      'Ein gekaufter Call und ein verkaufter Put mit gleichem Strike ergeben wieder einen Forward: die Put-Call-Parität. Darum beginnt jedes Options-Pricing beim Forward.'
+    ];
+    const kpis = ['Δ = 1', 'Δ = 0 oder 1', 'V = innerer Wert + Zeitwert', 'C − P = DF · (F − K)'];
+
+    const d = s.days;
+    const daysLabel = d === 0 ? 'Verfall' : (d >= 365 ? '1 Jahr' : d + ' Tage');
+
+    return {
+      pad: pad,
+      steps: steps,
+      legend: legends[s.phase],
+      mainD: this.d(main),
+      mainStroke: (s.phase === 1 || s.phase === 2) ? '#2563EB' : '#0E1116',
+      payD: this.d(pay),
+      areaD: area,
+      ghostD: this.d(this.pts((S) => (S - K) * 1e4)),
+      lcD: this.d(pay),
+      spD: this.d(this.pts((S) => -Math.max(K - S, 0) * 1e4)),
+      o1g: (w(1) * 0.45).toFixed(3),
+      o2: w(2).toFixed(3),
+      o3: w(3).toFixed(3),
+      tvLineD: 'M520,198V' + tvY.toFixed(1),
+      tvY: tvY.toFixed(1),
+      tvTextY: (tvY - 12).toFixed(1),
+      tvPips: Math.round(tvP),
+      capTitle: titles[s.phase],
+      capText: texts[s.phase],
+      kpi: kpis[s.phase],
+      kpiBg: s.phase === 2 ? '#EAF0FE' : '#F1F2F4',
+      showSlider: s.phase === 2,
+      days: d,
+      daysLabel: daysLabel,
+      onDays: (ev) => this.setState({ days: Number(ev.target.value), playing: false, prog: 0 }),
+      togglePlay: () => {
+        if (this.state.playing) { this.setState({ playing: false, prog: 0 }); }
+        else { this.t0 = performance.now(); this.setState({ playing: true, prog: 0 }); }
+      },
+      playing: s.playing,
+      paused: !s.playing,
+      playLabel: s.playing ? 'Animation pausieren' : 'Animation abspielen',
+      xLabel: s.phase === 2 ? 'USD/CHF Forward heute' : 'USD/CHF bei Verfall',
+      ariaLabel: 'Auszahlungsdiagramm USD/CHF: ' + titles[s.phase]
+    };
+  }
+}
+</script>
+</body>
+</html>
