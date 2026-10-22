@@ -127,3 +127,11 @@ Format: `D-xx · date · origin`, then question, decision, reasoning. Origin is 
 **Question:** Minus sign and English percent?
 **Decision:** Typographic minus (U+2212) in both languages; English percent without a space ("8%").
 **Reasoning:** Matches the prototypes; en-GB convention has no space before the percent sign.
+
+## D-22 · 2026-10-22 · Dario
+
+**Question:** How to handle choices Claude is unsure about while Dario is away?
+
+**Decision:** Decide, and make the choice easy to change later: every uncertain parameter lives in one clearly named, documented config object (e.g. the running example in `src/lib/fx/example.ts`, module structure in `src/data/modules.ts`, product parameters in `PRODUCT_DEFAULTS` in `src/lib/fx/mc/products.ts`, Riskometer method constants in `src/lib/data`), never as scattered literals. Each such choice gets an entry here or an open question in `PROGRESS.md`.
+
+**Reasoning:** Dario's instruction during the session ("if you're not sure … code it so we can change it easily later").

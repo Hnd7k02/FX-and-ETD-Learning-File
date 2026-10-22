@@ -43,3 +43,4 @@ Sandbox note: Node 24 is linked into `~/.local/bin` (ahead of the preinstalled N
 - Small Conventional Commits (`feat:`, `fix:`, `test:`, `docs:`, `data:`).
 - Record every decision in `DECISIONS.md` (`D-xx · date · origin`), keep `PROGRESS.md` current.
 - Check exit codes, not summaries.
+- Unsure about a choice? Decide, but keep it in one documented config object so it is easy to change later (D-22), and note it in `DECISIONS.md` or `PROGRESS.md`.
