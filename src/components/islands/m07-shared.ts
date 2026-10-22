@@ -211,3 +211,22 @@ export function useHoverTarget<K extends string>(
   };
   return [hover, onMove, () => setHover(null)];
 }
+
+/**
+ * True while the pointer is down on a slider (so charts follow it instantly instead of
+ * tweening). Returns the flag and the onPointerDown handler for the slider's wrapper.
+ */
+export function useSliderDrag(): [boolean, () => void] {
+  const [sliding, setSliding] = useState(false);
+  useEffect(() => {
+    if (!sliding) return;
+    const up = () => setSliding(false);
+    window.addEventListener('pointerup', up);
+    window.addEventListener('pointercancel', up);
+    return () => {
+      window.removeEventListener('pointerup', up);
+      window.removeEventListener('pointercancel', up);
+    };
+  }, [sliding]);
+  return [sliding, () => setSliding(true)];
+}

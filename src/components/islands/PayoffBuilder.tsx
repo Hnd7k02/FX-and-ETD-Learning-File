@@ -975,33 +975,35 @@ export default function PayoffBuilder(props: PayoffBuilderProps): JSX.Element {
                   </button>
                 </div>
               </div>
-              <button
-                type="button"
-                class="pb-lock"
-                aria-pressed={solve === i}
-                data-lock={i}
-                onClick={() => toggleLock(i)}
-              >
-                <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
-                  <rect
-                    x="2.5"
-                    y="6"
-                    width="9"
-                    height="6.5"
-                    rx="1.5"
-                    style={{ fill: 'currentColor' }}
-                  />
-                  <path
-                    d={
-                      solve === i
-                        ? 'M4.5 6V4.5a2.5 2.5 0 0 1 5 0V6'
-                        : 'M4.5 6V4.5a2.5 2.5 0 0 1 5 0'
-                    }
-                    style={{ fill: 'none', stroke: 'currentColor', strokeWidth: 1.6 }}
-                  />
-                </svg>
-                {t('pb.lock')}
-              </button>
+              {(legs.length > 1 || l.kind === 'forward') && (
+                <button
+                  type="button"
+                  class="pb-lock"
+                  aria-pressed={solve === i}
+                  data-lock={i}
+                  onClick={() => toggleLock(i)}
+                >
+                  <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
+                    <rect
+                      x="2.5"
+                      y="6"
+                      width="9"
+                      height="6.5"
+                      rx="1.5"
+                      style={{ fill: 'currentColor' }}
+                    />
+                    <path
+                      d={
+                        solve === i
+                          ? 'M4.5 6V4.5a2.5 2.5 0 0 1 5 0V6'
+                          : 'M4.5 6V4.5a2.5 2.5 0 0 1 5 0'
+                      }
+                      style={{ fill: 'none', stroke: 'currentColor', strokeWidth: 1.6 }}
+                    />
+                  </svg>
+                  {t('pb.lock')}
+                </button>
+              )}
               {solve === i && <p class="pb-note">{t('pb.lockHint', { n: nn })}</p>}
               {state.unreachable === i && (
                 <p class="pb-note pb-note--warn">{t('pb.unreachable')}</p>

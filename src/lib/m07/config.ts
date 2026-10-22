@@ -60,9 +60,8 @@ export const M07_CONFIG = {
 
   /** Figure (a) BarrierPaths, section 1. */
   paths: {
-    /** Paths on screen (desktop) and on phones (choice: few enough to follow each one). */
+    /** Paths on screen (choice: few enough to follow each one, same on every screen). */
     count: 10,
-    countCompact: 7,
     /** Daily steps over 3 months (91 days ≈ T = 0.25; integer days for daily steps). */
     days: 91,
     /** First seed; "Neue Pfade" adds 1 (choice: seed 7 shows hits on both sides). */

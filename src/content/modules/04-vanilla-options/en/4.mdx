@@ -1,0 +1,84 @@
+import PriceDriversFigure from '@/components/figures/PriceDriversFigure.astro';
+import PayoffBuilderFigure from '@/components/figures/PayoffBuilderFigure.astro';
+import WowFigure from '@/components/figures/WowFigure.astro';
+
+What does the importer's right cost? The answer comes from the **Garman-Kohlhagen model**, published in <Fact id="gk-1983" />. It is Black-Scholes for currencies: with two interest rates instead of one, that of the quote currency (CHF, <i>r</i><sub>d</sub>) and that of the base currency (USD, <i>r</i><sub>f</sub>).
+
+Six inputs set the price: spot, strike, time to expiry, vol and the two interest rates. Five of them you can see in the market. Only the vol has to be estimated, and that is exactly what the options market trades.
+
+<PriceDriversFigure caption="Move a slider. The chart shows call and put along that driver, and the arrows show the direction. The slope of the curve is the Greek from module 05." />
+
+### The formula, all through the forward
+
+<Formula variant="accent">
+  <span><i>C</i> = e<sup>−<i>r</i><sub>d</sub><i>T</i></sup> · [<i>F</i> · N(<i>d</i><sub>1</sub>) − <i>K</i> · N(<i>d</i><sub>2</sub>)]</span>
+  <span><i>P</i> = e<sup>−<i>r</i><sub>d</sub><i>T</i></sup> · [<i>K</i> · N(−<i>d</i><sub>2</sub>) − <i>F</i> · N(−<i>d</i><sub>1</sub>)]</span>
+  <span><i>d</i><sub>1,2</sub> = [ln(<i>F</i>/<i>K</i>) ± ½σ²<i>T</i>] / (σ√<i>T</i>)</span>
+</Formula>
+
+Spot only enters through the forward <i>F</i> = <i>S</i> · e<sup>(<i>r</i><sub>d</sub> − <i>r</i><sub>f</sub>)<i>T</i></sup>. That is why this tool is called "Forward First".
+
+In the example: <i>F</i> = <Num of="ex.forward" />, <i>K</i> = <Num of="ex.strike" />, σ√<i>T</i> = <Num of="m04.sigmaSqrtT" />. This gives <i>d</i><sub>1</sub> = <Num of="ex.d1" /> and <i>d</i><sub>2</sub> = <Num of="ex.d2" />, N(<i>d</i><sub>1</sub>) = <Num of="m04.nd1" /> and N(<i>d</i><sub>2</sub>) = <Num of="m04.nd2" />. The discount factor is <Num of="m04.dfd" />, because the CHF rate is <Num of="ex.rd" />. Result: the call costs <Num of="ex.callPips" /> pips.
+
+| When … rises | Call | Put | Why |
+| --- | --- | --- | --- |
+| Spot <i>S</i> | ↑ | ↓ | The forward rises. |
+| Strike <i>K</i> | ↓ | ↑ | With the call you buy higher, with the put you sell higher. |
+| Time <i>T</i> | mostly ↑ | mostly ↑ | More time, more possible movement. Deep in the money the interest carry can win. |
+| Vol σ | ↑ | ↑ | Large moves become more likely, while the loss stays limited. |
+| CHF rate <i>r</i><sub>d</sub> | ↑ | ↓ | The forward rises. |
+| USD rate <i>r</i><sub>f</sub> | ↓ | ↑ | The forward falls. |
+
+### Put-call parity
+
+Buy a call and sell a put with the same strike. At expiry you always get <i>S</i><sub>T</sub> − <i>K</i>: above the strike the call pays, below it the put costs you. A forward at the rate <i>K</i> pays exactly the same. Same payoff means same price today:
+
+<Formula variant="accent">
+  <i>C</i> − <i>P</i> = e<sup>−<i>r</i><sub>d</sub><i>T</i></sup> · (<i>F</i> − <i>K</i>)
+</Formula>
+
+In the example the strike sits <Num of="m04.parityGapPips" /> pips below the forward. So the call is exactly <Num of="ex.parityPips" /> pips dearer than the put: <Num of="ex.callPips" /> against <Num of="ex.putPips" /> pips. With the strike exactly at the forward, call and put cost the same.
+
+A long call plus a short put is therefore a **synthetic forward**. Its spot delta is <Num of="m04.synthDelta" />, that is e<sup>−<i>r</i><sub>f</sub><i>T</i></sup>, and its forward delta is exactly 1: it moves one for one with the forward.
+
+<PayoffBuilderFigure templates={['synthetic-forward', 'long-forward', 'long-call', 'short-put']} initial="synthetic-forward" caption="Drag the shared strike K1·2. The net premium is always DF · (F − K). Zero cost happens exactly at the forward. Compare it with the Forward template." />
+
+### Arbitrage when parity fails
+
+Suppose the call is quoted <Num of="m04.arbPips" /> pips too high. Then you sell the call, buy the put and also buy a forward at the fair rate. What you pay at expiry is then fixed today, wherever the rate ends up, and covered by today's receipts. What remains is the pricing error, received today: <Num of="m04.arbChf" /> on USD 1m, without exchange-rate risk. Market makers close such gaps immediately. That is why parity holds in liquid markets up to costs and spreads.
+
+<WowFigure initialPhase={3} autoplay={false} caption="Summary in four steps: from the forward via the call and time value to parity. Click 1 to 4 or start the animation." />
+
+<Derivation title="Derivation: parity by replication, Garman-Kohlhagen via Black-76">
+
+**Parity.** Portfolio A: long call and short put with strike <i>K</i>. Portfolio B: long forward at the rate <i>K</i>. At expiry, for every <i>S</i><sub>T</sub>:
+
+<Formula>
+  <span>max(<i>S</i><sub>T</sub> − <i>K</i>, 0) − max(<i>K</i> − <i>S</i><sub>T</sub>, 0) = <i>S</i><sub>T</sub> − <i>K</i></span>
+</Formula>
+
+Equal payments at expiry mean equal value today, otherwise there would be arbitrage. A forward at the rate <i>K</i> is worth e<sup>−<i>r</i><sub>d</sub><i>T</i></sup> · (<i>F</i> − <i>K</i>) today. Hence <i>C</i> − <i>P</i> = e<sup>−<i>r</i><sub>d</sub><i>T</i></sup> · (<i>F</i> − <i>K</i>). Parity needs no model and no vol.
+
+**Garman-Kohlhagen.** In the model the rate at expiry is lognormally distributed, with expected value <i>F</i> under the risk-neutral measure. The expected payoff is the Black-76 price on the forward. Discounted at the CHF rate:
+
+<Formula>
+  <span><i>C</i> = e<sup>−<i>r</i><sub>d</sub><i>T</i></sup> · E[max(<i>S</i><sub>T</sub> − <i>K</i>, 0)] = e<sup>−<i>r</i><sub>d</sub><i>T</i></sup> · [<i>F</i> N(<i>d</i><sub>1</sub>) − <i>K</i> N(<i>d</i><sub>2</sub>)]</span>
+</Formula>
+
+Substitute <i>F</i> = <i>S</i> · e<sup>(<i>r</i><sub>d</sub> − <i>r</i><sub>f</sub>)<i>T</i></sup> and you get the spot form <i>S</i> e<sup>−<i>r</i><sub>f</sub><i>T</i></sup> N(<i>d</i><sub>1</sub>) − <i>K</i> e<sup>−<i>r</i><sub>d</sub><i>T</i></sup> N(<i>d</i><sub>2</sub>). The CHF rate acts twice: it lifts the forward and it discounts. For the call the first effect wins.
+
+</Derivation>
+
+<Desk title="The market quotes vol, not premium">
+
+Because spot, rates, strike and time to expiry are observable, only the vol is left to negotiate. Market makers therefore quote options in **implied vol**: the premium then follows from the formula.
+
+In the interbank market an option is often traded together with its delta hedge. That way the parties exchange only the vol risk, not the exchange-rate risk. How the price moves with small changes is measured by the Greeks in module 05.
+
+</Desk>
+
+<Takeaway>
+
+Six inputs set the price, and almost all of them work through the forward. A long call plus a short put with the same strike is a forward: C − P = DF · (F − K).
+
+</Takeaway>

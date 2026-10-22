@@ -1,0 +1,82 @@
+import MoneynessExplorerFigure from '@/components/figures/MoneynessExplorerFigure.astro';
+
+The importer is free to choose the strike. A higher strike only protects later, but it is cheaper. A lower strike protects sooner and costs more. How far a strike is "in the money" is called **moneyness**.
+
+It is measured against the **forward**, not against spot. The option is only exercised in 3 months, and the fair rate for that day is the forward. An example: a USD call with a strike of <Num of="m04.kMid" /> sits <Num of="m04.kMidSpotPips" /> pips below spot and looks in the money. Against the forward of <Num of="ex.forward" digits={4} />, however, it sits <Num of="m04.kMidOtmPips" /> pips above. It is out of the money.
+
+- **ATMF** (at the money forward): strike equal to the forward.
+- **ITM** (in the money): for a call the strike is below the forward, for a put above it.
+- **OTM** (out of the money): for a call the strike is above the forward, for a put below it.
+
+<MoneynessExplorerFigure caption="Drag the strike or pick a desk strike. Grey is the intrinsic value against the forward, the blue area the time value. Switch between USD call and USD put." />
+
+### Premium = intrinsic value + time value
+
+The **intrinsic value** is what you could already lock in today: you could exercise the call and sell the dollars forward at the same time. For a call this is max(F − K, 0), discounted to today. The **time value** is the rest. It pays for the chance that the rate still moves in your favour before expiry.
+
+Three USD calls with 3 months to expiry:
+
+- **ATMF**, strike at the forward: <Num of="m04.atmfPips" /> pips. That is pure time value.
+- **ITM**, strike <Num of="m04.kItm" />: <Num of="m04.itmPips" /> pips. Of this, <Num of="m04.itmIntrinsicPips" /> pips are intrinsic value and <Num of="m04.itmTimePips" /> pips time value.
+- **OTM**, strike <Num of="m04.kOtm" />: <Num of="m04.otmPips" /> pips, or <Num of="m04.otmChf" />. Again pure time value.
+
+Time value is largest at the forward and shrinks towards both wings. Deep in the money the option behaves almost like a forward; far out of the money it is almost worthless.
+
+### Delta instead of a rate: 25Δ and 10Δ
+
+On the desk strikes are often named by their **delta** rather than by a rate. Delta tells you how strongly the option value reacts to spot. Roughly, it is also the chance that the option ends in the money. A 25Δ call therefore has about a one-in-four chance.
+
+In the example the 25Δ call sits at <Num of="m04.call25" />, the 25Δ put at <Num of="m04.put25" />. Further out are the 10Δ strikes, <Num of="m04.call10" /> and <Num of="m04.put10" />. The advantage: "25Δ" means the same moneyness in every pair, at every tenor and every vol.
+
+"ATM" also has its own meaning on the desk. It usually refers to the **delta-neutral straddle** (ATM DNS): the strike at which the call delta and the put delta cancel out exactly. It sits at <Num of="m04.dns" />, <Num of="m04.dnsGapPips" /> pips above the forward. The call delta there is <Num of="m04.dnsDelta" />, and the put delta has the same size with a negative sign.
+
+### Pips or per cent
+
+The premium of our call can be written in two ways. In CHF pips: <Num of="ex.callPips" /> pips, which is <Num of="ex.callChf" /> on USD 1m. Or as a percentage of notional: converted into USD the premium is <Num of="m04.callUsd" />, or <Num of="m04.callPctUsd" /> of the USD notional. Same price, different unit. So always ask how a premium is quoted.
+
+### European or American
+
+A **European** option can only be exercised on the expiry date, an **American** one at any time until then. In the OTC FX market the European style is standard. An American option is worth at least as much as a European one, because it gives you an extra right. In this tool all options are European.
+
+<Derivation title="Derivation: intrinsic value, rule of thumb and strike from delta">
+
+**Intrinsic value against the forward.** If you exercise the call at expiry and sell the dollars forward today, you receive F − K per USD at expiry for certain. Today that is worth, discounted:
+
+<Formula>
+  intrinsic value = e<sup>−<i>r</i><sub>d</sub><i>T</i></sup> · max(<i>F</i> − <i>K</i>, 0)
+</Formula>
+
+**Rule of thumb for ATMF.** With <i>K</i> = <i>F</i>, Garman-Kohlhagen becomes approximately
+
+<Formula variant="accent">
+  <span><i>C</i><sub>ATMF</sub> ≈ e<sup>−<i>r</i><sub>d</sub><i>T</i></sup> · <i>F</i> · σ√<i>T</i> / √(2π) ≈ 0.4 · <i>F</i> · σ√<i>T</i></span>
+</Formula>
+
+With σ√<i>T</i> = <Num of="m04.sigmaSqrtT" /> this gives <Num of="m04.atmfApproxPips" /> pips. So the premium grows with the vol and with the square root of time.
+
+**Strike from delta.** The spot delta of the call is e<sup>−<i>r</i><sub>f</sub><i>T</i></sup> · N(<i>d</i><sub>1</sub>). For a target delta you solve for <i>d</i><sub>1</sub> and substitute:
+
+<Formula>
+  <span><i>d</i><sub>1</sub> = N<sup>−1</sup>(Δ · e<sup><i>r</i><sub>f</sub><i>T</i></sup>)</span>
+  <span><i>K</i> = <i>F</i> · e<sup>−<i>d</i><sub>1</sub>σ√<i>T</i> + ½σ²<i>T</i></sup></span>
+</Formula>
+
+**ATM DNS.** The call and put deltas cancel when N(<i>d</i><sub>1</sub>) = ½, so <i>d</i><sub>1</sub> = 0. This gives <i>K</i> = <i>F</i> · e<sup>½σ²<i>T</i></sup>, slightly above the forward.
+
+**A neat link.** The time value of the ITM call above, <Num of="m04.itmTimePips" /> pips, is exactly the price of the OTM put with the same strike. This follows from put-call parity in section 4.
+
+</Derivation>
+
+<Desk title="Which ATM do you mean?">
+
+ATM can mean spot, the forward or the delta-neutral straddle. In the interbank market, vol quotes usually refer to ATM DNS. Together with the 25Δ risk reversal and the 25Δ butterfly it describes the whole vol smile (module 06).
+
+If the premium is paid in USD, the desk often works with a premium-adjusted delta. The strikes then shift slightly. For every delta strike, ask which convention applies.
+
+</Desk>
+
+<Takeaway>
+
+Moneyness measures the strike against the forward, not against spot. The premium is intrinsic value plus time value; at the forward it is pure time value.
+
+</Takeaway>

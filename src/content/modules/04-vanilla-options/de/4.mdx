@@ -23,7 +23,7 @@ Im Beispiel: <i>F</i> = <Num of="ex.forward" />, <i>K</i> = <Num of="ex.strike" 
 | Wenn … steigt | Call | Put | Warum |
 | --- | --- | --- | --- |
 | Spot <i>S</i> | ↑ | ↓ | Der Forward steigt. |
-| Strike <i>K</i> | ↓ | ↑ | Du kaufst teurer bzw. verkaufst teurer. |
+| Strike <i>K</i> | ↓ | ↑ | Beim Call kaufst du teurer, beim Put verkaufst du teurer. |
 | Laufzeit <i>T</i> | meist ↑ | meist ↑ | Mehr Zeit, mehr mögliche Bewegung. Tief im Geld kann der Zins-Carry überwiegen. |
 | Vola σ | ↑ | ↑ | Grosse Bewegungen werden wahrscheinlicher, der Verlust bleibt begrenzt. |
 | CHF-Zins <i>r</i><sub>d</sub> | ↑ | ↓ | Der Forward steigt. |
@@ -45,7 +45,7 @@ Long Call plus Short Put ist darum ein **synthetischer Forward**. Sein Spot-Delt
 
 ### Arbitrage, wenn die Parität nicht gilt
 
-Angenommen, der Call notiert <Num of="m04.arbPips" /> Pips zu teuer. Dann verkaufst du den Call, kaufst den Put und kaufst zusätzlich einen Forward zum fairen Kurs. Bei Verfall heben sich alle Zahlungen auf, egal wo der Kurs steht. Übrig bleibt der Preisfehler, heute vereinnahmt: <Num of="m04.arbChf" /> auf USD 1 Mio., ohne Kursrisiko. Solche Lücken schliessen Market Maker sofort. Darum gilt die Parität in liquiden Märkten bis auf Kosten und Spreads.
+Angenommen, der Call notiert <Num of="m04.arbPips" /> Pips zu teuer. Dann verkaufst du den Call, kaufst den Put und kaufst zusätzlich einen Forward zum fairen Kurs. Was du bei Verfall zahlst, steht damit schon heute fest, egal wo der Kurs steht, und ist durch die heutigen Einnahmen gedeckt. Übrig bleibt der Preisfehler, heute vereinnahmt: <Num of="m04.arbChf" /> auf USD 1 Mio., ohne Kursrisiko. Solche Lücken schliessen Market Maker sofort. Darum gilt die Parität in liquiden Märkten bis auf Kosten und Spreads.
 
 <WowFigure initialPhase={3} autoplay={false} caption="Zusammenfassung in vier Schritten: vom Forward über den Call und den Zeitwert zur Parität. Klick auf 1 bis 4 oder starte die Animation." />
 
