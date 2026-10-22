@@ -253,6 +253,7 @@ export default function GreeksLab({ lang, mode = 'delta-gamma' }: GreeksLabProps
 
   /* ---------- per-mode heads, pills, aria ---------- */
   const slope = t('gl.pill.slope');
+  const slopeShort = t('gl.pill.slopeShort');
   type Head = {
     title: string;
     color: string;
@@ -399,6 +400,15 @@ export default function GreeksLab({ lang, mode = 'delta-gamma' }: GreeksLabProps
     const clipId = `${uid}-clip-${which}`;
     const guideX = x(xValue(spec.x, shown));
     const titleX = which === 'bottom' || !sharedX(mode);
+    // Put the axis title (and the payoff label) on the side where the curve leaves room.
+    const ends = projected([spec.points[0]!, spec.points[spec.points.length - 1]!], x, y);
+    const [leftEnd, rightEnd] = ends[0]![0] < ends[1]![0] ? ends : [ends[1]!, ends[0]!];
+    const titleRight = rightEnd![1] <= g.plotBottom - 26 || rightEnd![1] <= leftEnd![1];
+    const titleText = axisTitle[spec.x];
+    const titleW = titleText.length * 6.8;
+    const titleBox = titleRight
+      ? { a: x1 - titleW, b: x1 }
+      : { a: x0 + 4, b: x0 + 4 + titleW };
     const strikeLabel =
       (which === 'top' && spec.x === 'spot') || (which === 'bottom' && mode === 'vega');
     const dragging = dragPanel === which;
@@ -412,6 +422,10 @@ export default function GreeksLab({ lang, mode = 'delta-gamma' }: GreeksLabProps
       const w = Math.ceil(Math.max(l1.length * 7.1, l2.length * 6.3)) + 20;
       const h = 44;
       const obstacles: Point[] = projected(spec.points, x, y);
+      if (titleX) {
+        for (let px = titleBox.a; px <= titleBox.b; px += 8)
+          obstacles.push([px, g.plotBottom - 12], [px, g.plotBottom - 4]);
+      }
       if (spec.tangent) {
         const [a0, b0, a1, b1] = spec.tangent;
         for (let i = 0; i <= 12; i++) {
@@ -426,12 +440,22 @@ export default function GreeksLab({ lang, mode = 'delta-gamma' }: GreeksLabProps
         obstacles,
         14,
       );
+      // a thin leader when the box had to move away from the dot
+      const nx = Math.min(Math.max(cx, b.x), b.x + b.w);
+      const ny = Math.min(Math.max(cy, b.y), b.y + b.h);
+      const far = Math.hypot(nx - cx, ny - cy) > 26;
       callout = (
         <g
           class="gl-aha"
           data-aha={aha ? aha.key : ''}
           style={{ opacity: aha ? 1 : 0, transition: rm ? 'none' : 'opacity 300ms ease' }}
         >
+          {far && (
+            <path
+              d={`M${cx.toFixed(1)},${cy.toFixed(1)}L${nx.toFixed(1)},${ny.toFixed(1)}`}
+              class="gl-aha-leader"
+            />
+          )}
           <rect x={b.x} y={b.y} width={b.w} height={b.h} rx={10} class="gl-aha-box" />
           <text x={b.x + 10} y={b.y + 18} class="gl-aha-title">
             {l1}
@@ -534,10 +558,10 @@ export default function GreeksLab({ lang, mode = 'delta-gamma' }: GreeksLabProps
           </g>
           {spec.payoff && mode === 'theta' && (
             <text
-              x={x1 - 4}
-              y={clampY(y(spec.payoff[1]![1]), g) - 8}
+              x={x0 + 6}
+              y={clampY(y(spec.payoff[0]![1]), g) - 8}
               class="gl-label"
-              text-anchor="end"
+              text-anchor="start"
             >
               {t('gl.ref.payoff')}
             </text>
@@ -552,8 +576,13 @@ export default function GreeksLab({ lang, mode = 'delta-gamma' }: GreeksLabProps
             </text>
           ))}
           {titleX && (
-            <text x={x1} y={g.plotBottom - 8} class="gl-axis-title" text-anchor="end">
-              {axisTitle[spec.x]}
+            <text
+              x={titleRight ? x1 : x0 + 4}
+              y={g.plotBottom - 8}
+              class="gl-axis-title"
+              text-anchor={titleRight ? 'end' : 'start'}
+            >
+              {titleText}
             </text>
           )}
           {callout}
@@ -573,12 +602,13 @@ export default function GreeksLab({ lang, mode = 'delta-gamma' }: GreeksLabProps
         {head.tangent ? (
           <>
             <span aria-hidden="true" class="gl-pill-line" />
-            {slope} = <span class="math">{head.sym}</span> = <b>{head.value}</b>
+            <span class="gl-slope-long">{slope}</span>
+            <span class="gl-slope-short">{slopeShort}</span> = {head.sym} = <b>{head.value}</b>
           </>
         ) : (
           <>
             <span aria-hidden="true" class="gl-pill-dot" />
-            <span class="math">{head.sym}</span> = <b>{head.value}</b>
+            {head.sym} = <b>{head.value}</b>
           </>
         )}
         {head.unit && <> {head.unit}</>}
@@ -601,8 +631,8 @@ export default function GreeksLab({ lang, mode = 'delta-gamma' }: GreeksLabProps
         return (
           <>
             <span class="gl-check-f math">
-              [<i>V</i>(σ + <i>h</i>) − <i>V</i>(σ − <i>h</i>)] / 2<i>h</i> ={' '}
-              {chf(n.check.vegaChf, 2)}
+              [<i>V</i>(σ + <i>h</i>) − <i>V</i>(σ − <i>h</i>)] / 2<i>h</i>{' '}
+              <span class="gl-nowrap">= {chf(n.check.vegaChf, 2)}</span>
             </span>
             <span>{t('gl.check.vega', { notional, v: chf(n.vegaChf, 2) })}</span>
           </>
@@ -611,8 +641,8 @@ export default function GreeksLab({ lang, mode = 'delta-gamma' }: GreeksLabProps
         return (
           <>
             <span class="gl-check-f math">
-              −[<i>V</i>(<i>T</i> + <i>h</i>) − <i>V</i>(<i>T</i> − <i>h</i>)] / 2<i>h</i> ={' '}
-              {chf(n.check.thetaChf, 2)}
+              −[<i>V</i>(<i>T</i> + <i>h</i>) − <i>V</i>(<i>T</i> − <i>h</i>)] / 2<i>h</i>{' '}
+              <span class="gl-nowrap">= {chf(n.check.thetaChf, 2)}</span>
             </span>
             <span>
               {t('gl.check.theta', {
@@ -628,12 +658,14 @@ export default function GreeksLab({ lang, mode = 'delta-gamma' }: GreeksLabProps
             <span class="gl-check-f math">
               [<i>V</i>(<i>r</i>
               <sub>d</sub> + <i>h</i>) − <i>V</i>(<i>r</i>
-              <sub>d</sub> − <i>h</i>)] / 2<i>h</i> = {chf(n.check.rhoDChf, 2, true)}
+              <sub>d</sub> − <i>h</i>)] / 2<i>h</i>{' '}
+              <span class="gl-nowrap">= {chf(n.check.rhoDChf, 2, true)}</span>
             </span>
             <span class="gl-check-f math">
               [<i>V</i>(<i>r</i>
               <sub>f</sub> + <i>h</i>) − <i>V</i>(<i>r</i>
-              <sub>f</sub> − <i>h</i>)] / 2<i>h</i> = {chf(n.check.rhoFChf, 2, true)}
+              <sub>f</sub> − <i>h</i>)] / 2<i>h</i>{' '}
+              <span class="gl-nowrap">= {chf(n.check.rhoFChf, 2, true)}</span>
             </span>
             <span>
               {t('gl.check.rho', {

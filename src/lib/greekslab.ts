@@ -75,6 +75,8 @@ export const LAB_CONFIG = {
   vegaDomain: [0, 4000] as [number, number],
   /** Rho panels rescale with the curves but never show less than this many pips. */
   rhoMinSpan: 100,
+  /** The price-over-time panel (theta) rescales too, with at least this many pips. */
+  thetaPriceMinSpan: 200,
   /** Tangent length on each side, as a share of the x span (prototype ±0.025 of 0.12). */
   tangentHalf: 0.21,
   samples: 120,
@@ -476,17 +478,23 @@ export function panels(mode: LabMode, p: LabParams, n = labNumbers(p)): [PanelSp
     // dV/d(days to expiry) = −theta per day: the curve falls as time passes (x runs to expiry).
     const slope = -n.thetaPips;
     const intrinsic = payoff(p.spot, K, TYPE) / PIP;
+    const pricePts = sample((d) => priceAt(p, { T: d / DAYS_PER_YEAR }), X.days[0], X.days[1], n0);
+    // The price moves little over time, so this panel scales to the curve (at least 200 pips).
+    const pd = niceDomain(0, Math.max(intrinsic, ...pricePts.map(([, y]) => y)) * 1.1, {
+      withZero: true,
+      minSpan: C.thetaPriceMinSpan,
+    });
     const top: PanelSpec = {
       id: 'top',
       x: 'days',
       xDomain: dom(X.days),
       y: 'price',
-      yDomain: dom(C.priceDomain),
-      yStep: 200,
-      points: sample((d) => priceAt(p, { T: d / DAYS_PER_YEAR }), X.days[0], X.days[1], n0),
+      yDomain: pd.domain,
+      yStep: pd.step,
+      points: pricePts,
       at: [days, n.pricePips],
       slope,
-      tangent: tangentFor(days, n.pricePips, slope, dom(X.days), dom(C.priceDomain)),
+      tangent: tangentFor(days, n.pricePips, slope, dom(X.days), pd.domain),
       refs: [],
       payoff: [
         [X.days[0], intrinsic],
@@ -714,6 +722,11 @@ export function placeCallout(
     { x: ax + gap, y: ay - gap - h, w, h },
     { x: ax - gap - w, y: ay + gap, w, h },
     { x: ax - gap - w, y: ay - gap - h, w, h },
+    // plot corners: used when every spot next to the anchor is crowded (drawn with a leader)
+    { x: plot.x0, y: plot.y0, w, h },
+    { x: plot.x1 - w, y: plot.y0, w, h },
+    { x: plot.x0, y: plot.y1 - h, w, h },
+    { x: plot.x1 - w, y: plot.y1 - h, w, h },
   ];
   let best = candidates[0]!;
   let bestScore = Infinity;
@@ -727,7 +740,10 @@ export function placeCallout(
     for (const [px, py] of obstacles) {
       if (px >= b.x - 4 && px <= b.x + b.w + 4 && py >= b.y - 4 && py <= b.y + b.h + 4) hits++;
     }
-    const score = overflow * 10 + hits * 4 + i * 0.5;
+    // covering the anchor itself is never acceptable
+    const covers = ax >= b.x - 8 && ax <= b.x + b.w + 8 && ay >= b.y - 8 && ay <= b.y + b.h + 8;
+    const corner = i >= 4 ? 3 : 0;
+    const score = overflow * 10 + hits * 4 + (covers ? 1000 : 0) + corner + i * 0.1;
     if (score < bestScore) {
       bestScore = score;
       best = b;

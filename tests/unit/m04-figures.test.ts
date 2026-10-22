@@ -1,0 +1,197 @@
+import { describe, expect, it } from 'vitest';
+import { EXAMPLE as E, EXAMPLE_FORWARD as F, EXAMPLE_STRIKE as K } from '@/lib/fx/example';
+import { gkPrice } from '@/lib/fx/vanilla';
+import { greeks } from '@/lib/fx/greeks';
+import { atmDnsStrike, strikeFromDelta } from '@/lib/fx/implied';
+import {
+  ST_RANGE,
+  ST_START,
+  hedgeCosts,
+  hedgeFacts,
+  hedgeRegion,
+  rankCosts,
+  type HedgeSetup,
+} from '@/lib/hedge-cost';
+import {
+  ATMF_TOL,
+  K_RANGE,
+  markerAt,
+  moneyness,
+  premiumCurves,
+  premiumSplit,
+  strikeMarkers,
+  type OptionMarket,
+} from '@/lib/moneyness';
+import {
+  DRIVERS,
+  DRIVER_ORDER,
+  bumpEffect,
+  direction,
+  driverCurve,
+  exampleDrivers,
+  pricePips,
+  slope,
+  withDriver,
+} from '@/lib/price-drivers';
+
+const H: HedgeSetup = {
+  S: E.spot,
+  K,
+  T: E.T,
+  vol: E.vol,
+  rd: E.rd,
+  rf: E.rf,
+  notional: E.notional,
+};
+const call = gkPrice(E.spot, K, E.T, E.vol, E.rd, E.rf, 'call');
+const put = gkPrice(E.spot, K, E.T, E.vol, E.rd, E.rf, 'put');
+const M: OptionMarket = { S: E.spot, T: E.T, vol: E.vol, rd: E.rd, rf: E.rf };
+
+describe('hedge cost: option vs forward', () => {
+  const f = hedgeFacts(H);
+
+  it('uses the forward and the call of the example', () => {
+    expect(f.F).toBeCloseTo(F, 14);
+    expect(f.premium).toBeCloseTo(call, 14);
+    expect(f.premiumAtExpiry).toBeCloseTo(call * Math.exp(E.rd * E.T), 14);
+    expect(f.cap).toBeCloseTo(K + f.premiumAtExpiry, 14);
+    expect(f.optionBeatsUnhedgedAbove).toBe(f.cap);
+    expect(f.optionBeatsForwardBelow).toBeCloseTo(F - f.premiumAtExpiry, 14);
+  });
+
+  it('costs in CHF for USD 1 Mio.', () => {
+    const c = hedgeCosts(0.84, H, f);
+    expect(c.unhedged).toBeCloseTo(0.84 * E.notional, 6);
+    expect(c.forward).toBeCloseTo(F * E.notional, 6);
+    expect(c.option).toBeCloseTo((K + f.premiumAtExpiry) * E.notional, 6);
+    expect(hedgeCosts(0.76, H).option).toBeCloseTo((0.76 + f.premiumAtExpiry) * E.notional, 6);
+  });
+
+  it('the option is never the cheapest in hindsight, but never the dearest outside the middle', () => {
+    for (let s = ST_RANGE[0]; s <= ST_RANGE[1]; s += 0.0025) {
+      const r = rankCosts(hedgeCosts(s, H, f));
+      expect(r.cheapest).not.toBe('option');
+      const region = hedgeRegion(s, f);
+      if (region !== 'middle') expect(r.dearest).not.toBe('option');
+      else expect(r.dearest).toBe('option');
+    }
+  });
+
+  it('regions', () => {
+    expect(hedgeRegion(0.74, f)).toBe('weakUsd');
+    expect(hedgeRegion(0.8, f)).toBe('middle');
+    expect(hedgeRegion(ST_START, f)).toBe('strongUsd');
+  });
+});
+
+describe('moneyness and premium split', () => {
+  it('classifies against the forward with a 1-pip ATMF band', () => {
+    expect(moneyness(K, F, 'call').label).toBe('ATMF');
+    expect(moneyness(0.78, F, 'call').label).toBe('ITM');
+    expect(moneyness(0.78, F, 'put').label).toBe('OTM');
+    expect(moneyness(0.81, F, 'call').label).toBe('OTM');
+    expect(moneyness(0.81, F, 'put').label).toBe('ITM');
+    // spot is 0.8000, but a 0.7990 call is OTM against the forward
+    expect(moneyness(0.799, F, 'call').label).toBe('OTM');
+    expect(moneyness(0.78, F, 'call').fMinusKPips).toBeCloseTo((F - 0.78) / 1e-4, 8);
+    expect(moneyness(F + 2 * ATMF_TOL, F, 'call', 3 * ATMF_TOL).label).toBe('ATMF');
+  });
+
+  it('premium = intrinsic against the forward + time value', () => {
+    const s = premiumSplit(0.77, M, 'call');
+    expect(s.price).toBeCloseTo(gkPrice(E.spot, 0.77, E.T, E.vol, E.rd, E.rf, 'call'), 14);
+    expect(s.intrinsic).toBeCloseTo(Math.exp(-E.rd * E.T) * (F - 0.77), 14);
+    expect(s.time).toBeCloseTo(s.price - s.intrinsic, 14);
+    expect(s.time).toBeGreaterThan(0);
+    const otm = premiumSplit(0.82, M, 'call');
+    expect(otm.intrinsic).toBe(0);
+    expect(otm.time).toBeCloseTo(otm.price, 14);
+  });
+
+  it('quotes the example in % of the USD notional and gives the deltas', () => {
+    const s = premiumSplit(K, M, 'call');
+    expect(s.pctBase).toBeCloseTo(call / E.spot, 14);
+    const g = greeks(E.spot, K, E.T, E.vol, E.rd, E.rf, 'call');
+    expect(s.delta).toBeCloseTo(g.delta, 14);
+    expect(s.deltaFwd).toBeCloseTo(g.deltaFwd, 14);
+    expect(premiumSplit(K, M, 'put').price).toBeCloseTo(put, 14);
+  });
+
+  it('marks the desk strikes in order: 10Δ put < 25Δ put < ATMF < DNS < 25Δ call < 10Δ call', () => {
+    const mk = strikeMarkers(M);
+    expect(mk.map((m) => m.id)).toEqual(['p10', 'p25', 'atmf', 'dns', 'c25', 'c10']);
+    expect(mk[1]!.K).toBeCloseTo(strikeFromDelta(-0.25, E.spot, E.T, E.vol, E.rd, E.rf, 'put'), 14);
+    expect(mk[3]!.K).toBeCloseTo(atmDnsStrike(E.spot, E.T, E.vol, E.rd, E.rf), 14);
+    for (const m of mk) {
+      expect(m.K).toBeGreaterThan(K_RANGE[0]);
+      expect(m.K).toBeLessThan(K_RANGE[1]);
+    }
+    // a 25Δ call has spot delta 0.25 by construction
+    const c25 = mk.find((m) => m.id === 'c25')!.K;
+    expect(premiumSplit(c25, M, 'call').delta).toBeCloseTo(0.25, 10);
+    expect(markerAt(c25 + 0.00005, mk)?.id).toBe('c25');
+    expect(markerAt(0.8, mk)).toBeNull();
+    // ATMF and DNS are 6 pips apart; the nearer one wins
+    expect(markerAt(F, mk, 1e-3)?.id).toBe('atmf');
+  });
+
+  it('curves over strikes', () => {
+    const c = premiumCurves([0.76, K, 0.83], M, 'put');
+    expect(c.price[1]).toBeCloseTo(put / 1e-4, 8);
+    expect(c.intrinsic[0]).toBe(0);
+    expect(c.intrinsic[2]).toBeCloseTo((Math.exp(-E.rd * E.T) * (0.83 - F)) / 1e-4, 8);
+  });
+});
+
+describe('price drivers', () => {
+  const v = exampleDrivers();
+
+  it('starts at the running example', () => {
+    expect(v.weeks / 52).toBe(E.T);
+    expect(pricePips(v, 'call')).toBeCloseTo(call / 1e-4, 8);
+    expect(DRIVER_ORDER).toHaveLength(6);
+    for (const id of DRIVER_ORDER) {
+      const d = DRIVERS[id];
+      expect(v[d.key]).toBeGreaterThanOrEqual(d.min);
+      expect(v[d.key]).toBeLessThanOrEqual(d.max);
+    }
+  });
+
+  it('textbook directions at the example', () => {
+    expect(direction(v, 'S', 'call')).toBe('up');
+    expect(direction(v, 'S', 'put')).toBe('down');
+    expect(direction(v, 'K', 'call')).toBe('down');
+    expect(direction(v, 'K', 'put')).toBe('up');
+    expect(direction(v, 'vol', 'call')).toBe('up');
+    expect(direction(v, 'vol', 'put')).toBe('up');
+    expect(direction(v, 'T', 'call')).toBe('up');
+    expect(direction(v, 'rd', 'call')).toBe('up');
+    expect(direction(v, 'rd', 'put')).toBe('down');
+    expect(direction(v, 'rf', 'call')).toBe('down');
+    expect(direction(v, 'rf', 'put')).toBe('up');
+  });
+
+  it('a deep ITM call can lose value with more time when rf > rd (carry), and a far OTM option is flat', () => {
+    const deep = { ...v, K: 0.74, vol: 0.02, weeks: 26 };
+    expect(direction(deep, 'T', 'call')).toBe('down');
+    const far = { ...v, K: 0.86, vol: 0.02, weeks: 1 };
+    expect(direction(far, 'vol', 'call')).toBe('flat');
+  });
+
+  it('slope equals the Greek (delta in pips per unit of spot)', () => {
+    const g = greeks(E.spot, K, E.T, E.vol, E.rd, E.rf, 'call');
+    expect(slope(v, 'S', 'call') * 1e-4).toBeCloseTo(g.delta, 6);
+    expect(slope(v, 'vol', 'call') * 1e-4).toBeCloseTo(g.vega, 5);
+  });
+
+  it('bump effects and curves', () => {
+    expect(bumpEffect(v, 'vol', 'call')).toBeGreaterThan(0);
+    expect(bumpEffect({ ...v, weeks: 52 }, 'T', 'call')).toBe(0);
+    const c = driverCurve(v, 'S', 40);
+    expect(c.xs).toHaveLength(41);
+    expect(c.xs[0]).toBe(DRIVERS.S.min);
+    expect(c.call[40]).toBeGreaterThan(c.call[0]!);
+    expect(c.put[40]).toBeLessThan(c.put[0]!);
+    expect(withDriver(v, 'T', 26).weeks).toBe(26);
+  });
+});

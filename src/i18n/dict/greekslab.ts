@@ -19,11 +19,11 @@ export const greekslab = defineDict({
     'gl.head.vega': 'Vega ν(S) in CHF je Vola-Punkt',
     'gl.head.priceTime': 'Preis V(t) in Pips',
     'gl.head.theta': 'Theta Θ(t) in CHF pro Tag',
-    'gl.head.priceRd': 'Preis in Pips gegen den CHF-Zins',
-    'gl.head.priceRf': 'Preis in Pips gegen den USD-Zins',
+    'gl.head.priceRd': 'Preis in Pips je CHF-Zins',
+    'gl.head.priceRf': 'Preis in Pips je USD-Zins',
     'gl.head.ghost': 'Beispiel: {weeks}, Vola {vol}',
     'gl.pill.slope': 'Steigung der Tangente',
-    'gl.pill.now': 'Heute',
+    'gl.pill.slopeShort': 'Steigung',
 
     'gl.unit.pipsPerVol': 'Pips je Vola-Punkt',
     'gl.unit.pipsPerDay': 'Pips pro Tag',
@@ -60,11 +60,11 @@ export const greekslab = defineDict({
     'gl.check.title': 'Numerischer Check',
     'gl.check.gamma': 'mit h = 1 Pip. Deckt sich mit der Formel Γ = {v}.',
     'gl.check.vega':
-      'mit h = 0.01 Vola-Punkte, je Vola-Punkt auf {notional}. Deckt sich mit der Formel ν = {v}.',
+      'mit h = 0.01 Vola-Punkte, je Vola-Punkt auf {notional}: Deckt sich mit der Formel ν = {v}.',
     'gl.check.theta':
       'pro Tag, mit h = 0.0001 Jahre (knapp eine Stunde). Deckt sich mit der Formel Θ / 365 = {v}. Die Tabelle zeigt den ganzen Tag, V(T − 1 Tag) − V(T) = {day}.',
     'gl.check.rho':
-      'mit h = 0.01 %, je +1 % auf {notional}. Deckt sich mit den Formeln: Rho CHF {d}, Rho USD {f}.',
+      'mit h = 0.01 %, je +1 % auf {notional}: Deckt sich mit den Formeln für Rho CHF ({d}) und Rho USD ({f}).',
 
     'gl.axis.spot': 'Spot USD/CHF',
     'gl.axis.vol': 'Implizite Vola',
@@ -132,11 +132,11 @@ export const greekslab = defineDict({
     'gl.head.vega': 'Vega ν(S) in CHF per vol point',
     'gl.head.priceTime': 'Price V(t) in pips',
     'gl.head.theta': 'Theta Θ(t) in CHF per day',
-    'gl.head.priceRd': 'Price in pips against the CHF rate',
-    'gl.head.priceRf': 'Price in pips against the USD rate',
+    'gl.head.priceRd': 'Price in pips vs CHF rate',
+    'gl.head.priceRf': 'Price in pips vs USD rate',
     'gl.head.ghost': 'Example: {weeks}, vol {vol}',
     'gl.pill.slope': 'Slope of the tangent',
-    'gl.pill.now': 'Today',
+    'gl.pill.slopeShort': 'Slope',
 
     'gl.unit.pipsPerVol': 'pips per vol point',
     'gl.unit.pipsPerDay': 'pips per day',
@@ -173,11 +173,11 @@ export const greekslab = defineDict({
     'gl.check.title': 'Numerical check',
     'gl.check.gamma': 'with h = 1 pip. Matches the formula Γ = {v}.',
     'gl.check.vega':
-      'with h = 0.01 vol points, per vol point on {notional}. Matches the formula ν = {v}.',
+      'with h = 0.01 vol points, per vol point on {notional}: matches the formula ν = {v}.',
     'gl.check.theta':
       'per day, with h = 0.0001 years (just under an hour). Matches the formula Θ / 365 = {v}. The table shows the full day, V(T − 1 day) − V(T) = {day}.',
     'gl.check.rho':
-      'with h = 0.01%, per +1% on {notional}. Matches the formulas: rho CHF {d}, rho USD {f}.',
+      'with h = 0.01%, per +1% on {notional}: matches the formulas for rho CHF ({d}) and rho USD ({f}).',
 
     'gl.axis.spot': 'Spot USD/CHF',
     'gl.axis.vol': 'Implied vol',

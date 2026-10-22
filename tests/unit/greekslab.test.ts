@@ -319,3 +319,20 @@ describe('greeks lab: callout placement and percent digits', () => {
     expect(pctDigits(3.25)).toBe(2);
   });
 });
+
+describe('greeks lab: callout falls back to a plot corner', () => {
+  it('uses a free corner when the curve crowds the anchor', () => {
+    const plot = { x0: 0, x1: 400, y0: 0, y1: 200 };
+    // a thick band of points around the anchor
+    const band: [number, number][] = [];
+    for (let x = 60; x <= 340; x += 4) for (let y = 40; y <= 160; y += 8) band.push([x, y]);
+    const b = placeCallout([200, 100], { w: 100, h: 30 }, plot, band);
+    const corners = [
+      [0, 0],
+      [300, 0],
+      [0, 170],
+      [300, 170],
+    ];
+    expect(corners.some(([x, y]) => b.x === x && b.y === y)).toBe(true);
+  });
+});

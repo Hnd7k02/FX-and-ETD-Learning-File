@@ -7,7 +7,7 @@
  * question of the section (src/content/quiz/{slug}.ts → checks[n]) and the pager.
  * Without MDX the page shows a calm "coming soon" placeholder so all 9 × 5 pages exist.
  */
-import { getEntry, render } from 'astro:content';
+import { getCollection, render } from 'astro:content';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { mdxComponents } from '@/components/content/mdx-components';
 import ComingSoon from '@/components/module/ComingSoon.astro';
@@ -34,7 +34,9 @@ const t = translator(common, lang);
 const other: Lang = lang === 'de' ? 'en' : 'de';
 const m = getModule(slug);
 const sec = m.sections[Number(section) - 1]!;
-const entry = await getEntry('sections', `${slug}/${lang}/${section}`);
+// Looked up in the collection (not getEntry) so unwritten sections do not log a warning per page.
+const entryId = `${slug}/${lang}/${section}`;
+const entry = (await getCollection('sections')).find((e) => e.id === entryId);
 const Content = entry ? (await render(entry)).Content : null;
 const check = getQuiz(slug)?.checks[section];
 const title = `${entry?.data.title ?? sec.title[lang]} · ${m.n} ${m.title[lang]} · ${t('site.name')}`;

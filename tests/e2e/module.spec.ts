@@ -150,10 +150,7 @@ test.describe('module section page', () => {
     await expect(page.locator('.pager-next')).toHaveAttribute('href', '/module/05-greeks/quiz/');
     await expect(page.locator('.pager-next')).toContainText('5 · Quiz');
     await page.goto(QUIZ);
-    await expect(page.locator('.pager-next')).toHaveAttribute(
-      'href',
-      '/module/06-combos-smile/1/',
-    );
+    await expect(page.locator('.pager-next')).toHaveAttribute('href', '/module/06-combos-smile/1/');
     await expect(page.locator('.pager-next')).toContainText('Nächstes Modul');
     await page.goto('/module/09-hedge-alpha-yield/quiz/');
     await expect(page.locator('.pager-next')).toHaveAttribute('href', '/#lernpfad');
@@ -185,9 +182,9 @@ test.describe('module section page', () => {
     ).toBeVisible();
     await expect(page.locator('.intro .eyebrow')).toHaveText('Section 2 of 5');
     await expect(page.getByRole('heading', { level: 2, name: 'Delta and gamma' })).toBeVisible();
-    await expect(page.locator('[data-num="m05.vegaPoint"], [data-num="m05.gamma"]').first()).toHaveText(
-      /12\.36/,
-    );
+    await expect(
+      page.locator('[data-num="m05.vegaPoint"], [data-num="m05.gamma"]').first(),
+    ).toHaveText(/12\.36/);
     await expect(page.locator('[data-quiz="check"]')).toContainText('Quick check');
     await expect(page.locator('.pager-next')).toHaveAttribute('href', '/en/module/05-greeks/3/');
     await expect(page.locator('a[data-lang-switch="de"]')).toHaveAttribute(
