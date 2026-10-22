@@ -50,7 +50,10 @@ describe('GBM paths', () => {
     simulate(m, { paths: 2, days: 30, seed: 3 }, (p) => paths.push(p.slice()));
     const [up, down] = paths as [Float64Array, Float64Array];
     for (const d of [1, 7, 30]) {
-      expect(Math.log(up[d]! / m.spot) + Math.log(down[d]! / m.spot)).toBeCloseTo(2 * drift * d, 12);
+      expect(Math.log(up[d]! / m.spot) + Math.log(down[d]! / m.spot)).toBeCloseTo(
+        2 * drift * d,
+        12,
+      );
     }
   });
 
@@ -82,7 +85,10 @@ describe('GBM paths', () => {
 
   it('gbmStep is the exact log step', () => {
     const { drift, diffusion } = gbmCoefficients(m, 1 / 365);
-    expect(gbmStep(0.8, 1.5, drift, diffusion)).toBeCloseTo(0.8 * Math.exp(drift + diffusion * 1.5), 15);
+    expect(gbmStep(0.8, 1.5, drift, diffusion)).toBeCloseTo(
+      0.8 * Math.exp(drift + diffusion * 1.5),
+      15,
+    );
     expect(diffusion).toBeCloseTo(0.08 / Math.sqrt(365), 15);
   });
 
@@ -91,8 +97,12 @@ describe('GBM paths', () => {
     expect(() => simulate(m, { paths: 0, days: 1, seed: 1 }, f)).toThrow(RangeError);
     expect(() => simulate(m, { paths: 1, days: 0, seed: 1 }, f)).toThrow(RangeError);
     expect(() => simulate(m, { paths: 1, days: 1, seed: 1, dt: 0 }, f)).toThrow(RangeError);
-    expect(() => simulate({ ...m, spot: 0 }, { paths: 1, days: 1, seed: 1 }, f)).toThrow(RangeError);
-    expect(() => simulate({ ...m, vol: -0.1 }, { paths: 1, days: 1, seed: 1 }, f)).toThrow(RangeError);
+    expect(() => simulate({ ...m, spot: 0 }, { paths: 1, days: 1, seed: 1 }, f)).toThrow(
+      RangeError,
+    );
+    expect(() => simulate({ ...m, vol: -0.1 }, { paths: 1, days: 1, seed: 1 }, f)).toThrow(
+      RangeError,
+    );
   });
 });
 
@@ -185,7 +195,11 @@ describe('Monte Carlo against closed forms', () => {
       { paths: 60_000, seed: 11 },
     );
     const args = { S: m.spot, T, vol: m.vol, rd: m.rd, rf: m.rf };
-    const bgk = doubleNoTouch({ ...args, L: bgkShift(L, m.spot, m.vol), U: bgkShift(U, m.spot, m.vol) });
+    const bgk = doubleNoTouch({
+      ...args,
+      L: bgkShift(L, m.spot, m.vol),
+      U: bgkShift(U, m.spot, m.vol),
+    });
     const continuous = doubleNoTouch({ ...args, L, U });
     expect(Math.abs(mc.mean - bgk)).toBeLessThan(3 * mc.stdErr);
     expect(Math.abs(mc.mean - continuous)).toBeGreaterThan(10 * mc.stdErr);

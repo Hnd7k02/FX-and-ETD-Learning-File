@@ -138,7 +138,11 @@ export class GbmPathSource {
  * (memory O(days), whatever the number of paths). With antithetic pairs the paths 2k and 2k + 1
  * use Z and −Z.
  */
-export function simulate(market: Market, opts: SimulateOptions, onPath: PathCallback): SimulationInfo {
+export function simulate(
+  market: Market,
+  opts: SimulateOptions,
+  onPath: PathCallback,
+): SimulationInfo {
   const src = new GbmPathSource(market, opts);
   for (let path = src.next(); path !== undefined; path = src.next()) {
     onPath(path, src.nextIndex - 1);

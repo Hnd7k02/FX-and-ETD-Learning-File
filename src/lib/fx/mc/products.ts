@@ -198,14 +198,19 @@ export const MC_CONFIG = {
     },
   },
 
-  /** Deterministic scenario paths for the path simulator (§8.4). Drift and vol p.a. */
+  /**
+   * Deterministic scenario paths for the path simulator (§8.4). `move` is the total change over
+   * the horizon (whatever the product's length, so every product tells the same story), `vol`
+   * the noise p.a. The noise is a Brownian bridge (zero at both ends), so the end point is
+   * exact: S_end = spot · (1 + move) · (1 + gap).
+   */
   scenarios: {
-    trendUp: { driftPa: 0.12, vol: 0.04, seed: 101 },
-    trendDown: { driftPa: -0.12, vol: 0.04, seed: 102 },
-    /** Mean reversion (speed per year) keeps the path near spot. */
-    sideways: { driftPa: 0, vol: 0.05, meanReversion: 6, seed: 103 },
+    trendUp: { move: 0.08, vol: 0.04, seed: 101 },
+    trendDown: { move: -0.08, vol: 0.04, seed: 102 },
+    /** Lower noise: stays inside ±3 % (below the accumulator barrier) over 6 and 12 months. */
+    sideways: { move: 0, vol: 0.025, seed: 103 },
     /** A one-day gap of −6 % (CHF strengthens) after 40 % of the horizon. */
-    shock: { driftPa: 0, vol: 0.04, gap: -0.06, gapAt: 0.4, seed: 104 },
+    shock: { move: 0, vol: 0.04, gap: -0.06, gapAt: 0.4, seed: 104 },
     /** Risk-neutral GBM with the market vol (as in the valuation). */
     random: { seed: 105 },
   },
@@ -380,7 +385,9 @@ export function fixingSchedule(frequency: Frequency, count: number): number[] {
   const days: number[] = [];
   for (let i = 1; i <= count; i++) {
     days.push(
-      frequency === 'weekly' ? i * c.weeklyStepDays : Math.round((i * c.daysPerYear) / c.monthsPerYear),
+      frequency === 'weekly'
+        ? i * c.weeklyStepDays
+        : Math.round((i * c.daysPerYear) / c.monthsPerYear),
     );
   }
   return days;
@@ -395,7 +402,9 @@ export function dailyDays(from: number, to: number): number[] {
 
 /** Forward to a calendar day: S · e^((rd − rf) · day / 365). */
 export function forwardAt(market: Market, day: number): number {
-  return market.spot * Math.exp(((market.rd - market.rf) * day) / MC_CONFIG.conventions.daysPerYear);
+  return (
+    market.spot * Math.exp(((market.rd - market.rf) * day) / MC_CONFIG.conventions.daysPerYear)
+  );
 }
 
 /** Average of the fixing days of a product (the "average fixing date"). */
@@ -555,7 +564,10 @@ export function windowObservationDays(start: number, end: number, expiry: number
 function withConsistentDays<P extends Product>(p: P, overrides: Partial<P>): P {
   if ('fixingDays' in overrides) return p;
   if (p.kind === 'windowBarrier') {
-    return { ...p, fixingDays: windowObservationDays(p.windowStartDay, p.windowEndDay, p.expiryDay) };
+    return {
+      ...p,
+      fixingDays: windowObservationDays(p.windowStartDay, p.windowEndDay, p.expiryDay),
+    };
   }
   if (p.kind === 'doubleNoTouch') return { ...p, fixingDays: dailyDays(1, p.expiryDay) };
   return p;
@@ -611,51 +623,52 @@ export interface BuildingBlock {
  * - Window barrier: long call K with an up-and-out barrier H active only in the window.
  * - Double no-touch: cash at expiry − double one-touch (paid at expiry) on L and U.
  */
-export const BUILDING_BLOCKS: Readonly<Record<ProductKind | 'dualCurrency', readonly BuildingBlock[]>> =
-  {
-    accumulator: [
-      { key: 'longCall', ratio: 1, levels: ['strike'], perFixing: true },
-      { key: 'shortPut', ratio: 2, levels: ['strike'], perFixing: true },
-      { key: 'knockOutUp', ratio: 0, levels: ['barrier'], perFixing: true },
-    ],
-    decumulator: [
-      { key: 'longPut', ratio: 1, levels: ['strike'], perFixing: true },
-      { key: 'shortCall', ratio: 2, levels: ['strike'], perFixing: true },
-      { key: 'knockOutDown', ratio: 0, levels: ['barrier'], perFixing: true },
-    ],
-    tarf: [
-      { key: 'longCall', ratio: 1, levels: ['strike'], perFixing: true },
-      { key: 'shortPut', ratio: 2, levels: ['strike'], perFixing: true },
-      { key: 'targetKnockOut', ratio: 0, levels: ['target'], perFixing: false },
-    ],
-    pivotTarf: [
-      { key: 'longCall', ratio: 1, levels: ['lowerStrike'], perFixing: true },
-      { key: 'shortCall', ratio: 2, levels: ['pivot'], perFixing: true },
-      { key: 'shortCall', ratio: 1, levels: ['upperStrike'], perFixing: true },
-      { key: 'shortPut', ratio: 2, levels: ['lowerStrike'], perFixing: true },
-      { key: 'targetKnockOut', ratio: 0, levels: ['target'], perFixing: false },
-    ],
-    tpf: [
-      { key: 'longDigitalCall', ratio: 1, levels: ['strike'], perFixing: true },
-      { key: 'shortPut', ratio: 2, levels: ['strike'], perFixing: true },
-      { key: 'couponTargetKnockOut', ratio: 0, levels: ['targetCoupons'], perFixing: false },
-    ],
-    rtpf: [
-      { key: 'longRangeDigital', ratio: 1, levels: ['lower', 'upper'], perFixing: true },
-      { key: 'shortPut', ratio: 2, levels: ['lower'], perFixing: true },
-      { key: 'shortCall', ratio: 2, levels: ['upper'], perFixing: true },
-      { key: 'couponTargetKnockOut', ratio: 0, levels: ['targetCoupons'], perFixing: false },
-    ],
-    windowBarrier: [
-      { key: 'longCall', ratio: 1, levels: ['strike'], perFixing: false },
-      { key: 'windowKnockOutUp', ratio: 0, levels: ['barrier'], perFixing: false },
-    ],
-    doubleNoTouch: [
-      { key: 'cashAtExpiry', ratio: 1, levels: [], perFixing: false },
-      { key: 'shortDoubleOneTouch', ratio: 1, levels: ['lower', 'upper'], perFixing: false },
-    ],
-    dualCurrency: [
-      { key: 'deposit', ratio: 1, levels: [], perFixing: false },
-      { key: 'shortPut', ratio: 1, levels: ['strike'], perFixing: false },
-    ],
-  };
+export const BUILDING_BLOCKS: Readonly<
+  Record<ProductKind | 'dualCurrency', readonly BuildingBlock[]>
+> = {
+  accumulator: [
+    { key: 'longCall', ratio: 1, levels: ['strike'], perFixing: true },
+    { key: 'shortPut', ratio: 2, levels: ['strike'], perFixing: true },
+    { key: 'knockOutUp', ratio: 0, levels: ['barrier'], perFixing: true },
+  ],
+  decumulator: [
+    { key: 'longPut', ratio: 1, levels: ['strike'], perFixing: true },
+    { key: 'shortCall', ratio: 2, levels: ['strike'], perFixing: true },
+    { key: 'knockOutDown', ratio: 0, levels: ['barrier'], perFixing: true },
+  ],
+  tarf: [
+    { key: 'longCall', ratio: 1, levels: ['strike'], perFixing: true },
+    { key: 'shortPut', ratio: 2, levels: ['strike'], perFixing: true },
+    { key: 'targetKnockOut', ratio: 0, levels: ['target'], perFixing: false },
+  ],
+  pivotTarf: [
+    { key: 'longCall', ratio: 1, levels: ['lowerStrike'], perFixing: true },
+    { key: 'shortCall', ratio: 2, levels: ['pivot'], perFixing: true },
+    { key: 'shortCall', ratio: 1, levels: ['upperStrike'], perFixing: true },
+    { key: 'shortPut', ratio: 2, levels: ['lowerStrike'], perFixing: true },
+    { key: 'targetKnockOut', ratio: 0, levels: ['target'], perFixing: false },
+  ],
+  tpf: [
+    { key: 'longDigitalCall', ratio: 1, levels: ['strike'], perFixing: true },
+    { key: 'shortPut', ratio: 2, levels: ['strike'], perFixing: true },
+    { key: 'couponTargetKnockOut', ratio: 0, levels: ['targetCoupons'], perFixing: false },
+  ],
+  rtpf: [
+    { key: 'longRangeDigital', ratio: 1, levels: ['lower', 'upper'], perFixing: true },
+    { key: 'shortPut', ratio: 2, levels: ['lower'], perFixing: true },
+    { key: 'shortCall', ratio: 2, levels: ['upper'], perFixing: true },
+    { key: 'couponTargetKnockOut', ratio: 0, levels: ['targetCoupons'], perFixing: false },
+  ],
+  windowBarrier: [
+    { key: 'longCall', ratio: 1, levels: ['strike'], perFixing: false },
+    { key: 'windowKnockOutUp', ratio: 0, levels: ['barrier'], perFixing: false },
+  ],
+  doubleNoTouch: [
+    { key: 'cashAtExpiry', ratio: 1, levels: [], perFixing: false },
+    { key: 'shortDoubleOneTouch', ratio: 1, levels: ['lower', 'upper'], perFixing: false },
+  ],
+  dualCurrency: [
+    { key: 'deposit', ratio: 1, levels: [], perFixing: false },
+    { key: 'shortPut', ratio: 1, levels: ['strike'], perFixing: false },
+  ],
+};

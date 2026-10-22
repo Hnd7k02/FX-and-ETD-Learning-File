@@ -71,7 +71,7 @@
         "notional": 40000,
         "leverage": 2,
         "strike": 0.774001,
-        "barrier": 0.8240000000000001,
+        "barrier": 0.824,
         "tradeOnKnockOutFixing": false
       },
       "fairStrike": 0.774001,
@@ -228,7 +228,7 @@
         "pivot": 0.8,
         "lowerStrike": 0.750248,
         "upperStrike": 0.849752,
-        "target": 0.030000000000000002,
+        "target": 0.03,
         "lastFixing": "capped"
       },
       "fairWidth": 0.049752,
@@ -383,7 +383,7 @@
         "direction": "up",
         "notional": 1000000,
         "strike": 0.793,
-        "barrier": 0.8240000000000001,
+        "barrier": 0.824,
         "windowStartDay": 1,
         "windowEndDay": 30,
         "expiryDay": 91
@@ -503,7 +503,7 @@
         ],
         "payout": 100000,
         "lower": 0.768,
-        "upper": 0.8320000000000001,
+        "upper": 0.832,
         "expiryDay": 91
       },
       "compare": {

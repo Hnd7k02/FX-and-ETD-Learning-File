@@ -119,7 +119,16 @@ describe('Pivot TARF', () => {
   it('buys at K1 below the pivot, sells at K2 above it, doubles outside, caps at the target', () => {
     const fixings = [0.795, 0.805, 0.78, 0.83, 0.8, 0.805, 0.8];
     const r = pivotTarfPayoff(pathWith(pv, fixings), pv, m);
-    expect(kinds(r.cashflows)).toEqual(['buy', 'sell', 'buy', 'sell', 'buy', 'sell', 'buy', 'target']);
+    expect(kinds(r.cashflows)).toEqual([
+      'buy',
+      'sell',
+      'buy',
+      'sell',
+      'buy',
+      'sell',
+      'buy',
+      'target',
+    ]);
     expect(r.cashflows.map((c) => c.amountBase)).toEqual([
       100_000, -100_000, 200_000, -200_000, 100_000, -100_000, 100_000, 0,
     ]);
@@ -149,7 +158,14 @@ describe('TPF', () => {
   it('pays a coupon above the strike, leveraged loss below, ends after six coupons', () => {
     const r = tpfPayoff(pathWith(tpf, [0.79, 0.77, 0.8, 0.8, 0.78, 0.8, 0.8, 0.8]), tpf, m);
     expect(kinds(r.cashflows)).toEqual([
-      'coupon', 'payment', 'coupon', 'coupon', 'coupon', 'coupon', 'coupon', 'target',
+      'coupon',
+      'payment',
+      'coupon',
+      'coupon',
+      'coupon',
+      'coupon',
+      'coupon',
+      'target',
     ]);
     expect(pnl(r.cashflows)).toEqual([100, -2000, 100, 100, 100, 100, 100, 0]);
     expect(r.cashflows.at(-1)!.targetProgress).toBe(6);
@@ -169,7 +185,13 @@ describe('RTPF', () => {
 
   it('pays inside the range (bounds included), leveraged losses on both sides', () => {
     const r = rtpfPayoff(pathWith(rtpf, [0.8, 0.76, 0.84, 0.772, 0.828], 0.75), rtpf, m);
-    expect(kinds(r.cashflows).slice(0, 5)).toEqual(['coupon', 'payment', 'payment', 'coupon', 'coupon']);
+    expect(kinds(r.cashflows).slice(0, 5)).toEqual([
+      'coupon',
+      'payment',
+      'payment',
+      'coupon',
+      'coupon',
+    ]);
     expect(pnl(r.cashflows).slice(0, 5)).toEqual([200, -2400, -2400, 200, 200]);
     expect([r.endedAt, r.reason]).toEqual([12, 'maturity']);
     expect(r.cashflows.at(-1)!.targetProgress).toBe(3);
@@ -205,7 +227,12 @@ describe('window barrier', () => {
   it('expires worthless out of the money; a put with a down barrier works the same way', () => {
     const path = new Float64Array(92).fill(0.78);
     expect(productPayoff(path, wb, m).cashflows).toEqual([]);
-    const put = buildProduct('windowBarrier', m, { type: 'put', direction: 'down', strike: 0.8, barrier: 0.77 });
+    const put = buildProduct('windowBarrier', m, {
+      type: 'put',
+      direction: 'down',
+      strike: 0.8,
+      barrier: 0.77,
+    });
     const r = productPayoff(path, put, m);
     expect(r.cashflows[0]).toMatchObject({ kind: 'sell', amountBase: -1_000_000 });
     expect(r.cashflows[0]!.pnlQuote).toBeCloseTo(20_000, 6);
@@ -257,6 +284,8 @@ describe('helpers', () => {
     expect(r.pvQuote).toBeLessThan(r.totalPnlQuote);
     expect(r.cashflows[0]!.df).toBeCloseTo(Math.exp((-0.05 * 7) / 365), 14);
     expect(() => observationsFromPath(new Float64Array(10), acc)).toThrow(RangeError);
-    expect(Array.from(observationsFromPath(pathWith(acc, [0.7]), acc)).slice(0, 2)).toEqual([0.7, 0.8]);
+    expect(Array.from(observationsFromPath(pathWith(acc, [0.7]), acc)).slice(0, 2)).toEqual([
+      0.7, 0.8,
+    ]);
   });
 });

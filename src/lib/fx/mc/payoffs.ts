@@ -305,7 +305,11 @@ export const windowBarrierKernel: Kernel<ProductOf<'windowBarrier'>> = (obs, off
   for (let i = 0; i < n; i++) {
     const day = p.fixingDays[i]!;
     const S = obs[off + i]!;
-    if (day >= p.windowStartDay && day <= p.windowEndDay && (up ? S >= p.barrier : S <= p.barrier)) {
+    if (
+      day >= p.windowStartDay &&
+      day <= p.windowEndDay &&
+      (up ? S >= p.barrier : S <= p.barrier)
+    ) {
       sink.flow(i, 'ko', 0, 0, 0, NaN, 0);
       sink.end(i, 'knockout');
       return;

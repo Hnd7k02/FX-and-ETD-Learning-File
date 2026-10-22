@@ -21,7 +21,13 @@ import {
   type SolveParam,
   type ZeroCostKind,
 } from './products';
-import { price, simulateObservations, solveParameter, type ObservationSet, type PriceStats } from './value';
+import {
+  price,
+  simulateObservations,
+  solveParameter,
+  type ObservationSet,
+  type PriceStats,
+} from './value';
 
 /** Decimal places in the JSON. Rates and strikes: 0.01 pip; pips: 0.01; CHF: 0.01. */
 export const ROUNDING = { rate: 6, rateErr: 7, pips: 2, chf: 2, prob: 4, count: 3 } as const;
@@ -231,7 +237,8 @@ export function precomputeMcProducts(opts: PrecomputeOptions = {}): McProductsDa
   const wb = buildProduct('windowBarrier', market);
   const wbPrice = price(wb, market, mc);
   const T = wb.expiryDay / MC_CONFIG.conventions.daysPerYear;
-  const vanilla = wb.notional * gkPrice(market.spot, wb.strike, T, market.vol, market.rd, market.rf, wb.type);
+  const vanilla =
+    wb.notional * gkPrice(market.spot, wb.strike, T, market.vol, market.rd, market.rf, wb.type);
   log(
     `windowBarrier pv ${wbPrice.pv.toFixed(2)} ± ${wbPrice.stdErr.toFixed(2)} CHF (vanilla ${vanilla.toFixed(2)}, ` +
       `${((Date.now() - t1) / 1000).toFixed(1)} s)`,
@@ -242,7 +249,14 @@ export function precomputeMcProducts(opts: PrecomputeOptions = {}): McProductsDa
   const dnt = buildProduct('doubleNoTouch', market);
   const dntPrice = price(dnt, market, mc);
   const Td = dnt.expiryDay / MC_CONFIG.conventions.daysPerYear;
-  const dntArgs = { S: market.spot, T: Td, vol: market.vol, rd: market.rd, rf: market.rf, payout: dnt.payout };
+  const dntArgs = {
+    S: market.spot,
+    T: Td,
+    vol: market.vol,
+    rd: market.rd,
+    rf: market.rf,
+    payout: dnt.payout,
+  };
   const dntContinuous = doubleNoTouch({ ...dntArgs, L: dnt.lower, U: dnt.upper });
   const dntBgk = doubleNoTouch({
     ...dntArgs,

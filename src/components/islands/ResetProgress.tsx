@@ -3,7 +3,7 @@
  * "Yes, reset" calls resetProgress(). The outcome is announced in a live region.
  */
 import { useEffect, useRef, useState } from 'preact/hooks';
-import { about as dict } from '@/i18n/dict/about';
+import { reset as dict } from '@/i18n/dict/reset';
 import { translator, type Lang } from '@/i18n/types';
 import { fmtPct } from '@/lib/format';
 import {

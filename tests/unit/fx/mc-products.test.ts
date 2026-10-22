@@ -19,14 +19,21 @@ import {
 
 describe('MC_CONFIG and §8.7 defaults', () => {
   it('uses the running example market', () => {
-    expect(DEFAULT_MARKET).toEqual({ spot: EXAMPLE.spot, rd: EXAMPLE.rd, rf: EXAMPLE.rf, vol: EXAMPLE.vol });
+    expect(DEFAULT_MARKET).toEqual({
+      spot: EXAMPLE.spot,
+      rd: EXAMPLE.rd,
+      rf: EXAMPLE.rf,
+      vol: EXAMPLE.vol,
+    });
     expect(MC_CONFIG.conventions.dt).toBe(1 / 365);
     expect(PRODUCT_DEFAULTS).toBe(MC_CONFIG.products);
   });
 
   it('schedules weekly fixings every 7 days and monthly fixings on round(i · 365/12)', () => {
     expect(fixingSchedule('weekly', 3)).toEqual([7, 14, 21]);
-    expect(fixingSchedule('monthly', 12)).toEqual([30, 61, 91, 122, 152, 183, 213, 243, 274, 304, 335, 365]);
+    expect(fixingSchedule('monthly', 12)).toEqual([
+      30, 61, 91, 122, 152, 183, 213, 243, 274, 304, 335, 365,
+    ]);
     expect(() => fixingSchedule('weekly', 0)).toThrow(RangeError);
     expect(() => fixingSchedule('monthly', 1.5)).toThrow(RangeError);
     expect(dailyDays(0, 3)).toEqual([1, 2, 3]);
@@ -91,7 +98,10 @@ describe('MC_CONFIG and §8.7 defaults', () => {
     const fixed = buildProduct('doubleNoTouch', DEFAULT_MARKET, { expiryDay: 5, fixingDays: [5] });
     expect(fixed.fixingDays).toEqual([5]);
     const other = buildProduct('tarf', { ...DEFAULT_MARKET, spot: 0.9 });
-    expect(other.strike).toBeCloseTo(forwardAt({ ...DEFAULT_MARKET, spot: 0.9 }, averageFixingDay(other)), 7);
+    expect(other.strike).toBeCloseTo(
+      forwardAt({ ...DEFAULT_MARKET, spot: 0.9 }, averageFixingDay(other)),
+      7,
+    );
     expect(() => buildProduct('nope' as ProductKind)).toThrow(RangeError);
   });
 

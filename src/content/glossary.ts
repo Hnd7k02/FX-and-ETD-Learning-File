@@ -284,7 +284,7 @@ export const GLOSSARY: GlossaryEntry[] = [
     term: { de: 'Funding-Währung', en: 'Funding currency' },
     aliases: ['Finanzierungswährung', 'Funding'],
     def: {
-      de: 'Die Währung mit tiefem Zins, in der ein Carry Trade finanziert wird. Lösen viele solche Trades gleichzeitig auf, kaufen sie die Währung zurück, und sie kann stark aufwerten.',
+      de: 'Die Währung mit tiefem Zins, in der ein Carry Trade finanziert wird. Werden viele solche Trades gleichzeitig aufgelöst, wird sie zurückgekauft und kann stark aufwerten.',
       en: 'The low-yielding currency that finances a carry trade. When many such trades unwind at once, the currency is bought back and can appreciate sharply.',
     },
     module: '01-spot',
@@ -674,8 +674,8 @@ export const GLOSSARY: GlossaryEntry[] = [
     term: { de: '25-Delta', en: '25-delta' },
     aliases: ['25Δ', '25 Delta', '10Δ', '10-Delta', 'Delta-Quotierung'],
     def: {
-      de: 'Eine Option mit einem Delta von 0.25, also klar aus dem Geld. Im FX-Optionsmarkt werden Strikes oft über das Delta statt über den Kurs angegeben.',
-      en: 'An option with a delta of 0.25, i.e. clearly out of the money. In the FX options market strikes are often quoted by delta rather than by rate.',
+      de: 'Eine Option mit einem Delta von 0.25 (beim Put −0.25), also klar aus dem Geld. Im FX-Optionsmarkt werden Strikes oft über das Delta statt über den Kurs angegeben.',
+      en: 'An option with a delta of 0.25 (−0.25 for a put), i.e. clearly out of the money. In the FX options market strikes are often quoted by delta rather than by rate.',
     },
     module: '04-vanilla-options',
     section: '3',
@@ -882,8 +882,8 @@ export const GLOSSARY: GlossaryEntry[] = [
     term: { de: 'Risk Reversal', en: 'Risk reversal' },
     aliases: ['RR', '25Δ RR', 'Collar'],
     def: {
-      de: 'Kauf einer Option auf der einen Seite und Verkauf einer auf der anderen, meist beide 25Δ. Als Marktquote zeigt der Risk Reversal, um wie viel die Vola der Calls über der der Puts liegt.',
-      en: 'Buying an option on one side and selling one on the other, usually both 25Δ. As a market quote, the risk reversal shows how far call volatility sits above put volatility.',
+      de: 'Kauf einer Option auf der einen Seite und Verkauf einer auf der anderen, meist beide 25Δ. Als Marktquote ist der Risk Reversal die Vola-Differenz zwischen Call und Put mit gleichem Delta.',
+      en: 'Buying an option on one side and selling one on the other, usually both 25Δ. As a market quote, the risk reversal is the volatility difference between a call and a put of the same delta.',
     },
     module: '06-combos-smile',
     section: '2',

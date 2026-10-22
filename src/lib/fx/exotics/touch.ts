@@ -159,7 +159,7 @@ export function noTouchProbabilityRaw(
  *   (H/S)^(μ+λ) N(ηz) + (H/S)^(μ−λ) N(ηz − 2ηλσ√T),  z = ln(H/S)/σ√T + λσ√T,
  *   λ = √(μ² + 2rd/σ²).
  * If λ² < 0 (possible with negative rd), integration by parts instead:
- *   e^(−rd T)·P(τ ≤ T) + rd · ∫₀ᵀ e^(−rd t)·P(τ ≤ t) dt (composite Simpson, 400 steps).
+ *   e^(−rd T)·P(τ ≤ T) + rd · ∫₀ᵀ e^(−rd t)·P(τ ≤ t) dt (Simpson in √t, 400 steps).
  */
 export function hitDiscountFactor(
   S: number,
@@ -184,6 +184,9 @@ export function hitDiscountFactor(
 /**
  * E[e^(−rd τ) · 1{τ ≤ T}] by integration by parts and Simpson's rule (any sign of rd):
  *   e^(−rd T)·P(τ ≤ T) + rd · ∫₀ᵀ e^(−rd t)·P(τ ≤ t) dt, with P(τ ≤ t) = 1 − no-touch prob.
+ * The integral runs in u = √t (dt = 2u du): P(τ ≤ t) rises steeply over t ≈ ln(H/S)²/σ², which
+ * for a barrier close to the spot is a tiny part of [0, T]; in √t it is resolved with the same
+ * number of steps (error ≈ 1e-15 instead of ≈ 1e-7 at 1 % from the barrier).
  * Used when the closed form needs an imaginary λ; exported to test it against the closed form.
  */
 export function hitDiscountFactorByQuadrature(
@@ -198,10 +201,11 @@ export function hitDiscountFactorByQuadrature(
 ): number {
   const hitProb = (t: number): number =>
     t <= 0 ? 0 : 1 - noTouchProbabilityRaw(S, H, t, vol, rd, rf, eta);
-  const f = (t: number): number => Math.exp(-rd * t) * hitProb(t);
+  const f = (u: number): number => 2 * u * Math.exp(-rd * u * u) * hitProb(u * u);
   const n = steps % 2 === 0 ? steps : steps + 1;
-  const h = T / n;
-  let integral = f(0) + f(T);
+  const sqrtT = Math.sqrt(T);
+  const h = sqrtT / n;
+  let integral = f(0) + f(sqrtT);
   for (let i = 1; i < n; i++) integral += (i % 2 === 1 ? 4 : 2) * f(i * h);
   integral *= h / 3;
   return Math.exp(-rd * T) * hitProb(T) + rd * integral;

@@ -13,14 +13,14 @@
  * the same paths.
  */
 import { GbmPathSource } from './gbm';
-import { discountFactors, runKernel, type CashflowSink, type CashflowKind, type EndReason } from './payoffs';
 import {
-  DEFAULT_MARKET,
-  MC_CONFIG,
-  type Market,
-  type Product,
-  type SolveParam,
-} from './products';
+  discountFactors,
+  runKernel,
+  type CashflowSink,
+  type CashflowKind,
+  type EndReason,
+} from './payoffs';
+import { DEFAULT_MARKET, MC_CONFIG, type Market, type Product, type SolveParam } from './products';
 
 /** Monte Carlo options; defaults from MC_CONFIG.engine (interactive path count). */
 export interface McOptions {
@@ -199,7 +199,12 @@ export function price(
   const days = product.fixingDays;
   const n = days.length;
   const src = new GbmPathSource(market, { ...o, days: days[n - 1]! });
-  const ev = new PathEvaluator(product, discountFactors(days, market.rd), src.info.antithetic, src.info.paths);
+  const ev = new PathEvaluator(
+    product,
+    discountFactors(days, market.rd),
+    src.info.antithetic,
+    src.info.paths,
+  );
   const obs = new Float64Array(n);
   for (let path = src.next(); path !== undefined; path = src.next()) {
     for (let i = 0; i < n; i++) obs[i] = path[days[i]!]!;
@@ -236,7 +241,13 @@ export function simulateObservations(
     for (let i = 0; i < n; i++) data[off + i] = path[days[i]!]!;
     off += n;
   }
-  return { days: [...days], paths: src.info.paths, seed: o.seed, antithetic: src.info.antithetic, data };
+  return {
+    days: [...days],
+    paths: src.info.paths,
+    seed: o.seed,
+    antithetic: src.info.antithetic,
+    data,
+  };
 }
 
 function checkDays(product: Product, set: ObservationSet): void {
@@ -256,10 +267,19 @@ export function priceOnObservations(
   return evaluateSet(product, set, market).result(set.seed);
 }
 
-function evaluateSet(product: Product, set: ObservationSet, market: Pick<Market, 'rd'>): PathEvaluator {
+function evaluateSet(
+  product: Product,
+  set: ObservationSet,
+  market: Pick<Market, 'rd'>,
+): PathEvaluator {
   checkDays(product, set);
   const n = set.days.length;
-  const ev = new PathEvaluator(product, discountFactors(set.days, market.rd), set.antithetic, set.paths);
+  const ev = new PathEvaluator(
+    product,
+    discountFactors(set.days, market.rd),
+    set.antithetic,
+    set.paths,
+  );
   for (let k = 0, off = 0; k < set.paths; k++, off += n) ev.add(set.data, off);
   return ev;
 }
@@ -294,7 +314,11 @@ export function expectation(
     mean += d / units;
     m2 += d * (u - mean);
   }
-  return { mean, stdErr: units > 1 ? Math.sqrt(m2 / (units - 1) / units) : 0, paths: src.info.paths };
+  return {
+    mean,
+    stdErr: units > 1 ? Math.sqrt(m2 / (units - 1) / units) : 0,
+    paths: src.info.paths,
+  };
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -499,16 +523,28 @@ export function solveParameter(
 }
 
 /** Fair (zero-cost) strike of an accumulator, decumulator or TARF. */
-export function solveFairStrike(product: Product, market?: Market, opts?: SolveOptions): SolveResult {
+export function solveFairStrike(
+  product: Product,
+  market?: Market,
+  opts?: SolveOptions,
+): SolveResult {
   return solveParameter(product, 'strike', market, opts);
 }
 
 /** Fair (zero-cost) coupon of a TPF or RTPF, in CHF per USD of notional. */
-export function solveFairCoupon(product: Product, market?: Market, opts?: SolveOptions): SolveResult {
+export function solveFairCoupon(
+  product: Product,
+  market?: Market,
+  opts?: SolveOptions,
+): SolveResult {
   return solveParameter(product, 'coupon', market, opts);
 }
 
 /** Fair (zero-cost) half-width d of a Pivot TARF: K1 = P − d, K2 = P + d. */
-export function solvePivotWidth(product: Product, market?: Market, opts?: SolveOptions): SolveResult {
+export function solvePivotWidth(
+  product: Product,
+  market?: Market,
+  opts?: SolveOptions,
+): SolveResult {
   return solveParameter(product, 'width', market, opts);
 }

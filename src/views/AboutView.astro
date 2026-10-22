@@ -10,6 +10,7 @@ import ResetProgress from '@/components/islands/ResetProgress';
 import { FAMILIES, MODULES, getModule, type Family } from '@/data/modules';
 import { about as dict } from '@/i18n/dict/about';
 import { common } from '@/i18n/dict/common';
+import { reset } from '@/i18n/dict/reset';
 import { levels, LEVEL_COLORS, LEVEL_KEYS, type LevelIndex } from '@/i18n/dict/levels';
 import { aboutPath, homePath, modulePath, riskometerPath, type SectionKey } from '@/i18n/routes';
 import { translator, type Lang } from '@/i18n/types';
@@ -38,6 +39,7 @@ const { lang } = Astro.props;
 const other: Lang = lang === 'de' ? 'en' : 'de';
 const t = translator(dict, lang);
 const tc = translator(common, lang);
+const tr = translator(reset, lang);
 const tl = translator(levels, lang);
 /** Escapes dictionary text and typesets r_d / r_f as r with subscript. */
 const esc = (x: string) =>
@@ -760,7 +762,7 @@ const sid = (i: number) => toc[i]!.id;
                 {conventions.map((c) => (
                   <tr>
                     <th scope="row">{c.topic}</th>
-                    <td>{c.rule}</td>
+                    <td set:html={rich(c.rule)} />
                     <td class="mono ab-sample">{c.sample}</td>
                   </tr>
                 ))}
@@ -870,7 +872,7 @@ const sid = (i: number) => toc[i]!.id;
               <p class="ab-small">{tc('footer.data')}</p>
             </div>
             <div class="ab-reset card">
-              <h3 class="ab-h3">{t('reset.h')}</h3>
+              <h3 class="ab-h3">{tr('reset.h')}</h3>
               <p class="ab-small">{t('about.credits.privacy')}</p>
               <ResetProgress client:visible lang={lang} />
             </div>
@@ -1545,6 +1547,9 @@ const sid = (i: number) => toc[i]!.id;
   }
   a.ab-source-title {
     color: var(--ff-linear-text);
+  }
+  .ab-source-title svg {
+    flex: 0 0 auto;
   }
   a.ab-source-title:hover {
     text-decoration: underline;

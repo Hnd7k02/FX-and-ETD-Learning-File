@@ -19,7 +19,9 @@ function main(): number {
   const seed = args.seed ? Number(args.seed) : MC_CONFIG.engine.seed;
   const out = args.out ?? 'src/data/fx/mc-products.json';
 
-  console.log(`Monte Carlo: ${paths.toLocaleString('en')} paths (antithetic), seed ${seed}, daily steps`);
+  console.log(
+    `Monte Carlo: ${paths.toLocaleString('en')} paths (antithetic), seed ${seed}, daily steps`,
+  );
   const t0 = Date.now();
   const data = precomputeMcProducts({ paths, seed, log: (m) => console.log(`  ${m}`) });
   const seconds = (Date.now() - t0) / 1000;

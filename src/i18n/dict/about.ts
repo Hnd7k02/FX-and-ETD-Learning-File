@@ -1,6 +1,6 @@
 import { defineDict } from '../types';
 
-/** UI strings of the About & Methodology page and the reset-progress island. */
+/** UI strings of the About & Methodology page. */
 export const about = defineDict({
   de: {
     'about.title': 'Über Forward First: Methodik, Modelle und Quellen',
@@ -182,18 +182,6 @@ export const about = defineDict({
       'Gebaut mit Astro, TypeScript und Preact; Charts als handgeschriebenes SVG. Getestet mit Vitest, Playwright und axe.',
     'about.credits.privacy':
       'Dein Lernfortschritt bleibt in deinem Browser (localStorage). Es gibt kein Konto und kein Tracking.',
-
-    'reset.h': 'Fortschritt zurücksetzen',
-    'reset.stored': 'Gespeicherter Fortschritt: {pct}',
-    'reset.none': 'Noch kein Fortschritt gespeichert.',
-    'reset.button': 'Fortschritt zurücksetzen',
-    'reset.confirmTitle': 'Wirklich zurücksetzen?',
-    'reset.confirmText':
-      'Erledigte Abschnitte und Quiz-Ergebnisse in diesem Browser werden gelöscht. Das lässt sich nicht rückgängig machen.',
-    'reset.confirm': 'Ja, zurücksetzen',
-    'reset.cancel': 'Abbrechen',
-    'reset.done': 'Fortschritt zurückgesetzt. Du startest wieder bei 01 Spot.',
-    'reset.cancelled': 'Nichts geändert.',
   },
   en: {
     'about.title': 'About Forward First: methodology, models and sources',
@@ -377,17 +365,5 @@ export const about = defineDict({
       'Built with Astro, TypeScript and Preact; charts as hand-written SVG. Tested with Vitest, Playwright and axe.',
     'about.credits.privacy':
       'Your learning progress stays in your browser (localStorage). There is no account and no tracking.',
-
-    'reset.h': 'Reset progress',
-    'reset.stored': 'Saved progress: {pct}',
-    'reset.none': 'No progress saved yet.',
-    'reset.button': 'Reset progress',
-    'reset.confirmTitle': 'Really reset?',
-    'reset.confirmText':
-      'Completed sections and quiz results in this browser will be deleted. This cannot be undone.',
-    'reset.confirm': 'Yes, reset',
-    'reset.cancel': 'Cancel',
-    'reset.done': 'Progress reset. You start again at 01 Spot.',
-    'reset.cancelled': 'Nothing changed.',
   },
 });

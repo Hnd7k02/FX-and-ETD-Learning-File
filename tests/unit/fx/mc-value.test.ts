@@ -57,19 +57,25 @@ describe('price', () => {
   });
 
   it('computes the standard error from independent paths without antithetic pairs', () => {
-    const r = price(buildProduct('accumulator', m, { strike: 0.775 }), m, { ...FAST, antithetic: false });
+    const r = price(buildProduct('accumulator', m, { strike: 0.775 }), m, {
+      ...FAST,
+      antithetic: false,
+    });
     expect(r.antithetic).toBe(false);
     expect(r.stdErr).toBeGreaterThan(0);
-    const one = price(buildProduct('accumulator', m, { strike: 0.775 }), m, { paths: 1, antithetic: false });
+    const one = price(buildProduct('accumulator', m, { strike: 0.775 }), m, {
+      paths: 1,
+      antithetic: false,
+    });
     expect(one.stdErr).toBe(0);
   });
 
   it('rejects observation sets of another schedule', () => {
     const set = simulateObservations(m, [7, 14], { paths: 10 });
     expect(() => priceOnObservations(buildProduct('accumulator'), set)).toThrow(RangeError);
-    expect(() => priceOnObservations(buildProduct('accumulator', m, { fixingDays: [7, 15] }), set)).toThrow(
-      RangeError,
-    );
+    expect(() =>
+      priceOnObservations(buildProduct('accumulator', m, { fixingDays: [7, 15] }), set),
+    ).toThrow(RangeError);
   });
 
   it('expectation works with and without antithetic pairs', () => {
@@ -87,9 +93,9 @@ describe('solvers (common random numbers)', () => {
     const r = solveFairStrike(acc, m, FAST);
     expect(r.param).toBe('strike');
     expect(Math.abs(r.pvAtValue)).toBeLessThan(0.01 * r.pvStdErr);
-    expect(Math.abs(priceOnObservations(r.product, simulateObservations(m, acc.fixingDays, FAST)).pv)).toBeLessThan(
-      0.01 * r.pvStdErr,
-    );
+    expect(
+      Math.abs(priceOnObservations(r.product, simulateObservations(m, acc.fixingDays, FAST)).pv),
+    ).toBeLessThan(0.01 * r.pvStdErr);
     expect(r.value).toBeLessThan(forwardAtAverageFixing(acc) - 0.01); // > 100 pips better
     expect(r.stdErr).toBeCloseTo(r.pvStdErr / Math.abs(r.slope), 15);
     expect(r.slope).toBeLessThan(0); // a higher strike is worse for the buyer

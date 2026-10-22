@@ -52,8 +52,7 @@ export type McRequest = McPriceRequest | McSolveRequest;
 export type McResult = PriceResult | SolveResult;
 
 export type McResponse<R extends McResult = McResult> =
-  | { id: number; result: R; error?: undefined }
-  | { id: number; result?: undefined; error: string };
+  { id: number; result: R; error?: undefined } | { id: number; result?: undefined; error: string };
 
 /** Handles one request synchronously (the worker body; also used inline). */
 export function handleMcRequest(req: McRequest): McResponse {
@@ -67,7 +66,10 @@ export function handleMcRequest(req: McRequest): McResponse {
     }
     if (req.type === 'solve') {
       const product = buildProduct(req.product, market, req.overrides ?? {});
-      return { id: req.id, result: solveParameter(product, SOLVED_PARAM[req.product], market, clean) };
+      return {
+        id: req.id,
+        result: solveParameter(product, SOLVED_PARAM[req.product], market, clean),
+      };
     }
     return { id: (req as { id: number }).id, error: `unknown request type` };
   } catch (e) {
@@ -117,7 +119,9 @@ export function createMcClient(workerFactory?: () => WorkerLike): McClient {
   const send = (req: McRequest): Promise<McResult> => {
     if (!worker) {
       const res = handleMcRequest(req);
-      return res.error !== undefined ? Promise.reject(new Error(res.error)) : Promise.resolve(res.result);
+      return res.error !== undefined
+        ? Promise.reject(new Error(res.error))
+        : Promise.resolve(res.result);
     }
     return new Promise((resolve, reject) => {
       pending.set(req.id, { resolve, reject });

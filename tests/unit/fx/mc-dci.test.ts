@@ -1,10 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { gkPrice } from '@/lib/fx/vanilla';
-import {
-  buildDualCurrency,
-  dualCurrencyPayoff,
-  dualCurrencyQuote,
-} from '@/lib/fx/mc/dci';
+import { buildDualCurrency, dualCurrencyPayoff, dualCurrencyQuote } from '@/lib/fx/mc/dci';
 import { DEFAULT_MARKET as m, MC_CONFIG } from '@/lib/fx/mc/products';
 import { expectation } from '@/lib/fx/mc/value';
 
@@ -53,7 +49,11 @@ describe('dual currency investment (CHF)', () => {
   it('pays CHF capital plus interest at or above the strike, converts below it', () => {
     const q = dualCurrencyQuote(dci);
     const up = dualCurrencyPayoff(0.8, dci, q);
-    expect(up).toMatchObject({ converted: false, amountBase: 0, amountQuote: 100_000 + q.interest });
+    expect(up).toMatchObject({
+      converted: false,
+      amountBase: 0,
+      amountQuote: 100_000 + q.interest,
+    });
     expect(up.vsDepositQuote).toBeCloseTo(q.interest, 9);
     expect(dualCurrencyPayoff(0.792, dci, q).converted).toBe(false);
     const down = dualCurrencyPayoff(0.77, dci, q);
@@ -80,10 +80,15 @@ describe('dual currency investment (CHF)', () => {
 
   it('Monte Carlo of the payoff confirms PV = capital within 3 SE', () => {
     const q = dualCurrencyQuote(dci);
-    const r = expectation(m, dci.days, (path) => dualCurrencyPayoff(path[dci.days]!, dci, q).valueQuote, {
-      paths: 40_000,
-      seed: 99,
-    });
+    const r = expectation(
+      m,
+      dci.days,
+      (path) => dualCurrencyPayoff(path[dci.days]!, dci, q).valueQuote,
+      {
+        paths: 40_000,
+        seed: 99,
+      },
+    );
     expect(Math.abs(r.mean - dci.capital)).toBeLessThan(3 * r.stdErr);
   });
 
