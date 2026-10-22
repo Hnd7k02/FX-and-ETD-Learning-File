@@ -197,9 +197,21 @@ describe('payoff: zero-cost solver', () => {
     const m: PayoffMarket = { ...M, rd: 0, rf: 0 };
     const k = solveZeroCostStrike([L('long', 'forward', 0.8)], 0, m, [0.74, 0.86]);
     expect(k).toBeCloseTo(0.8, 12);
-    // Short call + long forward + short put … has two roots; nearest to `near` wins.
-    const legs = [L('long', 'call', 0.79), L('long', 'put', 0.79), L('short', 'forward', 0.79, 0)];
-    expect(solveZeroCostStrike(legs, 0, M, STRIKE_RANGE, 0.75)).toBeNull();
+    // A straddle whose strike moves, against a fixed short straddle at the forward and a
+    // short put: the net value is convex in K with two roots; the one nearest `near` wins.
+    const legs = [
+      L('long', 'call', 0.8),
+      L('long', 'put', 0.8),
+      L('short', 'call', F),
+      L('short', 'put', F),
+      L('short', 'put', 0.78),
+    ];
+    const left = solveZeroCostStrike(legs, [0, 1], M, STRIKE_RANGE, 0.75);
+    const right = solveZeroCostStrike(legs, [0, 1], M, STRIKE_RANGE, 0.84);
+    expect(left).not.toBeNull();
+    expect(right).not.toBeNull();
+    expect(left!).toBeLessThan(F);
+    expect(right!).toBeGreaterThan(F);
   });
 });
 
