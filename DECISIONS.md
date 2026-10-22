@@ -135,3 +135,43 @@ Format: `D-xx · date · origin`, then question, decision, reasoning. Origin is 
 **Decision:** Decide, and make the choice easy to change later: every uncertain parameter lives in one clearly named, documented config object (e.g. the running example in `src/lib/fx/example.ts`, module structure in `src/data/modules.ts`, product parameters in `PRODUCT_DEFAULTS` in `src/lib/fx/mc/products.ts`, Riskometer method constants in `src/lib/data`), never as scattered literals. Each such choice gets an entry here or an open question in `PROGRESS.md`.
 
 **Reasoning:** Dario's instruction during the session ("if you're not sure … code it so we can change it easily later").
+
+## D-23 · 2026-10-22 · Claude
+
+**Question:** Where do glossary chips link to?
+
+**Decision:** To the exact section where the term is taught (optional `section` per glossary entry), not always to section 1.
+
+**Reasoning:** One click to the explanation instead of searching through the module. Change per term in `src/content/glossary.ts`.
+
+## D-24 · 2026-10-22 · Claude
+
+**Question:** Conventions of the closed-form exotics?
+
+**Decision:** Knock-out rebates are paid at the hit, knock-in rebates at expiry (Haug). `oneTouch` pays at expiry by default (`payAt: 'hit'` optional), the usual interbank FX convention; with the CHF rate at 0 % both are equal in the example. European digitals pay ½ exactly at the strike. Pay-at-hit values with negative rates use a quadrature in u = √t (the uniform-in-t version was off by up to 6e-6 per unit near the barrier; found and fixed by the verification agent). Very low vols are computed in log space; vol ≤ 0 follows the forward path instead of throwing. The Double No-Touch uses Hui's series with an automatic number of terms, or 1 − two single touch probabilities when the chance of touching both barriers is provably below 1e-16.
+
+**Reasoning:** Matches the literature, never breaks a slider at an edge, verified against independent formulations (method of images, first-passage quadrature, image-sum DNT, PDE) to 1e-12, see `docs/reference/xcheck/`.
+
+## D-25 · 2026-10-22 · Claude
+
+**Question:** How exact is the hedge roll in module 03?
+
+**Decision:** Near leg at current spot; the all-in rate is old forward + swap points; interest on the cash settlement between roll date and new maturity is ignored and said so in the text.
+
+**Reasoning:** Keeps the teaching example readable; the historical-rate rollover and the settlement interest are desk details mentioned in prose.
+
+## D-26 · 2026-10-22 · Claude
+
+**Question:** How to split theta in the texts?
+
+**Decision:** `ex.thetaGammaChf` = −½σ²S²Γ/365 · N (CHF −69.33), `ex.thetaDayChf` = one-day difference (CHF −30.82, shown in the lab), and the carry part `ex.thetaCarryChf` is the residual of the two (CHF +38.50), so the parts add up to the number on screen. The analytic carry term (CHF +38.66) differs by the second-order effect of the one-day step; the derivation says so.
+
+**Reasoning:** Learners check sums; numbers that do not add up undermine trust.
+
+## D-27 · 2026-10-22 · Claude
+
+**Question:** Smile example values for module 06?
+
+**Decision:** `EXAMPLE_SMILE = { atm: 8 %, rr25: −1.0 %, bf25: 0.25 % }` in `src/lib/fx/example.ts`, labelled as example values.
+
+**Reasoning:** A negative risk reversal illustrates the typical demand for CHF calls as protection; the size is a round, plausible teaching value, not market data. One place to change.

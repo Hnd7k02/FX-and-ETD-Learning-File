@@ -40,3 +40,14 @@ export const EXAMPLE_LABEL = {
   de: 'Beispielwerte, keine Marktdaten',
   en: 'Example values, not market data',
 } as const;
+
+/**
+ * Example smile quotes for USD/CHF 3M (module 06). Beispielwerte, keine Marktdaten.
+ * ATM vol, 25-delta risk reversal (σ25 USD call − σ25 USD put; negative = CHF calls in demand)
+ * and 25-delta butterfly in the smile-strangle convention. Change here to change everywhere.
+ */
+export const EXAMPLE_SMILE = {
+  atm: 0.08,
+  rr25: -0.01,
+  bf25: 0.0025,
+} as const;
