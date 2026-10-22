@@ -299,7 +299,7 @@ export default function PriceDrivers({ lang }: PriceDriversProps): JSX.Element {
                   key={e.id}
                   class={`pd-driver${active === e.id ? ' is-active' : ''}`}
                   data-driver={e.id}
-                  onFocusIn={() => focusDriver(e.id)}
+                  onFocusCapture={() => focusDriver(e.id)}
                   onPointerDown={() => focusDriver(e.id)}
                 >
                   <Slider

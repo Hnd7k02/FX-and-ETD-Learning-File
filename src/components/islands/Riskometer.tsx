@@ -23,6 +23,7 @@ import {
   levelBounds,
   levelTrend,
   parseDeepLink,
+  parseNumbers,
   resolveSelection,
   seriesExtremes,
   spanYears,
@@ -68,6 +69,11 @@ export default function Riskometer(p: RiskometerProps): JSX.Element {
   const reduced = usePrefersReducedMotion();
   const dates = useMemo(() => p.dates.split(','), [p.dates]);
   const days = useMemo(() => dayNumbers(dates), [dates]);
+  const series = useMemo(() => {
+    const out = {} as Record<Pair, number[]>;
+    for (const x of PAIRS) out[x] = parseNumbers(p.pairs[x].vols);
+    return out;
+  }, [p.pairs]);
   const [sel, setSel] = useState<Selection>(() => resolveSelection(p.events, null, null));
   const [tableOpen, setTableOpen] = useState(false);
   const touched = useRef(false);
@@ -99,6 +105,7 @@ export default function Riskometer(p: RiskometerProps): JSX.Element {
   /* ---------- derived ---------- */
   const pair = sel.pair;
   const pd = p.pairs[pair];
+  const vols = series[pair];
   const cur = pd.current;
   const level = cur.level as LevelIndex;
   const levelName = tl(LEVEL_KEY[level]);
@@ -111,7 +118,7 @@ export default function Riskometer(p: RiskometerProps): JSX.Element {
   const pct = fmtPctValue(cur.percentile, lang, 0);
   const pctPlain = fmtNumber(Math.round(cur.percentile), lang);
   const volText = fmtPctValue(cur.vol, lang, 1);
-  const ext = seriesExtremes(pd.vols);
+  const ext = seriesExtremes(vols);
 
   const markers: ChartMarker[] = own.map((e) => ({
     id: e.id,
@@ -243,7 +250,7 @@ export default function Riskometer(p: RiskometerProps): JSX.Element {
             lang={lang}
             dates={dates}
             days={days}
-            vols={pd.vols}
+            vols={vols}
             markers={markers}
             selected={sel.event}
             onSelect={chooseEvent}

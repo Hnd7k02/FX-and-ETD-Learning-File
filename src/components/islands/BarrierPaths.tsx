@@ -19,7 +19,7 @@ import { scaleLinear } from '@/lib/chart';
 import { fmtMillions, fmtMoney, fmtNumber, fmtPct, fmtRate } from '@/lib/format';
 import { M07_CONFIG, chartLayout, onGrid } from '@/lib/m07/config';
 import { M07_MARKET, directionOf, hitDays, pathsSummary, seededPaths } from '@/lib/m07/paths';
-import { usePlayback, useSliderDrag, useSvgDrag, type DragTarget } from './m07-shared';
+import { annotationBox, usePlayback, useSliderDrag, useSvgDrag, type DragTarget } from './m07-shared';
 
 export interface BarrierPathsProps {
   lang: Lang;
@@ -126,8 +126,7 @@ export default function BarrierPaths({ lang }: BarrierPathsProps): JSX.Element {
     const [ax, ay] = pt(paths[firstHit.i]!, firstHit.d);
     const l1 = t(io === 'out' ? 'bp.aha.out.t' : 'bp.aha.in.t');
     const l2 = t(io === 'out' ? 'bp.aha.out.d' : 'bp.aha.in.d');
-    const w = Math.min(x1 - x0 - 8, Math.ceil(Math.max(l1.length * 7.2, l2.length * 6.4)) + 22);
-    const h = 44;
+    const { lines, w, h } = annotationBox(l1, l2, Math.min(330, x1 - x0 - 8));
     const left = ax > (x0 + x1) / 2;
     const bx = Math.max(x0 + 4, Math.min(x1 - w - 4, left ? ax - w - 14 : ax + 14));
     const above = dir === 'down';
@@ -138,9 +137,11 @@ export default function BarrierPaths({ lang }: BarrierPathsProps): JSX.Element {
         <text x={bx + 11} y={by + 18} class="m7-aha-title">
           {l1}
         </text>
-        <text x={bx + 11} y={by + 35} class="m7-aha-text">
-          {l2}
-        </text>
+        {lines.map((line, i) => (
+          <text key={i} x={bx + 11} y={by + 35 + i * 17} class="m7-aha-text">
+            {line}
+          </text>
+        ))}
       </g>
     );
   }

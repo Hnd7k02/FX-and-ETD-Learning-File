@@ -133,7 +133,7 @@ export function RiskometerChart(p: RiskometerChartProps): JSX.Element {
   const yearOf = new Map(yearDays.map((d, i) => [d, years[i]!]));
   const xTicks = yearDays.filter((d) => {
     const px = x(d);
-    return px >= layout.left - 10 && px <= W - layout.right + 10;
+    return px <= W - layout.right + 10 && px + 10 >= layout.left;
   });
 
   const markerPos = p.markers.map((m) => {

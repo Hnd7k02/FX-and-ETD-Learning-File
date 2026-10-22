@@ -234,3 +234,26 @@ export function pathExitDay(path: readonly number[], s: TouchState): number | nu
   }
   return null;
 }
+
+/** Annotation keys of the TouchLab ("aha" moments). */
+export type TouchAha = 'digital' | 'hit' | 'same' | 'near' | 'narrow' | null;
+
+/**
+ * Which annotation fits: a narrow call spread (≤ 10 pips) is practically the digital; a barrier
+ * within 30 pips of the spot is almost surely touched; the one-touch payment date matters only
+ * with a CHF rate ≠ 0; a corridor narrower than 4 % of the spot makes the DNT cheap.
+ */
+export function touchAha(s: TouchState, spot: number = M.spot): TouchAha {
+  switch (s.mode) {
+    case 'digital':
+      return s.spreadPips <= 10 ? 'digital' : null;
+    case 'oneTouch':
+      if (Math.abs(s.barrier - spot) <= 30 * PIP) return 'near';
+      if (s.payAt === 'hit') return s.rdPct > 0 ? 'hit' : s.rdPct === 0 ? 'same' : null;
+      return null;
+    case 'noTouch':
+      return Math.abs(s.barrier - spot) <= 30 * PIP ? 'near' : null;
+    case 'dnt':
+      return (s.upper - s.lower) / spot < 0.04 ? 'narrow' : null;
+  }
+}

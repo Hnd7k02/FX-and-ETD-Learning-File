@@ -15,6 +15,7 @@ import {
   markerIndex,
   pairCode,
   parseDeepLink,
+  parseNumbers,
   parsePairCode,
   resolveSelection,
   seriesExtremes,
@@ -39,8 +40,10 @@ describe('buildRiskometerProps', () => {
     expect(dates.length).toBe(RISKOMETER.pairs['EUR/CHF'].weekly.length);
     expect(dates[0]).toBe(RISKOMETER.pairs['EUR/CHF'].weekly[0]![0]);
     for (const p of PAIRS) {
-      expect(props.pairs[p].vols.length).toBe(dates.length);
-      expect(props.pairs[p].vols[dates.length - 1]).toBe(RISKOMETER.pairs[p].current.vol);
+      const vols = parseNumbers(props.pairs[p].vols);
+      expect(vols.length).toBe(dates.length);
+      expect(vols[dates.length - 1]).toBe(RISKOMETER.pairs[p].current.vol);
+      expect(vols.every(Number.isFinite)).toBe(true);
       expect(props.pairs[p].yearly.length).toBeGreaterThan(15);
       for (const y of props.pairs[p].yearly) expect(y.level).toBeGreaterThanOrEqual(1);
     }
@@ -65,7 +68,7 @@ describe('buildRiskometerProps', () => {
 
   it('places the 2015 marker on the visible weekly spike, not on the week after the cliff', () => {
     const e = props.events.find((x) => x.id === 'chf-shock-2015')!.pairs['EUR/CHF']!;
-    const vols = props.pairs['EUR/CHF'].vols;
+    const vols = parseNumbers(props.pairs['EUR/CHF'].vols);
     const m = RISKOMETER.pairs['EUR/CHF'].events['chf-shock-2015']!;
     expect(vols[e.week]).toBeGreaterThan(50);
     expect(e.week).toBeGreaterThanOrEqual(m.anchorWeekIndex);
@@ -215,6 +218,11 @@ describe('layout and scales', () => {
     expect(yearTicks('2006-01-06', '2026-09-14', 5)).toEqual([2006, 2011, 2016, 2021, 2026]);
     expect(yearStart(1970)).toBe(0);
     expect(spanYears('2006-01-06', '2026-09-14')).toBe(20);
+  });
+
+  it('parses number lists', () => {
+    expect(parseNumbers('2.27,3.1,0')).toEqual([2.27, 3.1, 0]);
+    expect(parseNumbers('')).toEqual([]);
   });
 
   it('interpolates arrays and finds extremes', () => {

@@ -648,6 +648,36 @@
   .m7-link:hover {
     color: #1e40af;
   }
+  .m7-muted {
+    font-weight: 500;
+    color: var(--ff-muted);
+  }
+  .bl-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    margin-bottom: 18px;
+  }
+  .bl-guide {
+    fill: none;
+    stroke: var(--ff-axis);
+    stroke-width: 1;
+    stroke-dasharray: 2 4;
+  }
+  .m7-check-icon {
+    flex: 0 0 20px;
+    margin-top: 2px;
+  }
+  .m7-check-icon circle {
+    fill: var(--ff-good-text);
+  }
+  .m7-check-icon path {
+    fill: none;
+    stroke: #fff;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
   @media (prefers-reduced-motion: reduce) {
     .m7-pop,
     .m7-aha {

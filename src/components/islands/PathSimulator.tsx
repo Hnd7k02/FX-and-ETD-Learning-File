@@ -144,7 +144,11 @@ function layoutFor(w: number) {
   };
 }
 
-const ratioDigits = (step: number) => (step >= 0.01 ? 2 : step >= 0.001 ? 3 : 4);
+/** Decimals that show a tick step exactly (0.02 → 2, 0.025 → 3), at least 2, at most 4. */
+const ratioDigits = (step: number) => {
+  for (let d = 2; d < 4; d++) if (Math.abs(Math.round(step * 10 ** d) - step * 10 ** d) < 1e-6) return d;
+  return 4;
+};
 
 export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
   const { lang } = props;

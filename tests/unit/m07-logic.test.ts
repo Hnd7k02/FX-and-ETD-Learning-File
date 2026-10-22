@@ -47,6 +47,7 @@ import {
   terminalDensity,
   touchCurves,
   touchMarket,
+  touchAha,
   touchNumbers,
 } from '@/lib/m07/touchlab';
 import {
@@ -338,6 +339,23 @@ describe('m07 touch lab (figure c)', () => {
     expect(pathExitDay(p, s0)).toBe(2);
     expect(pathExitDay([0.8, 0.84], { ...s0, mode: 'dnt' })).toBe(1);
     expect(pathExitDay(p, { ...s0, mode: 'digital' })).toBeNull();
+  });
+});
+
+describe('m07 touch lab annotations', () => {
+  const s0 = defaultTouchState();
+  it('picks the right moment', () => {
+    expect(touchAha({ ...s0, mode: 'digital', spreadPips: 50 })).toBeNull();
+    expect(touchAha({ ...s0, mode: 'digital', spreadPips: 4 })).toBe('digital');
+    expect(touchAha(s0)).toBeNull();
+    expect(touchAha({ ...s0, barrier: 0.802 })).toBe('near');
+    expect(touchAha({ ...s0, payAt: 'hit' })).toBe('same');
+    expect(touchAha({ ...s0, payAt: 'hit', rdPct: 1 })).toBe('hit');
+    expect(touchAha({ ...s0, payAt: 'hit', rdPct: -0.5 })).toBeNull();
+    expect(touchAha({ ...s0, mode: 'noTouch', barrier: 0.798 })).toBe('near');
+    expect(touchAha({ ...s0, mode: 'noTouch' })).toBeNull();
+    expect(touchAha({ ...s0, mode: 'dnt' })).toBeNull();
+    expect(touchAha({ ...s0, mode: 'dnt', lower: 0.79, upper: 0.81 })).toBe('narrow');
   });
 });
 

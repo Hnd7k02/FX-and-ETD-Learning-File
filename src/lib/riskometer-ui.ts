@@ -109,8 +109,8 @@ export interface RkYear {
 }
 
 export interface RkPair {
-  /** Weekly realised vol in percent, one value per date in `dates`. */
-  vols: number[];
+  /** Weekly realised vol in percent, one value per date in `dates`, comma-separated (small HTML). */
+  vols: string;
   current: { date: string; vol: number; percentile: number; level: LevelIndex; needle: number };
   thresholds: { p20: number; p60: number; p85: number; p97: number; max: number; maxDate: string };
   yearly: RkYear[];
@@ -150,14 +150,16 @@ export function buildRiskometerProps(
   const first = data.pairs[PAIRS[0]].weekly;
   const dates = first.map(([d]) => d);
   const pairs = {} as Record<Pair, RkPair>;
+  const vols = {} as Record<Pair, number[]>;
   for (const pair of PAIRS) {
     const pd = data.pairs[pair];
     if (pd.weekly.length !== dates.length || pd.weekly.some(([d], i) => d !== dates[i])) {
       throw new Error(`riskometer.json: weekly dates of ${pair} differ from ${PAIRS[0]}`);
     }
     const { p20, p60, p85, p97, max, maxDate } = pd.thresholds;
+    vols[pair] = pd.weekly.map(([, v]) => v);
     pairs[pair] = {
-      vols: pd.weekly.map(([, v]) => v),
+      vols: vols[pair].join(','),
       current: { ...pd.current },
       thresholds: { p20, p60, p85, p97, max, maxDate },
       yearly: pd.yearlyMax.map((y) => ({ ...y, level: levelOf(y.vol, pd.thresholds) })),
@@ -181,7 +183,7 @@ export function buildRiskometerProps(
         peakDate: m.peakDate,
         peakLevel: m.peakLevel,
         isRecord: m.isRecord,
-        week: markerIndex(pairs[pair].vols, m.anchorWeekIndex, m.peakWeekIndex),
+        week: markerIndex(vols[pair], m.anchorWeekIndex, m.peakWeekIndex),
       };
     }
     return {
@@ -315,6 +317,11 @@ export function layoutFor(width: number): RkLayout {
     compact: true,
     yearStep: RISKOMETER_UI.yearStep.compact,
   };
+}
+
+/** Parses a comma-separated number list (weekly values of a pair). */
+export function parseNumbers(s: string): number[] {
+  return s === '' ? [] : s.split(',').map(Number);
 }
 
 /** Day numbers of ISO dates (x positions in time, not in index space). */

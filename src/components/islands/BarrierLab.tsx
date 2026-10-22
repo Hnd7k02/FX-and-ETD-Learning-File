@@ -32,7 +32,7 @@ import {
   mirrorBarrier,
   type LabState,
 } from '@/lib/m07/barrierlab';
-import { useSliderDrag, useSvgDrag, type DragTarget } from './m07-shared';
+import { annotationBox, useSliderDrag, useSvgDrag, type DragTarget } from './m07-shared';
 
 export interface BarrierLabProps {
   lang: Lang;
@@ -74,14 +74,9 @@ export default function BarrierLab({ lang, initial }: BarrierLabProps): JSX.Elem
   const x1 = LV.width - LV.right;
   const x = scaleLinear([xa, xb], [x0, x1]);
 
-  const inside = (p: Point) =>
-    s.dir === 'up' ? p[0] < s.barrier : p[0] > s.barrier;
-  const yMaxTarget = Math.max(
-    40,
-    ...curves.option.map((p) => p[1]),
-    ...(curves.payoff ?? []).filter(inside).map((p) => p[1]),
-    ...(curves.payoff ?? []).map((p) => p[1]),
-  ) * 1.12;
+  const yMaxTarget =
+    Math.max(40, ...curves.option.map((p) => p[1]), ...(curves.payoff ?? []).map((p) => p[1])) *
+    1.12;
   const dVals = curves.delta.map((p) => p[1]);
   const dTarget: [number, number] = [
     Math.min(-0.2, ...dVals) * 1.08,
@@ -201,7 +196,7 @@ export default function BarrierLab({ lang, initial }: BarrierLabProps): JSX.Elem
           {fmtRate(v, PAIR, 2)}
         </text>
       ))}
-      {title && (
+      {title && !compact && (
         <text x={x1} y={L.height - L.bottom - 8} class="m7-axis-title" text-anchor="end">
           {t('bl.axis.spot')}
         </text>
@@ -223,15 +218,16 @@ export default function BarrierLab({ lang, initial }: BarrierLabProps): JSX.Elem
       ))}
     </g>
   );
-  const ticksFor = (lo: number, hi: number, count: number) => {
-    const span = hi - lo;
-    const raw = span / count;
+  const ticksFor = (lo: number, hi: number, count: number): { ticks: number[]; digits: number } => {
+    const raw = (hi - lo) / count;
     const mag = 10 ** Math.floor(Math.log10(raw));
     const st = [1, 2, 2.5, 5, 10].map((k) => k * mag).find((k) => k >= raw) ?? mag * 10;
-    const out: number[] = [];
-    for (let v = Math.ceil(lo / st) * st; v <= hi + 1e-9; v += st) out.push(Number(v.toFixed(6)));
-    return out;
+    const ticks: number[] = [];
+    for (let v = Math.ceil(lo / st) * st; v <= hi + 1e-9; v += st) ticks.push(Number(v.toFixed(6)));
+    return { ticks, digits: st >= 1 ? 0 : st >= 0.1 ? 1 : 2 };
   };
+  const vTicks = ticksFor(0, dom[0]!, compact ? 3 : 4);
+  const dTicks = ticksFor(dom[1]!, dom[2]!, compact ? 3 : 4);
   const P = (pts: Point[], y: typeof yV) => linePath(pts.map(([a, b]) => [x(a), y(b)]));
   const clipV = 'bl-clip-v';
   const clipD = 'bl-clip-d';
@@ -249,8 +245,7 @@ export default function BarrierLab({ lang, initial }: BarrierLabProps): JSX.Elem
     const key = aha === 'touched' ? `touched.${s.io}` : aha;
     const l1 = t(`bl.aha.${key}.t` as Parameters<typeof t>[0]);
     const l2 = t(`bl.aha.${key}.d` as Parameters<typeof t>[0]);
-    const w = Math.min(x1 - x0 - 8, Math.ceil(Math.max(l1.length * 7.2, l2.length * 6.4)) + 22);
-    const h = 44;
+    const { lines, w, h } = annotationBox(l1, l2, Math.min(330, x1 - x0 - 8));
     const right = sx < (x0 + x1) / 2;
     const ax = Math.max(x0 + 4, Math.min(x1 - w - 4, right ? sx + 16 : sx - w - 16));
     const ay = Math.max(LV.top + 4, Math.min(LV.height - LV.bottom - h - 4, svY - h - 18));
@@ -260,9 +255,11 @@ export default function BarrierLab({ lang, initial }: BarrierLabProps): JSX.Elem
         <text x={ax + 11} y={ay + 18} class="m7-aha-title">
           {l1}
         </text>
-        <text x={ax + 11} y={ay + 35} class="m7-aha-text">
-          {l2}
-        </text>
+        {lines.map((line, i) => (
+          <text key={i} x={ax + 11} y={ay + 35 + i * 17} class="m7-aha-text">
+            {line}
+          </text>
+        ))}
       </g>
     );
   }
@@ -365,9 +362,14 @@ export default function BarrierLab({ lang, initial }: BarrierLabProps): JSX.Elem
               </clipPath>
             </defs>
             {zone(LV)}
-            {yGrid(LV, yV, ticksFor(0, dom[0]!, compact ? 3 : 4), (v) => num(v, 0))}
+            {yGrid(LV, yV, vTicks.ticks, (v) => num(v, vTicks.digits))}
             {vline(LV, s.strike, 'm7-ref')}
-            <text x={x(s.strike) + 6} y={LV.top + 14} class="m7-ref-label">
+            <text
+              x={x(s.strike) + (s.strike < s.barrier ? -6 : 6)}
+              y={LV.top + 34}
+              class="m7-ref-label"
+              text-anchor={s.strike < s.barrier ? 'end' : 'start'}
+            >
               {t('bl.ref.strike')}
             </text>
             <g clip-path={`url(#${clipV})`}>
@@ -447,7 +449,7 @@ export default function BarrierLab({ lang, initial }: BarrierLabProps): JSX.Elem
               </clipPath>
             </defs>
             {zone(LD)}
-            {yGrid(LD, yD, ticksFor(dom[1]!, dom[2]!, compact ? 3 : 4), (v) => num(v, Math.abs(v) < 10 && v % 1 !== 0 ? 1 : 0))}
+            {yGrid(LD, yD, dTicks.ticks, (v) => num(v, dTicks.digits))}
             {vline(LD, s.strike, 'm7-ref')}
             <g clip-path={`url(#${clipD})`}>
               <path d={P(curves.vanillaDelta, yD)} class="m7-compare" />

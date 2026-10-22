@@ -39,11 +39,10 @@ async function expectNoSeriousAxeViolations(page: Page) {
   ).toEqual([]);
 }
 
-/** Scrolls through the page so every client:visible island hydrates, then waits for it. */
+/** Scrolls every island into view so client:visible hydrates it, then waits for all of them. */
 async function hydrateAll(page: Page) {
-  const h = await page.evaluate(() => document.body.scrollHeight);
-  for (let y = 0; y < h; y += 500) {
-    await page.evaluate((yy) => window.scrollTo(0, yy), y);
+  for (const island of await page.locator('astro-island').all()) {
+    await island.scrollIntoViewIfNeeded();
   }
   await page.waitForFunction(() =>
     [...document.querySelectorAll('astro-island')].every((i) => !i.hasAttribute('ssr')),
@@ -117,8 +116,14 @@ test('payoff builder: templates, view toggle and strike slider', async ({ page }
   await page.keyboard.press('ArrowRight');
   await expect(pb).not.toHaveAttribute('data-premium-pips', p1 ?? '');
   // flipping the leg to long call is recognised as the long call template
-  await pb.getByRole('group', { name: 'Direction of leg 1' }).getByRole('button', { name: 'Long' }).click();
-  await pb.getByRole('group', { name: 'Type of leg 1' }).getByRole('button', { name: 'Call' }).click();
+  await pb
+    .getByRole('group', { name: 'Direction of leg 1' })
+    .getByRole('button', { name: 'Long' })
+    .click();
+  await pb
+    .getByRole('group', { name: 'Type of leg 1' })
+    .getByRole('button', { name: 'Call' })
+    .click();
   await expect(pb).toHaveAttribute('data-template', 'long-call');
 });
 

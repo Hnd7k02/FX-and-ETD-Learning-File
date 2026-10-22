@@ -230,3 +230,30 @@ export function useSliderDrag(): [boolean, () => void] {
   }, [sliding]);
   return [sliding, () => setSliding(true)];
 }
+
+/**
+ * Splits an annotation into lines that fit `maxWidth` viewBox units (12 px text, about
+ * 6.5 units per character), and returns the box size for a title line plus these lines.
+ */
+export function annotationBox(
+  title: string,
+  text: string,
+  maxWidth: number,
+): { lines: string[]; w: number; h: number } {
+  const perChar = 6.5;
+  const maxChars = Math.max(12, Math.floor((maxWidth - 22) / perChar));
+  const lines: string[] = [];
+  let cur = '';
+  for (const word of text.split(' ')) {
+    const next = cur ? `${cur} ${word}` : word;
+    if (next.length > maxChars && cur) {
+      lines.push(cur);
+      cur = word;
+    } else {
+      cur = next;
+    }
+  }
+  if (cur) lines.push(cur);
+  const longest = Math.max(title.length * 7.2, ...lines.map((l) => l.length * perChar));
+  return { lines, w: Math.min(maxWidth, Math.ceil(longest) + 22), h: 27 + lines.length * 17 };
+}
