@@ -108,6 +108,28 @@ export function barrierDirection(
 }
 
 /**
+ * ln N(x), also far in the left tail where N(x) underflows to 0 (x < −37): there the
+ * asymptotic series ln N(x) ≈ −x²/2 − ln(−x) − ½ln(2π) + ln(1 − 1/x² + 3/x⁴ − 15/x⁶ + 105/x⁸).
+ */
+export function logNormCdf(x: number): number {
+  if (x > -37) return Math.log(normCdf(x));
+  const r = 1 / (x * x);
+  const series = 1 - r * (1 - r * (3 - r * (15 - 105 * r)));
+  return -0.5 * x * x - Math.log(-x) - 0.5 * Math.log(2 * Math.PI) + Math.log(series);
+}
+
+/**
+ * ratio^power · N(x) without overflow. The reflection terms of barrier formulas multiply a
+ * possibly huge weight such as (H/S)^(2μ) (low vol, large carry) by a tiny tail probability;
+ * evaluated naively that is ∞ · 0 = NaN. In log space: exp(power · ln(ratio) + ln N(x)).
+ */
+export function powTimesCdf(ratio: number, power: number, x: number): number {
+  const logWeight = power * Math.log(ratio);
+  if (logWeight < 700) return Math.exp(logWeight) * normCdf(x);
+  return Math.exp(logWeight + logNormCdf(x));
+}
+
+/**
  * Risk-neutral probability that ln S never reaches ln H before T (T > 0, vol > 0, spot on
  * the far side of the barrier). Reflection principle with drift ν = b − σ²/2 = μσ²:
  *   P = N(η(x2 − σ√T)) − (H/S)^(2μ) · N(η(y2 − σ√T)),
@@ -126,7 +148,7 @@ export function noTouchProbabilityRaw(
   const { sd, mu } = haugSetup(T, vol, rd, rf);
   const x2m = Math.log(S / H) / sd + mu * sd; // Haug x2 − σ√T
   const y2m = Math.log(H / S) / sd + mu * sd; // Haug y2 − σ√T
-  const p = normCdf(eta * x2m) - (H / S) ** (2 * mu) * normCdf(eta * y2m);
+  const p = normCdf(eta * x2m) - powTimesCdf(H / S, 2 * mu, eta * y2m);
   return Math.min(Math.max(p, 0), 1);
 }
 
@@ -153,8 +175,8 @@ export function hitDiscountFactor(
   const hs = H / S;
   const z = Math.log(hs) / sd + lambda * sd;
   return (
-    hs ** (mu + lambda) * normCdf(eta * z) +
-    hs ** (mu - lambda) * normCdf(eta * z - 2 * eta * lambda * sd)
+    powTimesCdf(hs, mu + lambda, eta * z) +
+    powTimesCdf(hs, mu - lambda, eta * z - 2 * eta * lambda * sd)
   );
 }
 
@@ -242,5 +264,5 @@ export function oneTouch(p: TouchParams): number {
   const { sd, mu } = haugSetup(T, vol, rd, rf);
   const x2m = Math.log(S / H) / sd + mu * sd;
   const y2m = Math.log(H / S) / sd + mu * sd;
-  return payout * dfd * (normCdf(-eta * x2m) + (H / S) ** (2 * mu) * normCdf(eta * y2m));
+  return payout * dfd * (normCdf(-eta * x2m) + powTimesCdf(H / S, 2 * mu, eta * y2m));
 }

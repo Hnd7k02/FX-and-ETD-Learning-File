@@ -285,12 +285,14 @@ export default function WowChart({ lang }: WowChartProps): JSX.Element {
           role="group"
           aria-label={t('wow.group')}
           style={{
-            display: 'flex',
+            display: compact ? 'grid' : 'flex',
+            gridTemplateColumns: compact ? '1fr 1fr' : undefined,
             flexWrap: 'wrap',
             gap: 4,
             padding: 4,
             background: 'var(--ff-chip)',
-            borderRadius: 999,
+            borderRadius: compact ? 22 : 999,
+            width: compact ? '100%' : undefined,
           }}
         >
           {PHASES.map((i) => {
@@ -436,7 +438,15 @@ export default function WowChart({ lang }: WowChartProps): JSX.Element {
           <text
             x={f.strikeX + 8}
             y={sc.y0 + layout.font + 5}
-            style={{ fontSize: fs, fontWeight: 600, fill: 'var(--ff-ink-2)' }}
+            style={{
+              fontSize: fs,
+              fontWeight: 600,
+              fill: 'var(--ff-ink-2)',
+              paintOrder: 'stroke',
+              stroke: '#fff',
+              strokeWidth: 3,
+              strokeLinejoin: 'round',
+            }}
           >
             {compact ? (
               <>
@@ -534,7 +544,15 @@ export default function WowChart({ lang }: WowChartProps): JSX.Element {
                 x={f.strikeX + 14}
                 y={f.tvY - 12}
                 data-tv
-                style={{ fontSize: `${layout.fontBig}px`, fontWeight: 700, fill: 'var(--ff-ink)' }}
+                style={{
+                  fontSize: `${layout.fontBig}px`,
+                  fontWeight: 700,
+                  fill: 'var(--ff-ink)',
+                  paintOrder: 'stroke',
+                  stroke: '#fff',
+                  strokeWidth: 4,
+                  strokeLinejoin: 'round',
+                }}
               >
                 {tvText}
               </text>

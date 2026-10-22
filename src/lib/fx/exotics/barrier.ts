@@ -20,6 +20,7 @@ import {
   haugSetup,
   hitDiscountFactor,
   noTouchProbabilityRaw,
+  powTimesCdf,
 } from './touch';
 
 export type BarrierKind = 'down-and-out' | 'down-and-in' | 'up-and-out' | 'up-and-in';
@@ -160,19 +161,17 @@ export function haugTerms(
   const y1 = Math.log((H * H) / (S * K)) / sd + shift;
   const y2 = Math.log(H / S) / sd + shift;
   const hs = H / S;
-  const assetWeight = hs ** (2 * (mu + 1)); // reflection weight on the asset leg
-  const cashWeight = hs ** (2 * mu); // reflection weight on the cash leg
   const N = normCdf;
+  // Reflection weights (H/S)^(2(μ+1)) on the asset leg and (H/S)^(2μ) on the cash leg, each
+  // multiplied by its N(·) in log space (powTimesCdf) so that huge weights cannot overflow.
+  const asset = (x: number) => powTimesCdf(hs, 2 * (mu + 1), x);
+  const cash = (x: number) => powTimesCdf(hs, 2 * mu, x);
 
   return {
     A: phi * S * dff * N(phi * x1) - phi * K * dfd * N(phi * x1 - phi * sd),
     B: phi * S * dff * N(phi * x2) - phi * K * dfd * N(phi * x2 - phi * sd),
-    C:
-      phi * S * dff * assetWeight * N(eta * y1) -
-      phi * K * dfd * cashWeight * N(eta * y1 - eta * sd),
-    D:
-      phi * S * dff * assetWeight * N(eta * y2) -
-      phi * K * dfd * cashWeight * N(eta * y2 - eta * sd),
+    C: phi * S * dff * asset(eta * y1) - phi * K * dfd * cash(eta * y1 - eta * sd),
+    D: phi * S * dff * asset(eta * y2) - phi * K * dfd * cash(eta * y2 - eta * sd),
     // E = rebate × no-touch paid at expiry (see touch.ts for the formula).
     E: rebate === 0 ? 0 : rebate * dfd * noTouchProbabilityRaw(S, H, T, vol, rd, rf, eta),
     // F = rebate × one-touch paid at hit (closed form, or quadrature if λ² < 0).

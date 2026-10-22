@@ -11,8 +11,14 @@
  * (2/Z)·Σ sin(iπx/Z)·sin(iπy/Z)·e^(−½(iπ/Z)²σ²T); integrating over y gives the price.
  * Each term decays like e^(−½(iπ/Z)²σ²T): long T or a narrow corridor need few terms,
  * a short T in a wide corridor needs many.
+ *
+ * Shortcut for that last case: if no path can realistically touch BOTH barriers, the two
+ * barriers act independently and DNT = payout · e^(−rd T) · (1 − P(touch L) − P(touch U))
+ * (inclusion–exclusion). The neglected term P(touch both) is bounded by
+ * P(touch L)·P(L → U within T) + P(touch U)·P(U → L within T); the shortcut is used only when
+ * that bound is below 1e-16.
  */
-import { assertPositive, forwardPathHitTime } from './touch';
+import { assertPositive, forwardPathHitTime, noTouchProbabilityRaw } from './touch';
 
 export interface DoubleTouchParams {
   /** Spot, quote currency per 1 unit base. */
@@ -32,8 +38,9 @@ export interface DoubleTouchParams {
   /** Cash amount in quote currency, paid at expiry (default 1). */
   payout?: number;
   /**
-   * Number of series terms. Default: enough for the last term to be below 1e-17 relative,
-   * i.e. n ≈ 8.9 · Z/(π σ√T), at least 50 and at most 20’000.
+   * Number of series terms; forces the series. Default: the inclusion–exclusion shortcut if
+   * it is exact to 1e-16, else enough terms for the last one to be below 1e-17 relative,
+   * n ≈ 8.9 · Z/(π σ√T), at least 50 and at most 20’000.
    */
   terms?: number;
 }
@@ -49,7 +56,8 @@ export function dntDefaultTerms(Z: number, vol: number, T: number): number {
  *   α = −½(2b/σ² − 1),  β = −¼(2b/σ² − 1)² − 2rd/σ²,  Z = ln(U/L)
  *   DNT = payout · Σ_{i=1..n} (2πi/Z²) · [(S/L)^α − (−1)^i (S/U)^α] / [α² + (iπ/Z)²]
  *                  · sin(iπ/Z · ln(S/L)) · e^(−½[(iπ/Z)² − β]σ²T)
- * Not clamped; doubleNoTouch clamps to [0, payout · e^(−rd T)].
+ * The factor e^(½βσ²T) contains the discounting e^(−rd T). Not clamped; doubleNoTouch
+ * clamps to [0, payout · e^(−rd T)].
  */
 export function dntSeries(
   S: number,
@@ -68,9 +76,11 @@ export function dntSeries(
   const beta = -0.25 * k * k - (2 * rd) / v2; // = −α² − 2rd/σ²
   const Z = Math.log(U / L);
   const x = Math.log(S / L); // position in the corridor, 0 < x < Z
-  const fromL = (S / L) ** alpha;
-  const fromU = (S / U) ** alpha;
-  const common = Math.exp(0.5 * beta * v2 * T); // e^(½βσ²T), the part shared by all terms
+  // (S/L)^α · e^(½βσ²T) and (S/U)^α · e^(½βσ²T), combined in the exponent so that a large α
+  // (low vol, large carry) cannot overflow.
+  const shared = 0.5 * beta * v2 * T;
+  const fromL = Math.exp(alpha * x + shared);
+  const fromU = Math.exp(alpha * (x - Z) + shared);
   let sum = 0;
   for (let i = 1; i <= terms; i++) {
     const w = (i * Math.PI) / Z; // wave number iπ/Z
@@ -81,12 +91,35 @@ export function dntSeries(
       Math.sin(w * x) *
       Math.exp(-0.5 * w * w * v2 * T);
   }
-  return payout * common * sum;
+  return payout * sum;
+}
+
+/**
+ * Risk-neutral probabilities for the inclusion–exclusion shortcut (T > 0, vol > 0,
+ * L < S < U), all dimensionless: touch L, touch U, and the bound on touching both,
+ * bothBound = P(touch L)·P(L → U) + P(touch U)·P(U → L) ≥ P(touch both).
+ */
+export function dntTouchProbabilities(
+  S: number,
+  L: number,
+  U: number,
+  T: number,
+  vol: number,
+  rd: number,
+  rf: number,
+): { touchL: number; touchU: number; bothBound: number } {
+  const touchL = 1 - noTouchProbabilityRaw(S, L, T, vol, rd, rf, 1);
+  const touchU = 1 - noTouchProbabilityRaw(S, U, T, vol, rd, rf, -1);
+  const crossUp = 1 - noTouchProbabilityRaw(L, U, T, vol, rd, rf, -1);
+  const crossDown = 1 - noTouchProbabilityRaw(U, L, T, vol, rd, rf, 1);
+  return { touchL, touchU, bothBound: touchL * crossUp + touchU * crossDown };
 }
 
 /**
  * Double no-touch: pays `payout` (quote currency) at expiry if the spot stays strictly
- * inside (L, U) until T. Value from dntSeries, clamped to [0, payout · e^(−rd T)].
+ * inside (L, U) until T. Value from dntSeries (or, without an explicit `terms`, from the
+ * inclusion–exclusion shortcut when touching both barriers is impossible to 1e-16, see the
+ * module doc), clamped to [0, payout · e^(−rd T)].
  * Special cases: spot at or outside a barrier → 0; T ≤ 0 → payout; vol ≤ 0 → the forward
  * path S·e^((rd − rf)t) decides. Throws RangeError unless S, L, U > 0 and L < U.
  */
@@ -102,9 +135,26 @@ export function doubleNoTouch(p: DoubleTouchParams): number {
       forwardPathHitTime(S, L, T, rd, rf) !== null || forwardPathHitTime(S, U, T, rd, rf) !== null;
     return hits ? 0 : payout * dfd;
   }
-  const terms = p.terms ?? dntDefaultTerms(Math.log(U / L), vol, T);
-  const value = dntSeries(S, L, U, T, vol, rd, rf, payout, terms);
-  return Math.min(Math.max(value, 0), payout * dfd);
+  const clamp = (v: number): number => Math.min(Math.max(v, 0), payout * dfd);
+  if (p.terms === undefined) {
+    const { touchL, touchU, bothBound } = dntTouchProbabilities(S, L, U, T, vol, rd, rf);
+    const independent = payout * dfd * (1 - touchL - touchU);
+    if (bothBound < 1e-16) return clamp(independent);
+    const value = dntSeries(
+      S,
+      L,
+      U,
+      T,
+      vol,
+      rd,
+      rf,
+      payout,
+      dntDefaultTerms(Math.log(U / L), vol, T),
+    );
+    // Extreme inputs (tiny vol with large carry) can make the series overflow.
+    return clamp(Number.isFinite(value) ? value : independent);
+  }
+  return clamp(dntSeries(S, L, U, T, vol, rd, rf, payout, p.terms));
 }
 
 /**

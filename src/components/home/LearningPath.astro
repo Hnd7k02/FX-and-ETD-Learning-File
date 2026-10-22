@@ -50,44 +50,52 @@ const last = MODULES.length - 1;
     <ol class="stations" aria-label={th('home.pathAria', { n: MODULES.length })}>
       {
         families.map((f) => (
-          <li class="family" data-family={f.key} style={`grid-column:${f.start} / span ${f.span}`}>
-            <span class="dot" style="background: var(--fam)" aria-hidden="true" />
-            {f.label}
-          </li>
-        ))
-      }
-      {
-        MODULES.map((m, i) => (
-          <li class="station-item" style={`grid-column:${i + 1}`}>
-            <a
-              class="station"
-              href={modulePath(lang, m.slug, '1')}
-              data-station={m.slug}
-              data-family={m.family}
-              data-state="open"
-              data-line-l={i === 0 ? 'none' : 'open'}
-              data-line-r={i === last ? 'none' : 'open'}
-            >
-              <span class="node-wrap">
-                <span class="line line-l" aria-hidden="true" />
-                <span class="line line-r" aria-hidden="true" />
-                <span class="node" style={`view-transition-name: ff-node-${m.slug}`}>
-                  <svg class="check" width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
-                    <path d="M4 9.4L7.4 12.6L14 5.6" />
-                  </svg>
-                  <span class="num">{m.n}</span>
-                </span>
-              </span>
-              <span class="meta">
-                <span class="title" style={`view-transition-name: ff-title-${m.slug}`}>
-                  {m.title[lang]}
-                </span>
-                <span class="sr-only" data-state-text data-done={t('home.stationDone')} />
-                <span class="min">{t('home.minutes', { min: m.minutes })}</span>
-                <span class="chip chip-family state-chip" data-chip data-tpl={common[lang]['home.inProgress']} hidden />
-              </span>
-            </a>
-          </li>
+          <>
+            <li class="family" data-family={f.key} style={`grid-column:${f.start} / span ${f.span}`}>
+              <span class="dot" style="background: var(--fam)" aria-hidden="true" />
+              {f.label}
+            </li>
+            {f.mods.map((m) => {
+              const i = MODULES.indexOf(m);
+              return (
+                <li class="station-item" style={`grid-column:${i + 1}`}>
+                  <a
+                    class="station"
+                    href={modulePath(lang, m.slug, '1')}
+                    data-station={m.slug}
+                    data-family={m.family}
+                    data-state="open"
+                    data-line-l={i === 0 ? 'none' : 'open'}
+                    data-line-r={i === last ? 'none' : 'open'}
+                  >
+                    <span class="node-wrap">
+                      <span class="line line-l" aria-hidden="true" />
+                      <span class="line line-r" aria-hidden="true" />
+                      <span class="node" style={`view-transition-name: ff-node-${m.slug}`}>
+                        <svg class="check" width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+                          <path d="M4 9.4L7.4 12.6L14 5.6" />
+                        </svg>
+                        <span class="num">{m.n}</span>
+                      </span>
+                    </span>
+                    <span class="meta">
+                      <span class="title" style={`view-transition-name: ff-title-${m.slug}`}>
+                        {m.title[lang]}
+                      </span>
+                      <span class="sr-only" data-state-text data-done={t('home.stationDone')} />
+                      <span class="min">{t('home.minutes', { min: m.minutes })}</span>
+                      <span
+                        class="chip chip-family state-chip"
+                        data-chip
+                        data-tpl={common[lang]['home.inProgress']}
+                        hidden
+                      />
+                    </span>
+                  </a>
+                </li>
+              );
+            })}
+          </>
         ))
       }
     </ol>

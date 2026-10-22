@@ -128,7 +128,7 @@ export function validate(rows: readonly RawRow[], opts: ValidationOptions = {}):
     for (let i = 1; i < rows.length; i++) {
       const a = crossRate(rows[i - 1]!, pair);
       const b = crossRate(rows[i]!, pair);
-      if (!(a > 0 && b > 0)) continue; // reported by the rate rule
+      if (!(a > 0 && b > 0 && Number.isFinite(a) && Number.isFinite(b))) continue; // rate rule
       const r = Math.log(b / a);
       const date = rows[i]!.date;
       if (Math.abs(r) >= maxAbsLogReturn && !allowed.has(`${date}|${pair}`)) {
