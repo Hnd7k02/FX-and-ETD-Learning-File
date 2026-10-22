@@ -305,7 +305,8 @@ export default function PayoffBuilder(props: PayoffBuilderProps): JSX.Element {
     setChange('toggle');
     setState((cur) => {
       if (cur.legs.length <= 1) return cur;
-      const lock = cur.solve === i ? null : cur.solve !== null && cur.solve > i ? cur.solve - 1 : cur.solve;
+      const lock =
+        cur.solve === i ? null : cur.solve !== null && cur.solve > i ? cur.solve - 1 : cur.solve;
       return reSolve({ ...cur, legs: cur.legs.filter((_, j) => j !== i), solve: lock });
     });
   };
@@ -389,13 +390,18 @@ export default function PayoffBuilder(props: PayoffBuilderProps): JSX.Element {
     : prem.direction === 'pay'
       ? t('pb.pay', { chf: premAbsChf })
       : t('pb.receive', { chf: premAbsChf });
+  const extremeSub = (at: number | null) =>
+    at === 0 && legs.some((l) => l.kind !== 'call')
+      ? t('pb.atZero', { pair: PAIR })
+      : t('pb.atExpiry');
   const gainText = (x: number | 'unlimited') => (x === 'unlimited' ? t('pb.unlimited') : chf(x));
   const beText = calc.be.length
     ? calc.be.map((b) => fmtRate(b, PAIR)).join(' · ')
     : t('pb.noBreakEven');
   const g = calc.greeks;
   const deltaRatio = fmtNumber(g.delta / N, lang, { digits: 3 });
-  const kindLabel = (k: LegKind) => t(k === 'call' ? 'pb.call' : k === 'put' ? 'pb.put' : 'pb.forward');
+  const kindLabel = (k: LegKind) =>
+    t(k === 'call' ? 'pb.call' : k === 'put' ? 'pb.put' : 'pb.forward');
   const legsAria = legs
     .map((l) =>
       t('pb.ariaLeg', {
@@ -457,10 +463,23 @@ export default function PayoffBuilder(props: PayoffBuilderProps): JSX.Element {
   const fs = `${L.font}px`;
   const clipId = `pb-clip-${uid}`;
   const labelRight = spotX > L.width - 150;
+  /** Value label on the side where the curve is lower (rising curve → label upper left). */
+  const labelLeft = calc.greeks.delta > 0;
+  /* "aha" label: on the free side of the curve (rising → upper left or lower right). */
+  const ahaWidth = t('pb.aha').length * (L.font + 1) * 0.56;
+  const leftRoom = spotX - 14 - ahaWidth >= L.left + 4;
+  const rightRoom = spotX + 14 + ahaWidth <= L.width - L.right;
+  const ahaAbove = labelLeft ? leftRoom : rightRoom;
+  const ahaToLeft = labelLeft === ahaAbove;
+  const ahaX = clamp(
+    ahaToLeft ? spotX - 14 - ahaWidth : spotX + 14,
+    L.left + 4,
+    L.width - L.right - ahaWidth,
+  );
+  const ahaY = ahaAbove ? spotY - 14 : spotY + L.font + 14;
 
   return (
     <div
-      ref={box}
       class="pb"
       data-pb
       data-template={templateNow ?? 'custom'}
@@ -473,9 +492,11 @@ export default function PayoffBuilder(props: PayoffBuilderProps): JSX.Element {
           <div class="ff-lab-sub">{sub}</div>
         </div>
         <div class="pb-chips-status">
-          <span class="ff-pill-note pb-name" data-position-name>
-            {name}
-          </span>
+          {pressed === null && (
+            <span class="ff-pill-note pb-name" data-position-name>
+              {name}
+            </span>
+          )}
           {prem.zeroCost && (
             <span class="pb-zero" data-zero-chip>
               <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
@@ -509,7 +530,10 @@ export default function PayoffBuilder(props: PayoffBuilderProps): JSX.Element {
               onClick={() => pickTemplate(id)}
             >
               <svg width="34" height="18" viewBox="0 0 34 18" aria-hidden="true">
-                <path d="M2,9H32" style={{ stroke: 'currentColor', strokeOpacity: 0.25, strokeWidth: 1 }} />
+                <path
+                  d="M2,9H32"
+                  style={{ stroke: 'currentColor', strokeOpacity: 0.25, strokeWidth: 1 }}
+                />
                 <path
                   d={glyphs[id]}
                   style={{
@@ -548,256 +572,278 @@ export default function PayoffBuilder(props: PayoffBuilderProps): JSX.Element {
               ]}
             />
           </div>
-          <svg
-            ref={svgRef}
-            viewBox={`0 0 ${L.width} ${L.height}`}
-            role="img"
-            aria-label={ariaLabel}
-            class="pb-svg"
-          >
-            <defs>
-              <clipPath id={clipId}>
-                <rect
-                  x={L.left}
-                  y={L.top - 2}
-                  width={L.width - L.left - L.right}
-                  height={L.plotBottom - L.top + 4}
-                />
-              </clipPath>
-            </defs>
-            <GridY
-              y={sy}
-              ticks={yTicks}
-              x0={L.left}
-              x1={L.width - L.right}
-              format={(v) => fmtPips(v, lang, 0, true)}
-              fontSize={L.font}
-            />
-            <text x={L.left} y={L.top - 14} style={{ fontSize: fs, fontWeight: 600, fill: 'var(--ff-muted)' }}>
-              {t(view === 'pnl' ? 'pb.yPnl' : 'pb.yValue')}
-            </text>
+          <div ref={box} class="pb-chart">
+            <svg
+              ref={svgRef}
+              viewBox={`0 0 ${L.width} ${L.height}`}
+              role="img"
+              aria-label={ariaLabel}
+              class="pb-svg"
+            >
+              <defs>
+                <clipPath id={clipId}>
+                  <rect
+                    x={L.left}
+                    y={L.top - 2}
+                    width={L.width - L.left - L.right}
+                    height={L.plotBottom - L.top + 4}
+                  />
+                </clipPath>
+              </defs>
+              <GridY
+                y={sy}
+                ticks={yTicks}
+                x0={L.left}
+                x1={L.width - L.right}
+                format={(v) => fmtPips(v, lang, 0, true)}
+                fontSize={L.font}
+              />
+              <text
+                x={L.left}
+                y={L.top - 14}
+                style={{ fontSize: fs, fontWeight: 600, fill: 'var(--ff-muted)' }}
+              >
+                {t(view === 'pnl' ? 'pb.yPnl' : 'pb.yValue')}
+              </text>
 
-            {/* strike lines */}
-            {groups.map((gr) => (
+              {/* strike lines */}
+              {groups.map((gr) => (
+                <path
+                  key={`k${gr.legs.join('-')}`}
+                  d={`M${sx(gr.strike).toFixed(1)},${L.top}V${L.rail}`}
+                  style={{
+                    fill: 'none',
+                    stroke: 'var(--ff-ref)',
+                    strokeWidth: 1,
+                    strokeDasharray: '4 5',
+                  }}
+                />
+              ))}
+
+              {/* spot line */}
               <path
-                key={`k${gr.legs.join('-')}`}
-                d={`M${sx(gr.strike).toFixed(1)},${L.top}V${L.rail}`}
+                d={`M${spotX.toFixed(1)},${L.top}V${L.plotBottom}`}
                 style={{
                   fill: 'none',
-                  stroke: 'var(--ff-ref)',
+                  stroke: 'var(--ff-axis)',
                   strokeWidth: 1,
-                  strokeDasharray: '4 5',
+                  strokeDasharray: '2 4',
                 }}
               />
-            ))}
+              <text
+                x={spotX + (labelRight ? -6 : 6)}
+                y={L.top + L.font}
+                style={{
+                  fontSize: fs,
+                  fontWeight: 600,
+                  fill: 'var(--ff-muted)',
+                  textAnchor: labelRight ? 'end' : 'start',
+                }}
+              >
+                {t('pb.spot')} {fmtRate(EXAMPLE.spot, PAIR)}
+              </text>
 
-            {/* spot line */}
-            <path
-              d={`M${spotX.toFixed(1)},${L.top}V${L.plotBottom}`}
-              style={{ fill: 'none', stroke: 'var(--ff-axis)', strokeWidth: 1, strokeDasharray: '2 4' }}
-            />
-            <text
-              x={spotX + (labelRight ? -6 : 6)}
-              y={L.top + L.font}
-              style={{
-                fontSize: fs,
-                fontWeight: 600,
-                fill: 'var(--ff-muted)',
-                textAnchor: labelRight ? 'end' : 'start',
-              }}
-            >
-              {t('pb.spot')} {fmtRate(EXAMPLE.spot, PAIR)}
-            </text>
+              <g clip-path={`url(#${clipId})`}>
+                {legs.length > 1 &&
+                  legs.map((l, j) => (
+                    <path
+                      key={`leg${j}`}
+                      d={legPaths[j]}
+                      style={{
+                        fill: 'none',
+                        stroke: sideColor(l.side, l.kind),
+                        strokeOpacity: 0.42,
+                        strokeWidth: 1.5,
+                        strokeLinejoin: 'round',
+                      }}
+                    />
+                  ))}
+                <path
+                  d={payoffPath}
+                  data-payoff
+                  style={{
+                    fill: 'none',
+                    stroke: 'var(--ff-payoff)',
+                    strokeWidth: 2,
+                    strokeDasharray: '6 6',
+                    strokeLinejoin: 'round',
+                  }}
+                />
+                <path
+                  d={valuePath}
+                  data-value
+                  style={{
+                    fill: 'none',
+                    stroke: 'var(--ff-long)',
+                    strokeWidth: 3,
+                    strokeLinecap: 'round',
+                    strokeLinejoin: 'round',
+                  }}
+                />
+              </g>
 
-            <g clip-path={`url(#${clipId})`}>
-              {legs.length > 1 &&
-                legs.map((l, j) => (
-                  <path
-                    key={`leg${j}`}
-                    d={legPaths[j]}
+              {/* break-evens (P&L view) */}
+              {view === 'pnl' &&
+                calc.be
+                  .filter((b) => b > X_RANGE[0] && b < X_RANGE[1])
+                  .map((b) => (
+                    <g key={`be${b.toFixed(6)}`}>
+                      <circle
+                        cx={sx(b)}
+                        cy={zeroY}
+                        r={4.5}
+                        style={{ fill: '#fff', stroke: 'var(--ff-forward)', strokeWidth: 2 }}
+                      />
+                      <text
+                        x={sx(b)}
+                        y={zeroY + L.font + 8}
+                        style={{
+                          fontSize: fs,
+                          fontWeight: 700,
+                          fill: 'var(--ff-ink)',
+                          textAnchor: 'middle',
+                          paintOrder: 'stroke',
+                          stroke: '#fff',
+                          strokeWidth: 3,
+                        }}
+                      >
+                        {t('pb.be')}
+                      </text>
+                    </g>
+                  ))}
+
+              {/* value today at the current spot */}
+              <circle
+                cx={spotX}
+                cy={spotY}
+                r={6}
+                style={{ fill: 'var(--ff-long)', stroke: '#fff', strokeWidth: 2.5 }}
+              />
+              {prem.zeroCost ? (
+                <g class="pb-aha" key="aha">
+                  <text
+                    x={ahaX}
+                    y={ahaY}
                     style={{
-                      fill: 'none',
-                      stroke: sideColor(l.side, l.kind),
-                      strokeOpacity: 0.42,
-                      strokeWidth: 1.5,
+                      fontSize: `${L.font + 1}px`,
+                      fontWeight: 800,
+                      fill: 'var(--ff-good-text-strong)',
+                      textAnchor: 'start',
+                      paintOrder: 'stroke',
+                      stroke: '#fff',
+                      strokeWidth: 4,
                       strokeLinejoin: 'round',
                     }}
-                  />
-                ))}
-              <path
-                d={payoffPath}
-                data-payoff
-                style={{
-                  fill: 'none',
-                  stroke: 'var(--ff-payoff)',
-                  strokeWidth: 2,
-                  strokeDasharray: '6 6',
-                  strokeLinejoin: 'round',
-                }}
-              />
-              <path
-                d={valuePath}
-                data-value
-                style={{
-                  fill: 'none',
-                  stroke: 'var(--ff-long)',
-                  strokeWidth: 3,
-                  strokeLinecap: 'round',
-                  strokeLinejoin: 'round',
-                }}
-              />
-            </g>
-
-            {/* break-evens (P&L view) */}
-            {view === 'pnl' &&
-              calc.be
-                .filter((b) => b > X_RANGE[0] && b < X_RANGE[1])
-                .map((b) => (
-                  <g key={`be${b.toFixed(6)}`}>
-                    <circle
-                      cx={sx(b)}
-                      cy={zeroY}
-                      r={4.5}
-                      style={{ fill: '#fff', stroke: 'var(--ff-forward)', strokeWidth: 2 }}
-                    />
-                    <text
-                      x={sx(b)}
-                      y={zeroY + L.font + 8}
-                      style={{
-                        fontSize: fs,
-                        fontWeight: 700,
-                        fill: 'var(--ff-ink)',
-                        textAnchor: 'middle',
-                        paintOrder: 'stroke',
-                        stroke: '#fff',
-                        strokeWidth: 3,
-                      }}
-                    >
-                      {t('pb.be')}
-                    </text>
-                  </g>
-                ))}
-
-            {/* value today at the current spot */}
-            <circle
-              cx={spotX}
-              cy={spotY}
-              r={6}
-              style={{ fill: 'var(--ff-long)', stroke: '#fff', strokeWidth: 2.5 }}
-            />
-            {prem.zeroCost ? (
-              <g class="pb-aha" key="aha">
+                  >
+                    {t('pb.aha')}
+                  </text>
+                </g>
+              ) : (
                 <text
-                  x={spotX + (labelRight ? -12 : 12)}
+                  x={spotX + (labelLeft ? -12 : 12)}
                   y={spotY - 12}
                   style={{
-                    fontSize: `${L.font + 1}px`,
-                    fontWeight: 800,
-                    fill: 'var(--ff-good-text-strong)',
-                    textAnchor: labelRight ? 'end' : 'start',
+                    fontSize: fs,
+                    fontWeight: 700,
+                    fill: 'var(--ff-ink)',
+                    textAnchor: labelLeft ? 'end' : 'start',
                     paintOrder: 'stroke',
                     stroke: '#fff',
                     strokeWidth: 4,
                     strokeLinejoin: 'round',
                   }}
                 >
-                  {t('pb.aha')}
+                  {t('pb.spotValue', { pips: fmtPips(spotTween, lang, 1, true) })}
                 </text>
-              </g>
-            ) : (
-              <text
-                x={spotX + (labelRight ? -12 : 12)}
-                y={spotY - 12}
-                style={{
-                  fontSize: fs,
-                  fontWeight: 700,
-                  fill: 'var(--ff-ink)',
-                  textAnchor: labelRight ? 'end' : 'start',
-                  paintOrder: 'stroke',
-                  stroke: '#fff',
-                  strokeWidth: 4,
-                  strokeLinejoin: 'round',
-                }}
-              >
-                {t('pb.spotValue', { pips: fmtPips(spotTween, lang, 1, true) })}
-              </text>
-            )}
+              )}
 
-            {/* handle rail and strike handles */}
-            <path
-              d={`M${L.left},${L.rail}H${L.width - L.right}`}
-              style={{ fill: 'none', stroke: 'var(--ff-line)', strokeWidth: 4, strokeLinecap: 'round' }}
-            />
-            {groups.map((gr, gi) => {
-              const x = sx(gr.strike);
-              const cy = rows[gi] === 0 ? L.rail : L.rail - 26;
-              const label = `K${gr.legs.map((i) => i + 1).join('·')}`;
-              const w = 16 + label.length * 7;
-              const sides = new Set(gr.legs.map((i) => sideColor(legs[i]!.side, legs[i]!.kind)));
-              const color = sides.size === 1 ? [...sides][0]! : 'var(--ff-forward)';
-              const active = drag !== null && drag.join() === gr.legs.join();
-              return (
-                <g
-                  key={`h${gr.legs.join('-')}`}
-                  class={`pb-handle${active ? ' is-active' : ''}`}
-                  data-handle={gr.legs.join('-')}
-                  onPointerDown={onDown(gr.legs)}
-                  onPointerMove={onMove}
-                  onPointerUp={onUp}
-                  onPointerCancel={onUp}
-                >
-                  <rect x={x - 24} y={cy - 22} width={48} height={44} style={{ fill: 'transparent' }} />
-                  <rect
-                    x={x - w / 2}
-                    y={cy - 11}
-                    width={w}
-                    height={22}
-                    rx={11}
-                    style={{ fill: color, stroke: '#fff', strokeWidth: 2 }}
-                  />
-                  <text
-                    x={x}
-                    y={cy + 4}
-                    style={{
-                      fontSize: '11px',
-                      fontWeight: 800,
-                      fill: '#fff',
-                      textAnchor: 'middle',
-                      pointerEvents: 'none',
-                    }}
+              {/* handle rail and strike handles */}
+              <path
+                d={`M${L.left},${L.rail}H${L.width - L.right}`}
+                style={{
+                  fill: 'none',
+                  stroke: 'var(--ff-line)',
+                  strokeWidth: 4,
+                  strokeLinecap: 'round',
+                }}
+              />
+              {groups.map((gr, gi) => {
+                const x = sx(gr.strike);
+                const cy = rows[gi] === 0 ? L.rail : L.rail - 26;
+                const label = `K${gr.legs.map((i) => i + 1).join('·')}`;
+                const w = 16 + label.length * 7;
+                const sides = new Set(gr.legs.map((i) => sideColor(legs[i]!.side, legs[i]!.kind)));
+                const color = sides.size === 1 ? [...sides][0]! : 'var(--ff-forward)';
+                const active = drag !== null && drag.join() === gr.legs.join();
+                return (
+                  <g
+                    key={`h${gr.legs.join('-')}`}
+                    class={`pb-handle${active ? ' is-active' : ''}`}
+                    data-handle={gr.legs.join('-')}
+                    onPointerDown={onDown(gr.legs)}
+                    onPointerMove={onMove}
+                    onPointerUp={onUp}
+                    onPointerCancel={onUp}
                   >
-                    {label}
-                  </text>
-                  {active && (
+                    <rect
+                      x={x - 24}
+                      y={cy - 22}
+                      width={48}
+                      height={44}
+                      style={{ fill: 'transparent' }}
+                    />
+                    <rect
+                      x={x - w / 2}
+                      y={cy - 11}
+                      width={w}
+                      height={22}
+                      rx={11}
+                      style={{ fill: color, stroke: '#fff', strokeWidth: 2 }}
+                    />
                     <text
                       x={x}
-                      y={cy - 18}
+                      y={cy + 4}
                       style={{
-                        fontSize: '12px',
-                        fontWeight: 700,
-                        fill: 'var(--ff-ink)',
+                        fontSize: '11px',
+                        fontWeight: 800,
+                        fill: '#fff',
                         textAnchor: 'middle',
-                        fontFamily: 'var(--ff-font-mono)',
-                        paintOrder: 'stroke',
-                        stroke: '#fff',
-                        strokeWidth: 4,
+                        pointerEvents: 'none',
                       }}
                     >
-                      {fmtRate(gr.strike, PAIR)}
+                      {label}
                     </text>
-                  )}
-                </g>
-              );
-            })}
+                    {active && (
+                      <text
+                        x={x}
+                        y={cy - 18}
+                        style={{
+                          fontSize: '12px',
+                          fontWeight: 700,
+                          fill: 'var(--ff-ink)',
+                          textAnchor: 'middle',
+                          fontFamily: 'var(--ff-font-mono)',
+                          paintOrder: 'stroke',
+                          stroke: '#fff',
+                          strokeWidth: 4,
+                        }}
+                      >
+                        {fmtRate(gr.strike, PAIR)}
+                      </text>
+                    )}
+                  </g>
+                );
+              })}
 
-            <AxisX
-              x={sx}
-              ticks={xTicks}
-              y={L.height - 6}
-              format={(v) => fmtRate(v, PAIR, 2)}
-              fontSize={L.font}
-            />
-          </svg>
+              <AxisX
+                x={sx}
+                ticks={xTicks}
+                y={L.height - 6}
+                format={(v) => fmtRate(v, PAIR, 2)}
+                fontSize={L.font}
+              />
+            </svg>
+          </div>
           <p class="pb-hint">{t('pb.dragHint')}</p>
           <p class="sr-only" data-summary>
             {summary}
@@ -827,13 +873,13 @@ export default function PayoffBuilder(props: PayoffBuilderProps): JSX.Element {
             <StatRow symbol="Θ" label={t('pb.theta')} sub={t('pb.thetaSub')} value={chf(g.theta)} />
             <StatRow
               label={t('pb.maxGain')}
-              sub={t('pb.atExpiry')}
+              sub={extremeSub(calc.extremes.maxGainAt)}
               value={gainText(calc.extremes.maxGain)}
               highlight
             />
             <StatRow
               label={t('pb.maxLoss')}
-              sub={t('pb.atExpiry')}
+              sub={extremeSub(calc.extremes.maxLossAt)}
               value={gainText(calc.extremes.maxLoss)}
               highlight
             />
@@ -905,7 +951,9 @@ export default function PayoffBuilder(props: PayoffBuilderProps): JSX.Element {
                     type="button"
                     aria-label={t('pb.less', { n: nn })}
                     disabled={l.notional <= NOTIONAL_MIN + 1}
-                    onClick={() => updateLeg(i, { notional: Math.max(NOTIONAL_MIN, l.notional - NOTIONAL_STEP) })}
+                    onClick={() =>
+                      updateLeg(i, { notional: Math.max(NOTIONAL_MIN, l.notional - NOTIONAL_STEP) })
+                    }
                   >
                     −
                   </button>
@@ -916,7 +964,9 @@ export default function PayoffBuilder(props: PayoffBuilderProps): JSX.Element {
                     type="button"
                     aria-label={t('pb.more', { n: nn })}
                     disabled={l.notional >= NOTIONAL_MAX - 1}
-                    onClick={() => updateLeg(i, { notional: Math.min(NOTIONAL_MAX, l.notional + NOTIONAL_STEP) })}
+                    onClick={() =>
+                      updateLeg(i, { notional: Math.min(NOTIONAL_MAX, l.notional + NOTIONAL_STEP) })
+                    }
                   >
                     +
                   </button>
@@ -930,23 +980,39 @@ export default function PayoffBuilder(props: PayoffBuilderProps): JSX.Element {
                 onClick={() => toggleLock(i)}
               >
                 <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
-                  <rect x="2.5" y="6" width="9" height="6.5" rx="1.5" style={{ fill: 'currentColor' }} />
+                  <rect
+                    x="2.5"
+                    y="6"
+                    width="9"
+                    height="6.5"
+                    rx="1.5"
+                    style={{ fill: 'currentColor' }}
+                  />
                   <path
-                    d={solve === i ? 'M4.5 6V4.5a2.5 2.5 0 0 1 5 0V6' : 'M4.5 6V4.5a2.5 2.5 0 0 1 5 0'}
+                    d={
+                      solve === i
+                        ? 'M4.5 6V4.5a2.5 2.5 0 0 1 5 0V6'
+                        : 'M4.5 6V4.5a2.5 2.5 0 0 1 5 0'
+                    }
                     style={{ fill: 'none', stroke: 'currentColor', strokeWidth: 1.6 }}
                   />
                 </svg>
                 {t('pb.lock')}
               </button>
               {solve === i && <p class="pb-note">{t('pb.lockHint', { n: nn })}</p>}
-              {state.unreachable === i && <p class="pb-note pb-note--warn">{t('pb.unreachable')}</p>}
+              {state.unreachable === i && (
+                <p class="pb-note pb-note--warn">{t('pb.unreachable')}</p>
+              )}
             </div>
           );
         })}
         {legs.length < MAX_LEGS && (
           <button type="button" class="pb-add" onClick={addLeg} data-add-leg>
             <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
-              <path d="M8 3V13M3 8H13" style={{ stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round' }} />
+              <path
+                d="M8 3V13M3 8H13"
+                style={{ stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round' }}
+              />
             </svg>
             {t('pb.add')}
           </button>

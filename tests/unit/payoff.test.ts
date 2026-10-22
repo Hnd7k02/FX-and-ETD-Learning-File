@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { EXAMPLE as E, EXAMPLE_FORWARD as F, EXAMPLE_SMILE, EXAMPLE_STRIKE as K } from '@/lib/fx/example';
+import {
+  EXAMPLE as E,
+  EXAMPLE_FORWARD as F,
+  EXAMPLE_SMILE,
+  EXAMPLE_STRIKE as K,
+} from '@/lib/fx/example';
 import { gkPrice } from '@/lib/fx/vanilla';
 import { greeks, thetaOneDay } from '@/lib/fx/greeks';
 import { atmDnsStrike, strikeFromDelta } from '@/lib/fx/implied';
@@ -137,8 +142,14 @@ describe('payoff: net Greeks', () => {
     expect(g.vega).toBe(0);
     const h = 1e-6;
     const v = (m: PayoffMarket) => legValue(fwd, m);
-    expect(g.rhoD).toBeCloseTo(((v({ ...M, rd: M.rd + h }) - v({ ...M, rd: M.rd - h })) / (2 * h)) / 100, 2);
-    expect(g.rhoF).toBeCloseTo(((v({ ...M, rf: M.rf + h }) - v({ ...M, rf: M.rf - h })) / (2 * h)) / 100, 2);
+    expect(g.rhoD).toBeCloseTo(
+      (v({ ...M, rd: M.rd + h }) - v({ ...M, rd: M.rd - h })) / (2 * h) / 100,
+      2,
+    );
+    expect(g.rhoF).toBeCloseTo(
+      (v({ ...M, rf: M.rf + h }) - v({ ...M, rf: M.rf - h })) / (2 * h) / 100,
+      2,
+    );
     expect(g.theta).toBeCloseTo(v({ ...M, T: M.T - 1 / 365 }) - v(M), 6);
   });
 
@@ -221,7 +232,9 @@ describe('payoff: at expiry', () => {
     expect(breakEvens(legs, M)).toEqual([expect.closeTo(K + call, 10)]);
     const x = expiryExtremes(legs, M);
     expect(x.maxGain).toBe('unlimited');
+    expect(x.maxGainAt).toBeNull();
     expect(x.maxLoss).toBeCloseTo(-call * N, 6);
+    expect(x.maxLossAt).toBe(0);
     expect(pnlAtExpiry(legs, M, K)).toBeCloseTo(-call * N, 6);
   });
 
@@ -229,13 +242,16 @@ describe('payoff: at expiry', () => {
     const x = expiryExtremes([L('short', 'call')], M);
     expect(x.maxGain).toBeCloseTo(call * N, 6);
     expect(x.maxLoss).toBe('unlimited');
+    expect(x.maxLossAt).toBeNull();
   });
 
   it('long put: gain up to (K − premium) at a rate of zero', () => {
     const legs = [L('long', 'put')];
     const x = expiryExtremes(legs, M);
     expect(x.maxGain).toBeCloseTo((K - put) * N, 6);
+    expect(x.maxGainAt).toBe(0);
     expect(x.maxLoss).toBeCloseTo(-put * N, 6);
+    expect(x.maxLossAt).toBeCloseTo(K, 12);
     expect(breakEvens(legs, M)).toEqual([expect.closeTo(K - put, 10)]);
   });
 
@@ -309,10 +325,16 @@ describe('payoff: templates', () => {
     // same structure as a risk reversal, but equal strikes → synthetic forward
     expect(identifyTemplate([L('long', 'call'), L('short', 'put')])).toBe('synthetic-forward');
     // straddle structure with distinct strikes → strangle; not in the allowed list → null
-    expect(identifyTemplate([L('long', 'call', 0.8), L('long', 'put', 0.78)], ['straddle'])).toBeNull();
+    expect(
+      identifyTemplate([L('long', 'call', 0.8), L('long', 'put', 0.78)], ['straddle']),
+    ).toBeNull();
     // butterfly with a missing distinct strike
     expect(
-      identifyTemplate([L('long', 'call', 0.78), L('short', 'call', 0.79, 2 * N), L('long', 'call', 0.78)]),
+      identifyTemplate([
+        L('long', 'call', 0.78),
+        L('short', 'call', 0.79, 2 * N),
+        L('long', 'call', 0.78),
+      ]),
     ).toBeNull();
   });
 
@@ -340,7 +362,9 @@ describe('payoff: smile (module 06)', () => {
     expect(legVol(L('long', 'forward'), MS)).toBe(E.vol);
     const k = templateStrikes(M);
     // negative risk reversal: USD puts (low strikes) are dearer than USD calls
-    expect(legVol(L('short', 'put', k.put25), MS)).toBeGreaterThan(legVol(L('long', 'call', k.call25), MS));
+    expect(legVol(L('short', 'put', k.put25), MS)).toBeGreaterThan(
+      legVol(L('long', 'call', k.call25), MS),
+    );
   });
 
   it('the zero-cost collar with the smile needs a lower put strike', () => {

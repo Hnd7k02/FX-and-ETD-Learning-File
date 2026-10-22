@@ -95,7 +95,9 @@ export function legPayoff(leg: Leg, ST: number): number {
 export function legValue(leg: Leg, m: PayoffMarket, S = m.S, T = m.T, vol?: number): number {
   const s = sideSign(leg.side) * leg.notional;
   if (leg.kind === 'forward') {
-    return s * (S * Math.exp(-m.rf * Math.max(T, 0)) - leg.strike * Math.exp(-m.rd * Math.max(T, 0)));
+    return (
+      s * (S * Math.exp(-m.rf * Math.max(T, 0)) - leg.strike * Math.exp(-m.rd * Math.max(T, 0)))
+    );
   }
   return s * gkPrice(S, leg.strike, T, vol ?? legVol(leg, m), m.rd, m.rf, leg.kind);
 }
@@ -328,6 +330,10 @@ export interface ExpiryExtremes {
   maxGain: number | 'unlimited';
   /** Smallest P&L at expiry (quote currency, ≤ 0 if there is a loss), or 'unlimited'. */
   maxLoss: number | 'unlimited';
+  /** Rate at expiry where the maximum gain is first reached (null if unlimited). */
+  maxGainAt: number | null;
+  /** Rate at expiry where the maximum loss is first reached (0 = only if the rate fell to zero). */
+  maxLossAt: number | null;
 }
 
 /**
@@ -340,9 +346,14 @@ export function expiryExtremes(legs: readonly Leg[], m: PayoffMarket): ExpiryExt
   const vals = xs.map((x) => pnlAtExpiry(legs, m, x));
   const slope = slopeAbove(legs);
   const tiny = 1e-9 * Math.max(1, m.notional);
+  const hi = Math.max(...vals);
+  const lo = Math.min(...vals);
+  const at = (v: number) => xs[vals.findIndex((y) => Math.abs(y - v) <= tiny)] ?? null;
   return {
-    maxGain: slope > tiny ? 'unlimited' : Math.max(...vals),
-    maxLoss: slope < -tiny ? 'unlimited' : Math.min(...vals),
+    maxGain: slope > tiny ? 'unlimited' : hi,
+    maxLoss: slope < -tiny ? 'unlimited' : lo,
+    maxGainAt: slope > tiny ? null : at(hi),
+    maxLossAt: slope < -tiny ? null : at(lo),
   };
 }
 

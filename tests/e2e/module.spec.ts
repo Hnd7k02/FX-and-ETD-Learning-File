@@ -94,9 +94,11 @@ test.describe('module section page', () => {
     const status = card.getByRole('status');
     await expect(status).toContainText('Nicht ganz.');
     await expect(status).toContainText('Richtig ist B.');
-    // locked after answering
-    await options.nth(2).click();
+    // locked after answering (the other options are aria-disabled, so a click changes nothing)
+    await expect(options.nth(2)).toHaveAttribute('aria-disabled', 'true');
+    await options.nth(2).dispatchEvent('click');
     await expect(options.nth(2)).toHaveAttribute('aria-pressed', 'false');
+    await expect(options.nth(0)).toHaveAttribute('aria-pressed', 'true');
 
     await card.getByRole('button', { name: 'Nochmals versuchen' }).click();
     await expect(options.nth(0)).toHaveAttribute('data-state', 'idle');

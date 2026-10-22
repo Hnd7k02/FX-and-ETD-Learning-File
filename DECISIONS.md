@@ -175,3 +175,19 @@ Format: `D-xx · date · origin`, then question, decision, reasoning. Origin is 
 **Decision:** `EXAMPLE_SMILE = { atm: 8 %, rr25: −1.0 %, bf25: 0.25 % }` in `src/lib/fx/example.ts`, labelled as example values.
 
 **Reasoning:** A negative risk reversal illustrates the typical demand for CHF calls as protection; the size is a round, plausible teaching value, not market data. One place to change.
+
+## D-28 · 2026-10-22 · Claude
+
+**Question:** Monte Carlo engine and product conventions (§7, §8.7)?
+
+**Decision:** xoshiro128\*\* (SplitMix32 seeding), Marsaglia polar normals, exact log-Euler GBM with drift rd − rf, daily steps, antithetic pairs, 1’000’000 paths for the precomputed fair values (seed 20261022), 20’000 paths for interactive runs in a Web Worker. Conventions, all in `MC_CONFIG` (`src/lib/fx/mc/products.ts`): no trade on the knock-out fixing of accumulator/decumulator; the last TARF gain is capped to the target; weekly fixings every 7 calendar days, monthly on day round(i·365/12), no business-day adjustment, settlement on the fixing day; Pivot TARF, TPF and RTPF use USD 100’000 per fixing and 12 monthly fixings (not specified in §8.7, copied from the TARF); dual currency interest Act/360, only the capital is converted. Fair values carry a standard error from the delta method; an independent re-implementation reproduced every value within 1.5 standard errors.
+
+**Reasoning:** Reproducible, fast enough (precompute 25 s), every convention changeable in one place; `npm run data:mc` regenerates `src/data/fx/mc-products.json` and a test fails if the JSON no longer matches the config.
+
+## D-29 · 2026-10-22 · Claude
+
+**Question:** The §8.7 parameters give a TARF that reaches its 500-pip target after about 2.4 fixings in 94 % of paths, and TPF/RTPF coupons of about 775–810 pips per fixing. Change the parameters?
+
+**Decision:** Keep Dario's parameters for now and teach the consequence: a target caps the good scenarios (the product ends early) while the bad scenarios run to maturity with double amounts — the asymmetry is the central TARF lesson. The large TPF/RTPF coupons are explained by the strike being set relative to the spot while the forward falls by the interest differential (strike above the 1-year forward). The "better than forward" comparison uses the forward at the average scheduled fixing day. Alternatives measured by the MC agent (TARF target 1’500 pips: K = 0.7540, about 6 fixings; Pivot TARF target 1’000 pips: about 5 fixings) are listed as an open question for Dario.
+
+**Reasoning:** The spec names the parameters as examples; changing them silently would contradict D-16/D-22, and the current values produce a valuable teaching point. Changing them is one edit in `MC_CONFIG` plus `npm run data:mc`.

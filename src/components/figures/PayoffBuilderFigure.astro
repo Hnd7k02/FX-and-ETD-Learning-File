@@ -138,7 +138,15 @@ const lang = pageLang(Astro.currentLocale);
     border-color: var(--ff-ink);
     color: #fff;
   }
-  .pb-desc {
+  .pb .ff-legend li {
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--ff-ink-2);
+  }
+  .pb p {
+    margin: 0;
+  }
+  .pb .pb-desc {
     max-width: 760px;
     font-size: 14px;
     line-height: 1.55;
@@ -180,7 +188,7 @@ const lang = pageLang(Astro.currentLocale);
   .pb-handle.is-active rect + rect {
     transform: scale(1.12);
   }
-  .pb-hint {
+  .pb .pb-hint {
     font-size: 12px;
     color: var(--ff-muted);
   }
@@ -304,12 +312,12 @@ const lang = pageLang(Astro.currentLocale);
     background: var(--ff-good-soft);
     color: var(--ff-good-text-strong);
   }
-  .pb-note {
+  .pb .pb-note {
     font-size: 12px;
     line-height: 1.45;
     color: var(--ff-good-text-strong);
   }
-  .pb-note--warn {
+  .pb .pb-note--warn {
     color: var(--ff-warn-text);
   }
   .pb-add {
