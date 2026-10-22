@@ -47,27 +47,21 @@ const trend = risk === null ? 'none' : risk.level >= 3 ? 'up' : risk.level === 1
   <MiniGauge needle={risk ? risk.needle : null} />
   <span class="risk-vol">{vol}</span>
   <span class="chip level" data-level={risk?.level ?? 0}>
-    {
-      trend === 'up' && (
-        <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
-          <path d="M6 10V2M2.5 5.5L6 2L9.5 5.5" />
-        </svg>
-      )
-    }
-    {
-      trend === 'down' && (
-        <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
-          <path d="M6 2V10M2.5 6.5L6 10L9.5 6.5" />
-        </svg>
-      )
-    }
-    {
-      trend === 'flat' && (
-        <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
-          <path d="M2 6H10" />
-        </svg>
-      )
-    }
+    {trend === 'up' && (
+      <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
+        <path d="M6 10V2M2.5 5.5L6 2L9.5 5.5" />
+      </svg>
+    )}
+    {trend === 'down' && (
+      <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
+        <path d="M6 2V10M2.5 6.5L6 10L9.5 6.5" />
+      </svg>
+    )}
+    {trend === 'flat' && (
+      <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
+        <path d="M2 6H10" />
+      </svg>
+    )}
     {levelLabel}
   </span>
   <span class="risk-text">{text}</span>

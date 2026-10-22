@@ -7,8 +7,10 @@ import {
   barrierPrice,
   digitalAsset,
   digitalCash,
+  dntBreakdown,
   dntDefaultTerms,
   dntSeries,
+  dntTouchProbabilities,
   doubleNoTouch,
   doubleOneTouch,
   forwardPathHitTime,
@@ -18,8 +20,11 @@ import {
   hitDiscountFactorByQuadrature,
   isBarrierTouched,
   isReverse,
+  logNormCdf,
   noTouch,
+  noTouchProbabilityRaw,
   oneTouch,
+  powTimesCdf,
   touchProbability,
   type BarrierKind,
   type BarrierParams,
@@ -662,8 +667,8 @@ describe('double no-touch (Hui series)', () => {
     expect(doubleNoTouch({ S: L * (1 + 1e-9), L, U, T, vol, rd, rf })).toBeLessThan(1e-6);
     expect(doubleNoTouch({ S: U * (1 - 1e-9), L, U, T, vol, rd, rf })).toBeLessThan(1e-6);
     // the raw series vanishes at the corridor ends (sin 0 = sin iπ = 0)
-    expect(Math.abs(dntSeries(L, L, U, T, vol, rd, rf, 1, 200))).toBeLessThan(1e-12);
-    expect(Math.abs(dntSeries(U, L, U, T, vol, rd, rf, 1, 200))).toBeLessThan(1e-12);
+    expect(Math.abs(dntSeries(L, L, U, T, vol, rd, rf, 1, 200).value)).toBeLessThan(1e-12);
+    expect(Math.abs(dntSeries(U, L, U, T, vol, rd, rf, 1, 200).value)).toBeLessThan(1e-12);
   });
 
   it('wide corridor and short T → e^(−rd T); narrow corridor or long T → 0', () => {
@@ -728,5 +733,129 @@ describe('double no-touch (Hui series)', () => {
     expect(doubleNoTouch({ ...p, vol: 0, rf: -0.05, U: 0.805 })).toBe(0);
     expect(() => doubleNoTouch({ ...p, L: 0.81, U: 0.79 })).toThrow(RangeError);
     expect(() => doubleNoTouch({ ...p, L: 0 })).toThrow(RangeError);
+  });
+
+  it('breakdown: method, terms and error estimate', () => {
+    const series = dntBreakdown({ S, L: 0.76, U: 0.84, T, vol, rd, rf });
+    expect(series.method).toBe('series');
+    expect(series.terms).toBe(50);
+    expect(series.errorEstimate).toBeLessThan(1e-14);
+    // a wide corridor for one day: no path touches both barriers → inclusion–exclusion
+    const wide = dntBreakdown({ S, L: 0.4, U: 1.6, T: 1 / 365, vol, rd, rf });
+    expect(wide).toMatchObject({ method: 'independent', terms: 0 });
+    const p = { S, L: 0.79, U: 0.81, T, vol, rd, rf };
+    expect(dntBreakdown({ ...p, S: 0.9 }).method).toBe('touched');
+    expect(dntBreakdown({ ...p, T: 0 }).method).toBe('expired');
+    expect(dntBreakdown({ ...p, vol: 0 }).method).toBe('no-vol');
+    expect(dntBreakdown({ ...p, terms: 7 })).toMatchObject({ method: 'series', terms: 7 });
+  });
+
+  it('inclusion–exclusion: 1 − P(touch L) − P(touch U), exact when both cannot be touched', () => {
+    const m = { S, L: 0.7, U: 0.9, T: 0.05, vol, rd: 0.01, rf };
+    const { touchL, touchU, bothBound } = dntTouchProbabilities(
+      m.S,
+      m.L,
+      m.U,
+      m.T,
+      m.vol,
+      m.rd,
+      m.rf,
+    );
+    expect(bothBound).toBeLessThan(1e-16);
+    const indep = Math.exp(-m.rd * m.T) * (1 - touchL - touchU);
+    expect(Math.abs(doubleNoTouch(m) - indep)).toBeLessThan(1e-15);
+    // the forced series agrees
+    expect(Math.abs(doubleNoTouch({ ...m, terms: 2000 }) - indep)).toBeLessThan(1e-12);
+    // narrow corridor: touching both is likely, the bound is large
+    expect(dntTouchProbabilities(S, 0.79, 0.81, T, vol, rd, rf).bothBound).toBeGreaterThan(0.5);
+  });
+
+  it('low vol with large carry: the cancelling series is replaced by inclusion–exclusion', () => {
+    // σ = 1 %, b = −10.75 %: the series terms reach 1e65 and cancel
+    const m = { S, L: 0.6, U: 0.801, T: 2, vol: 0.01, rd: -0.0075, rf: 0.1 };
+    const s = dntSeries(m.S, m.L, m.U, m.T, m.vol, m.rd, m.rf, 1, 200);
+    expect(s.errorEstimate).toBeGreaterThan(1);
+    const b = dntBreakdown(m);
+    expect(b.method).toBe('independent');
+    expect(b.errorEstimate).toBeLessThan(1e-8);
+    expect(
+      Math.abs(
+        b.price - (noTouch({ ...m, H: m.L }) + noTouch({ ...m, H: m.U }) - Math.exp(-m.rd * m.T)),
+      ),
+    ).toBeLessThan(1e-15);
+    // σ = 0.2 %: the series even overflows to NaN
+    const n = { S, L: 0.4, U: 0.801, T: 2, vol: 0.002, rd: 0, rf: 0.1 };
+    expect(Number.isNaN(dntSeries(n.S, n.L, n.U, n.T, n.vol, n.rd, n.rf, 1, 100).value)).toBe(true);
+    expect(doubleNoTouch(n)).toBeCloseTo(1, 12);
+  });
+});
+
+describe('numerical robustness (extreme but valid inputs)', () => {
+  it('logNormCdf and powTimesCdf', () => {
+    expect(logNormCdf(0)).toBeCloseTo(Math.log(0.5), 15);
+    expect(logNormCdf(-10)).toBeCloseTo(Math.log(7.619853024160527e-24), 7);
+    // continuous across the switch to the asymptotic series at x = −37 (N to 1e-6 relative)
+    expect(Math.abs(logNormCdf(-37 - 1e-9) - logNormCdf(-37 + 1e-9))).toBeLessThan(1e-6);
+    expect(logNormCdf(-60)).toBeCloseTo(
+      -1800 - Math.log(60) - 0.5 * Math.log(2 * Math.PI) + Math.log1p(-1 / 3600 + 3 / 3600 ** 2),
+      9,
+    );
+    expect(powTimesCdf(2, 3, 0)).toBe(4);
+    // 2^2000 overflows on its own, the product does not
+    const v = powTimesCdf(2, 2000, -50);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(Math.log(v)).toBeCloseTo(2000 * Math.log(2) + logNormCdf(-50), 9);
+  });
+
+  it('no NaN, parity and bounds across a grid down to σ = 0.1 % and negative rates', () => {
+    let checked = 0;
+    for (const v of [0.001, 0.005, 0.03, 0.3]) {
+      for (const t of [1 / 365, 2]) {
+        for (const [d, f] of [
+          [-0.0075, 0],
+          [0, 0.1],
+          [0.05, -0.0075],
+        ] as const) {
+          const dfd = Math.exp(-d * t);
+          for (const H of [0.4, 0.78, 0.82, 1.6]) {
+            const dir = H < S ? 'down' : 'up';
+            const nt = noTouch({ S, H, T: t, vol: v, rd: d, rf: f });
+            const hit = oneTouch({ S, H, T: t, vol: v, rd: d, rf: f, payAt: 'hit' });
+            expect(nt).toBeGreaterThanOrEqual(0);
+            expect(nt).toBeLessThanOrEqual(dfd + 1e-12);
+            expect(Number.isFinite(hit) && hit >= 0).toBe(true);
+            for (const type of TYPES) {
+              const p = { S, K: KATM, H, T: t, vol: v, rd: d, rf: f, type, rebate: 0 };
+              const ko = barrierPrice({ ...p, kind: `${dir}-and-out` as BarrierKind });
+              const ki = barrierPrice({ ...p, kind: `${dir}-and-in` as BarrierKind });
+              const van = gkPrice(S, KATM, t, v, d, f, type);
+              expect(Math.abs(ko + ki - van)).toBeLessThan(1e-10);
+              checked++;
+            }
+          }
+          for (const [L, U] of [
+            [0.79, 0.81],
+            [0.4, 1.6],
+            [0.6, 0.801],
+          ] as const) {
+            const dnt = doubleNoTouch({ S, L, U, T: t, vol: v, rd: d, rf: f });
+            const nL = noTouch({ S, H: L, T: t, vol: v, rd: d, rf: f });
+            const nU = noTouch({ S, H: U, T: t, vol: v, rd: d, rf: f });
+            // Bonferroni: nL + nU − dfd ≤ DNT ≤ min(nL, nU)
+            expect(dnt).toBeLessThanOrEqual(Math.min(nL, nU) + 1e-9);
+            expect(dnt).toBeGreaterThanOrEqual(nL + nU - dfd - 1e-9);
+          }
+        }
+      }
+    }
+    expect(checked).toBe(4 * 2 * 3 * 4 * 2);
+  });
+
+  it('noTouchProbabilityRaw stays in [0, 1]', () => {
+    for (const v of [0.001, 0.08]) {
+      const p = noTouchProbabilityRaw(S, 0.4, 2, v, 0, 0.1, 1);
+      expect(p).toBeGreaterThanOrEqual(0);
+      expect(p).toBeLessThanOrEqual(1);
+    }
   });
 });

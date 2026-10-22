@@ -7,11 +7,11 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import ArrowIcon from '@/components/layout/ArrowIcon.astro';
 import ResetProgress from '@/components/islands/ResetProgress';
-import { FAMILIES, MODULES, type Family } from '@/data/modules';
+import { FAMILIES, MODULES, getModule, type Family } from '@/data/modules';
 import { about as dict } from '@/i18n/dict/about';
 import { common } from '@/i18n/dict/common';
 import { levels, LEVEL_COLORS, LEVEL_KEYS, type LevelIndex } from '@/i18n/dict/levels';
-import { aboutPath, homePath, modulePath, riskometerPath } from '@/i18n/routes';
+import { aboutPath, homePath, modulePath, riskometerPath, type SectionKey } from '@/i18n/routes';
 import { translator, type Lang } from '@/i18n/types';
 import { EXAMPLE as E, EXAMPLE_FORWARD, EXAMPLE_LABEL, EXAMPLE_STRIKE } from '@/lib/fx/example';
 import { DAY_COUNT } from '@/lib/fx/daycount';
@@ -28,7 +28,7 @@ import {
   fmtRate,
   pipSize,
 } from '@/lib/format';
-import { collectSources, splitBilingual, urlHost } from '@/lib/sources';
+import { collectSources, inlineSegments, splitBilingual, urlHost } from '@/lib/sources';
 
 interface Props {
   lang: Lang;
@@ -39,6 +39,10 @@ const other: Lang = lang === 'de' ? 'en' : 'de';
 const t = translator(dict, lang);
 const tc = translator(common, lang);
 const tl = translator(levels, lang);
+/** Escapes dictionary text and typesets r_d / r_f as r with subscript. */
+const esc = (x: string) =>
+  x.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const rich = (x: string) => esc(x).replace(/\br_([df])\b/g, '<i>r</i><sub>$1</sub>');
 
 /* ---------- Running example (calculation core) ---------- */
 const fwdMm = forwardMoneyMarket(E.spot, E.rd, E.rf, E.mmDays);
@@ -184,6 +188,43 @@ const thresholdRows = rm?.pairs
     }))
   : [];
 
+const pipeline: Array<{ h: string; p: string; math: string; kind: 'math' | 'mono' }> = [
+  {
+    h: t('about.risk.step1.h'),
+    p: t('about.risk.step1.p'),
+    kind: 'mono',
+    math: ['EUR/CHF', 'EUR/USD', 'EUR/JPY'].map((x) => `<span>${x}</span>`).join(''),
+  },
+  {
+    h: t('about.risk.step2.h'),
+    p: t('about.risk.step2.p'),
+    kind: 'mono',
+    math: '<span>USD/CHF = EUR/CHF ÷ EUR/USD</span><span>USD/JPY = EUR/JPY ÷ EUR/USD</span>',
+  },
+  {
+    h: t('about.risk.step3.h'),
+    p: t('about.risk.step3.p'),
+    kind: 'math',
+    math: '<span><i>r</i><sub><i>t</i></sub> = ln(<i>S</i><sub><i>t</i></sub> / <i>S</i><sub><i>t</i>−1</sub>)</span>',
+  },
+  {
+    h: t('about.risk.step4.h'),
+    p: t('about.risk.step4.p', {
+      window: method.window,
+      fixings: method.window + 1,
+      ann: method.ann,
+    }),
+    kind: 'math',
+    math: `<span><i>σ</i><sub><i>t</i></sub> = √(${method.ann}/${method.window} · Σ<sub><i>i</i>=0</sub><sup>${method.window - 1}</sup> <i>r</i><sub><i>t</i>−<i>i</i></sub><sup>2</sup>)</span>`,
+  },
+  {
+    h: t('about.risk.step5.h'),
+    p: t('about.risk.step5.p', { since: sinceLabel }),
+    kind: 'mono',
+    math: method.p.map((x) => `<span>P${x}</span>`).join(''),
+  },
+];
+
 /* ---------- Conventions ---------- */
 const act360 = Object.entries(DAY_COUNT)
   .filter(([, dc]) => dc === 'ACT/360')
@@ -243,6 +284,93 @@ const sources = collectSources(
     ...Object.entries(fragSrc).sort(([a], [b]) => a.localeCompare(b)),
   ].map(([file, markdown]) => ({ file, markdown })),
 );
+
+/* ---------- Models (formulas are language-neutral HTML) ---------- */
+const r = (x: 'd' | 'f') => `<i>r</i><sub>${x}</sub>`;
+const sub12 = '<i>d</i><sub>1,2</sub>';
+const modelOf = (slug: string, section: SectionKey) => {
+  const m = getModule(slug);
+  return { family: m.family, n: m.n, module: m.title[lang], href: modulePath(lang, slug, section) };
+};
+const models: Array<
+  ReturnType<typeof modelOf> & {
+    title: string;
+    text: string;
+    formulas: string[];
+    wide?: boolean;
+    bullets?: Array<{ text: string; formula?: string }>;
+  }
+> = [
+  {
+    ...modelOf('02-forward', '2'),
+    title: t('about.models.fwd.h'),
+    text: t('about.models.fwd.p', { diff: fmtPips(mmDiffPips, lang, 1) }),
+    formulas: [
+      `<span><i>F</i> = <i>S</i> · (1 + ${r('d')} <i>t</i><sub>d</sub>) / (1 + ${r('f')} <i>t</i><sub>f</sub>)</span>`,
+      `<span><i>F</i> = <i>S</i> · e<sup>(${r('d')} − ${r('f')}) <i>T</i></sup></span>`,
+    ],
+  },
+  {
+    ...modelOf('04-vanilla-options', '4'),
+    title: t('about.models.gk.h'),
+    text: t('about.models.gk.p'),
+    formulas: [
+      `<span><i>C</i> = <i>S</i> e<sup>−${r('f')}<i>T</i></sup> <i>N</i>(<i>d</i><sub>1</sub>) − <i>K</i> e<sup>−${r('d')}<i>T</i></sup> <i>N</i>(<i>d</i><sub>2</sub>)</span><span class="formula-sub">${sub12} = [ln(<i>S</i>/<i>K</i>) + (${r('d')} − ${r('f')} ± ½<i>σ</i><sup>2</sup>) <i>T</i>] / (<i>σ</i>√<i>T</i>)</span>`,
+    ],
+  },
+  {
+    ...modelOf('04-vanilla-options', '4'),
+    title: t('about.models.b76.h'),
+    text: t('about.models.b76.p'),
+    formulas: [
+      `<span><i>C</i> = DF<sub>d</sub> · [<i>F</i> <i>N</i>(<i>d</i><sub>1</sub>) − <i>K</i> <i>N</i>(<i>d</i><sub>2</sub>)]</span><span class="formula-sub">${sub12} = [ln(<i>F</i>/<i>K</i>) ± ½<i>σ</i><sup>2</sup><i>T</i>] / (<i>σ</i>√<i>T</i>), DF<sub>d</sub> = e<sup>−${r('d')}<i>T</i></sup></span>`,
+    ],
+  },
+  {
+    ...modelOf('05-greeks', '2'),
+    title: t('about.models.greeks.h'),
+    text: t('about.models.greeks.p'),
+    formulas: [
+      `<span>Δ = e<sup>−${r('f')}<i>T</i></sup> <i>N</i>(<i>d</i><sub>1</sub>)</span><span>Γ = e<sup>−${r('f')}<i>T</i></sup> <i>φ</i>(<i>d</i><sub>1</sub>) / (<i>S σ</i>√<i>T</i>)</span>`,
+      `<span><i>C</i> − <i>P</i> = DF<sub>d</sub> · (<i>F</i> − <i>K</i>)</span>`,
+    ],
+  },
+  {
+    ...modelOf('06-combos-smile', '4'),
+    title: t('about.models.smile.h'),
+    text: t('about.models.smile.p'),
+    formulas: [
+      `<span><i>σ</i>(Δ) = ATM − 2 · RR · (Δ − 0.5) + 16 · BF · (Δ − 0.5)<sup>2</sup></span>`,
+    ],
+  },
+  {
+    ...modelOf('07-barrier-binary', '2'),
+    title: t('about.models.exotics.h'),
+    text: t('about.models.exotics.p'),
+    formulas: [
+      `<span>Digital<sub>call</sub> = e<sup>−${r('d')}<i>T</i></sup> <i>N</i>(<i>d</i><sub>2</sub>)</span>`,
+      `<span>Knock-in + Knock-out = Vanilla</span>`,
+    ],
+  },
+  {
+    ...modelOf('08-structured-products', '2'),
+    title: t('about.models.mc.h'),
+    text: t('about.models.mc.p'),
+    wide: true,
+    formulas: [
+      `<span><i>S</i><sub><i>t</i>+Δ<i>t</i></sub> = <i>S</i><sub><i>t</i></sub> · exp[(${r('d')} − ${r('f')} − ½<i>σ</i><sup>2</sup>) Δ<i>t</i> + <i>σ</i>√Δ<i>t</i> · <i>Z</i>], Δ<i>t</i> = 1/365</span>`,
+    ],
+    bullets: [
+      { text: t('about.models.mc.seed') },
+      { text: t('about.models.mc.anti') },
+      {
+        text: t('about.models.mc.bgk'),
+        formula: `<span><i>B</i> → <i>B</i> · e<sup>±0.5826 · <i>σ</i> · √Δ<i>t</i></sup></span>`,
+      },
+      { text: t('about.models.mc.out') },
+    ],
+  },
+];
 
 /* ---------- Families and TOC ---------- */
 const families = (Object.keys(FAMILIES) as Family[]).map((f) => ({
@@ -376,11 +504,12 @@ const sid = (i: number) => toc[i]!.id;
               }
             </div>
             <div class="ab-table-wrap">
-              <table class="ab-table">
+              <table class="ab-table ab-table--example">
                 <caption class="sr-only">{t('about.example.tableCaption')}</caption>
                 <thead>
                   <tr>
                     <th scope="col">{t('about.example.colQty')}</th>
+                    <th scope="col">{t('about.example.colSym')}</th>
                     <th scope="col">{t('about.example.colValue')}</th>
                     <th scope="col">{t('about.example.colNote')}</th>
                   </tr>
@@ -389,10 +518,8 @@ const sid = (i: number) => toc[i]!.id;
                   {
                     exampleRows.map((r) => (
                       <tr>
-                        <th scope="row">
-                          {r.qty}
-                          {r.sym && <span class="ab-sym math" set:html={r.sym} />}
-                        </th>
+                        <th scope="row">{r.qty}</th>
+                        <td class="ab-sym math" set:html={r.sym ?? ''} />
                         <td class="mono ab-val">{r.value}</td>
                         <td class="ab-note math-mixed" set:html={r.note} />
                       </tr>
@@ -412,135 +539,39 @@ const sid = (i: number) => toc[i]!.id;
         <section class="ab-section" id={sid(2)} aria-labelledby={`${sid(2)}-h`}>
           <p class="ab-num mono" aria-hidden="true">03</p>
           <h2 class="h2" id={`${sid(2)}-h`}>{t('about.models.h')}</h2>
-          <p class="ab-lead2">{t('about.models.lead')}</p>
+          <p class="ab-lead2" set:html={rich(t('about.models.lead'))} />
 
           <div class="ab-models">
-            <article class="ab-model card" data-family="linear">
-              {modChip('02-forward', '2')}
-              <h3 class="ab-h3">{t('about.models.fwd.h')}</h3>
-              <p>{t('about.models.fwd.p', { diff: fmtPips(mmDiffPips, lang, 1) })}</p>
-              <div class="formula">
-                <span
-                  ><i>F</i> = <i>S</i> · (1 + <i>r</i><sub>d</sub> <i>t</i><sub>d</sub>) / (1 + <i
-                    >r</i
-                  ><sub>f</sub> <i>t</i><sub>f</sub>)</span
-                >
-              </div>
-              <div class="formula formula--accent">
-                <span
-                  ><i>F</i> = <i>S</i> · e<sup>(<i>r</i><sub>d</sub> − <i>r</i><sub>f</sub>) <i>T</i
-                    ></sup
-                  ></span
-                >
-              </div>
-            </article>
-
-            <article class="ab-model card" data-family="options">
-              {modChip('04-vanilla-options', '4')}
-              <h3 class="ab-h3">{t('about.models.gk.h')}</h3>
-              <p>{t('about.models.gk.p')}</p>
-              <div class="formula formula--accent">
-                <span
-                  ><i>C</i> = <i>S</i> e<sup>−<i>r</i><sub>f</sub><i>T</i></sup> <i>N</i>(<i>d</i
-                  ><sub>1</sub>) − <i>K</i> e<sup>−<i>r</i><sub>d</sub><i>T</i></sup> <i>N</i>(<i
-                    >d</i
-                  ><sub>2</sub>)</span
-                >
-                <span class="formula-sub"
-                  ><i>d</i><sub>1,2</sub> = [ln(<i>S</i>/<i>K</i>) + (<i>r</i><sub>d</sub> − <i
-                    >r</i
-                  ><sub>f</sub> ± ½<i>σ</i><sup>2</sup>) <i>T</i>] / (<i>σ</i>√<i>T</i>)</span
-                >
-              </div>
-            </article>
-
-            <article class="ab-model card" data-family="options">
-              {modChip('04-vanilla-options', '4')}
-              <h3 class="ab-h3">{t('about.models.b76.h')}</h3>
-              <p>{t('about.models.b76.p')}</p>
-              <div class="formula formula--accent">
-                <span
-                  ><i>C</i> = DF<sub>d</sub> · [<i>F</i> <i>N</i>(<i>d</i><sub>1</sub>) − <i>K</i>
-                  <i>N</i>(<i>d</i><sub>2</sub>)]</span
-                >
-                <span class="formula-sub"
-                  ><i>d</i><sub>1,2</sub> = [ln(<i>F</i>/<i>K</i>) ± ½<i>σ</i><sup>2</sup><i>T</i>]
-                  / (<i>σ</i>√<i>T</i>), DF<sub>d</sub> = e<sup>−<i>r</i><sub>d</sub><i>T</i></sup
-                  ></span
-                >
-              </div>
-            </article>
-
-            <article class="ab-model card" data-family="options">
-              {modChip('05-greeks', '2')}
-              <h3 class="ab-h3">{t('about.models.greeks.h')}</h3>
-              <p>{t('about.models.greeks.p')}</p>
-              <div class="formula">
-                <span
-                  >Δ = e<sup>−<i>r</i><sub>f</sub><i>T</i></sup> <i>N</i>(<i>d</i><sub>1</sub>), Γ =
-                  e<sup>−<i>r</i><sub>f</sub><i>T</i></sup> <i>φ</i>(<i>d</i><sub>1</sub>) / (<i>S</i
-                  > <i>σ</i>√<i>T</i>)</span
-                >
-              </div>
-              <div class="formula formula--accent">
-                <span
-                  ><i>C</i> − <i>P</i> = DF<sub>d</sub> · (<i>F</i> − <i>K</i>)</span
-                >
-              </div>
-            </article>
-
-            <article class="ab-model card" data-family="options">
-              {modChip('06-combos-smile', '4')}
-              <h3 class="ab-h3">{t('about.models.smile.h')}</h3>
-              <p>{t('about.models.smile.p')}</p>
-              <div class="formula formula--accent">
-                <span
-                  ><i>σ</i>(Δ) = ATM − 2 · RR · (Δ − 0.5) + 16 · BF · (Δ − 0.5)<sup>2</sup></span
-                >
-              </div>
-            </article>
-
-            <article class="ab-model card" data-family="exotics">
-              {modChip('07-barrier-binary', '2')}
-              <h3 class="ab-h3">{t('about.models.exotics.h')}</h3>
-              <p>{t('about.models.exotics.p')}</p>
-              <div class="formula">
-                <span
-                  >Digital<sub>call</sub> = e<sup>−<i>r</i><sub>d</sub><i>T</i></sup> <i>N</i>(<i
-                    >d</i
-                  ><sub>2</sub>)</span
-                >
-              </div>
-              <div class="formula formula--accent">
-                <span>Knock-in + Knock-out = Vanilla</span>
-              </div>
-            </article>
-
-            <article class="ab-model ab-model--wide card" data-family="exotics">
-              {modChip('08-structured-products', '2')}
-              <h3 class="ab-h3">{t('about.models.mc.h')}</h3>
-              <p>{t('about.models.mc.p')}</p>
-              <div class="formula formula--accent">
-                <span
-                  ><i>S</i><sub><i>t</i>+Δ<i>t</i></sub> = <i>S</i><sub><i>t</i></sub> · exp[(<i>r</i
-                  ><sub>d</sub> − <i>r</i><sub>f</sub> − ½<i>σ</i><sup>2</sup>) Δ<i>t</i> + <i>σ</i
-                  >√Δ<i>t</i> · <i>Z</i>], Δ<i>t</i> = 1/365</span
-                >
-              </div>
-              <ul class="ab-mc-list">
-                <li>{t('about.models.mc.seed')}</li>
-                <li>{t('about.models.mc.anti')}</li>
-                <li>
-                  {t('about.models.mc.bgk')}
-                  <span class="formula ab-inline-formula"
-                    ><span
-                      ><i>B</i> → <i>B</i> · e<sup>±0.5826 · <i>σ</i> · √Δ<i>t</i></sup></span
-                    ></span
-                  >
-                </li>
-                <li>{t('about.models.mc.out')}</li>
-              </ul>
-            </article>
+            {
+              models.map((m) => (
+                <article class:list={['ab-model card', m.wide && 'ab-model--wide']} data-family={m.family}>
+                  <a class="chip chip-family ab-model-chip" href={m.href}>
+                    <span class="mono">{m.n}</span>
+                    {m.module}
+                  </a>
+                  <h3 class="ab-h3">{m.title}</h3>
+                  <p set:html={rich(m.text)} />
+                  {m.formulas.map((f, i) => (
+                    <div
+                      class:list={['formula', i === m.formulas.length - 1 && 'formula--accent']}
+                      set:html={f}
+                    />
+                  ))}
+                  {m.bullets && (
+                    <ul class="ab-mc-list">
+                      {m.bullets.map((b) => (
+                        <li>
+                          {b.text}
+                          {b.formula && (
+                            <span class="formula ab-inline-formula" set:html={b.formula} />
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </article>
+              ))
+            }
           </div>
           <p class="ab-small">{t('about.models.normal')}</p>
         </section>
@@ -552,54 +583,21 @@ const sid = (i: number) => toc[i]!.id;
           <p class="ab-lead2">{t('about.risk.lead', { since: sinceYear })}</p>
 
           <ol class="ab-pipeline">
-            <li>
-              <span class="ab-step-n mono" aria-hidden="true">1</span>
-              <h3>{t('about.risk.step1.h')}</h3>
-              <p>{t('about.risk.step1.p')}</p>
-            </li>
-            <li>
-              <span class="ab-step-n mono" aria-hidden="true">2</span>
-              <h3>{t('about.risk.step2.h')}</h3>
-              <p>{t('about.risk.step2.p')}</p>
-            </li>
-            <li>
-              <span class="ab-step-n mono" aria-hidden="true">3</span>
-              <h3>{t('about.risk.step3.h')}</h3>
-              <p>{t('about.risk.step3.p')}</p>
-              <p class="ab-step-math math">
-                <i>r</i><sub><i>t</i></sub> = ln(<i>S</i><sub><i>t</i></sub> / <i>S</i><sub
-                  ><i>t</i>−1</sub
-                >)
-              </p>
-            </li>
-            <li>
-              <span class="ab-step-n mono" aria-hidden="true">4</span>
-              <h3>{t('about.risk.step4.h')}</h3>
-              <p>
-                {
-                  t('about.risk.step4.p', {
-                    window: method.window,
-                    fixings: method.window + 1,
-                    ann: method.ann,
-                  })
-                }
-              </p>
-            </li>
-            <li>
-              <span class="ab-step-n mono" aria-hidden="true">5</span>
-              <h3>{t('about.risk.step5.h')}</h3>
-              <p>{t('about.risk.step5.p', { since: sinceLabel })}</p>
-            </li>
+            {
+              pipeline.map((st, i) => (
+                <li class="ab-step">
+                  <span class="ab-step-n mono" aria-hidden="true">
+                    {i + 1}
+                  </span>
+                  <div class="ab-step-body">
+                    <h3>{st.h}</h3>
+                    <p>{st.p}</p>
+                  </div>
+                  <div class:list={['ab-step-math', st.kind]} set:html={st.math} />
+                </li>
+              ))
+            }
           </ol>
-
-          <div class="formula formula--accent ab-vol-formula" data-family="linear">
-            <span
-              ><i>σ</i><sub><i>t</i></sub> = √( {method.ann}/{method.window} · Σ<sub
-                ><i>i</i>=0</sub
-              ><sup>{method.window - 1}</sup>
-              <i>r</i><sub><i>t</i>−<i>i</i></sub><sup>2</sup> ) · 100 %</span
-            >
-          </div>
 
           <h3 class="ab-h3">{t('about.risk.levelsH')}</h3>
           <ol class="ab-levels">
@@ -771,7 +769,11 @@ const sid = (i: number) => toc[i]!.id;
                       {s.supports && (
                         <div class="ab-source-supports">
                           <dt>{t('about.sources.supports')}</dt>
-                          <dd>{s.supports}</dd>
+                          <dd>
+                            {inlineSegments(s.supports).map((seg) =>
+                              seg.code ? <code>{seg.text}</code> : seg.text,
+                            )}
+                          </dd>
                         </div>
                       )}
                     </dl>
@@ -796,7 +798,9 @@ const sid = (i: number) => toc[i]!.id;
                   ></path>
                 </svg>
               </span>
-              <p class="ab-credit-line">{tc('footer.credits')}</p>
+              <p class="ab-credit-line">
+                {tc('footer.credits').split(' · ').map((part) => <span>{part}</span>)}
+              </p>
               <p class="ab-small">{t('about.credits.stack')}</p>
               <p class="ab-small">{tc('footer.data')}</p>
             </div>
@@ -1181,10 +1185,9 @@ const sid = (i: number) => toc[i]!.id;
     padding-left: 4px;
   }
   .ab-sym {
-    margin-left: 8px;
-    font-size: 16px;
-    font-weight: 400;
-    color: var(--ff-muted);
+    font-size: 17px;
+    color: var(--ff-ink-2);
+    white-space: nowrap;
   }
   .ab-val {
     white-space: nowrap;
@@ -1206,16 +1209,19 @@ const sid = (i: number) => toc[i]!.id;
     white-space: nowrap;
   }
   .ab-table--thresholds caption {
-    padding: 16px 16px 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
+    caption-side: top;
+    padding: 16px 16px 12px;
     font-size: 13px;
     color: var(--ff-muted);
   }
   .ab-table--thresholds caption strong {
+    display: block;
+    margin-bottom: 2px;
     font-size: 16px;
     color: var(--ff-ink);
+  }
+  .ab-table--thresholds caption span {
+    display: block;
   }
   .ab-max-date {
     display: block;
@@ -1258,10 +1264,10 @@ const sid = (i: number) => toc[i]!.id;
     color: var(--ff-body);
   }
   .ab-model .formula {
-    font-size: 18px;
+    font-size: 17px;
     padding: 10px 16px;
   }
-  .ab-model .formula .formula-sub {
+  .ab-model .formula :global(.formula-sub) {
     font-size: 15px;
     color: var(--ff-ink-2);
   }
@@ -1284,63 +1290,96 @@ const sid = (i: number) => toc[i]!.id;
     font-size: 17px !important;
   }
 
-  /* Pipeline */
+  /* Pipeline (vertical stepper) */
   .ab-pipeline {
     list-style: none;
     margin: 0;
-    padding: 0;
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 10px;
-    counter-reset: step;
-  }
-  .ab-pipeline li {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    padding: 16px 14px;
-    border-radius: var(--ff-r-box);
+    padding: 6px 0;
     background: var(--ff-surface);
     border: 1px solid var(--ff-line);
+    border-radius: var(--ff-r-card);
   }
-  .ab-pipeline li + li::before {
+  .ab-step {
+    position: relative;
+    display: grid;
+    grid-template-columns: 28px minmax(0, 1fr) minmax(0, 300px);
+    gap: 4px 18px;
+    align-items: center;
+    padding: 16px 22px;
+  }
+  .ab-step + .ab-step {
+    border-top: 1px solid var(--ff-row);
+  }
+  .ab-step::before {
     content: '';
     position: absolute;
-    left: -10px;
-    top: 28px;
-    width: 10px;
-    height: 2px;
-    background: var(--ff-line-strong);
+    left: 35px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--ff-line);
+  }
+  .ab-step:first-child::before {
+    top: 50%;
+  }
+  .ab-step:last-child::before {
+    bottom: 50%;
   }
   .ab-step-n {
+    position: relative;
+    z-index: 1;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 26px;
-    height: 26px;
+    width: 28px;
+    height: 28px;
     border-radius: var(--ff-r-pill);
     background: var(--ff-ink);
     color: #fff;
     font-size: 12px;
+    box-shadow: 0 0 0 4px var(--ff-surface);
   }
-  .ab-pipeline h3 {
-    font-size: 14px;
+  .ab-step-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .ab-step h3 {
+    font-size: 15px;
     font-weight: 800;
-    line-height: 1.3;
-    margin-top: 4px;
+    line-height: 1.35;
   }
-  .ab-pipeline p {
-    font-size: 13px;
-    line-height: 1.5;
+  .ab-step p {
+    font-size: 14px;
+    line-height: 1.55;
     color: var(--ff-ink-2);
   }
   .ab-step-math {
-    font-size: 16px !important;
-    color: var(--ff-ink) !important;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: flex-end;
   }
-  .ab-vol-formula {
-    font-size: 20px;
+  .ab-step-math.mono :global(span) {
+    display: inline-flex;
+    padding: 4px 10px;
+    border-radius: var(--ff-r-pill);
+    background: var(--ff-chip);
+    font-family: var(--ff-font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .ab-step-math.math :global(span) {
+    font-family: var(--ff-font-math);
+    font-size: 18px;
+    white-space: nowrap;
+    padding: 6px 14px;
+    border-radius: var(--ff-r-formula);
+    background: var(--ff-linear-soft);
+  }
+  .ab-step-math :global(i) {
+    font-style: italic;
   }
 
   /* Levels */
@@ -1471,6 +1510,14 @@ const sid = (i: number) => toc[i]!.id;
   .ab-source-supports {
     flex-basis: 100%;
   }
+  .ab-source-meta code {
+    font-family: var(--ff-font-mono);
+    font-size: 0.92em;
+    padding: 1px 6px;
+    border-radius: 6px;
+    background: var(--ff-chip);
+    color: var(--ff-ink);
+  }
 
   /* Credits */
   .ab-credits {
@@ -1500,6 +1547,13 @@ const sid = (i: number) => toc[i]!.id;
     font-weight: 800;
     letter-spacing: -0.01em;
     line-height: 1.4;
+  }
+  .ab-credit-line span {
+    display: block;
+  }
+  .ab-credit-line span + span {
+    font-weight: 600;
+    color: var(--ff-ink-2);
   }
   .ab-reset {
     padding: 24px;
@@ -1536,12 +1590,6 @@ const sid = (i: number) => toc[i]!.id;
     .ab-toc a[aria-current] {
       border-color: var(--ff-ink);
     }
-    .ab-pipeline {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-    .ab-pipeline li + li::before {
-      display: none;
-    }
     .ab-families {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
@@ -1555,6 +1603,45 @@ const sid = (i: number) => toc[i]!.id;
     }
     .ab-tile-value {
       font-size: 18px;
+    }
+    .ab-table--example thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+    }
+    .ab-table--example tr {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      grid-template-areas: 'qty sym val' 'note note note';
+      gap: 2px 12px;
+      padding: 10px 0;
+      border-top: 1px solid var(--ff-row);
+    }
+    .ab-table--example th,
+    .ab-table--example td {
+      display: block;
+      border: 0;
+      padding: 0 !important;
+    }
+    .ab-table--example tbody th {
+      grid-area: qty;
+    }
+    .ab-table--example .ab-sym {
+      grid-area: sym;
+    }
+    .ab-table--example .ab-val {
+      grid-area: val;
+      text-align: right;
+    }
+    .ab-table--example .ab-note {
+      grid-area: note;
+      font-size: 13px;
+      color: var(--ff-muted);
+    }
+    .ab-table--example .ab-note:empty {
+      display: none;
     }
     .ab-case {
       padding: 16px;
@@ -1570,8 +1657,22 @@ const sid = (i: number) => toc[i]!.id;
     .ab-model .formula {
       font-size: 16px;
     }
-    .ab-pipeline {
-      grid-template-columns: minmax(0, 1fr);
+    .ab-step {
+      grid-template-columns: 28px minmax(0, 1fr);
+      padding: 14px 16px;
+      align-items: start;
+    }
+    .ab-step::before {
+      left: 29px;
+    }
+    .ab-step-math {
+      grid-column: 2;
+      justify-content: flex-start;
+      margin-top: 6px;
+    }
+    .ab-step-math.math :global(span) {
+      font-size: 16px;
+      white-space: normal;
     }
     .ab-levels {
       grid-template-columns: minmax(0, 1fr);
@@ -1611,9 +1712,6 @@ const sid = (i: number) => toc[i]!.id;
     .ab-disclaimer-icon {
       width: 34px;
       height: 34px;
-    }
-    .ab-vol-formula {
-      font-size: 17px;
     }
   }
 </style>

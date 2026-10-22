@@ -19,7 +19,9 @@ const first = MODULES[0]!;
     <span class="dot" style="background: var(--ff-linear)" aria-hidden="true"></span>
     {t('site.tagline')}
   </span>
-  <h1 id="hero-h" class="h1-hero">{t('home.h1')}</h1>
+  <h1 id="hero-h" class="h1-hero">
+    {t('home.h1')}
+  </h1>
   <p class="lead hero-lead">{t('home.lead')}</p>
   <div class="hero-actions">
     <a
@@ -32,7 +34,9 @@ const first = MODULES[0]!;
       <span data-cta-label>{t('home.ctaStart')}</span>
       <ArrowIcon />
     </a>
-    <a class="btn btn-light btn-lg" href={riskometerPath(lang)}>{t('home.ctaRiskometer')}</a>
+    <a class="btn btn-light btn-lg" href={riskometerPath(lang)}>
+      {t('home.ctaRiskometer')}
+    </a>
   </div>
 </div>
 

@@ -113,3 +113,23 @@ export function splitBilingual(value: string | undefined): { de: string; en: str
   if (parts.length === 2) return { de: parts[0]!.trim(), en: parts[1]!.trim() };
   return { de: value, en: value };
 }
+
+/** A piece of text with inline-code markup resolved: `id` becomes { code: true, text: 'id' }. */
+export interface InlineSegment {
+  text: string;
+  code: boolean;
+}
+
+/** Splits text at markdown backticks into plain and code segments (unclosed backticks stay text). */
+export function inlineSegments(text: string): InlineSegment[] {
+  const out: InlineSegment[] = [];
+  const re = /`([^`]+)`/g;
+  let last = 0;
+  for (let m = re.exec(text); m; m = re.exec(text)) {
+    if (m.index > last) out.push({ text: text.slice(last, m.index), code: false });
+    out.push({ text: m[1]!, code: true });
+    last = m.index + m[0].length;
+  }
+  if (last < text.length) out.push({ text: text.slice(last), code: false });
+  return out;
+}

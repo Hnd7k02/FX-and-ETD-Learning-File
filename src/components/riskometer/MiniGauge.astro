@@ -26,18 +26,14 @@ const angle = needle === null ? null : needleAngle(needle);
   aria-hidden="true"
   data-empty={needle === null ? 'true' : undefined}
 >
-  {
-    segments.map((d, i) => (
-      <path class="seg" d={d} style={`stroke:${LEVEL_COLORS[(i + 1) as LevelIndex]}`} />
-    ))
-  }
-  {
-    angle !== null && (
-      <g class="needle" style={`--needle:${angle.toFixed(2)}deg`}>
-        <path d={needleBasePath(g)} />
-      </g>
-    )
-  }
+  {segments.map((d, i) => (
+    <path class="seg" d={d} style={`stroke:${LEVEL_COLORS[(i + 1) as LevelIndex]}`} />
+  ))}
+  {angle !== null && (
+    <g class="needle" style={`--needle:${angle.toFixed(2)}deg`}>
+      <path d={needleBasePath(g)} />
+    </g>
+  )}
   <circle class="hub" cx={g.cx} cy={g.cy} r={g.hub}></circle>
 </svg>
 

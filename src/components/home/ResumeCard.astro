@@ -36,29 +36,35 @@ const c = common[lang];
   aria-labelledby="resume-h"
 >
   <div class="resume-head">
-    <span class="resume-label" data-resume-label>{t('home.resumeStartLabel')}</span>
-    <span class="chip chip-family" data-resume-chip>{mod.n} · {FAMILIES[mod.family].label[lang]}</span>
+    <span class="resume-label" data-resume-label>
+      {t('home.resumeStartLabel')}
+    </span>
+    <span class="chip chip-family" data-resume-chip>
+      {mod.n} · {FAMILIES[mod.family].label[lang]}
+    </span>
   </div>
   <div class="resume-copy">
     <h2 id="resume-h" class="resume-title" data-resume-title>
       {mod.title[lang]}: {section.title[lang]}
     </h2>
-    <p class="resume-teaser" data-resume-teaser>{section.teaser[lang]}</p>
+    <p class="resume-teaser" data-resume-teaser>
+      {section.teaser[lang]}
+    </p>
   </div>
   <ol class="pills">
-    {
-      SECTION_KEYS.map((key, i) => (
-        <li class="pill" data-pill={key} data-state={i === 0 ? 'current' : 'open'}>
-          <span class="pill-n" aria-hidden="true">
-            {i + 1}
-          </span>
-          <span data-pill-label>{key === 'quiz' ? t('module.quiz') : mod.sections[i]!.short[lang]}</span>
-          <span class="sr-only" data-pill-sr>
-            {i === 0 ? ` · ${th('home.pillCurrent')}` : ''}
-          </span>
-        </li>
-      ))
-    }
+    {SECTION_KEYS.map((key, i) => (
+      <li class="pill" data-pill={key} data-state={i === 0 ? 'current' : 'open'}>
+        <span class="pill-n" aria-hidden="true">
+          {i + 1}
+        </span>
+        <span data-pill-label>
+          {key === 'quiz' ? t('module.quiz') : mod.sections[i]!.short[lang]}
+        </span>
+        <span class="sr-only" data-pill-sr>
+          {i === 0 ? ` · ${th('home.pillCurrent')}` : ''}
+        </span>
+      </li>
+    ))}
   </ol>
   <a class="btn btn-dark resume-cta" href={modulePath(lang, mod.slug, '1')} data-resume-cta>
     <span data-resume-cta-label>{t('home.resumeCtaStart')}</span>

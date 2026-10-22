@@ -21,9 +21,11 @@ export {
   haugSetup,
   hitDiscountFactor,
   hitDiscountFactorByQuadrature,
+  logNormCdf,
   noTouch,
   noTouchProbabilityRaw,
   oneTouch,
+  powTimesCdf,
   touchProbability,
   type BarrierDirection,
   type HaugSetup,
@@ -32,9 +34,12 @@ export {
   type TouchPayAt,
 } from './touch';
 export {
+  dntBreakdown,
   dntDefaultTerms,
   dntSeries,
+  dntTouchProbabilities,
   doubleNoTouch,
   doubleOneTouch,
+  type DntBreakdown,
   type DoubleTouchParams,
 } from './doubleNoTouch';

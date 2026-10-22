@@ -39,6 +39,7 @@ export const about = defineDict({
     'about.example.premium': 'Prämie USD Call',
     'about.example.tableCaption': 'Eingaben und abgeleitete Werte des Beispiels',
     'about.example.colQty': 'Grösse',
+    'about.example.colSym': 'Symbol',
     'about.example.colValue': 'Wert',
     'about.example.colNote': 'Herkunft',
     'about.example.pair': 'Währungspaar',
@@ -104,7 +105,7 @@ export const about = defineDict({
       'Werktags um ca. 16:00 MEZ, abgerufen über die ECB Data Portal API: EUR/CHF, EUR/USD und EUR/JPY.',
     'about.risk.step2.h': 'Paare und Kreuzkurse',
     'about.risk.step2.p':
-      'EUR/CHF und EUR/USD direkt. USD/CHF = EUR/CHF ÷ EUR/USD, USD/JPY = EUR/JPY ÷ EUR/USD.',
+      'EUR/CHF und EUR/USD kommen direkt von der EZB. Die beiden Dollar-Paare entstehen als Kreuzkurse.',
     'about.risk.step3.h': 'Log-Renditen',
     'about.risk.step3.p': 'Von einem Fixing zum nächsten, als Logarithmus des Kursverhältnisses.',
     'about.risk.step4.h': 'Realisierte Vola',
@@ -231,6 +232,7 @@ export const about = defineDict({
     'about.example.premium': 'USD call premium',
     'about.example.tableCaption': 'Inputs and derived values of the example',
     'about.example.colQty': 'Quantity',
+    'about.example.colSym': 'Symbol',
     'about.example.colValue': 'Value',
     'about.example.colNote': 'Source',
     'about.example.pair': 'Currency pair',
@@ -295,7 +297,7 @@ export const about = defineDict({
       'On working days around 16:00 CET, fetched via the ECB Data Portal API: EUR/CHF, EUR/USD and EUR/JPY.',
     'about.risk.step2.h': 'Pairs and crosses',
     'about.risk.step2.p':
-      'EUR/CHF and EUR/USD directly. USD/CHF = EUR/CHF ÷ EUR/USD, USD/JPY = EUR/JPY ÷ EUR/USD.',
+      'EUR/CHF and EUR/USD come straight from the ECB. The two dollar pairs are derived as cross rates.',
     'about.risk.step3.h': 'Log returns',
     'about.risk.step3.p': 'From one fixing to the next, as the logarithm of the rate ratio.',
     'about.risk.step4.h': 'Realised volatility',

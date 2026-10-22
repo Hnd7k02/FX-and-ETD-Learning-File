@@ -126,7 +126,7 @@ export default function WowChart({ lang }: WowChartProps): JSX.Element {
 
   useEffect(() => {
     const s = a.current;
-    let rm = false;
+    let rm: boolean;
     try {
       rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     } catch {
@@ -233,13 +233,20 @@ export default function WowChart({ lang }: WowChartProps): JSX.Element {
   const ariaLabel = t('wow.aria', { pair, title });
   const summary =
     t('wow.summary', { n: s.phase + 1, text }) +
-    (s.phase === 2 ? ' ' + t('wow.ariaTv', { days: daysText, pips: fmtPips(f.tvPips, lang, 0) }) : '');
+    (s.phase === 2
+      ? ' ' + t('wow.ariaTv', { days: daysText, pips: fmtPips(f.tvPips, lang, 0) })
+      : '');
 
   const legends: Record<Phase, LegendItem[]> = {
     0: [{ label: t('wow.legend.forwardPnl'), color: 'var(--ff-forward)' }],
     1: [
       { label: t('wow.legend.longCallExpiry'), color: 'var(--ff-long)' },
-      { label: t('wow.legend.forwardCompare'), color: 'var(--ff-forward)', kind: 'dashed', width: 2 },
+      {
+        label: t('wow.legend.forwardCompare'),
+        color: 'var(--ff-forward)',
+        kind: 'dashed',
+        width: 2,
+      },
     ],
     2: [
       { label: t('wow.legend.valueBefore'), color: 'var(--ff-long)' },
@@ -382,7 +389,12 @@ export default function WowChart({ lang }: WowChartProps): JSX.Element {
               <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
                 <path
                   d="M5 3.5V12.5M11 3.5V12.5"
-                  style={{ fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round' }}
+                  style={{
+                    fill: 'none',
+                    stroke: 'currentColor',
+                    strokeWidth: 2,
+                    strokeLinecap: 'round',
+                  }}
                 />
               </svg>
             ) : (
@@ -464,7 +476,12 @@ export default function WowChart({ lang }: WowChartProps): JSX.Element {
             <>
               <path
                 d={f.area}
-                style={{ fill: 'var(--ff-long)', fillOpacity: 0.1, stroke: 'none', opacity: w.timeValue }}
+                style={{
+                  fill: 'var(--ff-long)',
+                  fillOpacity: 0.1,
+                  stroke: 'none',
+                  opacity: w.timeValue,
+                }}
               />
               <path
                 d={f.pay}
@@ -588,7 +605,13 @@ export default function WowChart({ lang }: WowChartProps): JSX.Element {
         }}
       >
         <div
-          style={{ flex: '1 1 420px', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}
+          style={{
+            flex: '1 1 420px',
+            minWidth: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 6,
+          }}
         >
           <p
             data-caption-title

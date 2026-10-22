@@ -128,14 +128,20 @@ const other: Lang = lang === 'de' ? 'en' : 'de';
       card.querySelector('[data-resume-label]'),
       (target.started ? d.tplLabelResume : d.tplLabelStart) ?? '',
     );
-    setText(card.querySelector('[data-resume-chip]'), `${mod.n} · ${FAMILIES[mod.family].label[lang]}`);
+    setText(
+      card.querySelector('[data-resume-chip]'),
+      `${mod.n} · ${FAMILIES[mod.family].label[lang]}`,
+    );
     const isQuiz = target.section === 'quiz';
     const sec = isQuiz ? null : mod.sections[Number(target.section) - 1]!;
     setText(
       card.querySelector('[data-resume-title]'),
       `${mod.title[lang]}: ${sec ? sec.title[lang] : (d.quizLabel ?? '')}`,
     );
-    setText(card.querySelector('[data-resume-teaser]'), sec ? sec.teaser[lang] : (d.quizLead ?? ''));
+    setText(
+      card.querySelector('[data-resume-teaser]'),
+      sec ? sec.teaser[lang] : (d.quizLead ?? ''),
+    );
     card.querySelectorAll<HTMLElement>('[data-pill]').forEach((pill, idx) => {
       const key = pill.dataset.pill as SectionKey;
       const isDone = key === 'quiz' ? isQuizPassed(p, mod.slug) : isSectionDone(p, mod.slug, key);
@@ -147,7 +153,11 @@ const other: Lang = lang === 'de' ? 'en' : 'de';
       );
       setText(
         pill.querySelector('[data-pill-sr]'),
-        state === 'done' ? ` · ${d.srDone ?? ''}` : state === 'current' ? ` · ${d.srCurrent ?? ''}` : '',
+        state === 'done'
+          ? ` · ${d.srDone ?? ''}`
+          : state === 'current'
+            ? ` · ${d.srCurrent ?? ''}`
+            : '',
       );
     });
     const btn = card.querySelector<HTMLAnchorElement>('[data-resume-cta]');
