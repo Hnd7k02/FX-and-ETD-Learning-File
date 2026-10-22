@@ -135,9 +135,12 @@ export const M07_CONFIG = {
     /** x-axis of the "price vs level" chart (USD/CHF) and the vol axis of the DNT chart (%). */
     levelDomain: [0.75, 0.85] as [number, number],
     volDomain: [2, 16] as [number, number],
-    /** Faint sample paths in the path view (seeded, as in section 1). */
+    /**
+     * Faint sample paths in the path view (seeded, as in section 1). Choice: seed 80, whose
+     * counts at the defaults (one-touch 5 of 12, DNT 4 of 12) sit close to the model.
+     */
     samplePaths: 12,
-    seed: 11,
+    seed: 80,
     /** Example of section 3: one-touch paid at hit vs at expiry with a CHF rate of 1 %. */
     rdExample: 0.01,
     /** Example of section 3: call-spread width for the digital (pips). */

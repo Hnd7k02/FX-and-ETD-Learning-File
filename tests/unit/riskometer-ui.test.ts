@@ -20,7 +20,7 @@ import {
   resolveSelection,
   seriesExtremes,
   spanYears,
-  stackTags,
+  placeTags,
   tipShift,
   xScaleFor,
   yAxisMax,
@@ -232,12 +232,23 @@ describe('layout and scales', () => {
     expect(seriesExtremes([])).toEqual({ min: 0, minIndex: 0, max: 0, maxIndex: 0 });
   });
 
-  it('lifts year tags that would overlap', () => {
-    expect(stackTags([100, 300, 500])).toEqual([0, 0, 0]);
-    expect(stackTags([100, 120, 500])).toEqual([0, 1, 0]);
-    expect(stackTags([100, 120, 130])).toEqual([0, 1, 2]);
-    expect(stackTags([120, 100])).toEqual([1, 0]);
-    expect(stackTags([])).toEqual([]);
+  it('lifts year tags that would overlap each other or a fixed tag', () => {
+    const tag = (x: number, y = 100): { x: number; y: number; w: number; h: number } => ({
+      x,
+      y,
+      w: 42,
+      h: 21,
+    });
+    expect(placeTags([tag(100), tag(300), tag(500)])).toEqual([0, 0, 0]);
+    expect(placeTags([tag(100), tag(120), tag(500)])).toEqual([0, 1, 0]);
+    expect(placeTags([tag(100), tag(120), tag(130)])).toEqual([0, 1, 2]);
+    expect(placeTags([tag(120), tag(100)])).toEqual([1, 0]);
+    // same x but far apart vertically: no lift
+    expect(placeTags([tag(100, 100), tag(100, 200)])).toEqual([0, 0]);
+    // the fixed "Heute" tag pushes a neighbour up
+    expect(placeTags([tag(100)], [{ x: 120, y: 105, w: 78, h: 21 }])).toEqual([1]);
+    expect(placeTags([tag(100)], [{ x: 300, y: 105, w: 78, h: 21 }])).toEqual([0]);
+    expect(placeTags([])).toEqual([]);
   });
 
   it('anchors the tooltip away from the edges', () => {

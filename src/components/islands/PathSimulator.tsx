@@ -374,6 +374,9 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
   const pipsTxt = (x: number, d = 1) => fmtPips(x, lang, d);
   const count = (x: number) => fmtNumber(x, lang);
   const months = (m: number) => t('ps.monthTick', { m });
+  /** P&L axis ticks in CHF thousands. */
+  const kFmt = (v: number) =>
+    fmtNumber(v / 1000, lang, { digits: Math.abs(v) % 1000 > 1e-6 ? 1 : 0, sign: true });
 
   /* ---------- scales ---------- */
   const levels = productLevels(product);
@@ -1175,7 +1178,7 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
                     <path
                       key={`e${i}`}
                       d={ensD[i]}
-                      class={`ps-ens ${p.pnl < 0 ? 'ps-ens--loss' : 'ps-ens--gain'}`}
+                      class={`ps-ens ${p.endDay > tDay + 1e-9 ? 'ps-ens--run' : p.pnl < 0 ? 'ps-ens--loss' : 'ps-ens--gain'}`}
                     />
                   ))}
                   {ens.map((p, i) =>
@@ -1291,7 +1294,7 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
                   ticks={pnlTicks}
                   x0={L.left}
                   x1={L.width - L.right}
-                  format={(v) => fmtNumber(v, lang, { sign: true })}
+                  format={kFmt}
                   fontSize={L.font}
                 />
                 <text x={L.left} y={11} style={{ fontSize: fs, fontWeight: 600, fill: 'var(--ff-muted)' }}>
@@ -1323,7 +1326,7 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
                   ticks={outTicks}
                   x0={L.left}
                   x1={L.width - L.right}
-                  format={(v) => fmtNumber(v, lang, { sign: true })}
+                  format={kFmt}
                   fontSize={L.font}
                 />
                 {ensOrder.map((idx, rank) => {

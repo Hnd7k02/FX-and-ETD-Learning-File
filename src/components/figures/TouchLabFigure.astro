@@ -1,0 +1,35 @@
+---
+/**
+ * TouchLab as an MDX figure (module 07, section 3): <TouchLabFigure caption="…" mode="dnt" />.
+ * Passes the precomputed Monte Carlo value of the double no-touch (src/data/fx/mc-products.json)
+ * for the numerical check, reads the page language and hydrates the island when visible.
+ */
+import Figure from '@/components/content/Figure.astro';
+import TouchLab, { type DntCheck } from '@/components/islands/TouchLab';
+import { pageLang } from '@/components/content/lang';
+import { MC_PRODUCTS } from '@/lib/fx/mc/fair';
+import type { TouchMode } from '@/lib/m07/config';
+import M07Styles from './M07Styles.astro';
+
+interface Props {
+  caption?: string;
+  mode?: TouchMode;
+}
+const { caption, mode } = Astro.props;
+const lang = pageLang(Astro.currentLocale);
+const d = MC_PRODUCTS.products.doubleNoTouch;
+if (d.product.kind !== 'doubleNoTouch') throw new Error('mc-products.json: doubleNoTouch missing');
+const mc: DntCheck = {
+  pv: d.pv,
+  stdErr: d.stdErr,
+  bgk: d.compare.continuousBgk ?? Number.NaN,
+  lower: d.product.lower,
+  upper: d.product.upper,
+  vol: MC_PRODUCTS.market.vol,
+};
+---
+
+<M07Styles />
+<Figure caption={caption}>
+  <TouchLab client:visible lang={lang} mc={mc} initialMode={mode} />
+</Figure>

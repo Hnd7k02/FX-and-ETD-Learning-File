@@ -19,7 +19,7 @@ Fünf Hebel, aber sechs Greeks: Der Spot bekommt zwei. Delta misst die Steigung,
 | Spot | Delta Δ | ∂<i>V</i>/∂<i>S</i> | <Num of="m05.delta" />: reagiert wie <Num of="m05.deltaUsd" /> in Spot |
 | Spot | Gamma Γ | ∂²<i>V</i>/∂<i>S</i>² | <Num of="m05.gamma" />: Delta steigt um <Num of="m05.deltaChangeApprox" /> je Big Figure |
 | Zeit | Theta Θ | ∂<i>V</i>/∂<i>t</i> | <Num of="ex.thetaDayChf" digits={0} /> pro Tag |
-| Vola | Vega ν | ∂<i>V</i>/∂σ | <Num of="ex.vegaChf" /> je Vola-Punkt |
+| Vola | Vega <span class="math">ν</span> | ∂<i>V</i>/∂σ | <Num of="ex.vegaChf" /> je Vola-Punkt |
 | CHF-Zins | Rho CHF ρ<sub>d</sub> | ∂<i>V</i>/∂<i>r</i><sub>d</sub> | <Num of="ex.rhoDChf" /> je +1 % |
 | USD-Zins | Rho USD ρ<sub>f</sub> | ∂<i>V</i>/∂<i>r</i><sub>f</sub> | <Num of="ex.rhoFChf" /> je +1 % |
 
@@ -29,7 +29,7 @@ Lies die Tabelle als Rangliste. Der Spot ist der mit Abstand stärkste Hebel: Ei
 
 Steigt USD/CHF um eine Big Figure, schätzt Delta allein einen Gewinn von <Num of="m05.spotUpDeltaChf" />. Gamma ergänzt die Krümmung: Delta plus Gamma ergeben <Num of="m05.spotUpDeltaGammaChf" />. Die exakte Neubewertung liefert <Num of="m05.spotUpChf" />. Für kleine Bewegungen sind die Greeks sehr genau.
 
-Für grosse Schritte stimmen sie weniger. Ein ganzer Monat kostet den Call <Num of="m05.monthChf" />, das heutige Theta mal 30 sagt nur <Num of="m05.monthThetaChf" /> voraus. Der Grund: Ein Greek ist eine Momentaufnahme. Der Zeitverfall wird gegen Verfall hin schneller, und das sieht das heutige Theta noch nicht.
+Für grosse Schritte stimmen sie weniger. Ein ganzer Monat kostet den Call <Num of="m05.monthChf" />, rund 30-mal das heutige Theta sagt nur <Num of="m05.monthThetaChf" /> voraus. Der Grund: Ein Greek ist eine Momentaufnahme. Der Zeitverfall wird gegen Verfall hin schneller, und das sieht das heutige Theta noch nicht.
 
 <Derivation title="Herleitung: Greeks als Taylor-Entwicklung">
 

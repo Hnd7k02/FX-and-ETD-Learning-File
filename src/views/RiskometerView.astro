@@ -196,6 +196,7 @@ const footMethod = t('rk.footMethod', {
   }
   .rk-today {
     flex: 1 1 320px;
+    align-self: flex-start;
     min-width: 0;
     padding: 28px;
     display: flex;
@@ -342,20 +343,25 @@ const footMethod = t('rk.footMethod', {
     font-weight: 800;
   }
   .rk-chart-block {
+    flex: 1 1 auto;
+    min-height: 0;
     display: flex;
     flex-direction: column;
     gap: 10px;
   }
   .rk-chart {
     position: relative;
+    flex: 1 1 auto;
     width: 100%;
     touch-action: pan-y;
     -webkit-tap-highlight-color: transparent;
   }
   .rk-svg {
+    position: absolute;
+    inset: 0;
     display: block;
     width: 100%;
-    height: auto;
+    height: 100%;
     overflow: visible;
     font-family: var(--ff-font-ui);
   }
@@ -772,6 +778,14 @@ const footMethod = t('rk.footMethod', {
     }
     .rk-peak {
       font-size: 34px;
+    }
+    .rk-table .ff-table th,
+    .rk-table .ff-table td {
+      padding: 8px 8px;
+      font-size: 13px;
+    }
+    .rk-table-caption {
+      padding: 8px;
     }
   }
   @media (prefers-reduced-motion: reduce) {

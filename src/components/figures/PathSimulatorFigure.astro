@@ -411,6 +411,9 @@ const lang = pageLang(Astro.currentLocale);
   .ps-ens--gain {
     stroke: rgba(37, 99, 235, 0.38);
   }
+  .ps-ens--run {
+    stroke: rgba(14, 17, 22, 0.22);
+  }
   .ps-ens--loss {
     stroke: rgba(234, 88, 12, 0.6);
     stroke-width: 1.25;
@@ -576,6 +579,9 @@ const lang = pageLang(Astro.currentLocale);
     font-family: var(--ff-font-mono);
     font-size: 12px;
     color: var(--ff-muted);
+  }
+  .ps .ff-stat-row {
+    grid-template-columns: minmax(0, 1fr) auto;
   }
   .ps .ff-stat-value {
     font-variant-numeric: tabular-nums;

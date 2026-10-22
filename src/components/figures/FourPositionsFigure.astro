@@ -56,55 +56,54 @@ type Key = Parameters<typeof t>[0];
 
 <Figure caption={caption}>
   <div class="fp" data-four-positions>
-    {
-      curves.map((c) => {
-        const f = facts[c.id];
-        const color = f.long ? 'var(--ff-long)' : 'var(--ff-short)';
-        const d = linePath(c.xs.map((x, i): Point => [sx(x), sy(c.ys[i] ?? 0)]));
-        const name = t(`fp.${c.id}` as Key);
-        return (
-          <section class="fp-card" style={`--fp: ${color}`} aria-label={name}>
-            <div class="fp-head">
-              <span class="fp-name">{name}</span>
-              <span class="fp-view">
-                {t('fp.view')}: {t(`fp.view.${c.id}` as Key)}
-              </span>
+    {curves.map((c) => {
+      const f = facts[c.id];
+      const color = f.long ? 'var(--ff-long)' : 'var(--ff-short)';
+      const text = f.long ? 'var(--ff-linear-text)' : 'var(--ff-exotics-text)';
+      const d = linePath(c.xs.map((x, i): Point => [sx(x), sy(c.ys[i] ?? 0)]));
+      const name = t(`fp.${c.id}` as Key);
+      return (
+        <section class="fp-card" style={`--fp: ${color}; --fp-text: ${text}`} aria-label={name}>
+          <div class="fp-head">
+            <span class="fp-name">{name}</span>
+            <span class="fp-view">
+              {t('fp.view')}: {t(`fp.view.${c.id}` as Key)}
+            </span>
+          </div>
+          <svg
+            viewBox={`0 0 ${W} ${H}`}
+            role="img"
+            aria-label={t('fp.aria', { name })}
+            class="fp-svg"
+          >
+            <path d={`M8,${sy(0).toFixed(1)}H${W - 8}`} class="fp-zero" />
+            <path d={`M${sx(K).toFixed(1)},6V${H - 6}`} class="fp-k" />
+            <text x={sx(K) + 4} y={14} class="fp-klabel">
+              {t('fp.k')}
+            </text>
+            <path d={d} class="fp-line" />
+          </svg>
+          <dl class="fp-facts">
+            <div>
+              <dt class="sr-only">{name}</dt>
+              <dd class="fp-right">{t(`fp.right.${c.id}` as Key)}</dd>
             </div>
-            <svg
-              viewBox={`0 0 ${W} ${H}`}
-              role="img"
-              aria-label={t('fp.aria', { name })}
-              class="fp-svg"
-            >
-              <path d={`M8,${sy(0).toFixed(1)}H${W - 8}`} class="fp-zero" />
-              <path d={`M${sx(K).toFixed(1)},6V${H - 6}`} class="fp-k" />
-              <text x={sx(K) + 4} y={14} class="fp-klabel">
-                {t('fp.k')}
-              </text>
-              <path d={d} class="fp-line" />
-            </svg>
-            <dl class="fp-facts">
-              <div>
-                <dt class="sr-only">{name}</dt>
-                <dd class="fp-right">{t(`fp.right.${c.id}` as Key)}</dd>
-              </div>
-              <div>
-                <dt>{t('fp.premium')}</dt>
-                <dd>{t(f.pay ? 'fp.pay' : 'fp.receive')}</dd>
-              </div>
-              <div>
-                <dt>{t('fp.gain')}</dt>
-                <dd>{t(f.gain as Key)}</dd>
-              </div>
-              <div>
-                <dt>{t('fp.loss')}</dt>
-                <dd>{t(f.loss as Key)}</dd>
-              </div>
-            </dl>
-          </section>
-        );
-      })
-    }
+            <div>
+              <dt>{t('fp.premium')}</dt>
+              <dd>{t(f.pay ? 'fp.pay' : 'fp.receive')}</dd>
+            </div>
+            <div>
+              <dt>{t('fp.gain')}</dt>
+              <dd>{t(f.gain as Key)}</dd>
+            </div>
+            <div>
+              <dt>{t('fp.loss')}</dt>
+              <dd>{t(f.loss as Key)}</dd>
+            </div>
+          </dl>
+        </section>
+      );
+    })}
   </div>
 </Figure>
 
@@ -134,7 +133,7 @@ type Key = Parameters<typeof t>[0];
   .fp-name {
     font-size: 17px;
     font-weight: 800;
-    color: var(--fp);
+    color: var(--fp-text);
   }
   .fp-view {
     font-size: 12px;

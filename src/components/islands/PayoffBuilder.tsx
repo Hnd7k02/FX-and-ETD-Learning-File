@@ -135,6 +135,13 @@ function layoutFor(w: number): Layout {
 
 const sideColor = (side: LegSide, kind: LegKind): string =>
   kind === 'forward' ? 'var(--ff-forward)' : side === 'long' ? 'var(--ff-long)' : 'var(--ff-short)';
+/** Fill behind white text (handles, leg tags): the darker orange keeps 4.5:1 contrast. */
+const tagColor = (side: LegSide, kind: LegKind): string =>
+  kind === 'forward'
+    ? 'var(--ff-forward)'
+    : side === 'long'
+      ? 'var(--ff-long)'
+      : 'var(--ff-exotics-text)';
 
 /** Template list from the props: known ids only, default list if nothing is left. */
 function resolveTemplates(ids?: string[]): TemplateId[] {
@@ -775,7 +782,7 @@ export default function PayoffBuilder(props: PayoffBuilderProps): JSX.Element {
                 const cy = rows[gi] === 0 ? L.rail : L.rail - 26;
                 const label = `K${gr.legs.map((i) => i + 1).join('·')}`;
                 const w = 16 + label.length * 7;
-                const sides = new Set(gr.legs.map((i) => sideColor(legs[i]!.side, legs[i]!.kind)));
+                const sides = new Set(gr.legs.map((i) => tagColor(legs[i]!.side, legs[i]!.kind)));
                 const color = sides.size === 1 ? [...sides][0]! : 'var(--ff-forward)';
                 const active = drag !== null && drag.join() === gr.legs.join();
                 return (
@@ -896,7 +903,12 @@ export default function PayoffBuilder(props: PayoffBuilderProps): JSX.Element {
           const nn = i + 1;
           const color = sideColor(l.side, l.kind);
           return (
-            <div class="pb-leg" key={`leg-card-${i}`} data-leg={i} style={{ '--pb-leg': color }}>
+            <div
+              class="pb-leg"
+              key={`leg-card-${i}`}
+              data-leg={i}
+              style={{ '--pb-leg': color, '--pb-leg-tag': tagColor(l.side, l.kind) }}
+            >
               <div class="pb-leg-head">
                 <span class="pb-leg-tag" aria-hidden="true">
                   K{nn}

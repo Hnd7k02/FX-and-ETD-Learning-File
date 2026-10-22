@@ -392,7 +392,10 @@ export default function GreeksLab({ lang, mode = 'delta-gamma' }: GreeksLabProps
     const x1 = L.width - L.right;
     const dom: [number, number] = which === 'top' ? [doms[0]!, doms[1]!] : [doms[2]!, doms[3]!];
     const step = (which === 'top' ? target[0] : target[1]).yStep;
-    const ticks = yTicks(dom, step);
+    const all = yTicks(dom, step);
+    // phones: every second gridline when the axis gets crowded
+    const ticks =
+      L.compact && all.length > 5 ? all.filter((v) => Math.round(v / step) % 2 === 0) : all;
     const zeroIn = Math.min(...dom) - 1e-9 <= 0 && 0 <= Math.max(...dom) + 1e-9;
     const P = (pts: Point[]) => path(pts, x, y);
     const cx = x(spec.at[0]);

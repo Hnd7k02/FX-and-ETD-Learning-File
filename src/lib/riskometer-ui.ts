@@ -49,10 +49,11 @@ export const RISKOMETER_UI = {
   yTickCount: 4,
   /** Hit area of an event marker in CSS px (touch targets ≥ 44 px). */
   markerHit: 44,
-  /** Minimum horizontal distance between two year tags before the later one is lifted a row. */
-  tagMinGap: 40,
-  /** Row height for lifted year tags (CSS px). */
+  /** Row height for lifted year tags (CSS px) and the clearance kept between tags. */
   tagRow: 22,
+  tagGap: 4,
+  /** Estimated size of a year tag and of the "Heute" tag (CSS px, 12 px bold text). */
+  tagSize: { w: 42, h: 21, charW: 6.8, pad: 16 },
   /** Tooltip anchoring: left-aligned below this share of the width, right-aligned above the other. */
   tipEdge: { left: 12, right: 88 },
   /** Query parameters of the deep link (?pair=EURUSD&event=gfc-2008). */
@@ -372,19 +373,38 @@ export function lerpArray(a: readonly number[], b: readonly number[], t: number)
   return out;
 }
 
+/** A label box on the chart: `x` is its centre, `y` the bottom edge at row 0, `w`/`h` its size. */
+export interface TagBox {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
 /**
- * Rows for year tags so that neighbours do not overlap: tags closer than `minGap` to an
- * already placed tag in the same row move one row up. Returns one row index per input, 0 = base.
+ * Rows for tags that sit above chart points so they overlap neither each other nor the fixed
+ * boxes (the "Heute" tag): row r lifts a tag by r · rowStep. Greedy from left to right; returns
+ * one row index per tag, 0 = base row.
  */
-export function stackTags(xs: readonly number[], minGap = RISKOMETER_UI.tagMinGap): number[] {
-  const order = xs.map((x, i) => [x, i] as const).sort((p, q) => p[0] - q[0]);
-  const rows = new Array<number>(xs.length).fill(0);
-  const placed: Array<{ x: number; row: number }> = [];
-  for (const [x, i] of order) {
+export function placeTags(
+  tags: readonly TagBox[],
+  fixed: readonly TagBox[] = [],
+  rowStep = RISKOMETER_UI.tagRow,
+  gap = RISKOMETER_UI.tagGap,
+): number[] {
+  const hits = (a: TagBox, ra: number, b: TagBox, rb: number) =>
+    Math.abs(a.x - b.x) < (a.w + b.w) / 2 + gap &&
+    a.y - ra * rowStep > b.y - b.h - rb * rowStep &&
+    b.y - rb * rowStep > a.y - a.h - ra * rowStep;
+  const order = tags.map((t, i) => [t.x, i] as const).sort((p, q) => p[0] - q[0]);
+  const rows = new Array<number>(tags.length).fill(0);
+  const placed: Array<{ box: TagBox; row: number }> = fixed.map((box) => ({ box, row: 0 }));
+  for (const [, i] of order) {
+    const t = tags[i]!;
     let row = 0;
-    while (placed.some((p) => p.row === row && Math.abs(p.x - x) < minGap)) row++;
+    while (placed.some((p) => hits(t, row, p.box, p.row)) && row < 6) row++;
     rows[i] = row;
-    placed.push({ x, row });
+    placed.push({ box: t, row });
   }
   return rows;
 }

@@ -13,7 +13,6 @@
 import type { JSX } from 'preact';
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { AxisX, GridY } from '@/components/ui/Chart';
-import { useElementWidth } from '@/components/ui/hooks';
 import type { Lang } from '@/i18n/types';
 import { easeInOutCubic, linePath, nearestIndex, type Point } from '@/lib/chart';
 import { fmtDate, fmtPctValue } from '@/lib/format';
@@ -21,7 +20,7 @@ import {
   RISKOMETER_UI,
   layoutFor,
   lerpArray,
-  stackTags,
+  placeTags,
   tipShift,
   xScaleFor,
   yAxisMax,
@@ -60,6 +59,33 @@ export interface RiskometerChartProps {
 interface Morph {
   vals: number[];
   yMax: number;
+}
+
+interface BoxSize {
+  width: number;
+  height: number;
+}
+
+/** Size of the chart box in CSS px (ResizeObserver); the SSR fallback is 1000 × 0. */
+function useBoxSize(ref: { current: HTMLDivElement | null }): BoxSize {
+  const [size, setSize] = useState<BoxSize>({ width: 1000, height: 0 });
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    const read = () => {
+      const r = el.getBoundingClientRect();
+      setSize((s) =>
+        Math.abs(s.width - r.width) > 0.5 || Math.abs(s.height - r.height) > 0.5
+          ? { width: r.width || 1000, height: r.height }
+          : s,
+      );
+    };
+    const ro = new ResizeObserver(read);
+    ro.observe(el);
+    read();
+    return () => ro.disconnect();
+  }, [ref.current]);
+  return size;
 }
 
 /** Tweens the series and the y-axis top together (instant when `instant`). */
@@ -104,8 +130,10 @@ function useSeriesMorph(target: number[], yMaxTarget: number, instant: boolean):
 
 export function RiskometerChart(p: RiskometerChartProps): JSX.Element {
   const box = useRef<HTMLDivElement>(null);
-  const width = useElementWidth(box, 1000);
-  const layout = layoutFor(width);
+  const size = useBoxSize(box);
+  const base = layoutFor(size.width);
+  // The chart fills the card: the box grows with the card (flex), the viewBox follows its size.
+  const layout = { ...base, height: Math.max(base.height, Math.floor(size.height)) };
   const yMaxTarget = useMemo(() => yAxisMax(Math.max(...p.vols)), [p.vols]);
   const { vals, yMax } = useSeriesMorph(p.vols, yMaxTarget, p.reduced);
   const [hover, setHover] = useState<number | null>(null);
@@ -140,11 +168,15 @@ export function RiskometerChart(p: RiskometerChartProps): JSX.Element {
     const i = Math.min(Math.max(m.week, 0), n - 1);
     return { m, px: pts[i]?.[0] ?? 0, py: pts[i]?.[1] ?? 0 };
   });
-  const rows = stackTags(markerPos.map((k) => k.px));
   const sel = markerPos.find((k) => k.m.id === p.selected);
-
   const last = pts[n - 1];
   const todayTop = last ? (last[1] / H) * 100 : 0;
+  const ts = RISKOMETER_UI.tagSize;
+  const todayW = ts.pad + ts.charW * p.todayTag.length;
+  const rows = placeTags(
+    markerPos.map((k) => ({ x: k.px, y: k.py - 8, w: ts.w, h: ts.h })),
+    last ? [{ x: W - todayW / 2, y: last[1] - ts.h / 2, w: todayW, h: ts.h }] : [],
+  );
 
   const pointAt = (e: PointerEvent) => {
     const el = box.current;
@@ -198,6 +230,7 @@ export function RiskometerChart(p: RiskometerChartProps): JSX.Element {
       <div
         class="rk-chart"
         ref={box}
+        style={{ minHeight: `${base.height}px` }}
         data-compact={layout.compact ? 'true' : undefined}
         onPointerMove={onMove}
         onPointerDown={onMove}

@@ -19,7 +19,7 @@ Five levers, but six Greeks: spot gets two. Delta measures the slope, gamma the 
 | Spot | Delta Δ | ∂<i>V</i>/∂<i>S</i> | <Num of="m05.delta" />: reacts like <Num of="m05.deltaUsd" /> in spot |
 | Spot | Gamma Γ | ∂²<i>V</i>/∂<i>S</i>² | <Num of="m05.gamma" />: delta rises by <Num of="m05.deltaChangeApprox" /> per big figure |
 | Time | Theta Θ | ∂<i>V</i>/∂<i>t</i> | <Num of="ex.thetaDayChf" digits={0} /> per day |
-| Vol | Vega ν | ∂<i>V</i>/∂σ | <Num of="ex.vegaChf" /> per vol point |
+| Vol | Vega <span class="math">ν</span> | ∂<i>V</i>/∂σ | <Num of="ex.vegaChf" /> per vol point |
 | CHF rate | Rho CHF ρ<sub>d</sub> | ∂<i>V</i>/∂<i>r</i><sub>d</sub> | <Num of="ex.rhoDChf" /> per +1% |
 | USD rate | Rho USD ρ<sub>f</sub> | ∂<i>V</i>/∂<i>r</i><sub>f</sub> | <Num of="ex.rhoFChf" /> per +1% |
 
@@ -29,7 +29,7 @@ Read the table as a league table. Spot is by far the strongest lever: one big fi
 
 If USD/CHF rises by one big figure, delta alone estimates a gain of <Num of="m05.spotUpDeltaChf" />. Gamma adds the curvature: delta plus gamma give <Num of="m05.spotUpDeltaGammaChf" />. The exact repricing delivers <Num of="m05.spotUpChf" />. For small moves the Greeks are very accurate.
 
-For large steps they are less so. A whole month costs the call <Num of="m05.monthChf" />, whereas today's theta times 30 predicts only <Num of="m05.monthThetaChf" />. The reason: a Greek is a snapshot. Time decay speeds up towards expiry, and today's theta cannot see that yet.
+For large steps they are less so. A whole month costs the call <Num of="m05.monthChf" />, whereas about 30 times today's theta predicts only <Num of="m05.monthThetaChf" />. The reason: a Greek is a snapshot. Time decay speeds up towards expiry, and today's theta cannot see that yet.
 
 <Derivation title="Derivation: the Greeks as a Taylor expansion">
 
