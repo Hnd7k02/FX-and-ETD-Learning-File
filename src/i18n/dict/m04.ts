@@ -9,7 +9,8 @@ export const m04 = defineDict({
   de: {
     // OptionVsForward
     'ovf.title': 'Option oder Forward?',
-    'ovf.sub': 'USD {notional} in {months} Monaten · Forward {forward} · USD Call, Strike {k}, Prämie {premium}',
+    'ovf.sub':
+      'USD {notional} in {months} Monaten · Forward {forward} · USD Call, Strike {k}, Prämie {premium}',
     'ovf.chip': 'USD Call = CHF Put',
     'ovf.x': 'USD/CHF bei Verfall',
     'ovf.y': 'Kosten in CHF Tsd.',
@@ -70,7 +71,8 @@ export const m04 = defineDict({
     'mx.deltaSub': 'Spot-Delta',
     'mx.pips': '{v} Pips',
     'mx.bar': 'Zusammensetzung der Prämie',
-    'mx.aha.atmf': 'ATMF: kein innerer Wert, die Prämie ist reiner Zeitwert. Call und Put kosten gleich viel.',
+    'mx.aha.atmf':
+      'ATMF: kein innerer Wert, die Prämie ist reiner Zeitwert. Call und Put kosten gleich viel.',
     'mx.aha.dns':
       'ATM DNS: Call-Delta {c} und Put-Delta {p} heben sich auf. Ein Straddle hier ist delta-neutral.',
     'mx.aha.p25': '25Δ Put: Das Put-Delta ist −0.25. So quotiert der Markt die Flügel.',
@@ -154,7 +156,8 @@ export const m04 = defineDict({
   },
   en: {
     'ovf.title': 'Option or forward?',
-    'ovf.sub': 'USD {notional} in {months} months · Forward {forward} · USD call, strike {k}, premium {premium}',
+    'ovf.sub':
+      'USD {notional} in {months} months · Forward {forward} · USD call, strike {k}, premium {premium}',
     'ovf.chip': 'USD call = CHF put',
     'ovf.x': 'USD/CHF at expiry',
     'ovf.y': 'Cost in CHF thousands',
@@ -214,7 +217,8 @@ export const m04 = defineDict({
     'mx.deltaSub': 'spot delta',
     'mx.pips': '{v} pips',
     'mx.bar': 'What the premium is made of',
-    'mx.aha.atmf': 'ATMF: no intrinsic value, the premium is pure time value. Call and put cost the same.',
+    'mx.aha.atmf':
+      'ATMF: no intrinsic value, the premium is pure time value. Call and put cost the same.',
     'mx.aha.dns':
       'ATM DNS: call delta {c} and put delta {p} cancel out. A straddle here is delta-neutral.',
     'mx.aha.p25': '25Δ put: the put delta is −0.25. This is how the market quotes the wings.',

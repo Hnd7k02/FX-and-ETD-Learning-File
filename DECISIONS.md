@@ -191,3 +191,43 @@ Format: `D-xx · date · origin`, then question, decision, reasoning. Origin is 
 **Decision:** Keep Dario's parameters for now and teach the consequence: a target caps the good scenarios (the product ends early) while the bad scenarios run to maturity with double amounts — the asymmetry is the central TARF lesson. The large TPF/RTPF coupons are explained by the strike being set relative to the spot while the forward falls by the interest differential (strike above the 1-year forward). The "better than forward" comparison uses the forward at the average scheduled fixing day. Alternatives measured by the MC agent (TARF target 1’500 pips: K = 0.7540, about 6 fixings; Pivot TARF target 1’000 pips: about 5 fixings) are listed as an open question for Dario.
 
 **Reasoning:** The spec names the parameters as examples; changing them silently would contradict D-16/D-22, and the current values produce a valuable teaching point. Changing them is one edit in `MC_CONFIG` plus `npm run data:mc`.
+
+## D-30 · 2026-10-22 · Claude
+
+**Question:** The approved prototype text for 2008 names the failed investment bank; D-01 forbids bank names.
+
+**Decision:** Neutral wording ("eine grosse US-Investmentbank" / "a major US investment bank") for now; listed as an open question for Dario.
+
+**Reasoning:** When two of Dario's rules collide, the stricter one wins until he decides. One-line change in `src/data/events.json`.
+
+## D-31 · 2026-10-22 · Claude
+
+**Question:** How do the Riskometer event texts stay true to the data?
+
+**Decision:** Every computed number in `src/data/events.json` is a placeholder filled at build time (`{from}`, `{to}`, `{movePct}`, `{peak}`, `{peakDate}`, plus `{dayDate}`, `{dayMovePct}`, `{dayMoveAbsPct}`, `{volBefore}`, `{peakLevel}`); pair-specific sentences go into `pairNote[pair]`. Tests check each qualitative statement against the data. Corrections made because the ECB fixings say otherwise: EUR/CHF did not close below parity in March 2022 (ECB low 1.0056; the text now says "lowest since January 2015"); the 2015 move window runs to 23.01.2015 (ECB low); the fiscal-2025 peak window is anchor to +20 trading days (otherwise the April 2025 tariff turmoil would count). Claims without an official source were dropped ("within minutes", "largest Bund yield jump since 1990").
+
+**Reasoning:** The prototype used Fed noon rates; the build uses ECB fixings (D-11), so a few statements had to follow the data, not the other way round.
+
+## D-32 · 2026-10-22 · Claude
+
+**Question:** Deviations of the home page from the B-Home prototype?
+
+**Decision:** The Wow chart's SVG renders 1:1 in CSS pixels (viewBox = container width) so labels stay 13 px at every width, compact layout under 640 px; the phase-3 clock ends at 91.25 days (T = 0.25, "3 Monate"); the Riskometer card uses its visible text as accessible name (an aria-label failed axe "label-content-name-mismatch"); the learning path becomes a vertical list under 640 px; level chip icon up for levels ≥ 3, dash for 2, down for 1.
+
+**Reasoning:** Readability on phones, accessibility, and the spec's T = 0.25.
+
+## D-33 · 2026-10-22 · Claude
+
+**Question:** Deviations of the module template from B-Modul?
+
+**Decision:** Stepper items are links (44 px; numbers only under 640 px with full labels for screen readers); the per-section question is titled "Kurz geprüft" with the hint "ohne Wertung", the quiz page uses "Frage n von 4"; derivations are collapsed (§10) with the worked example visible above; appear animations are transform-only (opacity fades failed contrast checks mid-animation); `/module/{slug}/` uses Astro's static redirect page.
+
+**Reasoning:** Brief §10 and accessibility take precedence over the static prototype.
+
+## D-34 · 2026-10-22 · Claude
+
+**Question:** Rendering details found during integration.
+
+**Decision:** `<Num>`/`<Fact>` render with `set:text` (formatting could otherwise add spaces around values); `.formula` is a block with `width: fit-content` where plain child `<span>`s are lines and inline elements stay inline; Vitest's persistent module cache is off because the registries use `import.meta.glob` and new files would stay invisible.
+
+**Reasoning:** Bugs reported by the template agent; fixed centrally so no module has to work around them.

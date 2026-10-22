@@ -52,6 +52,12 @@ import GreeksLabFigure from '@/components/figures/GreeksLabFigure.astro';
 
 The wrapper reads the language itself (`Astro.currentLocale`) and passes it to the island with `client:visible`.
 
+### Formula and text-block details
+
+- A one-line formula can be written inline: `<Formula>Δ = ∂<i>V</i> / ∂<i>S</i> = <Num of="ex.delta" /></Formula>` — `<i>`, `<sub>`, `<sup>`, `<b>` and `<Num>`/`<Fact>` stay inline.
+- A multi-line formula: put each line in a plain `<span>` on its own line (`<Formula><span>…</span><span>…</span></Formula>`); plain spans become lines.
+- `<Takeaway>`, `<Callout>`, `<Desk>` and `<Derivation>`: put their text on separate lines inside the tag so MDX wraps it in `<p>`.
+
 ## Numbers
 
 - Never type a value from the example or the core into MDX. Register it in `src/lib/nums/m{NN}.ts`:

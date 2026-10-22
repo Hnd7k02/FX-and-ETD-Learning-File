@@ -1,0 +1,104 @@
+---
+/** Option vs forward (module 04, section 1) for MDX. Props: caption. */
+import OptionVsForward from '@/components/islands/OptionVsForward';
+import Figure from '@/components/content/Figure.astro';
+import { pageLang } from '@/components/content/lang';
+
+interface Props {
+  caption?: string;
+}
+const { caption } = Astro.props;
+const lang = pageLang(Astro.currentLocale);
+---
+
+<Figure caption={caption}>
+  <OptionVsForward client:visible lang={lang} />
+</Figure>
+
+<style is:global>
+  .ovf {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+  }
+  .ovf .ff-lab-head {
+    margin-bottom: 0;
+  }
+  .ovf-head-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+  .ovf-chip {
+    background: var(--ff-options-soft);
+    color: var(--ff-options-text);
+    font-weight: 800;
+  }
+  .ovf .ff-legend li {
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--ff-ink-2);
+  }
+  .ovf p {
+    margin: 0;
+  }
+  .ovf-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    font-family: var(--ff-font-ui);
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .ovf-svg rect:first-child {
+    transition: none;
+  }
+  .ovf-band-label {
+    animation: ovf-fade 320ms ease-out both;
+  }
+  @keyframes ovf-fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  .ovf-handle {
+    cursor: grab;
+    touch-action: none;
+  }
+  .ovf-handle.is-active {
+    cursor: grabbing;
+  }
+  .ovf .ovf-hint {
+    font-size: 12px;
+    color: var(--ff-muted);
+  }
+  .ovf-swatch {
+    display: inline-block;
+    width: 18px;
+    height: 0;
+    border-top: 3px solid;
+    vertical-align: middle;
+  }
+  .ovf .ovf-note {
+    padding: 14px 16px;
+    border-radius: var(--ff-r-box);
+    background: var(--ff-surface-2);
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--ff-ink-2);
+  }
+  .ovf .ovf-note--strongUsd {
+    background: var(--ff-linear-soft);
+    color: var(--ff-ink);
+  }
+  .ovf .ovf-note--weakUsd {
+    background: var(--ff-good-soft);
+    color: var(--ff-good-text-strong);
+  }
+</style>

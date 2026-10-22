@@ -400,9 +400,8 @@ p {
 /* ---------- Formula boxes ---------- */
 .formula {
   align-self: flex-start;
-  display: inline-flex;
-  flex-direction: column;
-  gap: 6px;
+  display: block;
+  width: fit-content;
   max-width: 100%;
   padding: 12px 20px;
   border-radius: var(--ff-r-formula);
@@ -412,6 +411,16 @@ p {
   font-size: var(--ff-formula);
   line-height: 1.45;
   overflow-x: auto;
+}
+/* Multi-line formulas: wrap each line in a plain <span> (or <p>). Num/Fact spans stay inline. */
+.formula > span:not(.num):not(.fact),
+.formula > p {
+  display: block;
+  margin: 0;
+}
+.formula > span:not(.num):not(.fact) + span:not(.num):not(.fact),
+.formula > p + p {
+  margin-top: 6px;
 }
 .formula i {
   font-style: italic;

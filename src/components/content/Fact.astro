@@ -13,9 +13,7 @@ const l = pageLang(Astro.currentLocale, lang);
 const fact = getFact(id);
 ---
 
-<span class="fact" data-fact={id} data-source={fact.source}>
-  {fact[l]}
-</span>
+<span class="fact" data-fact={id} data-source={fact.source} set:text={fact[l]} />
 
 <style>
   .fact {

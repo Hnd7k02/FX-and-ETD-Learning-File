@@ -3,6 +3,8 @@ import { getViteConfig } from 'astro/config';
 
 export default getViteConfig({
   test: {
+    // Registries use import.meta.glob; the persistent module cache would hide newly added files.
+    fsModuleCache: false,
     include: ['tests/unit/**/*.test.ts'],
     environment: 'node',
     coverage: {

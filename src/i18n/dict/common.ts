@@ -45,7 +45,6 @@ export const common = defineDict({
     'home.resumeCtaStart': 'Starten',
     'home.riskTitle': 'Riskometer heute',
     'home.riskText': 'Realisierte 1-Monats-Vola, höher als an {pct} % aller Handelstage seit 2006',
-    'home.riskAria': 'Riskometer: {pair}, realisierte Vola {vol}, Stufe {level}',
     'module.section': 'Abschnitt {n} von {total}',
     'module.quiz': 'Quiz',
     'module.back': 'Zurück',
@@ -119,7 +118,6 @@ export const common = defineDict({
     'home.riskTitle': 'Riskometer today',
     'home.riskText':
       'Realised 1-month volatility, higher than on {pct}% of all trading days since 2006',
-    'home.riskAria': 'Riskometer: {pair}, realised volatility {vol}, level {level}',
     'module.section': 'Section {n} of {total}',
     'module.quiz': 'Quiz',
     'module.back': 'Back',

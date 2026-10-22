@@ -18,9 +18,7 @@ const l = pageLang(Astro.currentLocale, lang);
 const text = formatNum(getNum(of), l, { digits, sign });
 ---
 
-<span class="num" data-num={of}>
-  {text}
-</span>
+<span class="num" data-num={of} set:text={text} />
 
 <style>
   .num {

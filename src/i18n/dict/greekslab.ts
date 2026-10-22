@@ -97,8 +97,7 @@ export const greekslab = defineDict({
 
     'gl.aria.dg.top':
       'Preis des Calls in Abhängigkeit vom Spot, mit Tangente bei {x}: Steigung Delta {v}',
-    'gl.aria.dg.bottom':
-      'Delta in Abhängigkeit vom Spot, mit Tangente bei {x}: Steigung Gamma {v}',
+    'gl.aria.dg.bottom': 'Delta in Abhängigkeit vom Spot, mit Tangente bei {x}: Steigung Gamma {v}',
     'gl.aria.vega.top':
       'Preis des Calls in Abhängigkeit von der impliziten Vola, mit Tangente bei {x}: Steigung Vega {v} Pips je Vola-Punkt',
     'gl.aria.vega.bottom':
@@ -212,8 +211,7 @@ export const greekslab = defineDict({
     'gl.aria.dg.bottom': 'Delta against spot, with the tangent at {x}: slope gamma {v}',
     'gl.aria.vega.top':
       'Price of the call against implied vol, with the tangent at {x}: slope vega {v} pips per vol point',
-    'gl.aria.vega.bottom':
-      'Vega against spot: {v} per vol point at spot {x}, peak at spot {peak}',
+    'gl.aria.vega.bottom': 'Vega against spot: {v} per vol point at spot {x}, peak at spot {peak}',
     'gl.aria.theta.top':
       'Price of the call against time to expiry, with the tangent at {x}: slope theta {v} pips per day',
     'gl.aria.theta.bottom': 'Theta per day against time to expiry: {v} at {x}',

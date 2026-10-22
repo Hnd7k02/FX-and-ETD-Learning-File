@@ -401,14 +401,14 @@ export default function GreeksLab({ lang, mode = 'delta-gamma' }: GreeksLabProps
     const guideX = x(xValue(spec.x, shown));
     const titleX = which === 'bottom' || !sharedX(mode);
     // Put the axis title (and the payoff label) on the side where the curve leaves room.
-    const ends = projected([spec.points[0]!, spec.points[spec.points.length - 1]!], x, y);
-    const [leftEnd, rightEnd] = ends[0]![0] < ends[1]![0] ? ends : [ends[1]!, ends[0]!];
-    const titleRight = rightEnd![1] <= g.plotBottom - 26 || rightEnd![1] <= leftEnd![1];
     const titleText = axisTitle[spec.x];
     const titleW = titleText.length * 6.8;
-    const titleBox = titleRight
-      ? { a: x1 - titleW, b: x1 }
-      : { a: x0 + 4, b: x0 + 4 + titleW };
+    const px = projected(spec.points, x, y);
+    const crowd = (a: number, b: number) =>
+      px.filter(([u, v]) => u >= a - 4 && u <= b + 4 && v >= g.plotBottom - 24).length;
+    const titleRight =
+      crowd(x1 - titleW, x1) <= crowd(x0 + 4, x0 + 4 + titleW);
+    const titleBox = titleRight ? { a: x1 - titleW, b: x1 } : { a: x0 + 4, b: x0 + 4 + titleW };
     const strikeLabel =
       (which === 'top' && spec.x === 'spot') || (which === 'bottom' && mode === 'vega');
     const dragging = dragPanel === which;
@@ -421,7 +421,11 @@ export default function GreeksLab({ lang, mode = 'delta-gamma' }: GreeksLabProps
       const l2 = t(`gl.aha.${ahaKey}.d`);
       const w = Math.ceil(Math.max(l1.length * 7.1, l2.length * 6.3)) + 20;
       const h = 44;
-      const obstacles: Point[] = projected(spec.points, x, y);
+      const obstacles: Point[] = [...px];
+      for (const r of spec.refs) {
+        const rx = x(r.x);
+        for (let k = 0; k <= 8; k++) obstacles.push([rx + k * 8, g.plotTop + 10]);
+      }
       if (titleX) {
         for (let px = titleBox.a; px <= titleBox.b; px += 8)
           obstacles.push([px, g.plotBottom - 12], [px, g.plotBottom - 4]);
@@ -576,6 +580,16 @@ export default function GreeksLab({ lang, mode = 'delta-gamma' }: GreeksLabProps
             </text>
           ))}
           {titleX && (
+            <rect
+              x={titleBox.a - 4}
+              y={g.plotBottom - 21}
+              width={titleBox.b - titleBox.a + 8}
+              height={17}
+              rx={4}
+              class="gl-title-bg"
+            />
+          )}
+          {titleX && (
             <text
               x={titleRight ? x1 : x0 + 4}
               y={g.plotBottom - 8}
@@ -595,23 +609,21 @@ export default function GreeksLab({ lang, mode = 'delta-gamma' }: GreeksLabProps
     <div class="gl-head">
       <span class="gl-legend">
         <span aria-hidden="true" class="gl-swatch" style={{ borderTopColor: head.color }} />
-        {head.title}
+        <span>{greek(head.title)}</span>
       </span>
       {extra}
       <span class="gl-pill" style={{ background: head.pillBg }}>
-        {head.tangent ? (
-          <>
-            <span aria-hidden="true" class="gl-pill-line" />
-            <span class="gl-slope-long">{slope}</span>
-            <span class="gl-slope-short">{slopeShort}</span> = {head.sym} = <b>{head.value}</b>
-          </>
-        ) : (
-          <>
-            <span aria-hidden="true" class="gl-pill-dot" />
-            {head.sym} = <b>{head.value}</b>
-          </>
-        )}
-        {head.unit && <> {head.unit}</>}
+        <span aria-hidden="true" class={head.tangent ? 'gl-pill-line' : 'gl-pill-dot'} />
+        <span>
+          {head.tangent && (
+            <>
+              <span class="gl-slope-long">{slope}</span>
+              <span class="gl-slope-short">{slopeShort}</span> ={' '}
+            </>
+          )}
+          <span class="gl-sym">{head.sym}</span> = <b>{head.value}</b>
+          {head.unit && <> {head.unit}</>}
+        </span>
       </span>
     </div>
   );
@@ -922,6 +934,22 @@ export default function GreeksLab({ lang, mode = 'delta-gamma' }: GreeksLabProps
       </div>
     </div>
   );
+}
+
+/** Wraps Greek letters in a span set in STIX Two (the UI font has no Greek glyphs). */
+function greek(text: string): Array<string | JSX.Element> {
+  return text
+    .split(/([\u0391-\u03C9])/)
+    .filter(Boolean)
+    .map((part, i) =>
+      /^[\u0391-\u03C9]$/.test(part) ? (
+        <span key={i} class="gl-sym">
+          {part}
+        </span>
+      ) : (
+        part
+      ),
+    );
 }
 
 /** Panel that carries the annotation of a mode (rho: the CHF-rate chart). */

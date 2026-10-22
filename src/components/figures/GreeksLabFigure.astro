@@ -83,11 +83,19 @@ const lang = pageLang(Astro.currentLocale);
     width: 18px;
     border-top: 3px solid var(--ff-long);
   }
+  .gl-sym {
+    font-family: var(--ff-font-math);
+    font-size: 1.12em;
+    line-height: 1;
+  }
+  .gl-title-bg {
+    fill: #fff;
+    fill-opacity: 0.9;
+  }
   .gl-pill {
     display: inline-flex;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 0 6px;
+    gap: 8px;
     padding: 6px 12px;
     border-radius: var(--ff-r-pill);
     font-size: 13px;
@@ -116,10 +124,12 @@ const lang = pageLang(Astro.currentLocale);
     font-style: normal;
   }
   .gl-pill-line {
+    flex: 0 0 16px;
     width: 16px;
     border-top: 2px solid var(--ff-forward);
   }
   .gl-pill-dot {
+    flex: 0 0 8px;
     width: 8px;
     height: 8px;
     border-radius: 999px;
