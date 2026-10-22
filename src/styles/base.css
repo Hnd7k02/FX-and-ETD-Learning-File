@@ -336,8 +336,8 @@ p {
   letter-spacing: -0.02em;
   line-height: 1.2;
 }
-.prose h3 + p,
-.prose h2 + p {
+.prose > h3 + p,
+.prose > h2 + p {
   margin-top: -16px;
 }
 .prose ul,
