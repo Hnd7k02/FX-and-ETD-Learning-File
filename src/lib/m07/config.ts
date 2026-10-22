@@ -69,7 +69,7 @@ export const M07_CONFIG = {
     /** Playback speed: milliseconds per simulated day (91 days ≈ 3.6 s). */
     msPerDay: 40,
     /** Barrier slider range and step (USD/CHF). */
-    barrier: { min: 0.7600, max: 0.8400, step: 0.0005 },
+    barrier: { min: 0.76, max: 0.84, step: 0.0005 },
     /** Fixed y-axis around the spot (USD/CHF); paths outside are clipped. */
     yDomain: [0.735, 0.865] as [number, number],
   },
@@ -88,10 +88,10 @@ export const M07_CONFIG = {
       monitoring: 'continuous' as 'continuous' | 'daily',
     },
     ranges: {
-      strike: { min: 0.7600, max: 0.8400, step: 0.0005 },
-      barrier: { min: 0.7400, max: 0.8600, step: 0.0005 },
+      strike: { min: 0.76, max: 0.84, step: 0.0005 },
+      barrier: { min: 0.74, max: 0.86, step: 0.0005 },
       rebatePips: { min: 0, max: 100, step: 5 },
-      spot: { min: 0.7400, max: 0.8600, step: 0.0005 },
+      spot: { min: 0.74, max: 0.86, step: 0.0005 },
       weeks: { min: 1, max: 52, step: 1 },
     },
     /** x-axis of both charts (spot USD/CHF). */
@@ -122,11 +122,11 @@ export const M07_CONFIG = {
       payAt: 'expiry' as 'expiry' | 'hit',
     },
     ranges: {
-      strike: { min: 0.7600, max: 0.8400, step: 0.0005 },
+      strike: { min: 0.76, max: 0.84, step: 0.0005 },
       spreadPips: { min: 2, max: 200, step: 2 },
-      barrier: { min: 0.7500, max: 0.8500, step: 0.0005 },
-      lower: { min: 0.7400, max: 0.7990, step: 0.0005 },
-      upper: { min: 0.8010, max: 0.8600, step: 0.0005 },
+      barrier: { min: 0.75, max: 0.85, step: 0.0005 },
+      lower: { min: 0.74, max: 0.799, step: 0.0005 },
+      upper: { min: 0.801, max: 0.86, step: 0.0005 },
       rdPct: { min: -1, max: 4, step: 0.25 },
       volPct: { min: 2, max: 16, step: 0.5 },
     },

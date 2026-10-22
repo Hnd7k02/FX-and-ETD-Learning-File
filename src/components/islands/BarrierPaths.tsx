@@ -12,14 +12,25 @@ import { useMemo, useRef, useState } from 'preact/hooks';
 import { Segmented } from '@/components/ui/Segmented';
 import { Slider } from '@/components/ui/Slider';
 import { StatHero, StatRow, StatTable } from '@/components/ui/Stat';
-import { useElementWidth, useInView, usePrefersReducedMotion, useTween } from '@/components/ui/hooks';
+import {
+  useElementWidth,
+  useInView,
+  usePrefersReducedMotion,
+  useTween,
+} from '@/components/ui/hooks';
 import { barrierpaths as dict } from '@/i18n/dict/barrierpaths';
 import { translator, type Lang } from '@/i18n/types';
 import { scaleLinear } from '@/lib/chart';
 import { fmtMillions, fmtMoney, fmtNumber, fmtPct, fmtRate } from '@/lib/format';
 import { M07_CONFIG, chartLayout, onGrid } from '@/lib/m07/config';
 import { M07_MARKET, directionOf, hitDays, pathsSummary, seededPaths } from '@/lib/m07/paths';
-import { annotationBox, usePlayback, useSliderDrag, useSvgDrag, type DragTarget } from './m07-shared';
+import {
+  annotationBox,
+  usePlayback,
+  useSliderDrag,
+  useSvgDrag,
+  type DragTarget,
+} from './m07-shared';
 
 export interface BarrierPathsProps {
   lang: Lang;
@@ -71,7 +82,11 @@ export default function BarrierPaths({ lang }: BarrierPathsProps): JSX.Element {
   ]);
   const instant = rm || drag.active !== null || sliding;
 
-  const tw = useTween([sum.price * 1e4, sum.vanilla * 1e4, sum.discount, sum.touchProb], 300, instant);
+  const tw = useTween(
+    [sum.price * 1e4, sum.vanilla * 1e4, sum.discount, sum.touchProb],
+    300,
+    instant,
+  );
   const [pricePips, vanillaPips, discount, prob] = tw as [number, number, number, number];
 
   /* ---------- paths ---------- */
@@ -130,7 +145,10 @@ export default function BarrierPaths({ lang }: BarrierPathsProps): JSX.Element {
     const left = ax > (x0 + x1) / 2;
     const bx = Math.max(x0 + 4, Math.min(x1 - w - 4, left ? ax - w - 14 : ax + 14));
     const above = dir === 'down';
-    const by = Math.max(L.top + 4, Math.min(L.height - L.bottom - h - 4, above ? ay - h - 16 : ay + 16));
+    const by = Math.max(
+      L.top + 4,
+      Math.min(L.height - L.bottom - h - 4, above ? ay - h - 16 : ay + 16),
+    );
     aha = (
       <g class="m7-aha" data-aha={io}>
         <rect x={bx} y={by} width={w} height={h} rx={10} class="m7-aha-box" />
@@ -276,11 +294,7 @@ export default function BarrierPaths({ lang }: BarrierPathsProps): JSX.Element {
             <circle cx={x(0)} cy={y(S)} r={4.5} class="m7-spot" />
             {/* barrier with handle */}
             <path d={`M${x0},${by.toFixed(1)}H${x1}`} class="m7-barrier" />
-            <text
-              x={x0 + 8}
-              y={dir === 'up' ? by - 7 : by + 16}
-              class="m7-barrier-label"
-            >
+            <text x={x0 + 8} y={dir === 'up' ? by - 7 : by + 16} class="m7-barrier-label">
               {t('bp.label.barrier', { v: rate(barrier) })}
             </text>
             <g class="m7-handle" transform={`translate(${x1 + 10},${by.toFixed(1)})`}>

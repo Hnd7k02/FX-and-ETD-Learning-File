@@ -19,7 +19,7 @@ test.describe('riskometer page', () => {
     const root = page.locator('[data-rk]');
     await expect(root).toHaveAttribute('data-pair', 'EUR/CHF');
     await expect(page.locator('h1')).toHaveText('Wie nervös ist der Franken?');
-    await expect(page.locator('[data-vol]')).toHaveText(/\d+\.\d %/);
+    await expect(page.locator('[data-vol]')).toHaveText(/\d+\.\d\s%/);
     await expect(page.locator('.rk-level')).toHaveText(/Ruhig|Normal|Erhöht|Hoch|Extrem/);
     await expect(page.locator('.rk-gauge')).toHaveAttribute('aria-label', /Tacho: Stufe/);
     await expect(page.locator('.rk-svg')).toHaveAttribute('aria-label', /EUR\/CHF/);
@@ -63,9 +63,12 @@ test.describe('riskometer page', () => {
     await expect(btn).toHaveAttribute('aria-pressed', 'true');
     await expect(page.locator('[data-case-title]')).toHaveText('Finanzkrise');
     await expect(page.locator('[data-case-year]')).toHaveText('2008');
-    await expect(page.locator('[data-case-peak]')).toHaveText(/\d+\.\d %/);
+    await expect(page.locator('[data-case-peak]')).toHaveText(/\d+\.\d\s%/);
     await expect(page.locator('.rk-stem')).toHaveCount(1);
-    await expect(page.locator('.rk-mod').first()).toHaveAttribute('href', /\/module\/05-greeks\/1\/$/);
+    await expect(page.locator('.rk-mod').first()).toHaveAttribute(
+      'href',
+      /\/module\/05-greeks\/1\/$/,
+    );
     await expect(page).toHaveURL(/\?event=gfc-2008$/);
   });
 
@@ -89,7 +92,7 @@ test.describe('riskometer page', () => {
   test('deep link selects pair and event', async ({ page }) => {
     await page.goto('/en/riskometer/?pair=EURUSD&event=ukraine-2022');
     await expect(page.locator('[data-rk]')).toHaveAttribute('data-pair', 'EUR/USD');
-    await expect(page.locator('[data-rk]')).toHaveAttribute('data-event', 'ukraine-2022');
+    await expect(page.locator('[data-rk]')).toHaveAttribute('data-selected-event', 'ukraine-2022');
     await expect(page.locator('h1')).toHaveText('How nervous is the euro?');
     await expect(page.locator('[data-case-title]')).toHaveText('War in Ukraine');
     await expect(page.locator('.rk-box-label').first()).toHaveText('EUR/USD');

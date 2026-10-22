@@ -171,6 +171,8 @@ export default function OptionVsForward({ lang }: OptionVsForwardProps): JSX.Ele
   });
   const bandLabel = t(`ovf.band.${region}`);
   const bandMid = (sx(band[0]!) + sx(band[1]!)) / 2;
+  /** Half the label width (estimate: 0.56 em per character), so the label stays inside. */
+  const bandHalf = (bandLabel.length * L.font * 0.56) / 2 + 4;
 
   return (
     <div class="ovf" data-ovf data-region={region} data-st={st.toFixed(4)}>
@@ -230,7 +232,7 @@ export default function OptionVsForward({ lang }: OptionVsForwardProps): JSX.Ele
                 {t('ovf.y')}
               </text>
               <text
-                x={clamp(bandMid, L.left + 70, L.width - L.right - 70)}
+                x={clamp(bandMid, L.left + bandHalf, L.width - L.right - bandHalf)}
                 y={L.top + L.font + 6}
                 class="ovf-band-label"
                 key={region}

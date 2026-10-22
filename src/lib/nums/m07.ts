@@ -28,8 +28,23 @@ const K = C.strike;
 const Hu = C.barriers.up;
 const Hd = C.barriers.down;
 const pips = (x: number) => x / PIP;
-const call = (kind: 'up-and-out' | 'up-and-in' | 'down-and-out' | 'down-and-in', H: number, extra: { rebate?: number; T?: number } = {}) =>
-  barrierPrice({ S, K, H, T: extra.T ?? T, vol, rd, rf, type: 'call', kind, rebate: extra.rebate ?? 0 });
+const call = (
+  kind: 'up-and-out' | 'up-and-in' | 'down-and-out' | 'down-and-in',
+  H: number,
+  extra: { rebate?: number; T?: number } = {},
+) =>
+  barrierPrice({
+    S,
+    K,
+    H,
+    T: extra.T ?? T,
+    vol,
+    rd,
+    rf,
+    type: 'call',
+    kind,
+    rebate: extra.rebate ?? 0,
+  });
 
 /* ---------- Section 1 ---------- */
 const vanilla = gkPrice(S, K, T, vol, rd, rf, 'call');

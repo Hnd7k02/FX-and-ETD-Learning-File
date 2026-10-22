@@ -4,7 +4,8 @@ import { defineDict } from '../types';
 export const barrierlab = defineDict({
   de: {
     'bl.title': 'Barrier-Labor',
-    'bl.sub': '{kind} · Strike {strike} · Barriere {barrier} · {time} · Vola {vol} · Zins CHF {rd}, USD {rf}',
+    'bl.sub':
+      '{kind} · Strike {strike} · Barriere {barrier} · {time} · Vola {vol} · Zins CHF {rd}, USD {rf}',
     'bl.kind': '{dir}-and-{io} {type}',
     'bl.dir.up': 'Up',
     'bl.dir.down': 'Down',
@@ -82,8 +83,10 @@ export const barrierlab = defineDict({
     'bl.row.gamma': 'Gamma',
     'bl.row.gammaSub': 'Vanilla: {v}',
     'bl.check.title': 'Numerischer Check',
-    'bl.check.text': 'In-Out-Parität ohne Rebate: Knock-out und Knock-in zusammen sind genau der Vanilla.',
-    'bl.mon.note': 'Täglich beobachtet wirkt die Barriere wie eine stetige bei {eff}: Faktor e^(0.5826 · σ · √Δt) = {f}.',
+    'bl.check.text':
+      'In-Out-Parität ohne Rebate: Knock-out und Knock-in zusammen sind genau der Vanilla.',
+    'bl.mon.note':
+      'Täglich beobachtet wirkt die Barriere wie eine stetige bei {eff}: Faktor e^(0.5826 · σ · √Δt) = {f}.',
     'bl.aha.touched.out.t': 'Barriere berührt',
     'bl.aha.touched.out.d': 'Die Option ist weg, es bleibt das Rebate.',
     'bl.aha.touched.in.t': 'Barriere berührt',
@@ -101,7 +104,8 @@ export const barrierlab = defineDict({
   },
   en: {
     'bl.title': 'Barrier lab',
-    'bl.sub': '{kind} · strike {strike} · barrier {barrier} · {time} · vol {vol} · rates CHF {rd}, USD {rf}',
+    'bl.sub':
+      '{kind} · strike {strike} · barrier {barrier} · {time} · vol {vol} · rates CHF {rd}, USD {rf}',
     'bl.kind': '{dir}-and-{io} {type}',
     'bl.dir.up': 'Up',
     'bl.dir.down': 'Down',
@@ -179,8 +183,10 @@ export const barrierlab = defineDict({
     'bl.row.gamma': 'Gamma',
     'bl.row.gammaSub': 'vanilla: {v}',
     'bl.check.title': 'Numerical check',
-    'bl.check.text': 'In-out parity without rebate: knock-out and knock-in together are exactly the vanilla.',
-    'bl.mon.note': 'Observed daily, the barrier acts like a continuous one at {eff}: factor e^(0.5826 · σ · √Δt) = {f}.',
+    'bl.check.text':
+      'In-out parity without rebate: knock-out and knock-in together are exactly the vanilla.',
+    'bl.mon.note':
+      'Observed daily, the barrier acts like a continuous one at {eff}: factor e^(0.5826 · σ · √Δt) = {f}.',
     'bl.aha.touched.out.t': 'Barrier touched',
     'bl.aha.touched.out.d': 'The option is gone; only the rebate is left.',
     'bl.aha.touched.in.t': 'Barrier touched',

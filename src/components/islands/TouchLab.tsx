@@ -129,14 +129,17 @@ export default function TouchLab({ lang, mc, initialMode }: TouchLabProps): JSX.
         {
           key: 'strike',
           distance: (vx, vy) =>
-            vy >= LT.top - 14 && vy <= LT.height - LT.bottom ? Math.abs(vx - xLevel(s.strike)) : Infinity,
+            vy >= LT.top - 14 && vy <= LT.height - LT.bottom
+              ? Math.abs(vx - xLevel(s.strike))
+              : Infinity,
           move: (vx) => moveLevel('strike', xLevel.invert(vx)),
         },
       ]
     : s.mode === 'dnt'
       ? (['lower', 'upper'] as const).map((key) => ({
           key,
-          distance: (vx: number, vy: number) => (vx >= x0 - 8 ? Math.abs(vy - yTop(s[key])) : Infinity),
+          distance: (vx: number, vy: number) =>
+            vx >= x0 - 8 ? Math.abs(vy - yTop(s[key])) : Infinity,
           move: (_vx: number, vy: number) => moveLevel(key, yTop.invert(vy)),
         }))
       : [
@@ -165,7 +168,8 @@ export default function TouchLab({ lang, mc, initialMode }: TouchLabProps): JSX.
 
   /* ---------- texts ---------- */
   const rate = (v: number) => fmtRate(v, PAIR);
-  const chf = (frac: number, digits = 0, sign = false) => fmtMoney(frac * C.payout, 'CHF', lang, digits, sign);
+  const chf = (frac: number, digits = 0, sign = false) =>
+    fmtMoney(frac * C.payout, 'CHF', lang, digits, sign);
   const pct = (v: number, d = 1) => fmtPct(v, lang, d);
   const volText = (v: number) => fmtPctValue(v, lang, Number.isInteger(v) ? 0 : 1);
   const rdText = (v: number) => fmtPctValue(v, lang, Number.isInteger(v) ? 0 : 2);
@@ -192,7 +196,13 @@ export default function TouchLab({ lang, mc, initialMode }: TouchLabProps): JSX.
   const cone = useMemo(() => {
     const ts = Array.from({ length: C.days + 1 }, (_, d) => d);
     const q = (z: number) => ts.map((d): Point => [d, quantileAt(m, d / 365, z)]);
-    return { o2: q(2), u2: q(-2), o1: q(1), u1: q(-1), fwd: ts.map((d): Point => [d, forwardAt(m, d / 365)]) };
+    return {
+      o2: q(2),
+      u2: q(-2),
+      o1: q(1),
+      u1: q(-1),
+      fwd: ts.map((d): Point => [d, forwardAt(m, d / 365)]),
+    };
   }, [m.rd, m.vol]);
   const PT = (pts: Point[]) => pts.map(([a, b]): Point => [xDays(a), yTop(b)]);
 
@@ -270,7 +280,10 @@ export default function TouchLab({ lang, mc, initialMode }: TouchLabProps): JSX.
         <text x={kx + 8} y={yTop(0.45)} class="m7-label">
           {t('tl.area', { p: pct(n.prob) })}
         </text>
-        <path d={`M${kx.toFixed(1)},${LT.top}V${LT.height - LT.bottom}`} class="m7-barrier is-dashed" />
+        <path
+          d={`M${kx.toFixed(1)},${LT.top}V${LT.height - LT.bottom}`}
+          class="m7-barrier is-dashed"
+        />
         <text x={kx - 8} y={LT.top + 14} class="m7-barrier-label" text-anchor="end">
           {t('tl.ref.strike', { v: rate(s.strike) })}
         </text>
@@ -282,8 +295,16 @@ export default function TouchLab({ lang, mc, initialMode }: TouchLabProps): JSX.
     );
   })();
 
-  const topTicksY = isDigital ? [0, 0.25, 0.5, 0.75, 1] : compact ? [0.76, 0.8, 0.84] : [0.74, 0.76, 0.78, 0.8, 0.82, 0.84, 0.86];
-  const topTicksX = isDigital ? (compact ? [0.76, 0.8, 0.84] : [0.74, 0.76, 0.78, 0.8, 0.82, 0.84, 0.86]) : [0, 1, 2, 3];
+  const topTicksY = isDigital
+    ? [0, 0.25, 0.5, 0.75, 1]
+    : compact
+      ? [0.76, 0.8, 0.84]
+      : [0.74, 0.76, 0.78, 0.8, 0.82, 0.84, 0.86];
+  const topTicksX = isDigital
+    ? compact
+      ? [0.76, 0.8, 0.84]
+      : [0.74, 0.76, 0.78, 0.8, 0.82, 0.84, 0.86]
+    : [0, 1, 2, 3];
 
   // annotation (top chart, upper left corner of the plot)
   let ahaEl: JSX.Element | null = null;
@@ -310,13 +331,26 @@ export default function TouchLab({ lang, mc, initialMode }: TouchLabProps): JSX.
 
   /* ---------- bottom chart ---------- */
   const PB = (pts: Point[]) => linePath(pts.map(([a, b]): Point => [xB(a), yB(b)]));
-  const bTicksX = curves.x === 'vol' ? [2, 4, 6, 8, 10, 12, 14, 16] : compact ? [0.76, 0.8, 0.84] : [0.75, 0.77, 0.79, 0.81, 0.83, 0.85];
+  const bTicksX =
+    curves.x === 'vol'
+      ? [2, 4, 6, 8, 10, 12, 14, 16]
+      : compact
+        ? [0.76, 0.8, 0.84]
+        : [0.75, 0.77, 0.79, 0.81, 0.83, 0.85];
   const atX = xB(curves.at[0]);
   const atY = yB(curves.at[1]);
   const secondLabel =
-    s.mode === 'digital' ? t('tl.legend.secondDigital') : s.mode === 'oneTouch' ? t('tl.legend.secondOT') : t('tl.legend.secondNT');
+    s.mode === 'digital'
+      ? t('tl.legend.secondDigital')
+      : s.mode === 'oneTouch'
+        ? t('tl.legend.secondOT')
+        : t('tl.legend.secondNT');
   const bottomHead =
-    s.mode === 'dnt' ? t('tl.head.vol') : s.mode === 'digital' ? t('tl.head.strike') : t('tl.head.level');
+    s.mode === 'dnt'
+      ? t('tl.head.vol')
+      : s.mode === 'digital'
+        ? t('tl.head.strike')
+        : t('tl.head.level');
 
   /* ---------- side ---------- */
   const atDefaults = JSON.stringify({ ...s, mode: start.mode }) === JSON.stringify(start);
@@ -347,7 +381,11 @@ export default function TouchLab({ lang, mc, initialMode }: TouchLabProps): JSX.
         return (
           <>
             <StatRow label={t('tl.row.ot')} sub={t('tl.row.otSub')} value={chf(compare)} />
-            <StatRow label={t('tl.row.sum')} sub={t('tl.row.sumSub')} value={chf(price + compare)} />
+            <StatRow
+              label={t('tl.row.sum')}
+              sub={t('tl.row.sumSub')}
+              value={chf(price + compare)}
+            />
           </>
         );
       case 'dnt':
@@ -402,7 +440,11 @@ export default function TouchLab({ lang, mc, initialMode }: TouchLabProps): JSX.
       {...r}
       valueText={text}
       accent={accent}
-      onInput={(v) => (key === 'barrier' || key === 'lower' || key === 'upper' ? moveLevel(key, v) : set({ [key]: v }))}
+      onInput={(v) =>
+        key === 'barrier' || key === 'lower' || key === 'upper'
+          ? moveLevel(key, v)
+          : set({ [key]: v })
+      }
     />
   );
 
@@ -488,7 +530,10 @@ export default function TouchLab({ lang, mc, initialMode }: TouchLabProps): JSX.
           >
             {topTicksY.map((v) => (
               <g key={`ty${v}`}>
-                <path d={`M${x0},${yTop(v).toFixed(1)}H${x1}`} class={isDigital && v === 0 ? 'm7-axis' : 'm7-grid'} />
+                <path
+                  d={`M${x0},${yTop(v).toFixed(1)}H${x1}`}
+                  class={isDigital && v === 0 ? 'm7-axis' : 'm7-grid'}
+                />
                 <text x={x0 - 8} y={yTop(v) + 4} class="m7-tick" text-anchor="end">
                   {isDigital ? fmtPct(v, lang, 0) : fmtRate(v, PAIR, 2)}
                 </text>
@@ -502,7 +547,11 @@ export default function TouchLab({ lang, mc, initialMode }: TouchLabProps): JSX.
                 class="m7-tick"
                 text-anchor={isDigital ? 'middle' : i === 0 ? 'start' : i === 3 ? 'end' : 'middle'}
               >
-                {isDigital ? fmtRate(v, PAIR, 2) : v === 0 ? t('tl.axis.today') : t('tl.axis.month', { n: v })}
+                {isDigital
+                  ? fmtRate(v, PAIR, 2)
+                  : v === 0
+                    ? t('tl.axis.today')
+                    : t('tl.axis.month', { n: v })}
               </text>
             ))}
             {isDigital ? (
@@ -568,20 +617,32 @@ export default function TouchLab({ lang, mc, initialMode }: TouchLabProps): JSX.
           >
             {[0, 0.25, 0.5, 0.75, 1].map((v) => (
               <g key={`by${v}`}>
-                <path d={`M${bx0},${yB(v).toFixed(1)}H${bx1}`} class={v === 0 ? 'm7-axis' : 'm7-grid'} />
+                <path
+                  d={`M${bx0},${yB(v).toFixed(1)}H${bx1}`}
+                  class={v === 0 ? 'm7-axis' : 'm7-grid'}
+                />
                 <text x={bx0 - 8} y={yB(v) + 4} class="m7-tick" text-anchor="end">
                   {fmtPct(v, lang, 0)}
                 </text>
               </g>
             ))}
             {bTicksX.map((v) => (
-              <text key={`bx${v}`} x={xB(v)} y={LB.height - 10} class="m7-tick" text-anchor="middle">
+              <text
+                key={`bx${v}`}
+                x={xB(v)}
+                y={LB.height - 10}
+                class="m7-tick"
+                text-anchor="middle"
+              >
                 {curves.x === 'vol' ? fmtPctValue(v, lang, 0) : fmtRate(v, PAIR, 2)}
               </text>
             ))}
             {curves.x === 'level' && s.mode !== 'digital' && (
               <g>
-                <path d={`M${xB(S).toFixed(1)},${LB.top}V${LB.height - LB.bottom}`} class="m7-ref" />
+                <path
+                  d={`M${xB(S).toFixed(1)},${LB.top}V${LB.height - LB.bottom}`}
+                  class="m7-ref"
+                />
                 <text x={xB(S) + 6} y={LB.top + 12} class="m7-ref-label">
                   {t('tl.ref.spot')}
                 </text>
@@ -602,16 +663,50 @@ export default function TouchLab({ lang, mc, initialMode }: TouchLabProps): JSX.
           <div class="panel" onPointerDown={onSlide}>
             {s.mode === 'digital' && (
               <>
-                {slider('strike', t('tl.slider.strike'), 'strike', R.strike, rate(s.strike), 'var(--ff-exotics)')}
-                {slider('spread', t('tl.slider.spread'), 'spreadPips', R.spreadPips, t('tl.pips', { v: fmtNumber(s.spreadPips, lang) }))}
+                {slider(
+                  'strike',
+                  t('tl.slider.strike'),
+                  'strike',
+                  R.strike,
+                  rate(s.strike),
+                  'var(--ff-exotics)',
+                )}
+                {slider(
+                  'spread',
+                  t('tl.slider.spread'),
+                  'spreadPips',
+                  R.spreadPips,
+                  t('tl.pips', { v: fmtNumber(s.spreadPips, lang) }),
+                )}
               </>
             )}
             {(s.mode === 'oneTouch' || s.mode === 'noTouch') &&
-              slider('barrier', t('tl.slider.barrier'), 'barrier', R.barrier, rate(s.barrier), 'var(--ff-exotics)')}
+              slider(
+                'barrier',
+                t('tl.slider.barrier'),
+                'barrier',
+                R.barrier,
+                rate(s.barrier),
+                'var(--ff-exotics)',
+              )}
             {s.mode === 'dnt' && (
               <>
-                {slider('upper', t('tl.slider.upper'), 'upper', R.upper, rate(s.upper), 'var(--ff-exotics)')}
-                {slider('lower', t('tl.slider.lower'), 'lower', R.lower, rate(s.lower), 'var(--ff-exotics)')}
+                {slider(
+                  'upper',
+                  t('tl.slider.upper'),
+                  'upper',
+                  R.upper,
+                  rate(s.upper),
+                  'var(--ff-exotics)',
+                )}
+                {slider(
+                  'lower',
+                  t('tl.slider.lower'),
+                  'lower',
+                  R.lower,
+                  rate(s.lower),
+                  'var(--ff-exotics)',
+                )}
               </>
             )}
             {s.mode === 'oneTouch' && (
@@ -648,14 +743,33 @@ export default function TouchLab({ lang, mc, initialMode }: TouchLabProps): JSX.
           </div>
 
           <StatTable>
-            <StatHero label={t('tl.hero', { mode: modeLabel })} value={chf(price)} sub={t('tl.heroSub', { pct: pct(price) })} />
-            <StatRow label={t('tl.row.prob')} sub={t('tl.row.probSub')} value={pct(prob)} highlight />
-            <StatRow label={t('tl.row.df')} sub={t('tl.row.dfSub')} value={fmtNumber(df, lang, { digits: 4 })} />
+            <StatHero
+              label={t('tl.hero', { mode: modeLabel })}
+              value={chf(price)}
+              sub={t('tl.heroSub', { pct: pct(price) })}
+            />
+            <StatRow
+              label={t('tl.row.prob')}
+              sub={t('tl.row.probSub')}
+              value={pct(prob)}
+              highlight
+            />
+            <StatRow
+              label={t('tl.row.df')}
+              sub={t('tl.row.dfSub')}
+              value={fmtNumber(df, lang, { digits: 4 })}
+            />
             {compareRow}
           </StatTable>
 
           <div class="ff-check">
-            <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true" class="m7-check-icon">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 20 20"
+              aria-hidden="true"
+              class="m7-check-icon"
+            >
               <circle cx="10" cy="10" r="9" />
               <path d="M6 10.3L8.8 13L14 7.4" />
             </svg>
@@ -669,4 +783,3 @@ export default function TouchLab({ lang, mc, initialMode }: TouchLabProps): JSX.
     </div>
   );
 }
-

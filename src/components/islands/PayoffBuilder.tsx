@@ -335,7 +335,7 @@ export default function PayoffBuilder(props: PayoffBuilderProps): JSX.Element {
   const L = layout;
   const sx = scaleLinear([X_RANGE[0], X_RANGE[1]], [L.left, L.width - L.right]);
   const sy = scaleLinear([dom[0]!, dom[1]!], [L.plotBottom, L.top]);
-  const yTicks = niceTicks(dom[0]!, dom[1]!, L.compact ? 4 : 6).filter((v) =>
+  const yTicks = niceTicks(dom[0]!, dom[1]!, 5).filter((v) =>
     inside(v, dom[0]! - 1e-9, dom[1]! + 1e-9),
   );
   const xTicks = niceTicks(X_RANGE[0], X_RANGE[1], L.compact ? 4 : 7).filter((v) =>

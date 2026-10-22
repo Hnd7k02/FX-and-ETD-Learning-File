@@ -13,11 +13,24 @@ import type { JSX } from 'preact';
 import { useMemo, useRef } from 'preact/hooks';
 import { Slider } from '@/components/ui/Slider';
 import { StatHero, StatRow, StatTable } from '@/components/ui/Stat';
-import { useElementWidth, useInView, usePrefersReducedMotion, useTween } from '@/components/ui/hooks';
+import {
+  useElementWidth,
+  useInView,
+  usePrefersReducedMotion,
+  useTween,
+} from '@/components/ui/hooks';
 import { gapreplay as dict } from '@/i18n/dict/gapreplay';
 import { translator, type Lang } from '@/i18n/types';
 import { linePath, scaleLinear, type Point } from '@/lib/chart';
-import { fmtDate, fmtMillions, fmtMoney, fmtMonthYear, fmtNumber, fmtPct, fmtRate } from '@/lib/format';
+import {
+  fmtDate,
+  fmtMillions,
+  fmtMoney,
+  fmtMonthYear,
+  fmtNumber,
+  fmtPct,
+  fmtRate,
+} from '@/lib/format';
 import { M07_CONFIG, chartLayout } from '@/lib/m07/config';
 import { gapSummary, type FixingPoint } from '@/lib/m07/gap';
 import { annotationBox, usePlayback } from './m07-shared';
@@ -59,7 +72,7 @@ export default function GapReplay(p: GapReplayProps): JSX.Element {
   const cur = series[idx]!;
 
   /* ---------- geometry ---------- */
-  const labelSpace = L.compact ? 64 : 92;
+  const labelSpace = L.compact ? 74 : 92;
   const x0 = L.left;
   const x1 = L.width - L.right - labelSpace;
   const x = scaleLinear([0, last], [x0, x1]);
@@ -67,7 +80,9 @@ export default function GapReplay(p: GapReplayProps): JSX.Element {
   const valueAt = (q: number) => {
     const i = Math.min(last, Math.floor(q));
     const f = q - i;
-    return i < last && f > 0 ? series[i]!.value + (series[i + 1]!.value - series[i]!.value) * f : series[i]!.value;
+    return i < last && f > 0
+      ? series[i]!.value + (series[i + 1]!.value - series[i]!.value) * f
+      : series[i]!.value;
   };
 
   const before: Point[] = [];
@@ -128,12 +143,17 @@ export default function GapReplay(p: GapReplayProps): JSX.Element {
   }
 
   const orders = [
-    { key: 'stop', label: t('gr.row.stop'), o: sum.stop, line: t('gr.stop', { v: rate(G.stop) }) },
+    {
+      key: 'stop',
+      label: t('gr.row.stop'),
+      o: sum.stop,
+      line: t(L.compact ? 'gr.stopShort' : 'gr.stop', { v: rate(G.stop) }),
+    },
     ...sum.knockOuts.map((o) => ({
       key: `ko${o.level}`,
-      label: t('gr.row.ko', { k: rate(G.putStrike) }),
+      label: t('gr.row.ko'),
       o,
-      line: t('gr.ko', { v: rate(o.level) }),
+      line: L.compact ? rate(o.level) : t('gr.ko', { v: rate(o.level) }),
     })),
   ];
 
@@ -143,9 +163,9 @@ export default function GapReplay(p: GapReplayProps): JSX.Element {
     const l1 = t('gr.aha.t');
     const l2 = t('gr.aha.d', { n: G.knockOuts.length, v: rate(sum.shock) });
     const b = annotationBox(l1, l2, Math.min(300, x1 - x0 - 16));
-    const sx = x(shock);
-    const ax = Math.max(x0 + 4, Math.min(x1 - b.w - 4, sx + 18));
-    const ay = y(sum.shock) - b.h / 2 > L.top ? Math.min(L.height - L.bottom - b.h - 6, y(sum.shock) + 16) : L.top + 4;
+    // lower left: below the floor before the shock, where the chart is empty
+    const ax = x0 + 6;
+    const ay = L.height - L.bottom - b.h - 6;
     aha = (
       <g class="m7-aha" data-aha="gap">
         <rect x={ax} y={ay} width={b.w} height={b.h} rx={10} class="m7-aha-box" />
@@ -241,22 +261,26 @@ export default function GapReplay(p: GapReplayProps): JSX.Element {
             {shock >= 0 && (
               <>
                 <path d={`M${x0},${y(p.floor).toFixed(1)}H${shockX.toFixed(1)}`} class="gr-floor" />
-                <path d={`M${shockX.toFixed(1)},${y(p.floor).toFixed(1)}H${x1}`} class="gr-floor is-gone" />
-                <text x={x0 + 6} y={y(p.floor) - 8} class="m7-label">
-                  {t('gr.floor', { v: p.floorText, since: p.floorSince })}
+                <path
+                  d={`M${shockX.toFixed(1)},${y(p.floor).toFixed(1)}H${x1}`}
+                  class="gr-floor is-gone"
+                />
+                <text
+                  x={x0 + 6}
+                  y={y(p.floor) - 8}
+                  class={`m7-label${triggered ? ' gr-gone-label' : ''}`}
+                >
+                  {triggered
+                    ? t('gr.floorEnded', { v: p.floorText, since: p.floorSince, date: shockDate })
+                    : t('gr.floor', { v: p.floorText, since: p.floorSince })}
                 </text>
-                {triggered && (
-                  <text x={x1 - 4} y={y(p.floor) - 8} class="m7-label gr-gone-label" text-anchor="end">
-                    {t('gr.floorEnd', { date: shockDate })}
-                  </text>
-                )}
               </>
             )}
             {/* the series */}
             <path d={linePath(before)} class="gr-line" />
             {gapSeg.length === 2 && <path d={linePath(gapSeg)} class="gr-gap" />}
             <path d={linePath(after)} class="gr-line" />
-            {triggered && (
+            {triggered && !L.compact && (
               <text
                 x={shockX - 8}
                 y={(y(sum.before) + y(sum.shock)) / 2}
@@ -293,14 +317,11 @@ export default function GapReplay(p: GapReplayProps): JSX.Element {
               />
             </div>
           </div>
-          <p class="sr-only">{summary}</p>
-        </div>
-
-        <div class="ff-lab-side">
           <div class="m7-table-wrap">
             <table class="m7-table">
               <caption class="gr-caption">
-                {t('gr.table', { notional: fmtNumber(G.notional / 1e6, lang) + (lang === 'de' ? ' Mio.' : 'm') })}
+                {t('gr.table', { notional })}
+                <span>{t('gr.tableSub', { k: rate(G.putStrike) })}</span>
               </caption>
               <thead>
                 <tr>
@@ -320,13 +341,16 @@ export default function GapReplay(p: GapReplayProps): JSX.Element {
                 {orders.map(({ key, label, o }) => {
                   const hit = o.index !== null && pos >= o.index;
                   return (
-                    <tr key={key} class={hit ? 'is-hit' : ''} data-order={key} data-hit={hit ? 'true' : 'false'}>
+                    <tr
+                      key={key}
+                      class={hit ? 'is-hit' : ''}
+                      data-order={key}
+                      data-hit={hit ? 'true' : 'false'}
+                    >
                       <td>{label}</td>
                       <td class="num">{rate(o.level)}</td>
                       <td class="num">{hit ? rate(o.fill) : t('gr.pending')}</td>
-                      <td class="num">
-                        {hit ? t('gr.pips', { v: fmtNumber(-o.gapPips, lang) }) : t('gr.pending')}
-                      </td>
+                      <td class="num">{hit ? fmtNumber(-o.gapPips, lang) : t('gr.pending')}</td>
                     </tr>
                   );
                 })}
@@ -334,6 +358,10 @@ export default function GapReplay(p: GapReplayProps): JSX.Element {
             </table>
           </div>
 
+          <p class="sr-only">{summary}</p>
+        </div>
+
+        <div class="ff-lab-side">
           <StatTable>
             <StatHero
               label={t('gr.hero')}

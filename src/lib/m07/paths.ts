@@ -41,7 +41,11 @@ export function seededPaths(market: Market, count: number, days: number, seed: n
 }
 
 /** Hit days of every path for one barrier (null = never touched). */
-export function hitDays(paths: readonly number[][], barrier: number, dir: Direction): (number | null)[] {
+export function hitDays(
+  paths: readonly number[][],
+  barrier: number,
+  dir: Direction,
+): (number | null)[] {
   return paths.map((p) => firstHit(p, barrier, dir));
 }
 
@@ -101,7 +105,11 @@ export interface PathsSummary {
 }
 
 /** Prices of the importer's call with a barrier (K = ATMF, T = 3 months). */
-export function pathsSummary(barrier: number, io: 'in' | 'out', market: Market = M07_MARKET): PathsSummary {
+export function pathsSummary(
+  barrier: number,
+  io: 'in' | 'out',
+  market: Market = M07_MARKET,
+): PathsSummary {
   const { spot: S, rd, rf, vol } = market;
   const { T } = M07_CONFIG.market;
   const K = M07_CONFIG.strike;

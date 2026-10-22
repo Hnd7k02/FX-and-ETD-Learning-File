@@ -68,8 +68,8 @@ const check1: QuizQuestion = {
     {
       label: { de: 'Der USD-Zins steigt um 1 %', en: 'The USD rate rises by 1%' },
       explain: {
-        de: `Richtig. Ein höherer USD-Zins drückt den Forward nach unten, und ein tieferer Forward schadet dem USD Call. Rho USD beträgt ${rhoF.de} je +1 %.`,
-        en: `Correct. A higher USD rate pushes the forward down, and a lower forward hurts the USD call. Rho USD is ${rhoF.en} per +1%.`,
+        de: `Ein höherer USD-Zins drückt den Forward nach unten, und ein tieferer Forward schadet dem USD Call. Rho USD beträgt ${rhoF.de} je +1 %.`,
+        en: `A higher USD rate pushes the forward down, and a lower forward hurts the USD call. Rho USD is ${rhoF.en} per +1%.`,
       },
     },
     {
@@ -102,8 +102,8 @@ const check2: QuizQuestion = {
       label: dChange,
       mono: true,
       explain: {
-        de: `Richtig. Delta ändert sich um Gamma mal Kursänderung: ${gamma} · 0.01 ≈ ${dChange.de}. Weil Gamma selbst wandert, landet Delta tatsächlich bei etwa ${deltaUp}.`,
-        en: `Correct. Delta changes by gamma times the move: ${gamma} · 0.01 ≈ ${dChange.en}. Because gamma itself drifts, delta actually ends up near ${deltaUp}.`,
+        de: `Delta ändert sich um Gamma mal Kursänderung: ${gamma} · 0.01 ≈ ${dChange.de}. Weil Gamma selbst wandert, landet Delta tatsächlich bei etwa ${deltaUp}.`,
+        en: `Delta changes by gamma times the move: ${gamma} · 0.01 ≈ ${dChange.en}. Because gamma itself drifts, delta actually ends up near ${deltaUp}.`,
       },
     },
     {
@@ -135,8 +135,8 @@ const check3: QuizQuestion = {
     {
       label: { de: 'Nahe am Forward (ATMF)', en: 'Close to the forward (ATMF)' },
       explain: {
-        de: `Richtig. Nahe am Forward ist offen, ob die Option am Ende etwas wert ist. Dort bewirkt mehr Vola am meisten: Vega beträgt ${vega.de} je Punkt, bei Spot ${spotOtm} nur noch ${vegaOtm.de}.`,
-        en: `Correct. Close to the forward it is an open question whether the option will finish with value. That is where extra volatility does the most: vega is ${vega.en} per point, at spot ${spotOtm} only ${vegaOtm.en}.`,
+        de: `Nahe am Forward ist offen, ob die Option am Ende etwas wert ist. Dort bewirkt mehr Vola am meisten: Vega beträgt ${vega.de} je Punkt, bei Spot ${spotOtm} nur noch ${vegaOtm.de}.`,
+        en: `Close to the forward it is an open question whether the option will finish with value. That is where extra volatility does the most: vega is ${vega.en} per point, at spot ${spotOtm} only ${vegaOtm.en}.`,
       },
     },
     {
@@ -163,8 +163,8 @@ const check4: QuizQuestion = {
         en: 'From the rate carry: each day the forward moves closer to spot',
       },
       explain: {
-        de: `Richtig. Der USD-Zins (${rf.de}) liegt über dem CHF-Zins, der Forward also unter dem Spot. Mit jedem Tag rückt der Forward näher an den Spot. Das hilft dem Call um rund ${thetaCarry.de} pro Tag: ${thetaGamma.de} + ${carryPlain.de} = ${thetaDay.de}.`,
-        en: `Correct. The USD rate (${rf.en}) is above the CHF rate, so the forward sits below spot. With every day the forward moves closer to spot. That helps the call by about ${thetaCarry.en} per day: ${thetaGamma.en} + ${carryPlain.en} = ${thetaDay.en}.`,
+        de: `Der USD-Zins (${rf.de}) liegt über dem CHF-Zins, der Forward also unter dem Spot. Mit jedem Tag rückt der Forward näher an den Spot. Das hilft dem Call um rund ${thetaCarry.de} pro Tag: ${thetaGamma.de} + ${carryPlain.de} = ${thetaDay.de}.`,
+        en: `The USD rate (${rf.en}) is above the CHF rate, so the forward sits below spot. With every day the forward moves closer to spot. That helps the call by about ${thetaCarry.en} per day: ${thetaGamma.en} + ${carryPlain.en} = ${thetaDay.en}.`,
       },
     },
     {
@@ -201,8 +201,8 @@ const q1: QuizQuestion = {
       label: pnl10,
       mono: true,
       explain: {
-        de: `Richtig. Delta mal Kursänderung mal Nominal: ${delta} · 0.0010 · USD 1 Mio. ≈ ${pnl10.de}. Die Option bewegt sich etwa halb so stark wie ein Forward über denselben Betrag.`,
-        en: `Correct. Delta times the move times the notional: ${delta} · 0.0010 · USD 1m ≈ ${pnl10.en}. The option moves about half as much as a forward on the same amount.`,
+        de: `Delta mal Kursänderung mal Nominal: ${delta} · 0.0010 · USD 1 Mio. ≈ ${pnl10.de}. Die Option bewegt sich etwa halb so stark wie ein Forward über denselben Betrag.`,
+        en: `Delta times the move times the notional: ${delta} · 0.0010 · USD 1m ≈ ${pnl10.en}. The option moves about half as much as a forward on the same amount.`,
       },
     },
     {
@@ -248,8 +248,8 @@ const q2: QuizQuestion = {
         en: `When USD/CHF moves by more than about ${breakEven.en} pips`,
       },
       explain: {
-        de: `Richtig. P&L ≈ ½ · Γ · [(ΔS)² − σ² · S² · Δt]. Die Klammer wird positiv, wenn |ΔS| über σ · S / √365 liegt, hier rund ${breakEven.de} Pips. Darunter frisst Theta den Gamma-Gewinn.`,
-        en: `Correct. P&L ≈ ½ · Γ · [(ΔS)² − σ² · S² · Δt]. The bracket turns positive once |ΔS| exceeds σ · S / √365, here about ${breakEven.en} pips. Below that, theta eats the gamma gain.`,
+        de: `P&L ≈ ½ · Γ · [(ΔS)² − σ² · S² · Δt]. Die Klammer wird positiv, wenn |ΔS| über σ · S / √365 liegt, hier rund ${breakEven.de} Pips. Darunter frisst Theta den Gamma-Gewinn.`,
+        en: `P&L ≈ ½ · Γ · [(ΔS)² − σ² · S² · Δt]. The bracket turns positive once |ΔS| exceeds σ · S / √365, here about ${breakEven.en} pips. Below that, theta eats the gamma gain.`,
       },
     },
     {
@@ -295,8 +295,8 @@ const q3: QuizQuestion = {
       label: vega,
       mono: true,
       explain: {
-        de: `Richtig. Vega je Vola-Punkt beträgt rund ${vega.de}. Ein Punkt mehr Vola macht den Call um diesen Betrag teurer, ein Punkt weniger entsprechend billiger.`,
-        en: `Correct. Vega per vol point is about ${vega.en}. One point more volatility makes the call dearer by that amount, one point less cheaper by the same.`,
+        de: `Vega je Vola-Punkt beträgt rund ${vega.de}. Ein Punkt mehr Vola macht den Call um diesen Betrag teurer, ein Punkt weniger entsprechend billiger.`,
+        en: `Vega per vol point is about ${vega.en}. One point more volatility makes the call dearer by that amount, one point less cheaper by the same.`,
       },
     },
     {
@@ -322,8 +322,8 @@ const q4: QuizQuestion = {
       label: rhoF,
       mono: true,
       explain: {
-        de: `Richtig. Ein höherer USD-Zins drückt den Forward (Forward = Spot + Cost − Benefit, der USD-Zins ist der Benefit). Ein tieferer Forward ist schlecht für einen USD Call: Rho USD ≈ ${rhoF.de} je +1 %.`,
-        en: `Correct. A higher USD rate pushes the forward down (forward = spot + cost − benefit; the USD rate is the benefit). A lower forward is bad for a USD call: rho USD ≈ ${rhoF.en} per +1%.`,
+        de: `Ein höherer USD-Zins drückt den Forward (Forward = Spot + Cost − Benefit, der USD-Zins ist der Benefit). Ein tieferer Forward ist schlecht für einen USD Call: Rho USD ≈ ${rhoF.de} je +1 %.`,
+        en: `A higher USD rate pushes the forward down (forward = spot + cost − benefit; the USD rate is the benefit). A lower forward is bad for a USD call: rho USD ≈ ${rhoF.en} per +1%.`,
       },
     },
     {

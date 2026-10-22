@@ -9,7 +9,12 @@
  * - continuous vs daily monitoring via the Broadie-Glasserman-Kou shift.
  * Prices in CHF per 1 USD (quote currency per unit base); pips = 0.0001.
  */
-import { barrierPrice, isBarrierTouched, isReverse, type BarrierKind } from '@/lib/fx/exotics/barrier';
+import {
+  barrierPrice,
+  isBarrierTouched,
+  isReverse,
+  type BarrierKind,
+} from '@/lib/fx/exotics/barrier';
 import { touchProbability } from '@/lib/fx/exotics/touch';
 import { gkPrice, payoff, type OptionType } from '@/lib/fx/vanilla';
 import { M07_CONFIG, PIP, onGrid } from './config';
@@ -51,7 +56,12 @@ export function effectiveBarrier(s: LabState): number {
  * A spot at or beyond the barrier as set counts as touched for both kinds of monitoring
  * (knock-out = rebate, knock-in = vanilla); daily monitoring shifts only the alive side.
  */
-export function priceAt(s: LabState, S: number, io: 'in' | 'out' = s.io, rebate = s.rebatePips * PIP): number {
+export function priceAt(
+  s: LabState,
+  S: number,
+  io: 'in' | 'out' = s.io,
+  rebate = s.rebatePips * PIP,
+): number {
   if (isBarrierTouched(kindOf({ dir: s.dir, io }), S, s.barrier)) {
     return io === 'out' ? rebate : vanillaAt(s, S);
   }
@@ -164,7 +174,13 @@ export function labNumbers(s: LabState): LabNumbers {
  * Spot grid on [a, b] every `stepPips`, plus the barrier itself and a few points just inside it
  * (½, 1 and 2 pips), so the steep approach to the barrier is drawn sharply.
  */
-export function spotGrid(a: number, b: number, stepPips: number, barrier: number, dir: Direction): number[] {
+export function spotGrid(
+  a: number,
+  b: number,
+  stepPips: number,
+  barrier: number,
+  dir: Direction,
+): number[] {
   const xs: number[] = [];
   const n = Math.round((b - a) / (stepPips * PIP));
   for (let i = 0; i <= n; i++) xs.push(a + ((b - a) * i) / n);
@@ -188,7 +204,10 @@ export interface LabCurves {
   region: [number, number];
 }
 
-export function labCurves(s: LabState, xDomain: [number, number] = M07_CONFIG.lab.xDomain): LabCurves {
+export function labCurves(
+  s: LabState,
+  xDomain: [number, number] = M07_CONFIG.lab.xDomain,
+): LabCurves {
   const [a, b] = xDomain;
   const xs = spotGrid(a, b, M07_CONFIG.lab.sampleStepPips, s.barrier, s.dir);
   const pips = (x: number) => x / PIP;
@@ -231,7 +250,8 @@ export function labCurves(s: LabState, xDomain: [number, number] = M07_CONFIG.la
             ...inside.map((x): Point => [x, value(x)]),
           ];
   }
-  const region: [number, number] = s.dir === 'up' ? [Math.max(a, s.barrier), b] : [a, Math.min(b, s.barrier)];
+  const region: [number, number] =
+    s.dir === 'up' ? [Math.max(a, s.barrier), b] : [a, Math.min(b, s.barrier)];
   return { option, vanilla, payoff: pay, delta, vanillaDelta, region };
 }
 
@@ -259,7 +279,8 @@ export type LabAha = 'touched' | 'reverseNear' | 'regularNear' | 'cheap' | null;
 export function labAha(s: LabState, n: LabNumbers): LabAha {
   if (n.touched) return 'touched';
   const dist = Math.abs(s.barrier - s.spot) / PIP;
-  if (s.io === 'out' && dist <= M07_CONFIG.lab.nearPips) return n.reverse ? 'reverseNear' : 'regularNear';
+  if (s.io === 'out' && dist <= M07_CONFIG.lab.nearPips)
+    return n.reverse ? 'reverseNear' : 'regularNear';
   if (s.io === 'out' && n.discount > 0.5) return 'cheap';
   return null;
 }
@@ -278,7 +299,15 @@ export function mirrorDecomposition(
   vol: number,
   rd: number,
   rf: number,
-): { vanilla: number; mirrorSpot: number; weight: number; mirrorCall: number; mirror: number; mu: number; price: number } {
+): {
+  vanilla: number;
+  mirrorSpot: number;
+  weight: number;
+  mirrorCall: number;
+  mirror: number;
+  mu: number;
+  price: number;
+} {
   const mu = (rd - rf - 0.5 * vol * vol) / (vol * vol);
   const mirrorSpot = (H * H) / S;
   const weight = (H / S) ** (2 * mu);

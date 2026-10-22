@@ -93,15 +93,26 @@ export default function BarrierLab({ lang, initial }: BarrierLabProps): JSX.Elem
   const yD = scaleLinear([dom[1]!, dom[2]!], [LD.height - LD.bottom, LD.top]);
 
   const nums = useTween(
-    [n.price / PIP, n.vanilla / PIP, n.discount, n.touchProb, n.delta, n.gamma, n.ko / PIP, n.ki / PIP],
+    [
+      n.price / PIP,
+      n.vanilla / PIP,
+      n.discount,
+      n.touchProb,
+      n.delta,
+      n.gamma,
+      n.ko / PIP,
+      n.ki / PIP,
+    ],
     300,
     instant,
   );
-  const [pricePips, vanillaPips, discount, prob, delta, gamma, koPips, kiPips] = nums as number[] as [
-    number, number, number, number, number, number, number, number,
-  ];
+  const [pricePips, vanillaPips, discount, prob, delta, gamma, koPips, kiPips] =
+    nums as number[] as [number, number, number, number, number, number, number, number];
 
-  function targets(L: ReturnType<typeof chartLayout>, which: 'value' | 'delta'): DragTarget<'spot' | 'barrier'>[] {
+  function targets(
+    L: ReturnType<typeof chartLayout>,
+    which: 'value' | 'delta',
+  ): DragTarget<'spot' | 'barrier'>[] {
     const xs = scaleLinear([xa, xb], [L.left, L.width - L.right]);
     return [
       {
@@ -118,7 +129,9 @@ export default function BarrierLab({ lang, initial }: BarrierLabProps): JSX.Elem
       {
         key: 'barrier',
         distance: (vx, vy) =>
-          vy >= L.top - 12 && vy <= L.height - L.bottom ? Math.abs(vx - xs(s.barrier)) + 4 : Infinity,
+          vy >= L.top - 12 && vy <= L.height - L.bottom
+            ? Math.abs(vx - xs(s.barrier)) + 4
+            : Infinity,
         move: (vx) => {
           const v = onGrid(xs.invert(vx), R.barrier.step);
           set({ barrier: Math.min(R.barrier.max, Math.max(R.barrier.min, v)) });
@@ -183,7 +196,13 @@ export default function BarrierLab({ lang, initial }: BarrierLabProps): JSX.Elem
     const a = x(Math.max(xa, r0));
     const b = x(Math.min(xb, r1));
     return (
-      <rect x={Math.min(a, b)} y={L.top} width={Math.abs(b - a)} height={L.height - L.bottom - L.top} class="m7-zone" />
+      <rect
+        x={Math.min(a, b)}
+        y={L.top}
+        width={Math.abs(b - a)}
+        height={L.height - L.bottom - L.top}
+        class="m7-zone"
+      />
     );
   };
   const vline = (L: ReturnType<typeof chartLayout>, v: number, cls: string) => (
@@ -203,7 +222,12 @@ export default function BarrierLab({ lang, initial }: BarrierLabProps): JSX.Elem
       )}
     </g>
   );
-  const yGrid = (L: ReturnType<typeof chartLayout>, y: typeof yV, ticks: number[], fmt: (v: number) => string) => (
+  const yGrid = (
+    L: ReturnType<typeof chartLayout>,
+    y: typeof yV,
+    ticks: number[],
+    fmt: (v: number) => string,
+  ) => (
     <g>
       {ticks.map((v) => (
         <g key={`g${v}`}>
@@ -272,7 +296,12 @@ export default function BarrierLab({ lang, initial }: BarrierLabProps): JSX.Elem
   const atDefaults = JSON.stringify(s) === JSON.stringify(start);
 
   return (
-    <div class="m7 bl" data-barrierlab data-kind={n.kind} data-reverse={n.reverse ? 'true' : 'false'}>
+    <div
+      class="m7 bl"
+      data-barrierlab
+      data-kind={n.kind}
+      data-reverse={n.reverse ? 'true' : 'false'}
+    >
       <div class="ff-lab-head">
         <div class="m7-titles">
           <div class="ff-lab-title">{t('bl.title')}</div>
@@ -358,7 +387,12 @@ export default function BarrierLab({ lang, initial }: BarrierLabProps): JSX.Elem
           >
             <defs>
               <clipPath id={clipV}>
-                <rect x={x0 - 2} y={LV.top - 2} width={x1 - x0 + 4} height={LV.height - LV.bottom - LV.top + 4} />
+                <rect
+                  x={x0 - 2}
+                  y={LV.top - 2}
+                  width={x1 - x0 + 4}
+                  height={LV.height - LV.bottom - LV.top + 4}
+                />
               </clipPath>
             </defs>
             {zone(LV)}
@@ -445,7 +479,12 @@ export default function BarrierLab({ lang, initial }: BarrierLabProps): JSX.Elem
           >
             <defs>
               <clipPath id={clipD}>
-                <rect x={x0 - 2} y={LD.top - 2} width={x1 - x0 + 4} height={LD.height - LD.bottom - LD.top + 4} />
+                <rect
+                  x={x0 - 2}
+                  y={LD.top - 2}
+                  width={x1 - x0 + 4}
+                  height={LD.height - LD.bottom - LD.top + 4}
+                />
               </clipPath>
             </defs>
             {zone(LD)}
@@ -634,7 +673,13 @@ export default function BarrierLab({ lang, initial }: BarrierLabProps): JSX.Elem
           </StatTable>
 
           <div class="ff-check">
-            <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true" class="m7-check-icon">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 20 20"
+              aria-hidden="true"
+              class="m7-check-icon"
+            >
               <circle cx="10" cy="10" r="9" />
               <path d="M6 10.3L8.8 13L14 7.4" />
             </svg>

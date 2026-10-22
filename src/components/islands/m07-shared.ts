@@ -35,11 +35,16 @@ export function usePlayback(
   const posRef = useRef(0);
   posRef.current = pos;
 
-  // First visibility: autoplay, or jump to the end under reduced motion.
+  // First visibility: autoplay, or jump to the end under reduced motion. The media query is read
+  // directly as well, because the reduced-motion hook only knows it after its own first effect.
   useEffect(() => {
     if (started.current || !opts.inView) return;
     started.current = true;
-    if (opts.reduced || !opts.autoplay) {
+    const reduced =
+      opts.reduced ||
+      (typeof window !== 'undefined' &&
+        !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
+    if (reduced || !opts.autoplay) {
       setPos(total);
     } else {
       setPos(0);

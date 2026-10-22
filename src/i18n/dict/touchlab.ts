@@ -78,9 +78,12 @@ export const touchlab = defineDict({
     'tl.check.title': 'Numerischer Check',
     'tl.check.digital': 'Je schmaler der Call Spread, desto näher am Digital: Differenz {d}.',
     'tl.check.expiry': 'Preis = e^(−r_CHF · T) · Wahrscheinlichkeit = {v}.',
-    'tl.check.hit': 'Bei Berührung bezahlt ist der One-Touch mehr wert als die abgezinste Wahrscheinlichkeit ({v}), weil das Geld früher kommt.',
-    'tl.check.dnt': 'Monte Carlo mit täglichen Fixings für {l}/{u}: {mc} ± {se}. Stetige Formel mit BGK-verschobenen Barrieren: {bgk}.',
-    'tl.check.dntOff': 'Monte-Carlo-Kontrolle für den Standardkorridor {l}/{u} bei Vola {v}: {mc} ± {se}.',
+    'tl.check.hit':
+      'Bei Berührung bezahlt ist der One-Touch mehr wert als die abgezinste Wahrscheinlichkeit ({v}), weil das Geld früher kommt.',
+    'tl.check.dnt':
+      'Monte Carlo mit täglichen Fixings für {l}/{u}: {mc} ± {se}. Stetige Formel mit BGK-verschobenen Barrieren: {bgk}.',
+    'tl.check.dntOff':
+      'Monte-Carlo-Kontrolle für den Standardkorridor {l}/{u} bei Vola {v}: {mc} ± {se}.',
     'tl.aha.digital.t': 'Fast gleich',
     'tl.aha.digital.d': 'Ein schmaler Call Spread ist praktisch ein Digital.',
     'tl.aha.hit.t': 'Früher bezahlt',
@@ -175,9 +178,12 @@ export const touchlab = defineDict({
     'tl.check.title': 'Numerical check',
     'tl.check.digital': 'The narrower the call spread, the closer to the digital: difference {d}.',
     'tl.check.expiry': 'Price = e^(−r_CHF · T) · probability = {v}.',
-    'tl.check.hit': 'Paid at the hit, the one-touch is worth more than the discounted probability ({v}) because the money arrives earlier.',
-    'tl.check.dnt': 'Monte Carlo with daily fixings for {l}/{u}: {mc} ± {se}. Continuous formula with BGK-shifted barriers: {bgk}.',
-    'tl.check.dntOff': 'Monte Carlo check for the standard corridor {l}/{u} at vol {v}: {mc} ± {se}.',
+    'tl.check.hit':
+      'Paid at the hit, the one-touch is worth more than the discounted probability ({v}) because the money arrives earlier.',
+    'tl.check.dnt':
+      'Monte Carlo with daily fixings for {l}/{u}: {mc} ± {se}. Continuous formula with BGK-shifted barriers: {bgk}.',
+    'tl.check.dntOff':
+      'Monte Carlo check for the standard corridor {l}/{u} at vol {v}: {mc} ± {se}.',
     'tl.aha.digital.t': 'Almost the same',
     'tl.aha.digital.d': 'A narrow call spread is practically a digital.',
     'tl.aha.hit.t': 'Paid earlier',

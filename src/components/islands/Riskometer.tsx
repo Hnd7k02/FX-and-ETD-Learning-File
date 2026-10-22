@@ -153,7 +153,7 @@ export default function Riskometer(p: RiskometerProps): JSX.Element {
   });
 
   return (
-    <div class="rk" data-rk data-pair={pair} data-event={sel.event ?? ''}>
+    <div class="rk" data-rk data-pair={pair} data-selected-event={sel.event ?? ''}>
       <header class="rk-head">
         <div class="rk-head-text">
           <span class="rk-chip">

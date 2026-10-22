@@ -155,14 +155,20 @@ describe('m07 barrier lab (figure b)', () => {
     expect(kindOf(s0)).toBe('up-and-out');
     expect(yearsOf(13)).toBe(0.25);
     expect(effectiveBarrier(s0)).toBe(0.824);
-    expect(effectiveBarrier({ ...s0, monitoring: 'daily' })).toBeCloseTo(0.824 * bgkFactor(vol), 14);
+    expect(effectiveBarrier({ ...s0, monitoring: 'daily' })).toBeCloseTo(
+      0.824 * bgkFactor(vol),
+      14,
+    );
     expect(priceAt(s0, S)).toBeCloseTo(
       barrierPrice({ S, K, H: 0.824, T, vol, rd, rf, type: 'call', kind: 'up-and-out' }),
       14,
     );
     // touched: knock-out = rebate, knock-in = vanilla
     expect(priceAt({ ...s0, rebatePips: 20 }, 0.83)).toBeCloseTo(20 * PIP, 14);
-    expect(priceAt({ ...s0, io: 'in' }, 0.83)).toBeCloseTo(gkPrice(0.83, K, T, vol, rd, rf, 'call'), 14);
+    expect(priceAt({ ...s0, io: 'in' }, 0.83)).toBeCloseTo(
+      gkPrice(0.83, K, T, vol, rd, rf, 'call'),
+      14,
+    );
   });
 
   it('holds in-out parity and flags the reverse knock-out', () => {
@@ -180,7 +186,13 @@ describe('m07 barrier lab (figure b)', () => {
     for (const type of ['call', 'put'] as const) {
       for (const dir of ['up', 'down'] as const) {
         for (const monitoring of ['continuous', 'daily'] as const) {
-          const st: LabState = { ...s0, type, dir, monitoring, barrier: dir === 'up' ? 0.83 : 0.77 };
+          const st: LabState = {
+            ...s0,
+            type,
+            dir,
+            monitoring,
+            barrier: dir === 'up' ? 0.83 : 0.77,
+          };
           expect(Math.abs(labNumbers(st).parityGap)).toBeLessThan(1e-12);
         }
       }
@@ -258,7 +270,17 @@ describe('m07 barrier lab (figure b)', () => {
 
   it('decomposes the down-and-out call by the method of images', () => {
     const m = mirrorDecomposition(S, K, 0.776, T, vol, rd, rf);
-    const doc = barrierPrice({ S, K, H: 0.776, T, vol, rd, rf, type: 'call', kind: 'down-and-out' });
+    const doc = barrierPrice({
+      S,
+      K,
+      H: 0.776,
+      T,
+      vol,
+      rd,
+      rf,
+      type: 'call',
+      kind: 'down-and-out',
+    });
     expect(m.price).toBeCloseTo(doc, 12);
     const atH = mirrorDecomposition(0.776, K, 0.776, T, vol, rd, rf);
     expect(atH.price).toBeCloseTo(0, 12);

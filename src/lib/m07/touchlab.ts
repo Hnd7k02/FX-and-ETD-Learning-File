@@ -53,7 +53,11 @@ export function touchMarket(s: Pick<TouchState, 'rdPct' | 'volPct'>): TouchMarke
 /** Call spread long K − ε/2, short K + ε/2, scaled by 1/ε: pays 0 … 1 with a ramp of width ε. */
 export function callSpreadDigital(m: TouchMarket, K: number, eps: number): number {
   const { S, T, vol, rd, rf } = m;
-  return (gkPrice(S, K - eps / 2, T, vol, rd, rf, 'call') - gkPrice(S, K + eps / 2, T, vol, rd, rf, 'call')) / eps;
+  return (
+    (gkPrice(S, K - eps / 2, T, vol, rd, rf, 'call') -
+      gkPrice(S, K + eps / 2, T, vol, rd, rf, 'call')) /
+    eps
+  );
 }
 
 /** Payoff of that call spread at expiry for S_T = x (0 … 1). */
@@ -98,7 +102,12 @@ export function touchNumbers(s: TouchState): TouchNumbers {
   switch (s.mode) {
     case 'digital': {
       const price = digitalCash(S, s.strike, T, vol, rd, rf, 'call');
-      return { price, prob: price / df, df, compare: callSpreadDigital(m, s.strike, s.spreadPips * PIP) };
+      return {
+        price,
+        prob: price / df,
+        df,
+        compare: callSpreadDigital(m, s.strike, s.spreadPips * PIP),
+      };
     }
     case 'oneTouch': {
       const p = { S, H: s.barrier, T, vol, rd, rf };
@@ -121,7 +130,20 @@ export function touchNumbers(s: TouchState): TouchNumbers {
     }
     case 'dnt': {
       const price = doubleNoTouch({ S, L: s.lower, U: s.upper, T, vol, rd, rf });
-      return { price, prob: price / df, df, compare: doubleNoTouch({ S, L: s.lower, U: s.upper, T, vol: vol + C.volBumpPct / 100, rd, rf }) };
+      return {
+        price,
+        prob: price / df,
+        df,
+        compare: doubleNoTouch({
+          S,
+          L: s.lower,
+          U: s.upper,
+          T,
+          vol: vol + C.volBumpPct / 100,
+          rd,
+          rf,
+        }),
+      };
     }
   }
 }
@@ -139,7 +161,8 @@ export interface TouchCurves {
   at: Point;
 }
 
-const linspace = (a: number, b: number, n: number) => Array.from({ length: n + 1 }, (_, i) => a + ((b - a) * i) / n);
+const linspace = (a: number, b: number, n: number) =>
+  Array.from({ length: n + 1 }, (_, i) => a + ((b - a) * i) / n);
 
 export function touchCurves(s: TouchState, n = 120): TouchCurves {
   const m = touchMarket(s);
@@ -178,7 +201,8 @@ export function touchCurves(s: TouchState, n = 120): TouchCurves {
     case 'dnt': {
       const [v0, v1] = C.volDomain;
       const vols = linspace(v0, v1, n);
-      const dnt = (v: number) => doubleNoTouch({ S, L: s.lower, U: s.upper, T, vol: v / 100, rd, rf });
+      const dnt = (v: number) =>
+        doubleNoTouch({ S, L: s.lower, U: s.upper, T, vol: v / 100, rd, rf });
       const df = Math.exp(-rd * T);
       return {
         x: 'vol',
@@ -201,7 +225,11 @@ export function clampBarrier(H: number, spot: number = M.spot): number {
   return H >= spot ? spot + gap : spot - gap;
 }
 
-export function clampCorridor(lower: number, upper: number, spot: number = M.spot): [number, number] {
+export function clampCorridor(
+  lower: number,
+  upper: number,
+  spot: number = M.spot,
+): [number, number] {
   const gap = C.minGapPips * PIP;
   return [Math.min(lower, spot - gap), Math.max(upper, spot + gap)];
 }

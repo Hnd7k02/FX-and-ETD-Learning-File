@@ -36,6 +36,8 @@ export const DCI_CONFIG = {
   xRange: [-0.06, 0.04] as const,
   /** Fixing slider step (CHF per USD). */
   fixingStep: 0.0005,
+  /** Choice: the outcome card starts with a fixing 2 % below the strike (conversion, a loss). */
+  initialFixingBelowStrike: 0.02,
 } as const;
 
 export type DciMonths = (typeof DCI_CONFIG.months)[number];

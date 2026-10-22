@@ -4,7 +4,8 @@ import { defineDict } from '../types';
 export const barrierpaths = defineDict({
   de: {
     'bp.title': 'Pfade mit Barriere',
-    'bp.sub': 'USD Call / CHF Put · Strike {strike} · {months} · Vola {vol} · {n} Zufallspfade, täglich beobachtet',
+    'bp.sub':
+      'USD Call / CHF Put · Strike {strike} · {months} · Vola {vol} · {n} Zufallspfade, täglich beobachtet',
     'bp.months': '3 Monate',
     'bp.io': 'Art der Barriere',
     'bp.io.out': 'Knock-out',
@@ -48,14 +49,17 @@ export const barrierpaths = defineDict({
     'bp.legend.dead': 'Option tot',
     'bp.legend.waiting': 'noch nicht aktiv',
     'bp.legend.touch': 'Berührung',
-    'bp.note': 'Seed {seed}. Beispielwerte, keine Marktdaten. Preise mit stetiger Beobachtung (Garman-Kohlhagen, Reiner-Rubinstein).',
+    'bp.note':
+      'Seed {seed}. Beispielwerte, keine Marktdaten. Preise mit stetiger Beobachtung (Garman-Kohlhagen, Reiner-Rubinstein).',
     'bp.summary':
       'Tag {d} von {n}: {hits} von {total} Pfaden haben die Barriere {barrier} berührt und sind {state}. Modell: {prob}. {kind} {price} Pips statt {vanilla} Pips für den Vanilla Call.',
-    'bp.aria': 'Zufallspfade USD/CHF über {months} mit Barriere {barrier} und Strike {strike}. {summary}',
+    'bp.aria':
+      'Zufallspfade USD/CHF über {months} mit Barriere {barrier} und Strike {strike}. {summary}',
   },
   en: {
     'bp.title': 'Paths with a barrier',
-    'bp.sub': 'USD call / CHF put · strike {strike} · {months} · vol {vol} · {n} random paths, observed daily',
+    'bp.sub':
+      'USD call / CHF put · strike {strike} · {months} · vol {vol} · {n} random paths, observed daily',
     'bp.months': '3 months',
     'bp.io': 'Type of barrier',
     'bp.io.out': 'Knock-out',
@@ -99,9 +103,11 @@ export const barrierpaths = defineDict({
     'bp.legend.dead': 'option dead',
     'bp.legend.waiting': 'not yet active',
     'bp.legend.touch': 'touch',
-    'bp.note': 'Seed {seed}. Example values, not market data. Prices with continuous monitoring (Garman-Kohlhagen, Reiner-Rubinstein).',
+    'bp.note':
+      'Seed {seed}. Example values, not market data. Prices with continuous monitoring (Garman-Kohlhagen, Reiner-Rubinstein).',
     'bp.summary':
       'Day {d} of {n}: {hits} of {total} paths have touched the barrier {barrier} and are {state}. Model: {prob}. {kind} {price} pips instead of {vanilla} pips for the vanilla call.',
-    'bp.aria': 'Random USD/CHF paths over {months} with barrier {barrier} and strike {strike}. {summary}',
+    'bp.aria':
+      'Random USD/CHF paths over {months} with barrier {barrier} and strike {strike}. {summary}',
   },
 });

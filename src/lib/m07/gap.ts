@@ -47,7 +47,8 @@ export function biggestDrop(series: readonly Point[]): { index: number; move: nu
   let best = { index: -1, move: 0, log: 0 };
   for (let i = 1; i < series.length; i++) {
     const r = Math.log(series[i]!.value / series[i - 1]!.value);
-    if (r < best.log) best = { index: i, move: series[i]!.value / series[i - 1]!.value - 1, log: r };
+    if (r < best.log)
+      best = { index: i, move: series[i]!.value / series[i - 1]!.value - 1, log: r };
   }
   return { index: best.index, move: best.move };
 }
@@ -105,6 +106,10 @@ export function gapSummary(series: readonly Point[], cfg = M07_CONFIG.gap): GapS
 }
 
 /** Riskometer deep link for the event (path from src/i18n/routes riskometerPath). */
-export function riskometerLink(base: string, event: string = M07_CONFIG.gap.riskometerEvent, pair: string = M07_CONFIG.gap.pair): string {
+export function riskometerLink(
+  base: string,
+  event: string = M07_CONFIG.gap.riskometerEvent,
+  pair: string = M07_CONFIG.gap.pair,
+): string {
   return `${base}?event=${encodeURIComponent(event)}&pair=${encodeURIComponent(pair)}`;
 }
