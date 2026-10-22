@@ -469,7 +469,7 @@ export function buildProduct<K extends ProductKind>(
       const d = P.tarf;
       const fixingDays = fixingSchedule(d.frequency, d.fixings);
       base = {
-        kind,
+        kind: k,
         fixingDays,
         notional: d.notional,
         leverage: d.leverage,
@@ -483,7 +483,7 @@ export function buildProduct<K extends ProductKind>(
       const d = P.pivotTarf;
       const pivot = level(S * d.pivotFactor);
       base = {
-        kind,
+        kind: k,
         fixingDays: fixingSchedule(d.frequency, d.fixings),
         notional: d.notional,
         leverage: d.leverage,
@@ -498,7 +498,7 @@ export function buildProduct<K extends ProductKind>(
     case 'tpf': {
       const d = P.tpf;
       base = {
-        kind,
+        kind: k,
         fixingDays: fixingSchedule(d.frequency, d.fixings),
         notional: d.notional,
         leverage: d.leverage,
@@ -511,7 +511,7 @@ export function buildProduct<K extends ProductKind>(
     case 'rtpf': {
       const d = P.rtpf;
       base = {
-        kind,
+        kind: k,
         fixingDays: fixingSchedule(d.frequency, d.fixings),
         notional: d.notional,
         leverage: d.leverage,
@@ -525,7 +525,7 @@ export function buildProduct<K extends ProductKind>(
     case 'windowBarrier': {
       const d = P.windowBarrier;
       base = {
-        kind,
+        kind: k,
         fixingDays: windowObservationDays(d.windowStartDay, d.windowEndDay, d.expiryDay),
         type: d.type,
         direction: d.barrierFactor >= 1 ? 'up' : 'down',
@@ -541,7 +541,7 @@ export function buildProduct<K extends ProductKind>(
     case 'doubleNoTouch': {
       const d = P.doubleNoTouch;
       base = {
-        kind,
+        kind: k,
         fixingDays: dailyDays(1, d.expiryDay),
         payout: d.payout,
         lower: level(S * d.lowerFactor),

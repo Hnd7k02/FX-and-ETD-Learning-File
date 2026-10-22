@@ -119,6 +119,6 @@ describe('precomputeMcProducts', () => {
   it('is re-exported by the index barrel', () => {
     expect(mc.price).toBeTypeOf('function');
     expect(mc.MC_PRODUCTS).toBe(MC_PRODUCTS);
-    expect(mc.precomputeMcProducts).toBe(precomputeMcProducts);
+    expect('precomputeMcProducts' in mc).toBe(false);
   });
 });

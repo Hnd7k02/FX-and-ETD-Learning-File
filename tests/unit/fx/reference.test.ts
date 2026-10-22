@@ -54,7 +54,11 @@ describe('MASTER_PROMPT §6 reference table (stated tolerances)', () => {
   });
 
   it('Forward Geldmarkt (Act/360, 90 Tage): 0.79306 (−69.4 pips), tol 1e-5', () => {
-    const F = forward(S, rd, rf, T, 'moneyMarket', { days: mmDays, quoteCcy: 'CHF', baseCcy: 'USD' });
+    const F = forward(S, rd, rf, T, 'moneyMarket', {
+      days: mmDays,
+      quoteCcy: 'CHF',
+      baseCcy: 'USD',
+    });
     within(F, 0.79306, 1e-5, 'money-market forward');
     within(forwardPoints(F, S), -69.4, 0.05, 'forward points (1 decimal)');
   });

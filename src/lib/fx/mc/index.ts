@@ -21,4 +21,6 @@ export * from './scenarios';
 export * from './dci';
 export * from './protocol';
 export * from './fair';
-export { precomputeMcProducts, roundTo, ROUNDING, type McProductsData } from './precompute';
+// precompute.ts (the builder of the JSON, used by scripts/precompute-mc.ts) is not re-exported
+// so that islands do not bundle it; only its data types are.
+export type { McProductsData, StoredPremium, StoredStats, StoredZeroCost } from './precompute';
