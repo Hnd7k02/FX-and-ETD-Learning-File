@@ -86,8 +86,7 @@ export const about = defineDict({
     'about.models.mc.h': 'Monte Carlo für pfadabhängige Produkte',
     'about.models.mc.p':
       'Window Barrier, Accumulator, Decumulator, TARF, Pivot TARF, TPF und RTPF haben keine geschlossene Formel. Das Tool simuliert Kurspfade als geometrische Brownsche Bewegung mit Drift r_d − r_f in Tagesschritten.',
-    'about.models.mc.seed':
-      'Seed-basierter Zufallsgenerator: Jedes Ergebnis ist reproduzierbar.',
+    'about.models.mc.seed': 'Seed-basierter Zufallsgenerator: Jedes Ergebnis ist reproduzierbar.',
     'about.models.mc.anti':
       'Antithetische Pfade: Zu jedem Zufallszug Z läuft auch −Z. Das senkt den Standardfehler.',
     'about.models.mc.bgk':
@@ -122,7 +121,8 @@ export const about = defineDict({
     'about.risk.range.mid': 'P{from} bis P{to}',
     'about.risk.range.last': 'ab P{from}',
     'about.risk.thresholdsH': 'Schwellen je Paar',
-    'about.risk.thresholdsCaption': 'Realisierte 1-Monats-Vola in %, Tageswerte seit {since}. Stand {asOf}.',
+    'about.risk.thresholdsCaption':
+      'Realisierte 1-Monats-Vola in %, Tageswerte seit {since}. Stand {asOf}.',
     'about.risk.colPair': 'Paar',
     'about.risk.colMax': 'Maximum',
     'about.risk.detailsH': 'Weitere Details',
@@ -241,7 +241,8 @@ export const about = defineDict({
     'about.example.rf': 'USD rate (foreign)',
     'about.example.term': 'Term',
     'about.example.termValue': '{months} months',
-    'about.example.termNote': 'T = {T} in the option model; {days} days Act/360 in the money market',
+    'about.example.termNote':
+      'T = {T} in the option model; {days} days Act/360 in the money market',
     'about.example.vol': 'Implied volatility',
     'about.example.fwdCont': 'Forward, continuous',
     'about.example.fwdMm': 'Forward, money market',
@@ -341,7 +342,8 @@ export const about = defineDict({
     'about.conv.numbersRule':
       'Swiss format in German (de-CH): apostrophe as thousands separator, point as decimal sign. English: en-GB.',
     'about.conv.percent': 'Percent',
-    'about.conv.percentRule': 'No space before the percent sign in English; a no-break space in German.',
+    'about.conv.percentRule':
+      'No space before the percent sign in English; a no-break space in German.',
     'about.conv.minus': 'Sign',
     'about.conv.minusRule': 'Typographic minus instead of a hyphen.',
     'about.conv.rates': 'Rates',

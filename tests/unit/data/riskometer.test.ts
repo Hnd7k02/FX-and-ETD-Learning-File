@@ -64,8 +64,18 @@ describe('Riskometer build on the seed data', () => {
   });
 
   it('marks the record peaks', () => {
+    for (const p of PAIRS) {
+      for (const e of Object.values(data.pairs[p].events)) {
+        expect(e.isRecord).toBe(e.peakDate === data.pairs[p].thresholds.maxDate);
+      }
+    }
+    // in the seed snapshot (D-15)
+    const seed = buildRiskometer(
+      SEED.filter((r) => r.date <= '2026-09-14'),
+      EVENTS_JSON,
+    );
     const rec = PAIRS.flatMap((p) =>
-      Object.entries(data.pairs[p].events)
+      Object.entries(seed.pairs[p].events)
         .filter(([, e]) => e.isRecord)
         .map(([id]) => `${p} ${id}`),
     );
@@ -75,7 +85,14 @@ describe('Riskometer build on the seed data', () => {
   it('gives the EUR/CHF summary for nav dot and mini gauge', () => {
     const s = buildSummary(data);
     const c = data.pairs['EUR/CHF'].current;
-    expect(s).toEqual({ pair: 'EUR/CHF', asOf: data.asOf, vol: c.vol, level: c.level, percentile: c.percentile, needle: c.needle });
+    expect(s).toEqual({
+      pair: 'EUR/CHF',
+      asOf: data.asOf,
+      vol: c.vol,
+      level: c.level,
+      percentile: c.percentile,
+      needle: c.needle,
+    });
     expect(buildSummary(data, 'USD/JPY').pair).toBe('USD/JPY');
   });
 
@@ -97,14 +114,25 @@ describe('typed access for pages', () => {
     expect(RISKOMETER.asOf).toBe(data.asOf);
     expect(pairData('EUR/USD').thresholds).toEqual(data.pairs['EUR/USD'].thresholds);
     expect(EVENTS.map((e) => e.id)).toEqual(EVENTS_JSON.map((e) => e.id));
-    expect(eventsFor('USD/CHF').map((e) => e.id)).toEqual(['gfc-2008', 'floor-2011', 'chf-shock-2015']);
+    expect(eventsFor('USD/CHF').map((e) => e.id)).toEqual([
+      'gfc-2008',
+      'floor-2011',
+      'chf-shock-2015',
+    ]);
     expect(getRiskSummary()).toEqual(buildSummary(data));
   });
 });
 
 describe('deterministic JSON', () => {
   it('keeps primitive arrays on one line and drops undefined', () => {
-    const out = toJson({ a: 1, b: [1, 'x', null], c: [[1, 2], []], d: {}, e: undefined, f: { g: true } });
+    const out = toJson({
+      a: 1,
+      b: [1, 'x', null],
+      c: [[1, 2], []],
+      d: {},
+      e: undefined,
+      f: { g: true },
+    });
     expect(out).toBe(
       [
         '{',
@@ -122,7 +150,13 @@ describe('deterministic JSON', () => {
         '',
       ].join('\n'),
     );
-    expect(JSON.parse(out)).toEqual({ a: 1, b: [1, 'x', null], c: [[1, 2], []], d: {}, f: { g: true } });
+    expect(JSON.parse(out)).toEqual({
+      a: 1,
+      b: [1, 'x', null],
+      c: [[1, 2], []],
+      d: {},
+      f: { g: true },
+    });
     expect(toJson('x')).toBe('"x"\n');
   });
 });

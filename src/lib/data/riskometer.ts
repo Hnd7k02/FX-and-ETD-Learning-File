@@ -6,7 +6,13 @@
 import type { LevelIndex } from '@/i18n/dict/levels';
 import type { RiskSummary } from '@/lib/risk-summary';
 import type { RawRow } from './csv';
-import { eventMetrics, eventsForPair, PEAK_RANGE, type EventMetrics, type MarketEvent } from './events';
+import {
+  eventMetrics,
+  eventsForPair,
+  PEAK_RANGE,
+  type EventMetrics,
+  type MarketEvent,
+} from './events';
 import { levelOf, needle } from './levels';
 import { PAIRS, pairSeries, since, weekIndexOf, weekly, type Pair } from './series';
 import {
@@ -131,7 +137,10 @@ function buildPair(rows: readonly RawRow[], pair: Pair, events: readonly MarketE
 }
 
 /** Full Riskometer data for the four pairs. */
-export function buildRiskometer(rows: readonly RawRow[], events: readonly MarketEvent[]): RiskometerData {
+export function buildRiskometer(
+  rows: readonly RawRow[],
+  events: readonly MarketEvent[],
+): RiskometerData {
   if (rows.length === 0) throw new Error('no data');
   const pairs = {} as Record<Pair, PairData>;
   for (const p of PAIRS) pairs[p] = buildPair(rows, p, events);

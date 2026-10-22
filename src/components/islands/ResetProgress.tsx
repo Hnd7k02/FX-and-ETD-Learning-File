@@ -78,12 +78,7 @@ export default function ResetProgress({ lang }: ResetProgressProps) {
       )}
 
       {phase === 'idle' ? (
-        <button
-          ref={openBtn}
-          type="button"
-          class="btn btn-light rp-open"
-          onClick={open}
-        >
+        <button ref={openBtn} type="button" class="btn btn-light rp-open" onClick={open}>
           <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
             <path
               d="M2.5 8a5.5 5.5 0 1 0 1.7-4M2.5 2.5V5.5h3"

@@ -104,6 +104,11 @@ describe('smileRange / minSmileVol', () => {
     expect(smileRange(q).max).toBeCloseTo(smileVol(vertex, q), 15);
   });
 
+  it('steep skew, little curvature: vertex outside [0, 1], extremes at the ends', () => {
+    const q = { atm: 0.08, rr25: -0.01, bf25: 0.0001 };
+    expect(smileRange(q)).toEqual({ min: smileVol(0, q), max: smileVol(1, q) });
+  });
+
   it('flags quotes with a negative wing', () => {
     expect(minSmileVol({ atm: 0.05, rr25: -0.2, bf25: 0 })).toBeLessThan(0);
   });

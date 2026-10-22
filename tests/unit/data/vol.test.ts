@@ -6,7 +6,9 @@ import { ANNUALISATION, VOL_WINDOW, logReturns, realisedVol } from '@/lib/data/v
 /** Series from log returns, starting at 1.0, one point per calendar day. */
 function fromReturns(returns: number[], start = 1): Series {
   const out: Series = [{ date: isoFromDayNumber(20000), value: start }];
-  returns.forEach((r, i) => out.push({ date: isoFromDayNumber(20001 + i), value: out[i]!.value * Math.exp(r) }));
+  returns.forEach((r, i) =>
+    out.push({ date: isoFromDayNumber(20001 + i), value: out[i]!.value * Math.exp(r) }),
+  );
   return out;
 }
 

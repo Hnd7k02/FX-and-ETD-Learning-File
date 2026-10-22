@@ -54,7 +54,9 @@ async function main(): Promise<number> {
     return 1;
   }
   const { rows, skipped } = parseEcbCsv(text);
-  console.log(`ECB csvdata: ${describe(rows)}${skipped ? ` (${skipped} observations ignored)` : ''}`);
+  console.log(
+    `ECB csvdata: ${describe(rows)}${skipped ? ` (${skipped} observations ignored)` : ''}`,
+  );
 
   const errors = validate(rows, { today });
   const prevText = readText(out);

@@ -102,7 +102,15 @@ describe('yearly maxima', () => {
   });
 });
 
-const T: Thresholds = { p20: 20, p60: 60, p85: 85, p97: 97, max: 100, maxDate: '2015-01-15', days: 100 };
+const T: Thresholds = {
+  p20: 20,
+  p60: 60,
+  p85: 85,
+  p97: 97,
+  max: 100,
+  maxDate: '2015-01-15',
+  days: 100,
+};
 
 describe('levels', () => {
   it('maps values to 1..5 with each threshold belonging to the higher level', () => {

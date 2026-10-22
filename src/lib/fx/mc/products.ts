@@ -74,8 +74,11 @@ export const MC_CONFIG = {
     antithetic: true,
     /** Paths for interactive valuations in the Web Worker (fast, SE a few pips). */
     interactivePaths: 20_000,
-    /** Paths for scripts/precompute-mc.ts (SE well below 1 pip on strikes). */
-    precomputePaths: 200_000,
+    /**
+     * Paths for scripts/precompute-mc.ts: 1’000’000 (500’000 antithetic pairs) gives standard
+     * errors of 0.2–0.5 pips on the strikes in about 25 s. 200’000 runs in 5 s with 0.5–1.1 pips.
+     */
+    precomputePaths: 1_000_000,
     /**
      * Broadie-Glasserman-Kou constant β = −ζ(½)/√(2π) ≈ 0.5826: a barrier monitored every
      * Δt behaves like a continuous barrier shifted away from the spot by e^(±β σ √Δt).
@@ -410,6 +413,14 @@ export function forwardAtAverageFixing(product: Product, market: Market = DEFAUL
 export const PIP = 1e-4;
 
 /**
+ * Level derived from spot · factor, rounded to 8 decimals to drop binary noise
+ * (0.8 · 1.03 = 0.8240000000000001 → 0.824). 8 decimals = 0.0001 pip, far below any effect.
+ */
+export function level(x: number): number {
+  return Number(x.toFixed(8));
+}
+
+/**
  * Builds a product with the defaults of {@link PRODUCT_DEFAULTS} for a market, then applies
  * `overrides` (absolute values, e.g. { strike: 0.7712 }).
  *
@@ -435,8 +446,8 @@ export function buildProduct<K extends ProductKind>(
         fixingDays,
         notional: d.notional,
         leverage: d.leverage,
-        strike: forwardAt(market, mean(fixingDays)),
-        barrier: S * d.barrierFactor,
+        strike: level(forwardAt(market, mean(fixingDays))),
+        barrier: level(S * d.barrierFactor),
         tradeOnKnockOutFixing: d.tradeOnKnockOutFixing,
       };
       break;
@@ -449,15 +460,15 @@ export function buildProduct<K extends ProductKind>(
         fixingDays,
         notional: d.notional,
         leverage: d.leverage,
-        strike: forwardAt(market, mean(fixingDays)),
-        target: d.targetPips * PIP,
+        strike: level(forwardAt(market, mean(fixingDays))),
+        target: level(d.targetPips * PIP),
         lastFixing: d.lastFixing,
       };
       break;
     }
     case 'pivotTarf': {
       const d = P.pivotTarf;
-      const pivot = S * d.pivotFactor;
+      const pivot = level(S * d.pivotFactor);
       base = {
         kind,
         fixingDays: fixingSchedule(d.frequency, d.fixings),
@@ -466,7 +477,7 @@ export function buildProduct<K extends ProductKind>(
         pivot,
         lowerStrike: pivot,
         upperStrike: pivot,
-        target: d.targetPips * PIP,
+        target: level(d.targetPips * PIP),
         lastFixing: d.lastFixing,
       };
       break;
@@ -478,7 +489,7 @@ export function buildProduct<K extends ProductKind>(
         fixingDays: fixingSchedule(d.frequency, d.fixings),
         notional: d.notional,
         leverage: d.leverage,
-        strike: S * d.strikeFactor,
+        strike: level(S * d.strikeFactor),
         coupon: 0,
         targetCoupons: d.targetCoupons,
       };
@@ -491,8 +502,8 @@ export function buildProduct<K extends ProductKind>(
         fixingDays: fixingSchedule(d.frequency, d.fixings),
         notional: d.notional,
         leverage: d.leverage,
-        lower: S * d.lowerFactor,
-        upper: S * d.upperFactor,
+        lower: level(S * d.lowerFactor),
+        upper: level(S * d.upperFactor),
         coupon: 0,
         targetCoupons: d.targetCoupons,
       };
@@ -507,7 +518,7 @@ export function buildProduct<K extends ProductKind>(
         direction: d.barrierFactor >= 1 ? 'up' : 'down',
         notional: d.notional,
         strike: d.strike,
-        barrier: S * d.barrierFactor,
+        barrier: level(S * d.barrierFactor),
         windowStartDay: d.windowStartDay,
         windowEndDay: d.windowEndDay,
         expiryDay: d.expiryDay,
@@ -520,8 +531,8 @@ export function buildProduct<K extends ProductKind>(
         kind,
         fixingDays: dailyDays(1, d.expiryDay),
         payout: d.payout,
-        lower: S * d.lowerFactor,
-        upper: S * d.upperFactor,
+        lower: level(S * d.lowerFactor),
+        upper: level(S * d.upperFactor),
         expiryDay: d.expiryDay,
       };
       break;

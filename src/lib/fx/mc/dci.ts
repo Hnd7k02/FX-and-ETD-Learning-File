@@ -17,7 +17,7 @@
  * With these definitions the DCI is fair: PV = capital (tested).
  */
 import { gkPrice } from '../vanilla';
-import { DEFAULT_MARKET, MC_CONFIG, type Market } from './products';
+import { DEFAULT_MARKET, level, MC_CONFIG, type Market } from './products';
 
 /** A dual currency investment in CHF (quote currency). */
 export interface DualCurrencyProduct {
@@ -74,7 +74,7 @@ export function buildDualCurrency(
     kind: 'dualCurrency',
     capital: d.capital,
     days: d.days,
-    strike: market.spot * d.strikeFactor,
+    strike: level(market.spot * d.strikeFactor),
     interestBasis: d.interestBasis,
     convertInterest: d.convertInterest,
     ...overrides,

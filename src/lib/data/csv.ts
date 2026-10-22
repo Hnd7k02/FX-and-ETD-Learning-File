@@ -29,7 +29,7 @@ function parseValue(cell: string | undefined): number {
 
 function lines(text: string): string[] {
   return text
-    .replace(/^﻿/, '')
+    .replace(/^\uFEFF/, '')
     .split(/\r?\n/)
     .filter((l) => l.trim() !== '');
 }
@@ -136,6 +136,8 @@ export function parseEcbCsv(text: string): EcbParseResult {
     }
     row[ccy] = value;
   }
-  const rows = [...byDate.values()].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+  const rows = [...byDate.values()].sort((a, b) =>
+    a.date < b.date ? -1 : a.date > b.date ? 1 : 0,
+  );
   return { rows, skipped };
 }

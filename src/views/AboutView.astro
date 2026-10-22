@@ -65,7 +65,12 @@ const tiles = [
 
 const exampleRows: Array<{ qty: string; sym?: string; value: string; note: string }> = [
   { qty: t('about.example.pair'), value: E.pair, note: t('about.example.pairNote') },
-  { qty: t('about.example.spot'), sym: '<i>S</i>', value: fmtRate(E.spot, E.pair), note: t('about.example.input') },
+  {
+    qty: t('about.example.spot'),
+    sym: '<i>S</i>',
+    value: fmtRate(E.spot, E.pair),
+    note: t('about.example.input'),
+  },
   {
     qty: t('about.example.rd'),
     sym: '<i>r</i><sub>d</sub>',
@@ -84,7 +89,12 @@ const exampleRows: Array<{ qty: string; sym?: string; value: string; note: strin
     value: t('about.example.termValue', { months: E.months }),
     note: t('about.example.termNote', { T: fmtNumber(E.T, lang, { digits: 2 }), days: E.mmDays }),
   },
-  { qty: t('about.example.vol'), sym: '<i>σ</i>', value: fmtPct(E.vol, lang, 0), note: t('about.example.input') },
+  {
+    qty: t('about.example.vol'),
+    sym: '<i>σ</i>',
+    value: fmtPct(E.vol, lang, 0),
+    note: t('about.example.input'),
+  },
   {
     qty: t('about.example.fwdCont'),
     sym: '<i>F</i>',
@@ -240,7 +250,11 @@ const conventions = [
     rule: t('about.conv.numbersRule'),
     sample: fmtNumber(1234567.5, lang, { digits: 2 }),
   },
-  { topic: t('about.conv.percent'), rule: t('about.conv.percentRule'), sample: fmtPct(0.125, lang, 1) },
+  {
+    topic: t('about.conv.percent'),
+    rule: t('about.conv.percentRule'),
+    sample: fmtPct(0.125, lang, 1),
+  },
   {
     topic: t('about.conv.minus'),
     rule: t('about.conv.minusRule'),
@@ -251,7 +265,11 @@ const conventions = [
     rule: t('about.conv.ratesRule'),
     sample: `${fmtRate(1.23456, 'EUR/USD')} · ${fmtRate(123.456, 'USD/JPY')}`,
   },
-  { topic: t('about.conv.pip'), rule: t('about.conv.pipRule'), sample: `${pipSize('EUR/USD')} · ${pipSize('USD/JPY')}` },
+  {
+    topic: t('about.conv.pip'),
+    rule: t('about.conv.pipRule'),
+    sample: `${pipSize('EUR/USD')} · ${pipSize('USD/JPY')}`,
+  },
   { topic: t('about.conv.quote'), rule: t('about.conv.quoteRule'), sample: 'Base/Quote' },
   {
     topic: t('about.conv.mm'),
@@ -404,7 +422,9 @@ const sid = (i: number) => toc[i]!.id;
         <nav aria-label={tc('a11y.breadcrumb')} class="ab-crumbs">
           <a href={homePath(lang)}>{tc('module.home')}</a>
           <span aria-hidden="true">/</span>
-          <span aria-current="page" class="ab-crumb-current">{t('about.crumb')}</span>
+          <span aria-current="page" class="ab-crumb-current">
+            {t('about.crumb')}
+          </span>
         </nav>
         <div class="ab-chips">
           <span class="chip chip-neutral">{t('about.chip')}</span>
@@ -414,15 +434,27 @@ const sid = (i: number) => toc[i]!.id;
         <aside class="ab-disclaimer" aria-labelledby="ab-disclaimer-title">
           <span class="ab-disclaimer-icon" aria-hidden="true">
             <svg width="22" height="22" viewBox="0 0 22 22">
-              <circle cx="11" cy="11" r="9.25" fill="none" stroke="currentColor" stroke-width="1.8"
+              <circle
+                cx="11"
+                cy="11"
+                r="9.25"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
               ></circle>
-              <path d="M11 10v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              <path
+                d="M11 10v6"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
               ></path>
               <circle cx="11" cy="6.6" r="1.2" fill="currentColor"></circle>
             </svg>
           </span>
           <div>
-            <p class="ab-disclaimer-title" id="ab-disclaimer-title">{t('about.disclaimer')}</p>
+            <p class="ab-disclaimer-title" id="ab-disclaimer-title">
+              {t('about.disclaimer')}
+            </p>
             <p class="ab-disclaimer-text">{t('about.disclaimerText')}</p>
           </div>
         </aside>
@@ -433,24 +465,26 @@ const sid = (i: number) => toc[i]!.id;
       <nav class="ab-toc" aria-label={t('about.toc')}>
         <p class="ab-toc-title">{t('about.toc')}</p>
         <ol>
-          {
-            toc.map((s, i) => (
-              <li>
-                <a href={`#${s.id}`} data-toc={s.id}>
-                  <span class="ab-toc-n mono">{String(i + 1).padStart(2, '0')}</span>
-                  <span>{s.label}</span>
-                </a>
-              </li>
-            ))
-          }
+          {toc.map((s, i) => (
+            <li>
+              <a href={`#${s.id}`} data-toc={s.id}>
+                <span class="ab-toc-n mono">{String(i + 1).padStart(2, '0')}</span>
+                <span>{s.label}</span>
+              </a>
+            </li>
+          ))}
         </ol>
       </nav>
 
       <main class="ab-main">
         {/* 01 What */}
         <section class="ab-section" id={sid(0)} aria-labelledby={`${sid(0)}-h`}>
-          <p class="ab-num mono" aria-hidden="true">01</p>
-          <h2 class="h2" id={`${sid(0)}-h`}>{t('about.what.h')}</h2>
+          <p class="ab-num mono" aria-hidden="true">
+            01
+          </p>
+          <h2 class="h2" id={`${sid(0)}-h`}>
+            {t('about.what.h')}
+          </h2>
           <div class="ab-prose">
             <p>{t('about.what.p1')}</p>
             <p>{t('about.what.p2')}</p>
@@ -467,41 +501,41 @@ const sid = (i: number) => toc[i]!.id;
           </div>
           <h3 class="ab-h3">{t('about.what.familiesH')}</h3>
           <ul class="ab-families">
-            {
-              families.map((f) => (
-                <li class="ab-family card" data-family={f.key}>
-                  <span class="chip chip-family">{f.label}</span>
-                  <ul>
-                    {f.modules.map((m) => (
-                      <li>
-                        <a href={modulePath(lang, m.slug, '1')}>
-                          <span class="mono ab-family-n">{m.n}</span>
-                          <span>{m.title[lang]}</span>
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </li>
-              ))
-            }
+            {families.map((f) => (
+              <li class="ab-family card" data-family={f.key}>
+                <span class="chip chip-family">{f.label}</span>
+                <ul>
+                  {f.modules.map((m) => (
+                    <li>
+                      <a href={modulePath(lang, m.slug, '1')}>
+                        <span class="mono ab-family-n">{m.n}</span>
+                        <span>{m.title[lang]}</span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            ))}
           </ul>
         </section>
 
         {/* 02 Example */}
         <section class="ab-section" id={sid(1)} aria-labelledby={`${sid(1)}-h`}>
-          <p class="ab-num mono" aria-hidden="true">02</p>
-          <h2 class="h2" id={`${sid(1)}-h`}>{t('about.example.h')}</h2>
+          <p class="ab-num mono" aria-hidden="true">
+            02
+          </p>
+          <h2 class="h2" id={`${sid(1)}-h`}>
+            {t('about.example.h')}
+          </h2>
           <p class="ab-lead2">{t('about.example.lead', { months: E.months, notional })}</p>
           <div class="ab-case card-hero">
             <div class="ab-tiles">
-              {
-                tiles.map((tile, i) => (
-                  <div class:list={['ab-tile', i === 3 && 'ab-tile--dark']}>
-                    <span class="ab-tile-label">{tile.label}</span>
-                    <span class="ab-tile-value mono">{tile.value}</span>
-                  </div>
-                ))
-              }
+              {tiles.map((tile, i) => (
+                <div class:list={['ab-tile', i === 3 && 'ab-tile--dark']}>
+                  <span class="ab-tile-label">{tile.label}</span>
+                  <span class="ab-tile-value mono">{tile.value}</span>
+                </div>
+              ))}
             </div>
             <div class="ab-table-wrap">
               <table class="ab-table ab-table--example">
@@ -515,16 +549,14 @@ const sid = (i: number) => toc[i]!.id;
                   </tr>
                 </thead>
                 <tbody>
-                  {
-                    exampleRows.map((r) => (
-                      <tr>
-                        <th scope="row">{r.qty}</th>
-                        <td class="ab-sym math" set:html={r.sym ?? ''} />
-                        <td class="mono ab-val">{r.value}</td>
-                        <td class="ab-note math-mixed" set:html={r.note} />
-                      </tr>
-                    ))
-                  }
+                  {exampleRows.map((r) => (
+                    <tr>
+                      <th scope="row">{r.qty}</th>
+                      <td class="ab-sym math" set:html={r.sym ?? ''} />
+                      <td class="mono ab-val">{r.value}</td>
+                      <td class="ab-note math-mixed" set:html={r.note} />
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
@@ -537,104 +569,108 @@ const sid = (i: number) => toc[i]!.id;
 
         {/* 03 Models */}
         <section class="ab-section" id={sid(2)} aria-labelledby={`${sid(2)}-h`}>
-          <p class="ab-num mono" aria-hidden="true">03</p>
-          <h2 class="h2" id={`${sid(2)}-h`}>{t('about.models.h')}</h2>
+          <p class="ab-num mono" aria-hidden="true">
+            03
+          </p>
+          <h2 class="h2" id={`${sid(2)}-h`}>
+            {t('about.models.h')}
+          </h2>
           <p class="ab-lead2" set:html={rich(t('about.models.lead'))} />
 
           <div class="ab-models">
-            {
-              models.map((m) => (
-                <article class:list={['ab-model card', m.wide && 'ab-model--wide']} data-family={m.family}>
-                  <a class="chip chip-family ab-model-chip" href={m.href}>
-                    <span class="mono">{m.n}</span>
-                    {m.module}
-                  </a>
-                  <h3 class="ab-h3">{m.title}</h3>
-                  <p set:html={rich(m.text)} />
-                  {m.formulas.map((f, i) => (
-                    <div
-                      class:list={['formula', i === m.formulas.length - 1 && 'formula--accent']}
-                      set:html={f}
-                    />
-                  ))}
-                  {m.bullets && (
-                    <ul class="ab-mc-list">
-                      {m.bullets.map((b) => (
-                        <li>
-                          {b.text}
-                          {b.formula && (
-                            <span class="formula ab-inline-formula" set:html={b.formula} />
-                          )}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </article>
-              ))
-            }
+            {models.map((m) => (
+              <article
+                class:list={['ab-model card', m.wide && 'ab-model--wide']}
+                data-family={m.family}
+              >
+                <a class="chip chip-family ab-model-chip" href={m.href}>
+                  <span class="mono">{m.n}</span>
+                  {m.module}
+                </a>
+                <h3 class="ab-h3">{m.title}</h3>
+                <p set:html={rich(m.text)} />
+                {m.formulas.map((f, i) => (
+                  <div
+                    class:list={['formula', i === m.formulas.length - 1 && 'formula--accent']}
+                    set:html={f}
+                  />
+                ))}
+                {m.bullets && (
+                  <ul class="ab-mc-list">
+                    {m.bullets.map((b) => (
+                      <li>
+                        {b.text}
+                        {b.formula && (
+                          <span class="formula ab-inline-formula" set:html={b.formula} />
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </article>
+            ))}
           </div>
           <p class="ab-small">{t('about.models.normal')}</p>
         </section>
 
         {/* 04 Riskometer */}
         <section class="ab-section" id={sid(3)} aria-labelledby={`${sid(3)}-h`}>
-          <p class="ab-num mono" aria-hidden="true">04</p>
-          <h2 class="h2" id={`${sid(3)}-h`}>{t('about.risk.h')}</h2>
+          <p class="ab-num mono" aria-hidden="true">
+            04
+          </p>
+          <h2 class="h2" id={`${sid(3)}-h`}>
+            {t('about.risk.h')}
+          </h2>
           <p class="ab-lead2">{t('about.risk.lead', { since: sinceYear })}</p>
 
           <ol class="ab-pipeline">
-            {
-              pipeline.map((st, i) => (
-                <li class="ab-step">
-                  <span class="ab-step-n mono" aria-hidden="true">
-                    {i + 1}
-                  </span>
-                  <div class="ab-step-body">
-                    <h3>{st.h}</h3>
-                    <p>{st.p}</p>
-                  </div>
-                  <div class:list={['ab-step-math', st.kind]} set:html={st.math} />
-                </li>
-              ))
-            }
+            {pipeline.map((st, i) => (
+              <li class="ab-step">
+                <span class="ab-step-n mono" aria-hidden="true">
+                  {i + 1}
+                </span>
+                <div class="ab-step-body">
+                  <h3>{st.h}</h3>
+                  <p>{st.p}</p>
+                </div>
+                <div class:list={['ab-step-math', st.kind]} set:html={st.math} />
+              </li>
+            ))}
           </ol>
 
           <h3 class="ab-h3">{t('about.risk.levelsH')}</h3>
           <ol class="ab-levels">
-            {
-              levelBands.map((b) => (
-                <li style={`--lv:${b.color}`}>
-                  <span class="ab-level-bar" aria-hidden="true" />
-                  <span class="ab-level-label">{b.label}</span>
-                  <span class="ab-level-range mono">{b.range}</span>
-                  <span class="ab-level-share">{b.share}</span>
-                </li>
-              ))
-            }
+            {levelBands.map((b) => (
+              <li style={`--lv:${b.color}`}>
+                <span class="ab-level-bar" aria-hidden="true" />
+                <span class="ab-level-label">{b.label}</span>
+                <span class="ab-level-range mono">{b.range}</span>
+                <span class="ab-level-share">{b.share}</span>
+              </li>
+            ))}
           </ol>
           <p class="ab-small">
-            {
-              t('about.risk.levelsCaption', {
-                p1: method.p[0],
-                p4: method.p[3],
-                since: sinceYear,
-              })
-            }
+            {t('about.risk.levelsCaption', {
+              p1: method.p[0],
+              p4: method.p[3],
+              since: sinceYear,
+            })}
           </p>
 
-          {
-            thresholdRows.length > 0 && (
-              <div class="ab-table-wrap card">
+          {thresholdRows.length > 0 && (
+            <div class="ab-thresholds card">
+              <div class="ab-thresholds-head">
+                <p class="ab-thresholds-title">{t('about.risk.thresholdsH')}</p>
+                <p class="ab-small">
+                  {t('about.risk.thresholdsCaption', {
+                    since: sinceYear,
+                    asOf: rm?.asOf ? fmtDate(rm.asOf, lang) : '–',
+                  })}
+                </p>
+              </div>
+              <div class="ab-table-wrap">
                 <table class="ab-table ab-table--thresholds">
-                  <caption>
-                    <strong>{t('about.risk.thresholdsH')}</strong>
-                    <span>
-                      {t('about.risk.thresholdsCaption', {
-                        since: sinceYear,
-                        asOf: rm?.asOf ? fmtDate(rm.asOf, lang) : '–',
-                      })}
-                    </span>
-                  </caption>
+                  <caption class="sr-only">{t('about.risk.thresholdsH')}</caption>
                   <thead>
                     <tr>
                       <th scope="col">{t('about.risk.colPair')}</th>
@@ -667,8 +703,8 @@ const sid = (i: number) => toc[i]!.id;
                   </tbody>
                 </table>
               </div>
-            )
-          }
+            </div>
+          )}
 
           <div class="ab-details">
             <h3 class="ab-h3">{t('about.risk.detailsH')}</h3>
@@ -685,14 +721,20 @@ const sid = (i: number) => toc[i]!.id;
               {t('about.risk.open')}
               <ArrowIcon />
             </a>
-            {rm?.asOf && <span class="ab-small">{t('about.risk.asOf', { date: fmtDate(rm.asOf, lang) })}</span>}
+            {rm?.asOf && (
+              <span class="ab-small">{t('about.risk.asOf', { date: fmtDate(rm.asOf, lang) })}</span>
+            )}
           </div>
         </section>
 
         {/* 05 Conventions */}
         <section class="ab-section" id={sid(4)} aria-labelledby={`${sid(4)}-h`}>
-          <p class="ab-num mono" aria-hidden="true">05</p>
-          <h2 class="h2" id={`${sid(4)}-h`}>{t('about.conv.h')}</h2>
+          <p class="ab-num mono" aria-hidden="true">
+            05
+          </p>
+          <h2 class="h2" id={`${sid(4)}-h`}>
+            {t('about.conv.h')}
+          </h2>
           <p class="ab-lead2">{t('about.conv.lead')}</p>
           <div class="ab-table-wrap card">
             <table class="ab-table ab-table--conv">
@@ -705,15 +747,13 @@ const sid = (i: number) => toc[i]!.id;
                 </tr>
               </thead>
               <tbody>
-                {
-                  conventions.map((c) => (
-                    <tr>
-                      <th scope="row">{c.topic}</th>
-                      <td>{c.rule}</td>
-                      <td class="mono ab-sample">{c.sample}</td>
-                    </tr>
-                  ))
-                }
+                {conventions.map((c) => (
+                  <tr>
+                    <th scope="row">{c.topic}</th>
+                    <td>{c.rule}</td>
+                    <td class="mono ab-sample">{c.sample}</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
@@ -721,73 +761,84 @@ const sid = (i: number) => toc[i]!.id;
 
         {/* 06 Sources */}
         <section class="ab-section" id={sid(5)} aria-labelledby={`${sid(5)}-h`}>
-          <p class="ab-num mono" aria-hidden="true">06</p>
-          <h2 class="h2" id={`${sid(5)}-h`}>{t('about.sources.h')}</h2>
+          <p class="ab-num mono" aria-hidden="true">
+            06
+          </p>
+          <h2 class="h2" id={`${sid(5)}-h`}>
+            {t('about.sources.h')}
+          </h2>
           <p class="ab-lead2">{t('about.sources.lead', { n: sources.length })}</p>
           <ol class="ab-sources">
-            {
-              sources.map((s) => {
-                const publisher = splitBilingual(s.publisher)[lang];
-                const date = splitBilingual(s.date)[lang];
-                const host = urlHost(s.url);
-                return (
-                  <li class="ab-source card" id={`src-${s.id}`}>
-                    <div class="ab-source-head">
-                      {s.url ? (
-                        <a class="ab-source-title" href={s.url} target="_blank" rel="noopener noreferrer">
-                          {s.title}
-                          <span class="sr-only"> {t('about.sources.newTab')}</span>
-                          <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
-                            <path
-                              d="M4.5 2H10v5.5M10 2L3 9"
-                              fill="none"
-                              stroke="currentColor"
-                              stroke-width="1.6"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                            />
-                          </svg>
-                        </a>
-                      ) : (
-                        <span class="ab-source-title">{s.title}</span>
-                      )}
-                      {host && <span class="ab-source-host mono">{host}</span>}
-                    </div>
-                    <dl class="ab-source-meta">
-                      {publisher && (
-                        <div>
-                          <dt>{t('about.sources.publisher')}</dt>
-                          <dd>{publisher}</dd>
-                        </div>
-                      )}
-                      {date && (
-                        <div>
-                          <dt>{t('about.sources.date')}</dt>
-                          <dd>{date}</dd>
-                        </div>
-                      )}
-                      {s.supports && (
-                        <div class="ab-source-supports">
-                          <dt>{t('about.sources.supports')}</dt>
-                          <dd>
-                            {inlineSegments(s.supports).map((seg) =>
-                              seg.code ? <code>{seg.text}</code> : seg.text,
-                            )}
-                          </dd>
-                        </div>
-                      )}
-                    </dl>
-                  </li>
-                );
-              })
-            }
+            {sources.map((s) => {
+              const publisher = splitBilingual(s.publisher)[lang];
+              const date = splitBilingual(s.date)[lang];
+              const host = urlHost(s.url);
+              return (
+                <li class="ab-source card" id={`src-${s.id}`}>
+                  <div class="ab-source-head">
+                    {s.url ? (
+                      <a
+                        class="ab-source-title"
+                        href={s.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {s.title}
+                        <span class="sr-only"> {t('about.sources.newTab')}</span>
+                        <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
+                          <path
+                            d="M4.5 2H10v5.5M10 2L3 9"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.6"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                        </svg>
+                      </a>
+                    ) : (
+                      <span class="ab-source-title">{s.title}</span>
+                    )}
+                    {host && <span class="ab-source-host mono">{host}</span>}
+                  </div>
+                  <dl class="ab-source-meta">
+                    {publisher && (
+                      <div>
+                        <dt>{t('about.sources.publisher')}</dt>
+                        <dd>{publisher}</dd>
+                      </div>
+                    )}
+                    {date && (
+                      <div>
+                        <dt>{t('about.sources.date')}</dt>
+                        <dd>{date}</dd>
+                      </div>
+                    )}
+                    {s.supports && (
+                      <div class="ab-source-supports">
+                        <dt>{t('about.sources.supports')}</dt>
+                        <dd>
+                          {inlineSegments(s.supports).map((seg) =>
+                            seg.code ? <code>{seg.text}</code> : seg.text,
+                          )}
+                        </dd>
+                      </div>
+                    )}
+                  </dl>
+                </li>
+              );
+            })}
           </ol>
         </section>
 
         {/* 07 Credits & reset */}
         <section class="ab-section" id={sid(6)} aria-labelledby={`${sid(6)}-h`}>
-          <p class="ab-num mono" aria-hidden="true">07</p>
-          <h2 class="h2" id={`${sid(6)}-h`}>{t('about.credits.h')}</h2>
+          <p class="ab-num mono" aria-hidden="true">
+            07
+          </p>
+          <h2 class="h2" id={`${sid(6)}-h`}>
+            {t('about.credits.h')}
+          </h2>
           <div class="ab-credits">
             <div class="ab-credit-card card-hero">
               <span class="ab-credit-mark" aria-hidden="true">
@@ -799,7 +850,11 @@ const sid = (i: number) => toc[i]!.id;
                 </svg>
               </span>
               <p class="ab-credit-line">
-                {tc('footer.credits').split(' · ').map((part) => <span>{part}</span>)}
+                {tc('footer.credits')
+                  .split(' · ')
+                  .map((part) => (
+                    <span>{part}</span>
+                  ))}
               </p>
               <p class="ab-small">{t('about.credits.stack')}</p>
               <p class="ab-small">{tc('footer.data')}</p>
@@ -1208,20 +1263,15 @@ const sid = (i: number) => toc[i]!.id;
     text-align: right;
     white-space: nowrap;
   }
-  .ab-table--thresholds caption {
-    caption-side: top;
-    padding: 16px 16px 12px;
-    font-size: 13px;
-    color: var(--ff-muted);
+  .ab-thresholds-head {
+    padding: 18px 16px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
   }
-  .ab-table--thresholds caption strong {
-    display: block;
-    margin-bottom: 2px;
+  .ab-thresholds-title {
     font-size: 16px;
-    color: var(--ff-ink);
-  }
-  .ab-table--thresholds caption span {
-    display: block;
+    font-weight: 800;
   }
   .ab-max-date {
     display: block;
@@ -1613,8 +1663,8 @@ const sid = (i: number) => toc[i]!.id;
     }
     .ab-table--example tr {
       display: grid;
-      grid-template-columns: auto minmax(0, 1fr) auto;
-      grid-template-areas: 'qty sym val' 'note note note';
+      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-areas: 'qty val' 'note note';
       gap: 2px 12px;
       padding: 10px 0;
       border-top: 1px solid var(--ff-row);
@@ -1629,7 +1679,7 @@ const sid = (i: number) => toc[i]!.id;
       grid-area: qty;
     }
     .ab-table--example .ab-sym {
-      grid-area: sym;
+      display: none;
     }
     .ab-table--example .ab-val {
       grid-area: val;
@@ -1642,6 +1692,18 @@ const sid = (i: number) => toc[i]!.id;
     }
     .ab-table--example .ab-note:empty {
       display: none;
+    }
+    .ab-table--thresholds th,
+    .ab-table--thresholds td {
+      padding: 8px 6px;
+      font-size: 12px;
+    }
+    .ab-table--thresholds th:first-child {
+      padding-left: 12px;
+    }
+    .ab-table--thresholds td:last-child,
+    .ab-table--thresholds th:last-child {
+      padding-right: 12px;
     }
     .ab-case {
       padding: 16px;
@@ -1717,6 +1779,11 @@ const sid = (i: number) => toc[i]!.id;
 </style>
 
 <style is:global>
+  /* Sub- and superscripts must not stretch the line height of prose and tables. */
+  .ab-page sub,
+  .ab-page sup {
+    line-height: 0;
+  }
   /* Reset island (markup rendered by ResetProgress.tsx). */
   .ab-page .rp {
     display: flex;

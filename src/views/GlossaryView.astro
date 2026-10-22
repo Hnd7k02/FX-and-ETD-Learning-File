@@ -80,7 +80,9 @@ const familyCounts = Object.fromEntries(
         <nav aria-label={tc('a11y.breadcrumb')} class="gl-crumbs">
           <a href={homePath(lang)}>{tc('module.home')}</a>
           <span aria-hidden="true">/</span>
-          <span aria-current="page" class="gl-crumb-current">{t('glossary.h1')}</span>
+          <span aria-current="page" class="gl-crumb-current">
+            {t('glossary.h1')}
+          </span>
         </nav>
         <div class="gl-chips">
           <span class="chip chip-neutral">{t('glossary.eyebrow')}</span>
@@ -98,92 +100,94 @@ const familyCounts = Object.fromEntries(
 
     <nav class="gl-letters" aria-label={t('glossary.letters')}>
       <div class="container-module gl-letters-inner">
-        {
-          letters.map((l) =>
-            present.has(l) ? (
-              <a href={`#${letterAnchor(l)}`} class="gl-letter-link" data-gl-letter={l}>
-                {l}
-              </a>
-            ) : (
-              <span class="gl-letter-link is-empty" aria-hidden="true">
-                {l}
-              </span>
-            ),
-          )
-        }
+        {letters.map((l) =>
+          present.has(l) ? (
+            <a href={`#${letterAnchor(l)}`} class="gl-letter-link" data-gl-letter={l}>
+              {l}
+            </a>
+          ) : (
+            <span class="gl-letter-link is-empty" aria-hidden="true">
+              {l}
+            </span>
+          ),
+        )}
       </div>
     </nav>
 
     <main class="container-module gl-main">
-      {
-        groups.map((g) => (
-          <section class="gl-group" data-gl-group={g.letter} aria-labelledby={letterAnchor(g.letter)}>
-            <h2 class="gl-letter" id={letterAnchor(g.letter)}>
-              <span aria-hidden="true">{g.letter}</span>
-              <span class="sr-only">{t('glossary.letterGroup', { letter: g.letter })}</span>
-            </h2>
-            <dl class="gl-list">
-              {g.items.map((r) => (
-                <div
-                  class="gl-item"
-                  id={termAnchor(r.id)}
-                  data-gl-item
-                  data-family={r.family}
-                  data-search={r.search}
-                >
-                  <dt class="gl-term">
-                    <span class="gl-term-name" data-gl-hl>
-                      {r.term}
+      {groups.map((g) => (
+        <section class="gl-group" data-gl-group={g.letter} aria-labelledby={letterAnchor(g.letter)}>
+          <h2
+            class="gl-letter"
+            id={letterAnchor(g.letter)}
+            data-long={g.letter.length > 1 ? '' : undefined}
+          >
+            <span aria-hidden="true">{g.letter}</span>
+            <span class="sr-only">{t('glossary.letterGroup', { letter: g.letter })}</span>
+          </h2>
+          <dl class="gl-list">
+            {g.items.map((r) => (
+              <div
+                class="gl-item"
+                id={termAnchor(r.id)}
+                data-gl-item
+                data-family={r.family}
+                data-search={r.search}
+              >
+                <dt class="gl-term">
+                  <span class="gl-term-name" data-gl-hl>
+                    {r.term}
+                  </span>
+                  {r.otherTerm && (
+                    <span class="gl-other">
+                      <abbr class="gl-other-tag" title={t('glossary.otherLangName')}>
+                        {t('glossary.otherLangTag')}
+                      </abbr>
+                      <span lang={other} data-gl-hl>
+                        {r.otherTerm}
+                      </span>
                     </span>
-                    {r.otherTerm && (
-                      <span class="gl-other">
-                        <abbr class="gl-other-tag" title={t('glossary.otherLangName')}>
-                          {t('glossary.otherLangTag')}
-                        </abbr>
-                        <span lang={other} data-gl-hl>
-                          {r.otherTerm}
-                        </span>
-                      </span>
-                    )}
-                  </dt>
-                  <dd class="gl-def" data-gl-hl>
-                    {r.def}
-                  </dd>
-                  <dd class="gl-meta">
-                    <a
-                      class="chip chip-family gl-chip"
-                      href={r.href}
-                      title={`${r.moduleN} ${r.moduleTitle} · ${t('glossary.sectionShort', { n: r.section })}: ${r.sectionTitle}`}
-                    >
-                      <span class="sr-only">{t('glossary.learnIn')} </span>
-                      <span class="gl-chip-n">{r.moduleN}</span>
-                      <span>{r.moduleTitle}</span>
-                      <span class="gl-chip-sec" aria-hidden="true">
-                        ·
-                      </span>
-                      <span class="gl-chip-sec">{r.sectionShort}</span>
-                      <ArrowIcon color="currentColor" />
-                    </a>
-                    {r.see.length > 0 && (
-                      <div class="gl-see">
-                        <span class="gl-see-label">{t('glossary.seeAlso')}</span>
-                        <ul>
-                          {r.see.map((s) => (
-                            <li>
-                              <a href={`#${termAnchor(s.id)}`}>{s.term}</a>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          </section>
-        ))
-      }
-      <p class="gl-top"><a href="#main">{t('glossary.toTop')} ↑</a></p>
+                  )}
+                </dt>
+                <dd class="gl-def" data-gl-hl>
+                  {r.def}
+                </dd>
+                <dd class="gl-meta">
+                  <a
+                    class="chip chip-family gl-chip"
+                    href={r.href}
+                    title={`${r.moduleN} ${r.moduleTitle} · ${t('glossary.sectionShort', { n: r.section })}: ${r.sectionTitle}`}
+                  >
+                    <span class="sr-only">{t('glossary.learnIn')} </span>
+                    <span class="gl-chip-n">{r.moduleN}</span>
+                    <span>{r.moduleTitle}</span>
+                    <span class="gl-chip-sec" aria-hidden="true">
+                      ·
+                    </span>
+                    <span class="gl-chip-sec">{r.sectionShort}</span>
+                    <ArrowIcon color="currentColor" />
+                  </a>
+                  {r.see.length > 0 && (
+                    <div class="gl-see">
+                      <span class="gl-see-label">{t('glossary.seeAlso')}</span>
+                      <ul>
+                        {r.see.map((s) => (
+                          <li>
+                            <a href={`#${termAnchor(s.id)}`}>{s.term}</a>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      ))}
+      <p class="gl-top">
+        <a href="#main">{t('glossary.toTop')} ↑</a>
+      </p>
     </main>
   </div>
 </BaseLayout>
@@ -315,6 +319,11 @@ const familyCounts = Object.fromEntries(
     color: var(--ff-ink);
     padding-top: 14px;
     scroll-margin-top: 76px;
+    white-space: nowrap;
+  }
+  .gl-letter[data-long] {
+    font-size: 34px;
+    padding-top: 22px;
   }
   .gl-list {
     margin: 0;

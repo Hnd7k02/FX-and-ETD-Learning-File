@@ -165,24 +165,30 @@ export function precomputeMcProducts(opts: PrecomputeOptions = {}): McProductsDa
   const log = opts.log ?? (() => undefined);
   const mc = { paths, seed, antithetic };
 
-  // Products with the same fixing days share one simulation (common random numbers).
+  // Products with the same fixing days share one simulation (common random numbers); a set is
+  // dropped as soon as no later product needs it (memory: paths · fixings numbers per set).
+  const kinds = Object.keys(SOLVED_PARAM) as ZeroCostKind[];
+  const starts = kinds.map((kind) => buildProduct(kind, market));
+  const keyOf = (p: Product) => p.fixingDays.join(',');
+  const uses = new Map<string, number>();
+  for (const p of starts) uses.set(keyOf(p), (uses.get(keyOf(p)) ?? 0) + 1);
   const cache = new Map<string, ObservationSet>();
-  const observations = (days: readonly number[]): ObservationSet => {
-    const key = days.join(',');
-    let set = cache.get(key);
-    if (!set) {
-      set = simulateObservations(market, days, mc);
-      cache.set(key, set);
-    }
+  const observations = (p: Product): ObservationSet => {
+    const key = keyOf(p);
+    const set = cache.get(key) ?? simulateObservations(market, p.fixingDays, mc);
+    const left = (uses.get(key) ?? 1) - 1;
+    uses.set(key, left);
+    if (left > 0) cache.set(key, set);
+    else cache.delete(key);
     return set;
   };
 
   const zeroCost = {} as Record<ZeroCostKind, StoredZeroCost>;
-  for (const kind of Object.keys(SOLVED_PARAM) as ZeroCostKind[]) {
+  for (const [k, kind] of kinds.entries()) {
     const t0 = Date.now();
     const param = SOLVED_PARAM[kind];
-    const start = buildProduct(kind, market);
-    const r = solveParameter(start, param, market, { ...mc, observations: observations(start.fixingDays) });
+    const start = starts[k]!;
+    const r = solveParameter(start, param, market, { ...mc, observations: observations(start) });
     const value = roundTo(r.value, ROUNDING.rate);
     const forwardAvg = forwardAt(market, averageFixingDay(start));
     const entry: StoredZeroCost = {

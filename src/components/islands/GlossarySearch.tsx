@@ -153,7 +153,11 @@ export default function GlossarySearch({ lang, total, familyCounts }: GlossarySe
   const filtered = query.trim() !== '' || family !== 'all';
   const familyOptions: Array<{ value: FamilyFilter; label: string; count: number }> = [
     { value: 'all', label: t('glossary.filterAll'), count: total },
-    ...FAMILY_KEYS.map((f) => ({ value: f, label: FAMILIES[f].label[lang], count: familyCounts[f] })),
+    ...FAMILY_KEYS.map((f) => ({
+      value: f,
+      label: FAMILIES[f].label[lang],
+      count: familyCounts[f],
+    })),
   ];
 
   return (
@@ -212,9 +216,7 @@ export default function GlossarySearch({ lang, total, familyCounts }: GlossarySe
           ))}
         </div>
         <p class="gls-count" role="status" aria-live="polite" aria-atomic="true">
-          {filtered
-            ? t('glossary.count', { shown, total })
-            : t('glossary.countAll', { total })}
+          {filtered ? t('glossary.count', { shown, total }) : t('glossary.countAll', { total })}
         </p>
       </div>
 

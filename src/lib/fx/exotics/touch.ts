@@ -124,9 +124,10 @@ export function logNormCdf(x: number): number {
  * evaluated naively that is ∞ · 0 = NaN. In log space: exp(power · ln(ratio) + ln N(x)).
  */
 export function powTimesCdf(ratio: number, power: number, x: number): number {
-  const logWeight = power * Math.log(ratio);
-  if (logWeight < 700) return Math.exp(logWeight) * normCdf(x);
-  return Math.exp(logWeight + logNormCdf(x));
+  const weight = ratio ** power;
+  // Direct product while neither factor over- or underflows (N(x) = 0 only below −37).
+  if (weight < 1e300 && x > -37) return weight * normCdf(x);
+  return Math.exp(power * Math.log(ratio) + logNormCdf(x));
 }
 
 /**

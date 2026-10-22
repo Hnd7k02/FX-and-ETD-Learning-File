@@ -20,7 +20,10 @@ import { percentileRank, type Thresholds } from './stats';
 /** Percentile bounds of the five levels. */
 export const LEVEL_BOUNDS = [0, 20, 60, 85, 97, 100] as const;
 
-export function levelOf(value: number, t: Pick<Thresholds, 'p20' | 'p60' | 'p85' | 'p97'>): LevelIndex {
+export function levelOf(
+  value: number,
+  t: Pick<Thresholds, 'p20' | 'p60' | 'p85' | 'p97'>,
+): LevelIndex {
   if (value < t.p20) return 1;
   if (value < t.p60) return 2;
   if (value < t.p85) return 3;

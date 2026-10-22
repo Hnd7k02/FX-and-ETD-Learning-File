@@ -23,7 +23,10 @@ import { LANGS } from '@/i18n/types';
 
 const RAW_EVENTS: unknown = JSON.parse(readFileSync('src/data/events.json', 'utf8'));
 const EVENTS = parseEvents(RAW_EVENTS);
-const SEED = parseRawCsv(readFileSync('data/raw/ecb-eur-reference.csv', 'utf8'));
+/** Seed snapshot (D-15), so thresholds and levels in these tests do not drift with new data. */
+const SEED = parseRawCsv(readFileSync('data/raw/ecb-eur-reference.csv', 'utf8')).filter(
+  (r) => r.date <= '2026-09-14',
+);
 
 const series = Object.fromEntries(PAIRS.map((p) => [p, pairSeries(SEED, p)])) as Record<
   Pair,
@@ -33,9 +36,13 @@ const vols = Object.fromEntries(PAIRS.map((p) => [p, realisedVol(series[p])])) a
   Pair,
   ReturnType<typeof realisedVol>
 >;
-const ths = Object.fromEntries(PAIRS.map((p) => [p, thresholds(vols[p])])) as Record<Pair, Thresholds>;
+const ths = Object.fromEntries(PAIRS.map((p) => [p, thresholds(vols[p])])) as Record<
+  Pair,
+  Thresholds
+>;
 const ev = (id: string) => EVENTS.find((e) => e.id === id)!;
-const metrics = (id: string, pair: Pair) => eventMetrics(ev(id), series[pair], vols[pair], ths[pair]);
+const metrics = (id: string, pair: Pair) =>
+  eventMetrics(ev(id), series[pair], vols[pair], ths[pair]);
 
 describe('events.json', () => {
   it('holds the six events of MASTER_PROMPT §9 with their anchors and pairs', () => {
@@ -50,7 +57,8 @@ describe('events.json', () => {
   });
 
   it('links existing modules', () => {
-    for (const e of EVENTS) for (const m of e.modules) expect(MODULE_SLUGS, `${e.id} → ${m}`).toContain(m);
+    for (const e of EVENTS)
+      for (const m of e.modules) expect(MODULE_SLUGS, `${e.id} → ${m}`).toContain(m);
   });
 
   it('names sources that exist in src/content/sources', () => {
@@ -58,9 +66,11 @@ describe('events.json', () => {
     const files = ['src/content/sources.md', ...readdirSync(dir).map((f) => join(dir, f))];
     const ids = new Set<string>();
     for (const f of files.filter((x) => existsSync(x) && x.endsWith('.md'))) {
-      for (const m of readFileSync(f, 'utf8').matchAll(/^##\s+([a-z0-9][a-z0-9-]*)\s*$/gm)) ids.add(m[1]!);
+      for (const m of readFileSync(f, 'utf8').matchAll(/^##\s+([a-z0-9][a-z0-9-]*)\s*$/gm))
+        ids.add(m[1]!);
     }
-    for (const e of EVENTS) for (const s of e.sources) expect(ids.has(s), `${e.id} → ${s}`).toBe(true);
+    for (const e of EVENTS)
+      for (const s of e.sources) expect(ids.has(s), `${e.id} → ${s}`).toBe(true);
   });
 
   it('fills every text completely for every pair and language', () => {
@@ -85,8 +95,19 @@ describe('events.json', () => {
         const m = metrics(e.id, pair);
         for (const lang of LANGS) {
           const v = eventVars(m, pair, lang);
-          for (const k of ['from', 'to', 'movePct', 'moveAbsPct', 'dayMoveAbsPct', 'volBefore', 'peak'] as const) {
-            expect(raw.includes(v[k]), `${e.id} ${pair}: "${v[k]}" (${k}) must be a placeholder`).toBe(false);
+          for (const k of [
+            'from',
+            'to',
+            'movePct',
+            'moveAbsPct',
+            'dayMoveAbsPct',
+            'volBefore',
+            'peak',
+          ] as const) {
+            expect(
+              raw.includes(v[k]),
+              `${e.id} ${pair}: "${v[k]}" (${k}) must be a placeholder`,
+            ).toBe(false);
           }
         }
       }
@@ -96,27 +117,59 @@ describe('events.json', () => {
 
 describe('parseEvents rejects broken data', () => {
   const base = (RAW_EVENTS as Record<string, unknown>[])[2]!; // chf-shock-2015
-  const clone = () => JSON.parse(JSON.stringify(base)) as Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
-  const cases: [string, (e: Record<string, any>) => unknown, RegExp][] = [ // eslint-disable-line @typescript-eslint/no-explicit-any
+  const clone = () => JSON.parse(JSON.stringify(base)) as Record<string, unknown>;
+  const cases: [string, (e: Record<string, unknown>) => unknown, RegExp][] = [
     ['not an object', () => 5, /must be an object/],
     ['bad id', (e) => ({ ...e, id: 'Bad Id' }), /bad id/],
-    ['bad anchor date', (e) => ({ ...e, anchorDate: '2015-02-30' }), /anchorDate must be an ISO date/],
+    [
+      'bad anchor date',
+      (e) => ({ ...e, anchorDate: '2015-02-30' }),
+      /anchorDate must be an ISO date/,
+    ],
     ['missing year', (e) => ({ ...e, year: '' }), /year must be a text/],
     ['empty pairs', (e) => ({ ...e, pairs: [] }), /non-empty list of pairs/],
     ['unknown pair', (e) => ({ ...e, pairs: ['EUR/GBP'] }), /unknown pair EUR\/GBP/],
     ['window not an object', (e) => ({ ...e, window: '2015' }), /window must be/],
-    ['window order', (e) => ({ ...e, window: { from: '2015-01-20', to: '2015-01-14' } }), /from < to/],
-    ['anchor outside window', (e) => ({ ...e, window: { from: '2015-01-16', to: '2015-01-23' } }), /from ≤ anchorDate/],
+    [
+      'window order',
+      (e) => ({ ...e, window: { from: '2015-01-20', to: '2015-01-14' } }),
+      /from < to/,
+    ],
+    [
+      'anchor outside window',
+      (e) => ({ ...e, window: { from: '2015-01-16', to: '2015-01-23' } }),
+      /from ≤ anchorDate/,
+    ],
     ['bad peak range', (e) => ({ ...e, peakRange: { before: -1, after: 5 } }), /peakRange/],
     ['peak range not an object', (e) => ({ ...e, peakRange: 3 }), /peakRange/],
-    ['title missing en', (e) => ({ ...e, title: { de: 'x' } }), /title\.en must be a non-empty text/],
+    [
+      'title missing en',
+      (e) => ({ ...e, title: { de: 'x' } }),
+      /title\.en must be a non-empty text/,
+    ],
     ['title not bilingual', (e) => ({ ...e, title: 'x' }), /title must be \{de, en\}/],
-    ['placeholder in title', (e) => ({ ...e, title: { de: '{pair}', en: 'x' } }), /may not contain placeholders/],
-    ['unknown placeholder', (e) => ({ ...e, what: { de: '{price}', en: 'x' } }), /unknown placeholder \{price\}/],
+    [
+      'placeholder in title',
+      (e) => ({ ...e, title: { de: '{pair}', en: 'x' } }),
+      /may not contain placeholders/,
+    ],
+    [
+      'unknown placeholder',
+      (e) => ({ ...e, what: { de: '{price}', en: 'x' } }),
+      /unknown placeholder \{price\}/,
+    ],
     ['pairNote not an object', (e) => ({ ...e, pairNote: [] }), /pairNote must be an object/],
-    ['pairNote for other pair', (e) => ({ ...e, pairNote: { 'USD/JPY': { de: 'x', en: 'y' } } }), /not a pair of the event/],
+    [
+      'pairNote for other pair',
+      (e) => ({ ...e, pairNote: { 'USD/JPY': { de: 'x', en: 'y' } } }),
+      /not a pair of the event/,
+    ],
     ['no means', (e) => ({ ...e, means: [] }), /means must be a list/],
-    ['means pair outside event', (e) => ({ ...e, means: [{ de: 'x', en: 'y', pairs: ['EUR/USD'] }] }), /not a pair of the event/],
+    [
+      'means pair outside event',
+      (e) => ({ ...e, means: [{ de: 'x', en: 'y', pairs: ['EUR/USD'] }] }),
+      /not a pair of the event/,
+    ],
     ['no modules', (e) => ({ ...e, modules: [] }), /modules must be a non-empty list/],
     ['bad source id', (e) => ({ ...e, sources: ['SNB 2015'] }), /bad id/],
   ];
@@ -138,7 +191,9 @@ describe('parseEvents rejects broken data', () => {
     expect(p!.pairNote).toBeUndefined();
     expect(p!.peakRange).toBeUndefined();
     expect(p!.means).toEqual([{ de: 'a', en: 'b' }]);
-    expect(parseEvents([{ ...clone(), peakRange: { before: 0, after: 20 } }])[0]!.peakRange).toEqual({
+    expect(
+      parseEvents([{ ...clone(), peakRange: { before: 0, after: 20 } }])[0]!.peakRange,
+    ).toEqual({
       before: 0,
       after: 20,
     });
@@ -149,7 +204,15 @@ describe('event metrics on the fixture (Oct 2014 – Apr 2015)', () => {
   const rows = parseRawCsv(readFileSync('tests/fixtures/data/raw-2014-10-to-2015-04.csv', 'utf8'));
   const s = pairSeries(rows, 'EUR/CHF');
   const vol = realisedVol(s);
-  const t: Thresholds = { p20: 3, p60: 5, p85: 8, p97: 12, max: 55.777062559107236, maxDate: '2015-02-12', days: 1 };
+  const t: Thresholds = {
+    p20: 3,
+    p60: 5,
+    p85: 8,
+    p97: 12,
+    max: 55.777062559107236,
+    maxDate: '2015-02-12',
+    days: 1,
+  };
   const shock = ev('chf-shock-2015');
   const m = eventMetrics(shock, s, vol, t);
 
@@ -162,10 +225,20 @@ describe('event metrics on the fixture (Oct 2014 – Apr 2015)', () => {
   }
 
   it('takes the first fixing on/after window.from and the last on/before window.to', () => {
-    expect([m.fromDate, m.from, m.toDate, m.to]).toEqual(['2015-01-14', 1.201, '2015-01-23', 0.9816]);
+    expect([m.fromDate, m.from, m.toDate, m.to]).toEqual([
+      '2015-01-14',
+      1.201,
+      '2015-01-23',
+      0.9816,
+    ]);
     expect(m.movePct).toBeCloseTo((0.9816 / 1.201 - 1) * 100, 12);
     // window edges on non-fixing days snap inwards
-    const w = eventMetrics({ ...shock, window: { from: '2015-01-10', to: '2015-01-25' } }, s, vol, t);
+    const w = eventMetrics(
+      { ...shock, window: { from: '2015-01-10', to: '2015-01-25' } },
+      s,
+      vol,
+      t,
+    );
     expect([w.fromDate, w.toDate]).toEqual(['2015-01-12', '2015-01-23']);
   });
 
@@ -197,11 +270,26 @@ describe('event metrics on the fixture (Oct 2014 – Apr 2015)', () => {
   });
 
   it('fails clearly when the data does not cover the event', () => {
-    const late = { ...shock, id: 'x', anchorDate: '2016-01-04', window: { from: '2016-01-01', to: '2016-01-08' } };
+    const late = {
+      ...shock,
+      id: 'x',
+      anchorDate: '2016-01-04',
+      window: { from: '2016-01-01', to: '2016-01-08' },
+    };
     expect(() => eventMetrics(late, s, vol, t)).toThrow(/no fixings in window/);
-    const early = { ...shock, id: 'y', anchorDate: '2014-10-01', window: { from: '2014-10-01', to: '2014-10-03' } };
+    const early = {
+      ...shock,
+      id: 'y',
+      anchorDate: '2014-10-01',
+      window: { from: '2014-10-01', to: '2014-10-03' },
+    };
     expect(() => eventMetrics(early, s, vol, t)).toThrow(/outside the data/);
-    const noVol = { ...shock, id: 'z', anchorDate: '2014-10-10', window: { from: '2014-10-01', to: '2014-10-20' } };
+    const noVol = {
+      ...shock,
+      id: 'z',
+      anchorDate: '2014-10-10',
+      window: { from: '2014-10-01', to: '2014-10-20' },
+    };
     expect(() => eventMetrics(noVol, s, vol, t)).toThrow(/no vol around/);
   });
 
@@ -214,17 +302,17 @@ describe('event metrics on the fixture (Oct 2014 – Apr 2015)', () => {
       to: '0.9816',
       fromDate: '14.01.2015',
       toDate: '23.01.2015',
-      movePct: '−18.3 %',
-      moveAbsPct: '18.3 %',
+      movePct: '−18.3\u00a0%',
+      moveAbsPct: '18.3\u00a0%',
       dayDate: '15.01.2015',
-      dayMovePct: '−14.4 %',
-      dayMoveAbsPct: '14.4 %',
+      dayMovePct: '−14.4\u00a0%',
+      dayMoveAbsPct: '14.4\u00a0%',
       volBefore: de.volBefore,
-      peak: '55.8 %',
+      peak: '55.8\u00a0%',
       peakDate: '12.02.2015',
       peakLevel: 'Extrem',
     });
-    expect(de.volBefore).toMatch(/^1\.3 %$/);
+    expect(de.volBefore).toMatch(/^1\.3\u00a0%$/);
     const en = eventVars(m, 'EUR/CHF', 'en');
     expect([en.movePct, en.fromDate, en.peakLevel]).toEqual(['−18.3%', '14 Jan 2015', 'Extreme']);
     const jpy = eventVars({ ...m, from: 153.8689, to: 142.2396 } as EventMetrics, 'USD/JPY', 'de');
@@ -234,8 +322,8 @@ describe('event metrics on the fixture (Oct 2014 – Apr 2015)', () => {
   it('builds texts per pair: pair note appended, means filtered by pair', () => {
     const de = eventTexts(shock, 'EUR/CHF', 'de', m);
     expect(de.title).toBe('Frankenschock');
-    expect(de.what).toContain('−0.75 %');
-    expect(de.what).toContain('liegt EUR/CHF 14.4 % tiefer');
+    expect(de.what).toContain('−0.75\u00a0%');
+    expect(de.what).toContain('liegt EUR/CHF 14.4\u00a0% tiefer');
     expect(de.means.some((x) => x.startsWith('Ruhe vor dem Sturm'))).toBe(true);
     const usd = eventTexts(shock, 'USD/CHF', 'en', m);
     expect(usd.what).toContain('USD/CHF is 14.4% lower');
@@ -313,11 +401,12 @@ describe('statements in the event texts hold in the data', () => {
     expect(metrics('ukraine-2022', 'EUR/USD').movePct).toBeLessThan(0);
   });
 
-  it('2022: the same vol means a different level for EUR/CHF and EUR/USD', () => {
+  it('2022: the same vol means a different level for EUR/CHF and EUR/USD (seed snapshot)', () => {
+    // The text only says "levels are relative" and fills {peakLevel}; this documents the example.
     const chf = metrics('ukraine-2022', 'EUR/CHF');
     const usd = metrics('ukraine-2022', 'EUR/USD');
     expect(Math.abs(chf.peak - usd.peak)).toBeLessThan(0.5);
-    expect(chf.peakLevel).toBeGreaterThan(usd.peakLevel);
+    expect([chf.peakLevel, usd.peakLevel]).toEqual([4, 3]);
   });
 
   it('2024: EUR/CHF and USD/JPY fall, USD/JPY most of all on 5 August', () => {

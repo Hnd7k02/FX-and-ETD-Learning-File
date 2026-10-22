@@ -3,6 +3,8 @@
  * "Riskometer heute" card (B-Home): a link to the Riskometer with the mini gauge, the realised
  * 1-month volatility, the level (always with a label) and the percentile sentence. Data from
  * src/data/fx/summary.json via getRiskSummary(); a neutral state when it has not been built.
+ * The link has no aria-label: its visible text (title, pair, vol, level, sentence) is the name
+ * (WCAG 2.5.3 label in name).
  */
 import MiniGauge from '@/components/riskometer/MiniGauge.astro';
 import { common } from '@/i18n/dict/common';
@@ -24,22 +26,13 @@ const risk = getRiskSummary();
 
 const vol = risk ? fmtPctValue(risk.vol, lang, 1) : '–';
 const levelLabel = risk ? tl(LEVEL_KEYS[risk.level - 1]!) : th('home.riskNoDataChip');
-const aria = risk
-  ? t('home.riskAria', { pair: risk.pair, vol, level: levelLabel })
-  : th('home.riskAriaNoData');
 const text = risk
   ? t('home.riskText', { pct: fmtNumber(Math.round(risk.percentile), lang) })
   : th('home.riskNoData');
 const trend = risk === null ? 'none' : risk.level >= 3 ? 'up' : risk.level === 1 ? 'down' : 'flat';
 ---
 
-<a
-  class="card risk"
-  href={riskometerPath(lang)}
-  aria-label={aria}
-  data-risk
-  data-level={risk?.level ?? 0}
->
+<a class="card risk" href={riskometerPath(lang)} data-risk data-level={risk?.level ?? 0}>
   <span class="risk-head">
     <span class="risk-label">{t('home.riskTitle')}</span>
     <span class="chip chip-neutral chip-mono">{risk ? risk.pair : th('home.riskPeriod')}</span>

@@ -125,7 +125,7 @@ test.describe('home page', () => {
     await page.goto('/');
     const card = page.locator('[data-risk]');
     await expect(card).toHaveAttribute('href', /\/riskometer\/$/);
-    await expect(card).toHaveAttribute('aria-label', /Riskometer/);
+    await expect(page.getByRole('link', { name: /Riskometer (heute|today)/ })).toBeVisible();
     await expect(card.locator('.level')).not.toHaveText('');
   });
 
@@ -145,9 +145,8 @@ test.describe('home page', () => {
 });
 
 test.describe('reduced motion', () => {
-  test.use({ reducedMotion: 'reduce' });
-
   test('wow chart does not autoplay', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/');
     const wow = page.locator('[data-wow]');
     await expect(wow).toHaveAttribute('data-playing', 'false');

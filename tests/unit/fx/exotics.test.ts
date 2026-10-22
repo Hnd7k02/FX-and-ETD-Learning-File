@@ -801,6 +801,11 @@ describe('numerical robustness (extreme but valid inputs)', () => {
       9,
     );
     expect(powTimesCdf(2, 3, 0)).toBe(4);
+    // N(−38) underflows to 0, but 2^1000 · N(−38) ≈ e^(−34) does not
+    expect(Math.log(powTimesCdf(2, 1000, -38))).toBeCloseTo(
+      1000 * Math.log(2) + logNormCdf(-38),
+      9,
+    );
     // 2^2000 overflows on its own, the product does not
     const v = powTimesCdf(2, 2000, -50);
     expect(Number.isFinite(v)).toBe(true);

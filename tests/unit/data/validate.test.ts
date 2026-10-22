@@ -9,7 +9,10 @@ import {
   validate,
 } from '@/lib/data/validate';
 
-const SEED = parseRawCsv(readFileSync('data/raw/ecb-eur-reference.csv', 'utf8'));
+/** The seed snapshot (D-15); later fixings appended by the daily job are not part of these tests. */
+const SEED = parseRawCsv(readFileSync('data/raw/ecb-eur-reference.csv', 'utf8')).filter(
+  (r) => r.date <= '2026-09-14',
+);
 
 /** A clean week of fixings (Mon 2026-09-07 … Mon 2026-09-14). */
 function week(): RawRow[] {
@@ -111,7 +114,10 @@ describe('seed data (data/raw, 1999-01-04 … 2026-09-14)', () => {
   it('passes every rule; the only daily moves ≥ 10 % are the whitelisted 15.01.2015', () => {
     expect(validate(SEED)).toEqual([]);
     const big = largeMoves(SEED);
-    expect(big.map((m) => `${m.date} ${m.pair}`)).toEqual(['2015-01-15 EUR/CHF', '2015-01-15 USD/CHF']);
+    expect(big.map((m) => `${m.date} ${m.pair}`)).toEqual([
+      '2015-01-15 EUR/CHF',
+      '2015-01-15 USD/CHF',
+    ]);
     expect(big[0]!.logReturn).toBeCloseTo(Math.log(1.028 / 1.201), 12);
     // without the whitelist the franc shock is reported
     expect(validate(SEED, { whitelist: [] }).map((e) => e.pair)).toEqual(['EUR/CHF', 'USD/CHF']);

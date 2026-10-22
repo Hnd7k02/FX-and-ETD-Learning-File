@@ -21,15 +21,7 @@ import { bankDaysBetween, isIsoDate } from './dates';
 import { PAIRS, crossRate, type Pair } from './series';
 
 export type ValidationRule =
-  | 'empty'
-  | 'date'
-  | 'order'
-  | 'duplicate'
-  | 'rate'
-  | 'future'
-  | 'stale'
-  | 'jump'
-  | 'continuity';
+  'empty' | 'date' | 'order' | 'duplicate' | 'rate' | 'future' | 'stale' | 'jump' | 'continuity';
 
 export interface ValidationError {
   rule: ValidationRule;
@@ -51,8 +43,16 @@ export interface WhitelistEntry {
  * shows EUR/CHF and USD/CHF about 15 % lower than the day before.
  */
 export const DEFAULT_WHITELIST: readonly WhitelistEntry[] = [
-  { date: '2015-01-15', pair: 'EUR/CHF', reason: 'SNB discontinues the 1.20 floor (snb-2015-01-15)' },
-  { date: '2015-01-15', pair: 'USD/CHF', reason: 'SNB discontinues the 1.20 floor (snb-2015-01-15)' },
+  {
+    date: '2015-01-15',
+    pair: 'EUR/CHF',
+    reason: 'SNB discontinues the 1.20 floor (snb-2015-01-15)',
+  },
+  {
+    date: '2015-01-15',
+    pair: 'USD/CHF',
+    reason: 'SNB discontinues the 1.20 floor (snb-2015-01-15)',
+  },
 ];
 
 export const MAX_ABS_LOG_RETURN = 0.1;
@@ -85,7 +85,11 @@ export function validate(rows: readonly RawRow[], opts: ValidationOptions = {}):
   rows.forEach((r, i) => {
     if (!isIsoDate(r.date)) {
       datesOk = false;
-      errors.push({ rule: 'date', date: r.date, message: `row ${i + 1}: invalid date "${r.date}"` });
+      errors.push({
+        rule: 'date',
+        date: r.date,
+        message: `row ${i + 1}: invalid date "${r.date}"`,
+      });
     }
     for (const ccy of CURRENCIES) {
       const v = r[ccy];
@@ -171,7 +175,10 @@ export interface ContinuityReport {
  * Compares freshly fetched data with the versioned file so a truncated download can never
  * replace the history: every date of `prev` must still be there and `next` may not end earlier.
  */
-export function checkContinuity(prev: readonly RawRow[], next: readonly RawRow[]): ContinuityReport {
+export function checkContinuity(
+  prev: readonly RawRow[],
+  next: readonly RawRow[],
+): ContinuityReport {
   const errors: ValidationError[] = [];
   const nextByDate = new Map(next.map((r) => [r.date, r]));
   const prevDates = new Set(prev.map((r) => r.date));

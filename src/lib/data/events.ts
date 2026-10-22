@@ -257,7 +257,8 @@ function checkDate(x: unknown, where: string): string {
 
 function checkIds(x: unknown, where: string): string[] {
   if (!Array.isArray(x) || x.length === 0) fail(`${where} must be a non-empty list`);
-  for (const s of x) if (typeof s !== 'string' || !ID_RE.test(s)) fail(`${where}: bad id ${String(s)}`);
+  for (const s of x)
+    if (typeof s !== 'string' || !ID_RE.test(s)) fail(`${where}: bad id ${String(s)}`);
   return x as string[];
 }
 

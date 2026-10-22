@@ -19,7 +19,7 @@ describe('raw format', () => {
   });
 
   it('reads CRLF, a BOM and empty cells (as NaN) and writes empty cells back', () => {
-    const rows = parseRawCsv(`﻿${RAW_HEADER}\r\n2026-01-05,1.1,,150\r\n\r\n`);
+    const rows = parseRawCsv(`\uFEFF${RAW_HEADER}\r\n2026-01-05,1.1,,150\r\n\r\n`);
     expect(rows).toHaveLength(1);
     expect(rows[0]!.USD).toBe(1.1);
     expect(rows[0]!.CHF).toBeNaN();
@@ -54,9 +54,9 @@ describe('ECB csvdata parser', () => {
     expect(rows).toHaveLength(30);
     expect(rows[0]!.date).toBe('2026-08-04');
     expect(rows[29]).toEqual({ date: '2026-09-14', USD: 1.1551, CHF: 0.9431, JPY: 178.52 });
-    // the same values as the seed file (the fixture was cut from it)
-    const seed = parseRawCsv(readFileSync('data/raw/ecb-eur-reference.csv', 'utf8')).slice(-30);
-    expect(rows).toEqual(seed);
+    // the same values as the raw file (the fixture was cut from the seed)
+    const raw = parseRawCsv(readFileSync('data/raw/ecb-eur-reference.csv', 'utf8'));
+    expect(rows).toEqual(raw.filter((r) => r.date >= '2026-08-04' && r.date <= '2026-09-14'));
   });
 
   it('skips other currencies and empty values, keeps gaps as NaN', () => {
@@ -80,7 +80,8 @@ describe('ECB csvdata parser', () => {
   });
 
   it('sorts unordered dates and requires the key columns', () => {
-    const text = 'CURRENCY,TIME_PERIOD,OBS_VALUE\nUSD,2026-01-07,1\nUSD,2026-01-05,1\nUSD,2026-01-06,1\nUSD,2026-01-06,2';
+    const text =
+      'CURRENCY,TIME_PERIOD,OBS_VALUE\nUSD,2026-01-07,1\nUSD,2026-01-05,1\nUSD,2026-01-06,1\nUSD,2026-01-06,2';
     const { rows } = parseEcbCsv(text);
     expect(rows.map((r) => [r.date, r.USD])).toEqual([
       ['2026-01-05', 1],
