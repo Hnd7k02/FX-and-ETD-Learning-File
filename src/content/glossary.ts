@@ -1,0 +1,1311 @@
+/**
+ * Glossary (DE/EN). One entry per term: definition in 1–2 sentences, the module (and section)
+ * where it is taught, and related terms. German in du-form; English technical terms such as
+ * Forward Points, Strike or Knock-out stay English in German too.
+ *
+ * Rules: textbook knowledge only, no numbers from the running example, no bank, product or
+ * provider names. tests/unit/glossary.test.ts checks ids, modules, cross-references and wording.
+ */
+import type { L10n } from '@/i18n/types';
+
+export type GlossarySection = '1' | '2' | '3' | '4';
+
+export interface GlossaryEntry {
+  /** Kebab-case id, also the anchor on the glossary page (#term-{id}). */
+  id: string;
+  term: L10n;
+  /** Extra search keys: abbreviations, synonyms, spellings (any language). */
+  aliases?: string[];
+  def: L10n;
+  /** Module slug where the term is taught (see src/data/modules.ts). */
+  module: string;
+  /** Section of that module (default '1'). */
+  section?: GlossarySection;
+  /** Related entries (ids). */
+  see?: string[];
+}
+
+export const GLOSSARY: GlossaryEntry[] = [
+  /* ---------- 01 · FX market & spot ---------- */
+  {
+    id: 'exchange-rate',
+    term: { de: 'Wechselkurs', en: 'Exchange rate' },
+    aliases: ['Devisenkurs', 'FX rate', 'Kurs'],
+    def: {
+      de: 'Der Preis einer Währung, ausgedrückt in einer anderen. USD/CHF sagt dir, wie viele Franken du für einen US-Dollar bezahlst.',
+      en: 'The price of one currency expressed in another. USD/CHF tells you how many Swiss francs you pay for one US dollar.',
+    },
+    module: '01-spot',
+    section: '1',
+    see: ['base-currency', 'quote-currency', 'spot'],
+  },
+  {
+    id: 'spot',
+    term: { de: 'Spot', en: 'Spot' },
+    aliases: ['Spotkurs', 'Kassa', 'spot rate'],
+    def: {
+      de: 'Ein Devisengeschäft zum aktuellen Kurs, geliefert kurz danach, meist zwei Bankarbeitstage später (T+2). Der Spotkurs ist der Ausgangspunkt für alle anderen Preise in diesem Tool.',
+      en: 'An FX deal at the current rate, settled shortly afterwards, usually two business days later (T+2). The spot rate is the starting point for every other price in this tool.',
+    },
+    module: '01-spot',
+    section: '1',
+    see: ['value-date', 'forward', 'exchange-rate'],
+  },
+  {
+    id: 'base-currency',
+    term: { de: 'Base-Währung', en: 'Base currency' },
+    aliases: ['Base', 'Basiswährung', 'foreign', 'rf'],
+    def: {
+      de: 'Die erste Währung eines Paars, also die Einheit, die gehandelt wird. In EUR/USD ist der Euro die Base: Der Kurs nennt den Preis für 1 Euro.',
+      en: 'The first currency of a pair, the unit being traded. In EUR/USD the euro is the base: the rate is the price of 1 euro.',
+    },
+    module: '01-spot',
+    section: '3',
+    see: ['quote-currency', 'exchange-rate'],
+  },
+  {
+    id: 'quote-currency',
+    term: { de: 'Quote-Währung', en: 'Quote currency' },
+    aliases: ['Quote', 'Preiswährung', 'domestic', 'rd', 'terms currency'],
+    def: {
+      de: 'Die zweite Währung eines Paars, in der der Preis angegeben wird. In den Optionsformeln ist sie die inländische Währung, ihr Zins heisst rd.',
+      en: 'The second currency of a pair, in which the price is stated. In the option formulas it is the domestic currency and its rate is called rd.',
+    },
+    module: '01-spot',
+    section: '3',
+    see: ['base-currency', 'garman-kohlhagen'],
+  },
+  {
+    id: 'pip',
+    term: { de: 'Pip', en: 'Pip' },
+    aliases: ['Pips', 'point'],
+    def: {
+      de: 'Die kleinste übliche Kursstufe: die vierte Nachkommastelle, also 0.0001. Bei JPY-Paaren ist ein Pip 0.01.',
+      en: 'The smallest usual price step: the fourth decimal place, i.e. 0.0001. For JPY pairs one pip is 0.01.',
+    },
+    module: '01-spot',
+    section: '3',
+    see: ['big-figure', 'forward-points'],
+  },
+  {
+    id: 'big-figure',
+    term: { de: 'Big Figure', en: 'Big figure' },
+    aliases: ['Figur', 'handle'],
+    def: {
+      de: 'Die vorderen Stellen eines Kurses, die sich selten ändern. Eine Big Figure sind 100 Pips; Händler nennen deshalb oft nur die letzten zwei Stellen.',
+      en: 'The leading digits of a rate, which rarely change. One big figure is 100 pips, so dealers often quote only the last two digits.',
+    },
+    module: '01-spot',
+    section: '3',
+    see: ['pip', 'two-way-price'],
+  },
+  {
+    id: 'bid',
+    term: { de: 'Bid', en: 'Bid' },
+    aliases: ['Geldkurs', 'Ankaufskurs'],
+    def: {
+      de: 'Der Kurs, zu dem der Market Maker die Base-Währung von dir kauft. Willst du verkaufen, bekommst du den Bid.',
+      en: 'The rate at which the market maker buys the base currency from you. If you want to sell, you get the bid.',
+    },
+    module: '01-spot',
+    section: '3',
+    see: ['ask', 'spread', 'two-way-price'],
+  },
+  {
+    id: 'ask',
+    term: { de: 'Ask', en: 'Ask' },
+    aliases: ['Offer', 'Briefkurs', 'Verkaufskurs'],
+    def: {
+      de: 'Der Kurs, zu dem der Market Maker dir die Base-Währung verkauft. Willst du kaufen, zahlst du den Ask, und der liegt immer über dem Bid.',
+      en: 'The rate at which the market maker sells the base currency to you, also called the offer. If you want to buy, you pay the ask, which is always above the bid.',
+    },
+    module: '01-spot',
+    section: '3',
+    see: ['bid', 'spread'],
+  },
+  {
+    id: 'spread',
+    term: { de: 'Spread', en: 'Spread' },
+    aliases: ['Geld-Brief-Spanne', 'bid-ask spread'],
+    def: {
+      de: 'Die Differenz zwischen Ask und Bid. Sie ist der Lohn des Market Makers und wird breiter, wenn der Markt dünn, nervös oder geschlossen ist.',
+      en: 'The difference between ask and bid. It pays the market maker and widens when the market is thin, nervous or closed.',
+    },
+    module: '01-spot',
+    section: '3',
+    see: ['bid', 'ask', 'market-maker'],
+  },
+  {
+    id: 'two-way-price',
+    term: { de: '2-Way Price', en: 'Two-way price' },
+    aliases: ['two way', 'Zweiweg-Kurs', 'Quote'],
+    def: {
+      de: 'Ein Kurs mit Bid und Ask zugleich. So erfährt der Market Maker nicht, ob du kaufen oder verkaufen willst, und muss beide Seiten fair stellen.',
+      en: 'A quote with bid and ask at the same time. The market maker does not learn whether you want to buy or sell and has to price both sides fairly.',
+    },
+    module: '01-spot',
+    section: '3',
+    see: ['bid', 'ask', 'spread'],
+  },
+  {
+    id: 'otc',
+    term: { de: 'OTC', en: 'OTC' },
+    aliases: ['Over the Counter', 'ausserbörslich', 'bilateral'],
+    def: {
+      de: 'Handel direkt zwischen zwei Parteien statt über eine Börse. Der Devisenmarkt ist grösstenteils OTC: Betrag, Kurs und Laufzeit werden bilateral vereinbart.',
+      en: 'Trading directly between two parties instead of on an exchange. The FX market is largely OTC: amount, rate and maturity are agreed bilaterally.',
+    },
+    module: '01-spot',
+    section: '2',
+    see: ['market-maker', 'spot'],
+  },
+  {
+    id: 'market-maker',
+    term: { de: 'Market Maker', en: 'Market maker' },
+    aliases: ['Händler', 'dealer', 'Liquidity provider'],
+    def: {
+      de: 'Ein Händler, der laufend Bid und Ask stellt und auf beiden Seiten handelt. Er verdient am Spread und trägt das Risiko, bis er die Position wieder los ist.',
+      en: 'A dealer who keeps quoting bid and ask and trades on both sides. They earn the spread and carry the risk until the position is offset.',
+    },
+    module: '01-spot',
+    section: '2',
+    see: ['spread', 'two-way-price', 'otc'],
+  },
+  {
+    id: 'value-date',
+    term: { de: 'Valuta (T+2)', en: 'Value date (T+2)' },
+    aliases: ['T+2', 'T+1', 'Valutatag', 'settlement date', 'Lieferdatum'],
+    def: {
+      de: 'Der Tag, an dem die Währungen tatsächlich fliessen. Beim Spot sind das meist zwei Bankarbeitstage nach dem Abschluss (T+2), bei USD/CAD einer (T+1).',
+      en: 'The day on which the currencies actually change hands. For spot this is usually two business days after the trade (T+2), for USD/CAD one (T+1).',
+    },
+    module: '01-spot',
+    section: '3',
+    see: ['spot', 'forward'],
+  },
+  {
+    id: 'market-order',
+    term: { de: 'Market Order', en: 'Market order' },
+    aliases: ['Bestens', 'Marktauftrag'],
+    def: {
+      de: 'Ein Auftrag, sofort zum besten verfügbaren Kurs zu handeln. Die Ausführung ist sicher, der genaue Kurs nicht.',
+      en: 'An order to trade immediately at the best available rate. Execution is certain, the exact rate is not.',
+    },
+    module: '01-spot',
+    section: '3',
+    see: ['limit-order', 'stop-loss-order'],
+  },
+  {
+    id: 'limit-order',
+    term: { de: 'Limit Order', en: 'Limit order' },
+    aliases: ['Limite', 'Limitauftrag', 'take profit'],
+    def: {
+      de: 'Ein Auftrag, nur zu einem festgelegten Kurs oder besser zu handeln. Der Kurs ist sicher, die Ausführung nicht: Erreicht der Markt das Limit nie, passiert nichts.',
+      en: 'An order to trade only at a set rate or better. The rate is certain, execution is not: if the market never reaches the limit, nothing happens.',
+    },
+    module: '01-spot',
+    section: '3',
+    see: ['market-order', 'stop-loss-order'],
+  },
+  {
+    id: 'stop-loss-order',
+    term: { de: 'Stop-Loss Order', en: 'Stop-loss order' },
+    aliases: ['Stop', 'Stop-Loss', 'Verlustbegrenzung'],
+    def: {
+      de: 'Ein Auftrag, der eine Position schliesst, sobald der Kurs eine Schwelle erreicht. Dann wird er zur Market Order und kann nach einem Kurssprung deutlich schlechter ausgeführt werden.',
+      en: 'An order that closes a position once the rate reaches a trigger level. It then becomes a market order and can be filled at a much worse rate after a jump.',
+    },
+    module: '01-spot',
+    section: '3',
+    see: ['gap-risk', 'market-order', 'limit-order'],
+  },
+  {
+    id: 'gap-risk',
+    term: { de: 'Gap-Risiko', en: 'Gap risk' },
+    aliases: ['Gap', 'Kurssprung', 'jump risk'],
+    def: {
+      de: 'Das Risiko, dass der Kurs springt, ohne die Werte dazwischen zu handeln. Stop-Loss Orders und Barrieren werden dann weit weg von ihrer Schwelle ausgelöst.',
+      en: 'The risk that the rate jumps without trading the levels in between. Stop-loss orders and barriers are then triggered far away from their level.',
+    },
+    module: '01-spot',
+    section: '3',
+    see: ['stop-loss-order', 'knock-out', 'barrier-option'],
+  },
+  {
+    id: 'cross-rate',
+    term: { de: 'Kreuzkurs', en: 'Cross rate' },
+    aliases: ['Cross', 'Crossrate'],
+    def: {
+      de: 'Ein Kurs zwischen zwei Währungen, der über eine dritte gerechnet wird. Im Riskometer entsteht USD/CHF so aus EUR/CHF geteilt durch EUR/USD.',
+      en: 'A rate between two currencies that is calculated via a third. In the Riskometer, USD/CHF is derived this way as EUR/CHF divided by EUR/USD.',
+    },
+    module: '01-spot',
+    section: '3',
+    see: ['triangular-arbitrage', 'exchange-rate'],
+  },
+  {
+    id: 'triangular-arbitrage',
+    term: { de: 'Dreiecksarbitrage', en: 'Triangular arbitrage' },
+    aliases: ['Triangular', 'Dreieck'],
+    def: {
+      de: 'Eine Arbitrage über drei Kurse, die nicht zueinander passen, etwa EUR/USD, USD/CHF und EUR/CHF. Weil Händler solche Lücken sofort schliessen, entspricht der Kreuzkurs praktisch dem Produkt der beiden anderen.',
+      en: 'An arbitrage across three rates that do not fit together, such as EUR/USD, USD/CHF and EUR/CHF. Because dealers close such gaps at once, the cross rate is in practice the product of the other two.',
+    },
+    module: '01-spot',
+    section: '3',
+    see: ['cross-rate', 'arbitrage'],
+  },
+  {
+    id: 'safe-haven',
+    term: { de: 'Safe Haven', en: 'Safe haven' },
+    aliases: ['sicherer Hafen', 'Fluchtwährung'],
+    def: {
+      de: 'Eine Währung, in die Anleger in Krisen flüchten und die dann oft aufwertet. Der Franken und der Yen gelten als typische Beispiele.',
+      en: 'A currency that investors flee into during crises and that then tends to appreciate. The Swiss franc and the yen are typical examples.',
+    },
+    module: '01-spot',
+    section: '4',
+    see: ['funding-currency', 'carry-trade'],
+  },
+  {
+    id: 'carry-trade',
+    term: { de: 'Carry Trade', en: 'Carry trade' },
+    aliases: ['Zinsdifferenzgeschäft'],
+    def: {
+      de: 'Du leihst eine Währung mit tiefem Zins und legst in einer mit hohem Zins an. Du verdienst die Zinsdifferenz, solange der Wechselkurs nicht stärker gegen dich läuft.',
+      en: 'You borrow a low-yielding currency and invest in a high-yielding one. You earn the rate differential as long as the exchange rate does not move against you by more.',
+    },
+    module: '01-spot',
+    section: '4',
+    see: ['funding-currency', 'carry', 'interest-rate-parity'],
+  },
+  {
+    id: 'funding-currency',
+    term: { de: 'Funding-Währung', en: 'Funding currency' },
+    aliases: ['Finanzierungswährung', 'Funding'],
+    def: {
+      de: 'Die Währung mit tiefem Zins, in der ein Carry Trade finanziert wird. Lösen viele solche Trades gleichzeitig auf, kaufen sie die Währung zurück, und sie kann stark aufwerten.',
+      en: 'The low-yielding currency that finances a carry trade. When many such trades unwind at once, the currency is bought back and can appreciate sharply.',
+    },
+    module: '01-spot',
+    section: '4',
+    see: ['carry-trade', 'safe-haven'],
+  },
+
+  /* ---------- 02 · Forward ---------- */
+  {
+    id: 'forward',
+    term: { de: 'Forward', en: 'Forward' },
+    aliases: ['Devisentermingeschäft', 'Termingeschäft', 'Terminkurs', 'outright forward'],
+    def: {
+      de: 'Ein verbindlicher Vertrag, eine Währung an einem späteren Datum zu einem heute fixierten Kurs zu tauschen. Der Kurs folgt aus Spot und Zinsdifferenz, nicht aus einer Prognose.',
+      en: 'A binding contract to exchange a currency on a later date at a rate fixed today. The rate follows from spot and the interest differential, not from a forecast.',
+    },
+    module: '02-forward',
+    section: '1',
+    see: ['forward-points', 'interest-rate-parity', 'outright'],
+  },
+  {
+    id: 'outright',
+    term: { de: 'Outright', en: 'Outright' },
+    aliases: ['Outright-Kurs', 'Outright Forward'],
+    def: {
+      de: 'Ein einzelner Forward ohne Gegengeschäft, im Gegensatz zum FX Swap. Der Outright-Kurs ist Spot plus Forward Points.',
+      en: 'A single forward without an offsetting leg, as opposed to an FX swap. The outright rate is spot plus forward points.',
+    },
+    module: '02-forward',
+    section: '1',
+    see: ['forward', 'forward-points', 'fx-swap'],
+  },
+  {
+    id: 'notional',
+    term: { de: 'Nominal', en: 'Notional' },
+    aliases: ['Nominalbetrag', 'Nennwert', 'notional amount'],
+    def: {
+      de: 'Der Betrag, auf den sich ein Geschäft bezieht, etwa die Menge Base-Währung eines Forwards oder einer Option. Prämie und Greeks werden oft auf das Nominal hochgerechnet.',
+      en: 'The amount a deal refers to, such as the amount of base currency in a forward or an option. Premium and Greeks are often scaled to the notional.',
+    },
+    module: '02-forward',
+    section: '1',
+    see: ['forward', 'premium'],
+  },
+  {
+    id: 'interest-rate-parity',
+    term: { de: 'Zinsparität', en: 'Interest rate parity' },
+    aliases: ['gedeckte Zinsparität', 'covered interest parity', 'CIP', 'IRP'],
+    def: {
+      de: 'Die Regel, die den Forward festlegt: Zwei gleich sichere Wege zum selben Betrag müssen heute gleich viel kosten. Daraus folgt F = S · (1 + r_Quote · t) / (1 + r_Base · t).',
+      en: 'The rule that sets the forward: two equally safe routes to the same amount must cost the same today. It gives F = S · (1 + r_quote · t) / (1 + r_base · t).',
+    },
+    module: '02-forward',
+    section: '2',
+    see: ['forward', 'cash-and-carry', 'covered-interest-arbitrage'],
+  },
+  {
+    id: 'forward-points',
+    term: { de: 'Forward Points', en: 'Forward points' },
+    aliases: ['Terminpunkte', 'Swapsatz', 'Points'],
+    def: {
+      de: 'Die Differenz zwischen Forward und Spot, in Pips. Sie spiegeln die Zinsdifferenz der beiden Währungen über die Laufzeit.',
+      en: 'The difference between forward and spot, in pips. They reflect the interest differential between the two currencies over the term.',
+    },
+    module: '02-forward',
+    section: '3',
+    see: ['forward', 'forward-premium-discount', 'swap-points', 'pip'],
+  },
+  {
+    id: 'forward-premium-discount',
+    term: { de: 'Aufschlag und Abschlag', en: 'Forward premium and discount' },
+    aliases: ['Report', 'Deport', 'Terminaufschlag', 'Terminabschlag', 'Contango'],
+    def: {
+      de: 'Liegt der Forward über dem Spot, notiert er mit Aufschlag, darunter mit Abschlag. Die Währung mit dem höheren Zins notiert auf Termin immer mit Abschlag.',
+      en: 'If the forward is above spot it trades at a premium, below spot at a discount. The currency with the higher interest rate always trades at a forward discount.',
+    },
+    module: '02-forward',
+    section: '3',
+    see: ['forward-points', 'carry'],
+  },
+  {
+    id: 'carry',
+    term: { de: 'Carry', en: 'Carry' },
+    aliases: ['Cost of Carry', 'Haltekosten', 'Cost minus Benefit'],
+    def: {
+      de: 'Was es kostet oder einbringt, eine Position über die Zeit zu halten. Für den Forward gilt: Forward = Spot + Cost − Benefit, mit dem Zins der Quote-Währung als Cost und dem der Base-Währung als Benefit.',
+      en: 'What it costs or earns to hold a position over time. For the forward: forward = spot + cost − benefit, with the quote currency rate as the cost and the base currency rate as the benefit.',
+    },
+    module: '02-forward',
+    section: '3',
+    see: ['forward-points', 'carry-trade', 'interest-rate-parity'],
+  },
+  {
+    id: 'arbitrage',
+    term: { de: 'Arbitrage', en: 'Arbitrage' },
+    aliases: ['Arbitrageur', 'no arbitrage'],
+    def: {
+      de: 'Ein Gewinn ohne Kursrisiko und ohne eigenes Kapital, wenn derselbe Wert an zwei Orten verschieden kostet. Arbitrage hält Forward, Kreuzkurse und Optionspreise in Linie.',
+      en: 'A profit without market risk and without own capital when the same value costs different amounts in two places. Arbitrage keeps forwards, cross rates and option prices in line.',
+    },
+    module: '02-forward',
+    section: '4',
+    see: ['cash-and-carry', 'triangular-arbitrage', 'put-call-parity'],
+  },
+  {
+    id: 'cash-and-carry',
+    term: { de: 'Cash and Carry', en: 'Cash and carry' },
+    aliases: ['Cash-and-Carry-Arbitrage'],
+    def: {
+      de: 'Eine Arbitrage gegen einen zu teuren Forward: Du leihst Geld, kaufst die Währung am Spot, legst sie an und verkaufst sie per Forward. Am Ende bleibt die Differenz zum fairen Forward als Gewinn ohne Kursrisiko.',
+      en: 'An arbitrage against an overpriced forward: borrow, buy the currency spot, invest it and sell it forward. At the end the gap to the fair forward remains as a profit with no exchange rate risk.',
+    },
+    module: '02-forward',
+    section: '4',
+    see: ['arbitrage', 'interest-rate-parity', 'covered-interest-arbitrage'],
+  },
+  {
+    id: 'covered-interest-arbitrage',
+    term: { de: 'Gedeckte Zinsarbitrage', en: 'Covered interest arbitrage' },
+    aliases: ['covered interest', 'Zinsarbitrage'],
+    def: {
+      de: 'Arbitrage, die eine Abweichung von der Zinsparität ausnutzt, wobei ein Forward das Währungsrisiko abdeckt. Weil Händler sie sofort nutzen würden, hält der Markt die Parität im Normalfall eng ein.',
+      en: 'Arbitrage that exploits a deviation from interest rate parity, with a forward covering the currency risk. Because dealers would use it at once, the market normally keeps parity tight.',
+    },
+    module: '02-forward',
+    section: '4',
+    see: ['interest-rate-parity', 'cash-and-carry'],
+  },
+
+  /* ---------- 03 · FX swap ---------- */
+  {
+    id: 'fx-swap',
+    term: { de: 'FX Swap', en: 'FX swap' },
+    aliases: ['Devisenswap', 'Swap'],
+    def: {
+      de: 'Zwei Devisengeschäfte in Gegenrichtung mit gleichem Nominal: heute tauschen, später zurücktauschen. So leihst du dir eine Währung auf Zeit, ohne ein offenes Kursrisiko einzugehen.',
+      en: 'Two FX deals in opposite directions with the same notional: exchange now, exchange back later. You borrow a currency for a period without taking an open exchange rate risk.',
+    },
+    module: '03-fx-swap',
+    section: '1',
+    see: ['near-leg', 'far-leg', 'swap-points', 'cross-currency-swap'],
+  },
+  {
+    id: 'near-leg',
+    term: { de: 'Near Leg', en: 'Near leg' },
+    aliases: ['erstes Bein', 'Nahbein'],
+    def: {
+      de: 'Das erste, frühere Geschäft eines FX Swaps, oft zum Spot. Hier werden die Währungen zum ersten Mal getauscht.',
+      en: 'The first, earlier deal of an FX swap, often at spot. This is where the currencies are first exchanged.',
+    },
+    module: '03-fx-swap',
+    section: '2',
+    see: ['far-leg', 'fx-swap'],
+  },
+  {
+    id: 'far-leg',
+    term: { de: 'Far Leg', en: 'Far leg' },
+    aliases: ['zweites Bein', 'Fernbein'],
+    def: {
+      de: 'Das zweite, spätere Geschäft eines FX Swaps, in Gegenrichtung. Sein Kurs ist der Kurs des Near Leg plus die Swap Points.',
+      en: 'The second, later deal of an FX swap, in the opposite direction. Its rate is the near-leg rate plus the swap points.',
+    },
+    module: '03-fx-swap',
+    section: '2',
+    see: ['near-leg', 'swap-points'],
+  },
+  {
+    id: 'swap-points',
+    term: { de: 'Swap Points', en: 'Swap points' },
+    aliases: ['Swapsatz', 'Swappunkte'],
+    def: {
+      de: 'Die Differenz zwischen dem Kurs des Far Leg und dem des Near Leg, in Pips. Sie sind der Preis des Swaps und entsprechen der Zinsdifferenz über die Laufzeit.',
+      en: 'The difference between the far-leg and near-leg rates, in pips. They are the price of the swap and reflect the interest differential over the term.',
+    },
+    module: '03-fx-swap',
+    section: '2',
+    see: ['forward-points', 'fx-swap'],
+  },
+  {
+    id: 'roll',
+    term: { de: 'Roll', en: 'Roll' },
+    aliases: ['Rollen', 'Hedge rollen', 'Prolongation', 'rollover'],
+    def: {
+      de: 'Eine fällige Absicherung wird auf ein späteres Datum verschoben, meist mit einem FX Swap. Das Near Leg gleicht den alten Forward aus, das Far Leg setzt den neuen.',
+      en: 'Moving a maturing hedge to a later date, usually with an FX swap. The near leg offsets the old forward, the far leg sets up the new one.',
+    },
+    module: '03-fx-swap',
+    section: '3',
+    see: ['fx-swap', 'hedge'],
+  },
+  {
+    id: 'cross-currency-swap',
+    term: { de: 'Cross-Currency Swap', en: 'Cross-currency swap' },
+    aliases: ['CCS', 'Währungsswap', 'CCY swap'],
+    def: {
+      de: 'Ein meist längerfristiger Tausch von Kapital und Zinszahlungen in zwei Währungen. Anders als beim FX Swap fliessen während der Laufzeit regelmässig Zinsen.',
+      en: 'A usually longer-term exchange of principal and interest payments in two currencies. Unlike an FX swap, interest is paid periodically during the term.',
+    },
+    module: '03-fx-swap',
+    section: '4',
+    see: ['fx-swap'],
+  },
+
+  /* ---------- 04 · Vanilla options ---------- */
+  {
+    id: 'option',
+    term: { de: 'Option', en: 'Option' },
+    aliases: ['Devisenoption', 'FX option', 'Vanilla'],
+    def: {
+      de: 'Ein Recht, aber keine Pflicht, eine Währung zu einem festgelegten Kurs zu kaufen oder zu verkaufen. Für dieses Recht zahlt der Käufer eine Prämie.',
+      en: 'A right, but not an obligation, to buy or sell a currency at an agreed rate. The buyer pays a premium for this right.',
+    },
+    module: '04-vanilla-options',
+    section: '1',
+    see: ['call', 'put', 'strike', 'premium'],
+  },
+  {
+    id: 'call',
+    term: { de: 'Call', en: 'Call' },
+    aliases: ['Kaufoption', 'call option'],
+    def: {
+      de: 'Das Recht, die Base-Währung zum Strike zu kaufen. In FX ist ein Call immer auch ein Put auf die andere Währung: Ein USD Call ist ein CHF Put.',
+      en: 'The right to buy the base currency at the strike. In FX a call is always also a put on the other currency: a USD call is a CHF put.',
+    },
+    module: '04-vanilla-options',
+    section: '1',
+    see: ['put', 'option', 'strike'],
+  },
+  {
+    id: 'put',
+    term: { de: 'Put', en: 'Put' },
+    aliases: ['Verkaufsoption', 'put option'],
+    def: {
+      de: 'Das Recht, die Base-Währung zum Strike zu verkaufen. Ein USD Put ist zugleich ein CHF Call.',
+      en: 'The right to sell the base currency at the strike. A USD put is at the same time a CHF call.',
+    },
+    module: '04-vanilla-options',
+    section: '1',
+    see: ['call', 'option', 'strike'],
+  },
+  {
+    id: 'long-short',
+    term: { de: 'Long und Short', en: 'Long and short' },
+    aliases: ['Long', 'Short', 'Käufer', 'Verkäufer', 'Stillhalter', 'writer'],
+    def: {
+      de: 'Long heisst, du hast gekauft und profitierst, wenn der Wert steigt; short heisst, du hast verkauft und profitierst, wenn er fällt. Bei Optionen ist der Käufer long, der Verkäufer (Stillhalter) short.',
+      en: 'Long means you have bought and gain when the value rises; short means you have sold and gain when it falls. With options the buyer is long and the seller (writer) is short.',
+    },
+    module: '04-vanilla-options',
+    section: '2',
+    see: ['call', 'put', 'option'],
+  },
+  {
+    id: 'strike',
+    term: { de: 'Strike', en: 'Strike' },
+    aliases: ['Ausübungspreis', 'Basispreis', 'K'],
+    def: {
+      de: 'Der vereinbarte Kurs, zu dem eine Option ausgeübt werden kann. Im Auszahlungsdiagramm liegt dort der Knick.',
+      en: 'The agreed rate at which an option can be exercised. It is where the kink sits in the payoff diagram.',
+    },
+    module: '04-vanilla-options',
+    section: '2',
+    see: ['moneyness', 'option', 'expiry'],
+  },
+  {
+    id: 'expiry',
+    term: { de: 'Verfall', en: 'Expiry' },
+    aliases: ['Expiry', 'Fälligkeit', 'Laufzeitende', 'maturity'],
+    def: {
+      de: 'Der Zeitpunkt, an dem eine Option ausgeübt wird oder wertlos verfällt. Ab dann zählt nur noch die Auszahlung, der Zeitwert ist null.',
+      en: 'The moment at which an option is exercised or lapses worthless. From then on only the payoff counts and time value is zero.',
+    },
+    module: '04-vanilla-options',
+    section: '2',
+    see: ['european-american', 'time-value'],
+  },
+  {
+    id: 'premium',
+    term: { de: 'Prämie', en: 'Premium' },
+    aliases: ['Optionspreis', 'option price'],
+    def: {
+      de: 'Der Preis einer Option, beim Abschluss bezahlt. Quotiert wird sie in Pips der Quote-Währung oder in Prozent vom Nominal; sie besteht aus innerem Wert und Zeitwert.',
+      en: 'The price of an option, paid up front. It is quoted in pips of the quote currency or as a percentage of notional and consists of intrinsic value plus time value.',
+    },
+    module: '04-vanilla-options',
+    section: '3',
+    see: ['intrinsic-value', 'time-value', 'notional'],
+  },
+  {
+    id: 'european-american',
+    term: { de: 'Europäisch und amerikanisch', en: 'European and American' },
+    aliases: ['European', 'American', 'europäische Option', 'amerikanische Option'],
+    def: {
+      de: 'Eine europäische Option kannst du nur am Verfall ausüben, eine amerikanische jederzeit bis dahin. Im OTC-Devisenmarkt ist die europäische Form der Standard.',
+      en: 'A European option can only be exercised at expiry, an American option at any time until then. In the OTC FX market the European style is standard.',
+    },
+    module: '04-vanilla-options',
+    section: '3',
+    see: ['expiry', 'garman-kohlhagen'],
+  },
+  {
+    id: 'moneyness',
+    term: { de: 'Moneyness', en: 'Moneyness' },
+    aliases: ['im Geld', 'am Geld', 'aus dem Geld'],
+    def: {
+      de: 'Wo der Strike im Verhältnis zum Forward liegt: im Geld, am Geld oder aus dem Geld. Sie bestimmt, wie viel innerer Wert in der Prämie steckt.',
+      en: 'Where the strike sits relative to the forward: in, at or out of the money. It determines how much intrinsic value the premium contains.',
+    },
+    module: '04-vanilla-options',
+    section: '3',
+    see: ['atm', 'atmf', 'itm', 'otm'],
+  },
+  {
+    id: 'atm',
+    term: { de: 'ATM', en: 'ATM' },
+    aliases: ['At the Money', 'am Geld', 'ATM DNS', 'delta-neutral'],
+    def: {
+      de: 'Am Geld: Der Strike liegt beim aktuellen Kurs. Am Desk meint ATM oft den Strike des delta-neutralen Straddles; frag deshalb nach, welcher ATM gemeint ist.',
+      en: 'At the money: the strike sits at the current rate. On the desk ATM often means the strike of the delta-neutral straddle, so ask which ATM is meant.',
+    },
+    module: '04-vanilla-options',
+    section: '3',
+    see: ['atmf', 'moneyness', 'straddle'],
+  },
+  {
+    id: 'atmf',
+    term: { de: 'ATMF', en: 'ATMF' },
+    aliases: ['At the Money Forward', 'am Geld Forward'],
+    def: {
+      de: 'Der Strike entspricht genau dem Forward. Dann kosten Call und Put gleich viel, und die Prämie ist reiner Zeitwert.',
+      en: 'The strike equals the forward exactly. Call and put then cost the same, and the premium is pure time value.',
+    },
+    module: '04-vanilla-options',
+    section: '3',
+    see: ['atm', 'moneyness', 'put-call-parity'],
+  },
+  {
+    id: 'itm',
+    term: { de: 'ITM', en: 'ITM' },
+    aliases: ['In the Money', 'im Geld'],
+    def: {
+      de: 'Im Geld: Die Option hat gegenüber dem Forward schon heute einen inneren Wert. Beim Call liegt der Strike unter dem Forward, beim Put darüber.',
+      en: 'In the money: the option already has intrinsic value against the forward today. For a call the strike is below the forward, for a put above it.',
+    },
+    module: '04-vanilla-options',
+    section: '3',
+    see: ['otm', 'intrinsic-value', 'moneyness'],
+  },
+  {
+    id: 'otm',
+    term: { de: 'OTM', en: 'OTM' },
+    aliases: ['Out of the Money', 'aus dem Geld'],
+    def: {
+      de: 'Aus dem Geld: Die Option hat gegenüber dem Forward keinen inneren Wert, nur Zeitwert. Beim Call liegt der Strike über dem Forward, beim Put darunter.',
+      en: 'Out of the money: the option has no intrinsic value against the forward, only time value. For a call the strike is above the forward, for a put below it.',
+    },
+    module: '04-vanilla-options',
+    section: '3',
+    see: ['itm', 'time-value', 'moneyness'],
+  },
+  {
+    id: 'intrinsic-value',
+    term: { de: 'Innerer Wert', en: 'Intrinsic value' },
+    aliases: ['intrinsic'],
+    def: {
+      de: 'Was die Option wert wäre, wenn du sie sofort gegen den Forward ausüben könntest: beim Call max(F − K, 0), abgezinst. Er ist nie negativ.',
+      en: 'What the option would be worth if you could exercise it against the forward right now: for a call max(F − K, 0), discounted. It is never negative.',
+    },
+    module: '04-vanilla-options',
+    section: '3',
+    see: ['time-value', 'premium', 'itm'],
+  },
+  {
+    id: 'time-value',
+    term: { de: 'Zeitwert', en: 'Time value' },
+    aliases: ['extrinsic value', 'Optionalität'],
+    def: {
+      de: 'Der Teil der Prämie über dem inneren Wert. Er bezahlt die Chance, dass sich der Kurs bis zum Verfall noch günstig bewegt, und schmilzt zum Verfall hin auf null.',
+      en: 'The part of the premium above intrinsic value. It pays for the chance that the rate still moves favourably before expiry and melts to zero at expiry.',
+    },
+    module: '04-vanilla-options',
+    section: '3',
+    see: ['intrinsic-value', 'theta', 'premium'],
+  },
+  {
+    id: 'delta-25',
+    term: { de: '25-Delta', en: '25-delta' },
+    aliases: ['25Δ', '25 Delta', '10Δ', '10-Delta', 'Delta-Quotierung'],
+    def: {
+      de: 'Eine Option mit einem Delta von 0.25, also klar aus dem Geld. Im FX-Optionsmarkt werden Strikes oft über das Delta statt über den Kurs angegeben.',
+      en: 'An option with a delta of 0.25, i.e. clearly out of the money. In the FX options market strikes are often quoted by delta rather than by rate.',
+    },
+    module: '04-vanilla-options',
+    section: '3',
+    see: ['delta', 'risk-reversal', 'butterfly'],
+  },
+  {
+    id: 'volatility',
+    term: { de: 'Volatilität', en: 'Volatility' },
+    aliases: ['Vola', 'Vol', 'σ', 'sigma'],
+    def: {
+      de: 'Ein Mass für die Schwankung eines Kurses: die annualisierte Standardabweichung der Log-Renditen. Mehr Vola macht Optionen teurer, weil grosse Bewegungen wahrscheinlicher werden.',
+      en: 'A measure of how much a rate fluctuates: the annualised standard deviation of log returns. Higher volatility makes options more expensive because large moves become more likely.',
+    },
+    module: '04-vanilla-options',
+    section: '4',
+    see: ['implied-volatility', 'realised-volatility', 'vega'],
+  },
+  {
+    id: 'implied-volatility',
+    term: { de: 'Implizite Volatilität', en: 'Implied volatility' },
+    aliases: ['implizite Vola', 'implied vol', 'IV'],
+    def: {
+      de: 'Die Vola, die du ins Optionsmodell einsetzen musst, damit der Marktpreis herauskommt. Sie zeigt, welche Schwankung der Markt bis zum Verfall einpreist, und misst nicht die Vergangenheit.',
+      en: 'The volatility you have to put into the option model to get the market price. It shows how much movement the market prices in until expiry; it does not measure the past.',
+    },
+    module: '04-vanilla-options',
+    section: '4',
+    see: ['realised-volatility', 'volatility-smile', 'vega'],
+  },
+  {
+    id: 'garman-kohlhagen',
+    term: { de: 'Garman-Kohlhagen', en: 'Garman-Kohlhagen' },
+    aliases: ['GK', 'Black-Scholes', 'Optionsmodell'],
+    def: {
+      de: 'Das Standardmodell für europäische Devisenoptionen, eine Erweiterung von Black-Scholes. Es rechnet mit zwei Zinsen: dem der Quote-Währung (rd) und dem der Base-Währung (rf).',
+      en: 'The standard model for European FX options, an extension of Black-Scholes. It works with two interest rates: that of the quote currency (rd) and that of the base currency (rf).',
+    },
+    module: '04-vanilla-options',
+    section: '4',
+    see: ['black-76', 'greeks', 'implied-volatility'],
+  },
+  {
+    id: 'black-76',
+    term: { de: 'Black-76', en: 'Black-76' },
+    aliases: ['Black model', 'Black-Modell'],
+    def: {
+      de: 'Dieselbe Optionsformel, direkt auf den Forward geschrieben. Für FX liefert sie dasselbe Ergebnis wie Garman-Kohlhagen und zeigt: Der Forward ist der Dreh- und Angelpunkt.',
+      en: 'The same option formula, written directly on the forward. For FX it gives the same result as Garman-Kohlhagen and shows that the forward is the pivot.',
+    },
+    module: '04-vanilla-options',
+    section: '4',
+    see: ['garman-kohlhagen', 'forward'],
+  },
+  {
+    id: 'put-call-parity',
+    term: { de: 'Put-Call-Parität', en: 'Put-call parity' },
+    aliases: ['Parität', 'parity'],
+    def: {
+      de: 'Call minus Put zum selben Strike ergibt einen Forward: C − P = DF · (F − K). Wäre das verletzt, liesse sich eine Arbitrage bauen.',
+      en: 'Call minus put at the same strike gives a forward: C − P = DF · (F − K). If it failed, an arbitrage could be built.',
+    },
+    module: '04-vanilla-options',
+    section: '4',
+    see: ['synthetic-forward', 'atmf', 'arbitrage'],
+  },
+  {
+    id: 'synthetic-forward',
+    term: { de: 'Synthetischer Forward', en: 'Synthetic forward' },
+    aliases: ['Synthetic', 'Long Call Short Put'],
+    def: {
+      de: 'Long Call plus Short Put zum selben Strike. Die Kombination verhält sich wie ein Forward zum Strike, mit einem Delta von etwa 1.',
+      en: 'A long call plus a short put at the same strike. Together they behave like a forward at the strike, with a delta of about 1.',
+    },
+    module: '04-vanilla-options',
+    section: '4',
+    see: ['put-call-parity', 'forward'],
+  },
+
+  /* ---------- 05 · Greeks ---------- */
+  {
+    id: 'greeks',
+    term: { de: 'Greeks', en: 'Greeks' },
+    aliases: ['Griechen', 'Sensitivitäten', 'sensitivities'],
+    def: {
+      de: 'Die Sensitivitäten eines Optionspreises: wie er auf Kurs, Zeit, Vola und die beiden Zinsen reagiert. Jeder Greek ist eine Ableitung des Preises nach einem dieser Treiber.',
+      en: 'The sensitivities of an option price: how it reacts to the rate, time, volatility and the two interest rates. Each Greek is a derivative of the price with respect to one of these drivers.',
+    },
+    module: '05-greeks',
+    section: '1',
+    see: ['delta', 'gamma', 'vega', 'theta', 'rho'],
+  },
+  {
+    id: 'delta',
+    term: { de: 'Delta', en: 'Delta' },
+    aliases: ['Δ', 'hedge ratio'],
+    def: {
+      de: 'Wie stark sich der Optionswert ändert, wenn der Kurs ein kleines Stück steigt: ∂V/∂S. Bei einem Delta von 0.5 bewegt sich die Option etwa halb so stark wie der Kurs.',
+      en: 'How much the option value changes when the rate rises a little: ∂V/∂S. With a delta of 0.5 the option moves about half as much as the rate.',
+    },
+    module: '05-greeks',
+    section: '2',
+    see: ['gamma', 'delta-hedging', 'delta-25'],
+  },
+  {
+    id: 'gamma',
+    term: { de: 'Gamma', en: 'Gamma' },
+    aliases: ['Γ', 'Konvexität', 'convexity'],
+    def: {
+      de: 'Wie schnell sich Delta ändert, wenn der Kurs sich bewegt: die zweite Ableitung ∂²V/∂S². Am grössten ist Gamma nahe am Strike und kurz vor Verfall.',
+      en: 'How fast delta changes as the rate moves: the second derivative ∂²V/∂S². Gamma is largest near the strike and shortly before expiry.',
+    },
+    module: '05-greeks',
+    section: '2',
+    see: ['delta', 'theta', 'delta-hedging'],
+  },
+  {
+    id: 'vega',
+    term: { de: 'Vega', en: 'Vega' },
+    aliases: ['ν', 'Vola-Sensitivität'],
+    def: {
+      de: 'Wie stark sich der Optionswert ändert, wenn die Vola um einen Punkt steigt. Gekaufte Optionen haben positives Vega, am grössten nahe am Forward.',
+      en: 'How much the option value changes when volatility rises by one point. Bought options have positive vega, largest near the forward.',
+    },
+    module: '05-greeks',
+    section: '3',
+    see: ['implied-volatility', 'gamma'],
+  },
+  {
+    id: 'theta',
+    term: { de: 'Theta', en: 'Theta' },
+    aliases: ['Θ', 'Zeitwertverlust', 'time decay'],
+    def: {
+      de: 'Wie viel Wert die Option verliert, wenn ein Tag vergeht und sonst nichts passiert. Für den Käufer ist Theta meist negativ: Es ist der Preis für Gamma.',
+      en: 'How much value the option loses when one day passes and nothing else happens. For the buyer theta is usually negative: it is the price of gamma.',
+    },
+    module: '05-greeks',
+    section: '4',
+    see: ['gamma', 'time-value'],
+  },
+  {
+    id: 'rho',
+    term: { de: 'Rho', en: 'Rho' },
+    aliases: ['ρ', 'Rho domestic', 'Rho foreign', 'Zinssensitivität'],
+    def: {
+      de: 'Wie stark sich der Optionswert ändert, wenn ein Zins um einen Prozentpunkt steigt. In FX gibt es zwei: Rho domestic für die Quote-Währung und Rho foreign für die Base-Währung.',
+      en: 'How much the option value changes when an interest rate rises by one percentage point. In FX there are two: rho domestic for the quote currency and rho foreign for the base currency.',
+    },
+    module: '05-greeks',
+    section: '4',
+    see: ['garman-kohlhagen', 'greeks'],
+  },
+  {
+    id: 'delta-hedging',
+    term: { de: 'Delta-Hedging', en: 'Delta hedging' },
+    aliases: ['Delta-Hedge', 'delta-neutral', 'Gamma Scalping'],
+    def: {
+      de: 'Du gleichst das Delta einer Option mit einer Gegenposition im Spot oder Forward aus, damit kleine Kursbewegungen dich nicht treffen. Weil sich Delta mit Gamma verändert, musst du laufend nachjustieren.',
+      en: 'You offset an option’s delta with an opposite position in spot or forwards so that small moves do not hit you. Because delta changes with gamma, you have to keep readjusting.',
+    },
+    module: '05-greeks',
+    section: '4',
+    see: ['delta', 'gamma', 'theta'],
+  },
+  {
+    id: 'realised-volatility',
+    term: { de: 'Realisierte Volatilität', en: 'Realised volatility' },
+    aliases: ['realisierte Vola', 'historische Vola', 'realized volatility', 'historical vol'],
+    def: {
+      de: 'Die tatsächlich gemessene Schwankung, berechnet aus vergangenen Log-Renditen und auf ein Jahr hochgerechnet. Das Riskometer zeigt sie für vier Währungspaare.',
+      en: 'The fluctuation actually measured, computed from past log returns and scaled to a year. The Riskometer shows it for four currency pairs.',
+    },
+    module: '05-greeks',
+    section: '4',
+    see: ['implied-volatility', 'volatility', 'gamma'],
+  },
+
+  /* ---------- 06 · Combos & smile ---------- */
+  {
+    id: 'call-spread',
+    term: { de: 'Call Spread', en: 'Call spread' },
+    aliases: ['Bull Spread', 'Call-Spread'],
+    def: {
+      de: 'Long Call zu einem Strike und Short Call zu einem höheren Strike. Die verkaufte Option verbilligt den Schutz, begrenzt ihn aber nach oben.',
+      en: 'A long call at one strike and a short call at a higher strike. The sold option makes the protection cheaper but caps it.',
+    },
+    module: '06-combos-smile',
+    section: '2',
+    see: ['put-spread', 'seagull'],
+  },
+  {
+    id: 'put-spread',
+    term: { de: 'Put Spread', en: 'Put spread' },
+    aliases: ['Bear Spread', 'Put-Spread'],
+    def: {
+      de: 'Long Put zu einem Strike und Short Put zu einem tieferen Strike. Günstiger als ein einfacher Put, schützt aber nur bis zum tieferen Strike.',
+      en: 'A long put at one strike and a short put at a lower strike. Cheaper than a plain put, but it only protects down to the lower strike.',
+    },
+    module: '06-combos-smile',
+    section: '2',
+    see: ['call-spread', 'put'],
+  },
+  {
+    id: 'risk-reversal',
+    term: { de: 'Risk Reversal', en: 'Risk reversal' },
+    aliases: ['RR', '25Δ RR', 'Collar'],
+    def: {
+      de: 'Kauf einer Option auf der einen Seite und Verkauf einer auf der anderen, meist beide 25Δ. Als Marktquote zeigt der Risk Reversal, um wie viel die Vola der Calls über der der Puts liegt.',
+      en: 'Buying an option on one side and selling one on the other, usually both 25Δ. As a market quote, the risk reversal shows how far call volatility sits above put volatility.',
+    },
+    module: '06-combos-smile',
+    section: '2',
+    see: ['zero-cost-collar', 'volatility-smile', 'delta-25'],
+  },
+  {
+    id: 'zero-cost-collar',
+    term: { de: 'Zero-Cost Collar', en: 'Zero-cost collar' },
+    aliases: ['Zero Cost', 'Collar', 'Nullkosten-Collar', 'Tunnel'],
+    def: {
+      de: 'Ein Risk Reversal mit Strikes, bei denen gekaufte und verkaufte Prämie gleich gross sind. Du sicherst dich ohne Prämie ab, gibst dafür aber Gewinne jenseits des verkauften Strikes ab.',
+      en: 'A risk reversal with strikes where the bought and sold premiums are equal. You hedge without paying premium but give up gains beyond the sold strike.',
+    },
+    module: '06-combos-smile',
+    section: '2',
+    see: ['risk-reversal', 'hedge'],
+  },
+  {
+    id: 'straddle',
+    term: { de: 'Straddle', en: 'Straddle' },
+    aliases: ['Long Straddle'],
+    def: {
+      de: 'Call und Put zum selben Strike gekauft. Du gewinnst bei einer grossen Bewegung in beide Richtungen; es ist eine Position auf die Vola, nicht auf die Richtung.',
+      en: 'A call and a put bought at the same strike. You gain from a large move in either direction; it is a position on volatility, not on direction.',
+    },
+    module: '06-combos-smile',
+    section: '3',
+    see: ['strangle', 'butterfly', 'atm'],
+  },
+  {
+    id: 'strangle',
+    term: { de: 'Strangle', en: 'Strangle' },
+    aliases: ['Long Strangle'],
+    def: {
+      de: 'Wie ein Straddle, aber mit einem Put unter und einem Call über dem aktuellen Kurs. Günstiger, dafür braucht es eine grössere Bewegung.',
+      en: 'Like a straddle, but with a put below and a call above the current rate. Cheaper, but it needs a larger move.',
+    },
+    module: '06-combos-smile',
+    section: '3',
+    see: ['straddle', 'butterfly'],
+  },
+  {
+    id: 'butterfly',
+    term: { de: 'Butterfly', en: 'Butterfly' },
+    aliases: ['Fly', 'BF', '25Δ BF'],
+    def: {
+      de: 'Eine Kombination aus Körper und Flügeln, etwa ein Straddle gegen einen Strangle in Gegenrichtung. Als Marktquote zeigt der 25Δ Butterfly, wie viel teurer die Flügel als ATM sind, also wie stark der Smile gekrümmt ist.',
+      en: 'A combination of a body and wings, such as a straddle against a strangle in the opposite direction. As a market quote, the 25Δ butterfly shows how much richer the wings are than ATM, i.e. how curved the smile is.',
+    },
+    module: '06-combos-smile',
+    section: '3',
+    see: ['straddle', 'strangle', 'volatility-smile'],
+  },
+  {
+    id: 'seagull',
+    term: { de: 'Seagull', en: 'Seagull' },
+    aliases: ['Möwe', 'Drei-Options-Struktur'],
+    def: {
+      de: 'Drei Optionen, zum Beispiel ein Call Spread, der durch einen verkauften Put finanziert wird. Oft kostet er netto nichts, doch der Schutz endet am oberen Strike.',
+      en: 'Three options, for example a call spread financed by a sold put. It often costs nothing net, but the protection stops at the upper strike.',
+    },
+    module: '06-combos-smile',
+    section: '3',
+    see: ['call-spread', 'risk-reversal', 'zero-cost-collar'],
+  },
+  {
+    id: 'volatility-smile',
+    term: { de: 'Vola-Smile', en: 'Volatility smile' },
+    aliases: ['Smile', 'Skew', 'Volatilitätslächeln', 'vol surface'],
+    def: {
+      de: 'Die implizite Vola ist nicht für alle Strikes gleich: Weit weg vom ATM ist sie meist höher. Gegen Strike oder Delta aufgetragen ergibt das eine lächelnde Kurve.',
+      en: 'Implied volatility is not the same for every strike: far from ATM it is usually higher. Plotted against strike or delta, this gives a smiling curve.',
+    },
+    module: '06-combos-smile',
+    section: '4',
+    see: ['implied-volatility', 'risk-reversal', 'butterfly'],
+  },
+
+  /* ---------- 07 · Barrier & binary ---------- */
+  {
+    id: 'barrier-option',
+    term: { de: 'Barrier-Option', en: 'Barrier option' },
+    aliases: ['Barriere', 'Barrier', 'Schwelle'],
+    def: {
+      de: 'Eine Option, die erst entsteht oder verschwindet, wenn der Kurs eine Schwelle berührt. Weil sie seltener zahlt, ist sie günstiger als die Vanilla Option.',
+      en: 'An option that comes alive or disappears when the rate touches a level. Because it pays out less often, it is cheaper than the vanilla option.',
+    },
+    module: '07-barrier-binary',
+    section: '1',
+    see: ['knock-out', 'knock-in', 'gap-risk'],
+  },
+  {
+    id: 'knock-out',
+    term: { de: 'Knock-out', en: 'Knock-out' },
+    aliases: ['KO', 'Up-and-out', 'Down-and-out'],
+    def: {
+      de: 'Die Option verfällt sofort wertlos, sobald der Kurs die Barriere berührt. Knock-out und Knock-in mit gleicher Barriere ergeben zusammen die Vanilla Option.',
+      en: 'The option dies immediately once the rate touches the barrier. A knock-out and a knock-in with the same barrier add up to the vanilla option.',
+    },
+    module: '07-barrier-binary',
+    section: '2',
+    see: ['knock-in', 'in-out-parity', 'reverse-knock-out'],
+  },
+  {
+    id: 'knock-in',
+    term: { de: 'Knock-in', en: 'Knock-in' },
+    aliases: ['KI', 'Up-and-in', 'Down-and-in'],
+    def: {
+      de: 'Die Option entsteht erst, wenn der Kurs die Barriere berührt. Ohne Berührung verfällt sie wertlos, auch wenn sie am Ende im Geld wäre.',
+      en: 'The option only comes into existence when the rate touches the barrier. Without a touch it expires worthless, even if it would end in the money.',
+    },
+    module: '07-barrier-binary',
+    section: '2',
+    see: ['knock-out', 'in-out-parity'],
+  },
+  {
+    id: 'reverse-knock-out',
+    term: { de: 'Reverse Knock-out', en: 'Reverse knock-out' },
+    aliases: ['RKO', 'Barriere im Geld'],
+    def: {
+      de: 'Ein Knock-out, dessen Barriere im Geld liegt, also dort, wo die Option schon viel wert ist. An der Barriere kann der Wert schlagartig auf null fallen; das macht das Absichern schwierig.',
+      en: 'A knock-out whose barrier sits in the money, where the option is already worth a lot. At the barrier its value can drop to zero in one step, which makes hedging difficult.',
+    },
+    module: '07-barrier-binary',
+    section: '2',
+    see: ['knock-out', 'gap-risk'],
+  },
+  {
+    id: 'rebate',
+    term: { de: 'Rebate', en: 'Rebate' },
+    aliases: ['Rückvergütung'],
+    def: {
+      de: 'Ein fester Betrag, den du erhältst, wenn eine Barrier-Option ausgeknockt wird oder nie einknockt. Er mildert den Totalverlust und kostet dafür etwas Prämie.',
+      en: 'A fixed amount you receive when a barrier option is knocked out or never knocks in. It softens the total loss and costs some premium in return.',
+    },
+    module: '07-barrier-binary',
+    section: '2',
+    see: ['knock-out', 'knock-in'],
+  },
+  {
+    id: 'in-out-parity',
+    term: { de: 'In-Out-Parität', en: 'In-out parity' },
+    aliases: ['KI + KO', 'Knock-in Knock-out Parität'],
+    def: {
+      de: 'Knock-in plus Knock-out mit gleicher Barriere, gleichem Strike und gleichem Verfall ergeben genau die Vanilla Option. Eine der beiden lebt am Ende immer.',
+      en: 'A knock-in plus a knock-out with the same barrier, strike and expiry equal exactly the vanilla option. One of the two is always alive at the end.',
+    },
+    module: '07-barrier-binary',
+    section: '2',
+    see: ['knock-in', 'knock-out', 'put-call-parity'],
+  },
+  {
+    id: 'digital',
+    term: { de: 'Digital', en: 'Digital' },
+    aliases: ['binäre Option', 'binary option', 'Cash-or-Nothing'],
+    def: {
+      de: 'Zahlt einen festen Betrag, wenn der Kurs am Verfall über (oder unter) dem Strike liegt, sonst nichts. Alles oder nichts statt einer linearen Auszahlung.',
+      en: 'Pays a fixed amount if the rate is above (or below) the strike at expiry, otherwise nothing. All or nothing instead of a linear payoff.',
+    },
+    module: '07-barrier-binary',
+    section: '3',
+    see: ['one-touch', 'call'],
+  },
+  {
+    id: 'one-touch',
+    term: { de: 'One-Touch', en: 'One-touch' },
+    aliases: ['OT', 'Touch'],
+    def: {
+      de: 'Zahlt einen festen Betrag, wenn der Kurs die Barriere irgendwann vor Verfall berührt. Es zählt der Weg, nicht der Schlusskurs.',
+      en: 'Pays a fixed amount if the rate touches the barrier at any time before expiry. The path counts, not the final rate.',
+    },
+    module: '07-barrier-binary',
+    section: '3',
+    see: ['no-touch', 'digital', 'barrier-option'],
+  },
+  {
+    id: 'no-touch',
+    term: { de: 'No-Touch', en: 'No-touch' },
+    aliases: ['NT'],
+    def: {
+      de: 'Zahlt einen festen Betrag am Verfall, wenn der Kurs die Barriere bis dahin nie berührt hat. Wer ihn kauft, setzt auf einen ruhigen Markt.',
+      en: 'Pays a fixed amount at expiry if the rate never touched the barrier until then. Buying it is a bet on a calm market.',
+    },
+    module: '07-barrier-binary',
+    section: '3',
+    see: ['one-touch', 'double-no-touch'],
+  },
+  {
+    id: 'double-no-touch',
+    term: { de: 'Double No-Touch', en: 'Double no-touch' },
+    aliases: ['DNT', 'Range-Wette'],
+    def: {
+      de: 'Zahlt einen festen Betrag, wenn der Kurs bis zum Verfall weder die obere noch die untere Barriere berührt. Eine Wette auf eine Seitwärtsphase, bewertet mit einer Reihenformel.',
+      en: 'Pays a fixed amount if the rate touches neither the upper nor the lower barrier before expiry. A bet on a sideways market, priced with a series formula.',
+    },
+    module: '07-barrier-binary',
+    section: '3',
+    see: ['no-touch', 'double-barrier'],
+  },
+  {
+    id: 'double-barrier',
+    term: { de: 'Double Barrier', en: 'Double barrier' },
+    aliases: ['Doppelbarriere', 'Double Knock-out', 'DKO'],
+    def: {
+      de: 'Eine Option mit einer oberen und einer unteren Barriere. Beim Double Knock-out reicht die Berührung einer der beiden, um die Option zu löschen.',
+      en: 'An option with an upper and a lower barrier. For a double knock-out, touching either one is enough to extinguish the option.',
+    },
+    module: '07-barrier-binary',
+    section: '4',
+    see: ['knock-out', 'double-no-touch', 'window-barrier'],
+  },
+  {
+    id: 'window-barrier',
+    term: { de: 'Window Barrier', en: 'Window barrier' },
+    aliases: ['Fensterbarriere', 'partial barrier'],
+    def: {
+      de: 'Eine Barriere, die nur in einem Zeitfenster innerhalb der Laufzeit aktiv ist. Ausserhalb des Fensters darf der Kurs sie ohne Folgen überschreiten.',
+      en: 'A barrier that is only active during a time window within the term. Outside the window the rate can cross it without consequence.',
+    },
+    module: '07-barrier-binary',
+    section: '4',
+    see: ['barrier-option', 'double-barrier', 'monte-carlo'],
+  },
+
+  /* ---------- 08 · Structured products ---------- */
+  {
+    id: 'structured-product',
+    term: { de: 'Strukturiertes Produkt', en: 'Structured product' },
+    aliases: ['Struktur', 'structure', 'Strukturierter Hedge'],
+    def: {
+      de: 'Mehrere einfache Bausteine wie Forwards und Optionen in einem Vertrag. Oft wird ein besserer Kurs durch verkaufte Optionen finanziert, die im ungünstigen Fall Verluste bringen.',
+      en: 'Several simple building blocks such as forwards and options in one contract. Often a better rate is financed by sold options that cause losses in the bad case.',
+    },
+    module: '08-structured-products',
+    section: '1',
+    see: ['leverage', 'path-dependence', 'accumulator', 'tarf'],
+  },
+  {
+    id: 'leverage',
+    term: { de: 'Hebel', en: 'Leverage' },
+    aliases: ['Leverage', 'Hebelwirkung', 'gearing'],
+    def: {
+      de: 'Im ungünstigen Fall handelst du ein Vielfaches des normalen Betrags, etwa die doppelte Menge. So wachsen Verluste schneller als die Gewinne im günstigen Fall.',
+      en: 'In the bad case you trade a multiple of the normal amount, for example twice as much. Losses then grow faster than the gains in the good case.',
+    },
+    module: '08-structured-products',
+    section: '1',
+    see: ['accumulator', 'tarf', 'tpf'],
+  },
+  {
+    id: 'path-dependence',
+    term: { de: 'Pfadabhängigkeit', en: 'Path dependence' },
+    aliases: ['pfadabhängig', 'path-dependent'],
+    def: {
+      de: 'Die Auszahlung hängt nicht nur vom Schlusskurs ab, sondern vom ganzen Weg dorthin. Barrieren, Targets und Fixing-Serien machen ein Produkt pfadabhängig.',
+      en: 'The payoff depends not only on the final rate but on the whole path to it. Barriers, targets and series of fixings make a product path-dependent.',
+    },
+    module: '08-structured-products',
+    section: '1',
+    see: ['monte-carlo', 'barrier-option', 'target'],
+  },
+  {
+    id: 'accumulator',
+    term: { de: 'Accumulator', en: 'Accumulator' },
+    aliases: ['Akkumulator'],
+    def: {
+      de: 'Du kaufst über viele Fixings eine Währung zu einem besseren Strike als dem Forward. Liegt das Fixing unter dem Strike, musst du die doppelte Menge kaufen; steigt der Kurs über die Barriere, endet alles (Knock-out).',
+      en: 'You buy a currency over many fixings at a better strike than the forward. If a fixing is below the strike you must buy twice the amount; if the rate rises above the barrier, everything ends (knock-out).',
+    },
+    module: '08-structured-products',
+    section: '2',
+    see: ['decumulator', 'leverage', 'knock-out', 'fixing'],
+  },
+  {
+    id: 'decumulator',
+    term: { de: 'Decumulator', en: 'Decumulator' },
+    aliases: ['Dekumulator'],
+    def: {
+      de: 'Das Spiegelbild des Accumulators für Verkäufer: Du verkaufst über viele Fixings zu einem Strike über dem Forward. Liegt das Fixing über dem Strike, musst du die doppelte Menge verkaufen.',
+      en: 'The mirror image of the accumulator for sellers: you sell over many fixings at a strike above the forward. If a fixing is above the strike you must sell twice the amount.',
+    },
+    module: '08-structured-products',
+    section: '2',
+    see: ['accumulator', 'leverage'],
+  },
+  {
+    id: 'monte-carlo',
+    term: { de: 'Monte-Carlo-Simulation', en: 'Monte Carlo simulation' },
+    aliases: ['Monte Carlo', 'MC', 'Simulation', 'GBM'],
+    def: {
+      de: 'Ein Rechenverfahren, das sehr viele zufällige Kurspfade erzeugt und die abgezinsten Auszahlungen mittelt. Es bewertet pfadabhängige Produkte ohne geschlossene Formel und liefert einen Standardfehler mit.',
+      en: 'A method that generates many random rate paths and averages the discounted payoffs. It prices path-dependent products without a closed formula and comes with a standard error.',
+    },
+    module: '08-structured-products',
+    section: '2',
+    see: ['path-dependence', 'window-barrier', 'tarf'],
+  },
+  {
+    id: 'fixing',
+    term: { de: 'Fixing', en: 'Fixing' },
+    aliases: ['Fixierung', 'Beobachtungstag', 'observation date'],
+    def: {
+      de: 'Ein festgelegter Zeitpunkt, an dem der Kurs beobachtet und ein Teilgeschäft abgerechnet wird. Strukturierte Produkte haben oft wöchentliche oder monatliche Fixings.',
+      en: 'A set point in time at which the rate is observed and one part of the deal is settled. Structured products often have weekly or monthly fixings.',
+    },
+    module: '08-structured-products',
+    section: '3',
+    see: ['target', 'accumulator', 'tarf'],
+  },
+  {
+    id: 'tarf',
+    term: { de: 'TARF', en: 'TARF' },
+    aliases: ['Target Redemption Forward', 'Target Forward'],
+    def: {
+      de: 'Eine Serie von Forwards zu einem besseren Strike, die endet, sobald die kumulierten Gewinne ein Target erreichen. Verluste zählen nicht aufs Target und sind gehebelt, oft doppelt.',
+      en: 'A series of forwards at an improved strike that ends once cumulative gains reach a target. Losses do not count towards the target and are leveraged, often twofold.',
+    },
+    module: '08-structured-products',
+    section: '3',
+    see: ['target', 'pivot-tarf', 'leverage'],
+  },
+  {
+    id: 'pivot-tarf',
+    term: { de: 'Pivot TARF', en: 'Pivot TARF' },
+    aliases: ['Pivot'],
+    def: {
+      de: 'Ein TARF mit zwei Strikes um einen Pivot-Kurs. Du gewinnst in einem Band um den Pivot und verlierst gehebelt, wenn der Kurs weit in eine der beiden Richtungen läuft.',
+      en: 'A TARF with two strikes around a pivot rate. You gain in a band around the pivot and lose with leverage if the rate runs far in either direction.',
+    },
+    module: '08-structured-products',
+    section: '3',
+    see: ['tarf', 'target'],
+  },
+  {
+    id: 'target',
+    term: { de: 'Target', en: 'Target' },
+    aliases: ['Zielgewinn', 'Gewinnziel'],
+    def: {
+      de: 'Die Gewinnschwelle eines TARF oder TPF. Ist sie erreicht, endet das Produkt vorzeitig: Dein Gewinn ist begrenzt, dein Verlust nicht.',
+      en: 'The profit threshold of a TARF or TPF. Once it is reached the product ends early: your gain is capped, your loss is not.',
+    },
+    module: '08-structured-products',
+    section: '3',
+    see: ['tarf', 'tpf', 'fixing'],
+  },
+  {
+    id: 'tpf',
+    term: { de: 'TPF', en: 'TPF' },
+    aliases: ['Coupon direktional', 'directional coupon'],
+    def: {
+      de: 'Ein Produkt, das bei jedem Fixing einen Coupon zahlt, solange der Kurs auf der richtigen Seite des Strikes liegt. Auf der falschen Seite zahlst du die Differenz gehebelt, potenziell weit mehr als alle Coupons.',
+      en: 'A product that pays a coupon at each fixing as long as the rate is on the right side of the strike. On the wrong side you pay the difference with leverage, potentially far more than all coupons.',
+    },
+    module: '08-structured-products',
+    section: '4',
+    see: ['rtpf', 'target', 'leverage'],
+  },
+  {
+    id: 'rtpf',
+    term: { de: 'RTPF', en: 'RTPF' },
+    aliases: ['Range TPF', 'Coupon Range'],
+    def: {
+      de: 'Wie ein TPF, aber der Coupon fliesst, solange das Fixing innerhalb einer Range liegt. Bricht der Kurs nach oben oder unten aus, entstehen gehebelte Verluste.',
+      en: 'Like a TPF, but the coupon is paid as long as the fixing stays within a range. If the rate breaks out up or down, leveraged losses arise.',
+    },
+    module: '08-structured-products',
+    section: '4',
+    see: ['tpf', 'double-no-touch'],
+  },
+  {
+    id: 'dual-currency',
+    term: { de: 'Dual Currency Investment', en: 'Dual currency investment' },
+    aliases: ['DCI', 'Dual Currency', 'Doppelwährungsanlage'],
+    def: {
+      de: 'Eine Festgeldanlage mit einer verkauften Option: Du erhältst einen höheren Zins, aber am Verfall kann dein Kapital zum Strike in die andere Währung umgewandelt werden. Das passiert genau dann, wenn diese Währung schwächer ist.',
+      en: 'A deposit combined with a sold option: you earn a higher rate, but at expiry your capital may be converted into the other currency at the strike. That happens exactly when that currency is the weaker one.',
+    },
+    module: '08-structured-products',
+    section: '4',
+    see: ['yield', 'put', 'strike'],
+  },
+
+  /* ---------- 09 · Hedge, alpha, yield ---------- */
+  {
+    id: 'hedge',
+    term: { de: 'Hedge', en: 'Hedge' },
+    aliases: ['Absicherung', 'hedging', 'Hedgen'],
+    def: {
+      de: 'Ein Geschäft, das ein bestehendes Risiko verkleinert, etwa ein Forward für eine künftige Zahlung in Fremdwährung. Ziel ist Planbarkeit, nicht Gewinn.',
+      en: 'A trade that reduces an existing risk, for example a forward for a future payment in a foreign currency. The goal is certainty, not profit.',
+    },
+    module: '09-hedge-alpha-yield',
+    section: '2',
+    see: ['forward', 'roll', 'zero-cost-collar'],
+  },
+  {
+    id: 'alpha',
+    term: { de: 'Alpha', en: 'Alpha' },
+    aliases: ['Mehrertrag', 'excess return', 'Marktsicht'],
+    def: {
+      de: 'Allgemein der Mehrertrag gegenüber einem Vergleichsmassstab. In diesem Tool steht Alpha für Produkte, die eine Sicht auf Richtung oder Range in einen besseren Kurs oder einen Coupon verwandeln.',
+      en: 'In general the excess return over a benchmark. In this tool alpha stands for products that turn a view on direction or range into a better rate or a coupon.',
+    },
+    module: '09-hedge-alpha-yield',
+    section: '3',
+    see: ['tpf', 'rtpf', 'tarf', 'accumulator'],
+  },
+  {
+    id: 'yield',
+    term: { de: 'Yield', en: 'Yield' },
+    aliases: ['Rendite', 'Ertrag', 'Zinsertrag'],
+    def: {
+      de: 'Laufender Ertrag auf einer Anlage, etwa Zins. In diesem Tool meint Yield Produkte, die mehr Zins bieten, weil du dafür ein Risiko übernimmst, zum Beispiel ein Konversionsrisiko.',
+      en: 'Ongoing income on an investment, such as interest. In this tool yield means products that pay more interest because you take on a risk in return, such as conversion risk.',
+    },
+    module: '09-hedge-alpha-yield',
+    section: '4',
+    see: ['dual-currency', 'carry'],
+  },
+];
+
+/** Entry by id (undefined if unknown). */
+export function getGlossaryEntry(id: string): GlossaryEntry | undefined {
+  return GLOSSARY.find((e) => e.id === id);
+}
