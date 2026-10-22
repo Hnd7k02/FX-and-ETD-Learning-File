@@ -38,6 +38,10 @@ import {
 
 export interface WowChartProps {
   lang: Lang;
+  /** Phase to start in: 0 forward, 1 call, 2 time value, 3 parity (default 0). */
+  initialPhase?: number;
+  /** Start playing on load (default true; always off under prefers-reduced-motion). */
+  autoplay?: boolean;
 }
 
 interface Anim {
@@ -62,16 +66,21 @@ interface Anim {
 const KEYS = ['1', '2', '3', '4'] as const;
 const PROGRESS_COLOR = '#60a5fa';
 
-export default function WowChart({ lang }: WowChartProps): JSX.Element {
+export default function WowChart({
+  lang,
+  initialPhase = 0,
+  autoplay = true,
+}: WowChartProps): JSX.Element {
   const t = translator(dict, lang);
   const [, setFrame] = useState(0);
   const rerender = () => setFrame((n) => n + 1);
+  const start = clamp(Math.round(initialPhase), 0, 3) as Phase;
   const a = useRef<Anim>({
-    phase: 0,
-    prev: 0,
+    phase: start,
+    prev: start,
     t: 1,
     days: DAYS_TARGET,
-    playing: true,
+    playing: autoplay,
     prog: 0,
     elapsed: 0,
     last: 0,

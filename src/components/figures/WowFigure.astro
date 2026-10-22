@@ -1,0 +1,22 @@
+---
+/**
+ * Wow moment (MASTER_PROMPT §8.1) for MDX.
+ * Props: caption; initialPhase 0–3 (0 forward, 1 call, 2 time value, 3 parity; default 0);
+ * autoplay (default true, never under prefers-reduced-motion).
+ */
+import WowChart from '@/components/islands/WowChart';
+import Figure from '@/components/content/Figure.astro';
+import { pageLang } from '@/components/content/lang';
+
+interface Props {
+  caption?: string;
+  initialPhase?: 0 | 1 | 2 | 3;
+  autoplay?: boolean;
+}
+const { caption, initialPhase = 0, autoplay = true } = Astro.props;
+const lang = pageLang(Astro.currentLocale);
+---
+
+<Figure caption={caption}>
+  <WowChart client:visible lang={lang} initialPhase={initialPhase} autoplay={autoplay} />
+</Figure>

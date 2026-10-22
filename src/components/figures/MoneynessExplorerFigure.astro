@@ -1,0 +1,170 @@
+---
+/** Moneyness explorer (module 04, section 3) for MDX. Props: caption, type ('call' | 'put'). */
+import MoneynessExplorer from '@/components/islands/MoneynessExplorer';
+import Figure from '@/components/content/Figure.astro';
+import { pageLang } from '@/components/content/lang';
+
+interface Props {
+  caption?: string;
+  type?: 'call' | 'put';
+}
+const { caption, type } = Astro.props;
+const lang = pageLang(Astro.currentLocale);
+---
+
+<Figure caption={caption}>
+  <MoneynessExplorer client:visible lang={lang} type={type} />
+</Figure>
+
+<style is:global>
+  .mx {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+  }
+  .mx .ff-lab-head {
+    margin-bottom: 0;
+  }
+  .mx-head-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+  .mx-money {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: var(--ff-r-pill);
+    font-size: 13px;
+    font-weight: 600;
+    background: var(--ff-chip);
+    color: var(--ff-ink);
+    transition:
+      background-color 200ms ease,
+      color 200ms ease;
+  }
+  .mx-money b {
+    font-weight: 800;
+  }
+  .mx-money.is-itm {
+    background: var(--ff-good-soft);
+    color: var(--ff-good-text-strong);
+  }
+  .mx-money.is-otm {
+    background: var(--ff-exotics-soft);
+    color: #9a3412;
+  }
+  .mx .ff-legend li {
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--ff-ink-2);
+  }
+  .mx p {
+    margin: 0;
+  }
+  .mx-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    font-family: var(--ff-font-ui);
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .mx-handle {
+    cursor: grab;
+    touch-action: none;
+  }
+  .mx-handle.is-active {
+    cursor: grabbing;
+  }
+  .mx-markers {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .mx-markers > button {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 0;
+    min-height: 44px;
+    padding: 4px 12px;
+    border: 1px solid var(--ff-line-input);
+    border-radius: var(--ff-r-control);
+    background: var(--ff-surface);
+    color: var(--ff-ink);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.25;
+    cursor: pointer;
+  }
+  .mx-markers > button .mono {
+    font-size: 11px;
+    color: var(--ff-muted);
+  }
+  .mx-markers > button:hover {
+    border-color: var(--ff-ref);
+  }
+  .mx-markers > button[aria-pressed='true'] {
+    background: var(--ff-options-soft);
+    border-color: var(--ff-options);
+    color: var(--ff-options-text);
+  }
+  .mx .mx-aha {
+    min-height: 3em;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--ff-options-text);
+    font-weight: 700;
+  }
+  .mx-aha-text {
+    display: inline-block;
+    animation: mx-fade 320ms ease-out both;
+  }
+  @keyframes mx-fade {
+    from {
+      opacity: 0;
+      transform: translateY(3px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .mx .segmented > button {
+    min-height: 44px;
+  }
+  .mx-bar {
+    display: flex;
+    height: 10px;
+    margin: 12px 16px 4px;
+    border-radius: var(--ff-r-pill);
+    overflow: hidden;
+    background: var(--ff-chip);
+  }
+  .mx-bar-intr {
+    background: var(--ff-payoff);
+  }
+  .mx-bar-time {
+    background: rgba(37, 99, 235, 0.45);
+  }
+  .mx-sw {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+    vertical-align: middle;
+  }
+  .mx-sw-intr {
+    background: var(--ff-payoff);
+  }
+  .mx-sw-time {
+    background: rgba(37, 99, 235, 0.28);
+    border: 1.5px solid var(--ff-long);
+  }
+</style>

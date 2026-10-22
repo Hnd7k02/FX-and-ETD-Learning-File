@@ -57,7 +57,11 @@ function layoutFor(w: number) {
 
 function Arrow({ dir }: { dir: Direction }): JSX.Element {
   const d =
-    dir === 'up' ? 'M6 10V2.5M2.5 6L6 2.5L9.5 6' : dir === 'down' ? 'M6 2V9.5M2.5 6L6 9.5L9.5 6' : 'M2 6H10';
+    dir === 'up'
+      ? 'M6 10V2.5M2.5 6L6 2.5L9.5 6'
+      : dir === 'down'
+        ? 'M6 2V9.5M2.5 6L6 9.5L9.5 6'
+        : 'M2 6H10';
   return (
     <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
       <path
@@ -93,14 +97,13 @@ export default function PriceDrivers({ lang }: PriceDriversProps): JSX.Element {
   const instant = rm || how !== 'switch';
   const ys = useTween([...curve.call, ...curve.put], 300, instant);
   const dom = useTween([0, top], 300, instant);
-  const prices = useTween([call, put], 300, rm || how === 'init');
+  const prices = useTween([call, put], 300, rm || how !== 'switch');
 
   const def = DRIVERS[active];
   const sx = scaleLinear([def.min, def.max], [L.left, L.width - L.right]);
   const sy = scaleLinear([dom[0]!, dom[1]!], [L.bottom, L.top]);
   const n = SAMPLES + 1;
-  const pts = (off: number) =>
-    curve.xs.map((x, i): Point => [sx(x), sy(ys[off + i] ?? 0)]);
+  const pts = (off: number) => curve.xs.map((x, i): Point => [sx(x), sy(ys[off + i] ?? 0)]);
   const xNow = v[def.key];
 
   const fmtX = (id: DriverId, x: number, digits?: number): string => {
@@ -165,9 +168,7 @@ export default function PriceDrivers({ lang }: PriceDriversProps): JSX.Element {
       <div class="ff-lab-head">
         <div class="pd-head-text">
           <div class="ff-lab-title">{t('pd.title')}</div>
-          <div class="ff-lab-sub">
-            {t('pd.sub', { notional: fmtMillions(N, '', lang).trim() })}
-          </div>
+          <div class="ff-lab-sub">{t('pd.sub', { notional: fmtMillions(N, '', lang).trim() })}</div>
         </div>
         <button type="button" class="btn btn-light pd-reset" onClick={reset} data-reset>
           {t('pd.reset')}
@@ -179,12 +180,16 @@ export default function PriceDrivers({ lang }: PriceDriversProps): JSX.Element {
             <div class="pd-price pd-price--call" data-price-call={call.toFixed(3)}>
               <span class="pd-price-label">{t('pd.call')}</span>
               <span class="pd-price-main">{pipsText(prices[0]!)}</span>
-              <span class="pd-price-sub">{fmtMoney(prices[0]! * 1e-4 * N, EXAMPLE.quote, lang)}</span>
+              <span class="pd-price-sub">
+                {fmtMoney(prices[0]! * 1e-4 * N, EXAMPLE.quote, lang)}
+              </span>
             </div>
             <div class="pd-price pd-price--put" data-price-put={put.toFixed(3)}>
               <span class="pd-price-label">{t('pd.put')}</span>
               <span class="pd-price-main">{pipsText(prices[1]!)}</span>
-              <span class="pd-price-sub">{fmtMoney(prices[1]! * 1e-4 * N, EXAMPLE.quote, lang)}</span>
+              <span class="pd-price-sub">
+                {fmtMoney(prices[1]! * 1e-4 * N, EXAMPLE.quote, lang)}
+              </span>
             </div>
           </div>
           <div class="pd-parity math" data-parity>
