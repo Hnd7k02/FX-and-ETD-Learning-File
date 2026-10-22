@@ -7,7 +7,7 @@
  * disables autoplay and the morph. Strings come from src/i18n/dict/wow.ts.
  */
 import type { JSX } from 'preact';
-import { useEffect, useReducer, useRef } from 'preact/hooks';
+import { useEffect, useRef, useState } from 'preact/hooks';
 import { AxisX, GridY, RefLineX } from '@/components/ui/Chart';
 import { Legend, type LegendItem } from '@/components/ui/Legend';
 import { Slider } from '@/components/ui/Slider';
@@ -64,7 +64,8 @@ const PROGRESS_COLOR = '#60a5fa';
 
 export default function WowChart({ lang }: WowChartProps): JSX.Element {
   const t = translator(dict, lang);
-  const [, rerender] = useReducer((n: number) => n + 1, 0);
+  const [, setFrame] = useState(0);
+  const rerender = () => setFrame((n) => n + 1);
   const a = useRef<Anim>({
     phase: 0,
     prev: 0,

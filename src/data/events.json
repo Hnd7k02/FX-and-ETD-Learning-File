@@ -1,0 +1,328 @@
+[
+  {
+    "id": "gfc-2008",
+    "anchorDate": "2008-09-15",
+    "year": "2008",
+    "pairs": ["EUR/CHF", "EUR/USD", "USD/CHF", "USD/JPY"],
+    "window": {
+      "from": "2008-09-02",
+      "to": "2008-10-27"
+    },
+    "title": {
+      "de": "Finanzkrise",
+      "en": "Financial crisis"
+    },
+    "dateLabel": {
+      "de": "Herbst 2008",
+      "en": "Autumn 2008"
+    },
+    "what": {
+      "de": "Am 15.09.2008 geht eine grosse US-Investmentbank in Konkurs. Aus der Kreditkrise wird eine weltweite Vertrauenskrise: Anleger verkaufen Risiko und suchen sichere Häfen.",
+      "en": "On 15 September 2008 a major US investment bank files for bankruptcy. The credit crunch turns into a global crisis of confidence: investors dump risk and run for safe havens."
+    },
+    "pairNote": {
+      "EUR/CHF": {
+        "de": "Der Franken ist als sicherer Hafen gefragt: Bis {toDate} verliert der Euro {moveAbsPct} gegenüber dem Franken.",
+        "en": "The franc is sought as a safe haven: by {toDate} the euro has lost {moveAbsPct} against the franc."
+      },
+      "EUR/USD": {
+        "de": "Weltweit wird der Dollar knapp: Banken brauchen Dollar-Finanzierung, Anleger flüchten in kurzfristige US-Staatspapiere. Bis {toDate} verliert der Euro {moveAbsPct} gegenüber dem Dollar.",
+        "en": "Dollars become scarce worldwide: banks scramble for dollar funding and investors flee into US Treasury bills. By {toDate} the euro has lost {moveAbsPct} against the dollar."
+      },
+      "USD/CHF": {
+        "de": "Dollar und Franken sind beide gesucht, ihre Bewegungen heben sich teilweise auf: USD/CHF kommt bis {toDate} nur auf {movePct}.",
+        "en": "The dollar and the franc are both in demand, so their moves partly cancel out: by {toDate} USD/CHF has moved just {movePct}."
+      },
+      "USD/JPY": {
+        "de": "Der Yen wertet sogar gegenüber dem Dollar auf: USD/JPY fällt bis {toDate} um {moveAbsPct}.",
+        "en": "The yen even gains against the dollar: by {toDate} USD/JPY has fallen {moveAbsPct}."
+      }
+    },
+    "means": [
+      {
+        "de": "Die Vola steigt: Optionen werden teurer, Absicherung kostet mehr Prämie (Vega).",
+        "en": "Volatility rises: options get dearer and hedging costs more premium (vega)."
+      },
+      {
+        "de": "Die Spitze kommt spät: Die 1-Monats-Vola erreicht {peak} erst am {peakDate}. Die Krise läuft über Wochen weiter, und das Fenster von 21 Handelstagen sammelt jeden unruhigen Tag ein.",
+        "en": "The peak comes late: one-month vol only reaches {peak} on {peakDate}. The crisis rumbles on for weeks, and the 21-day window collects every turbulent day."
+      },
+      {
+        "de": "Safe Haven: In Krisen wertet der Franken typischerweise auf.",
+        "en": "Safe haven: in a crisis the franc typically appreciates.",
+        "pairs": ["EUR/CHF"]
+      },
+      {
+        "de": "Vola misst die täglichen Ausschläge, nicht die Netto-Bewegung: USD/CHF kommt netto weniger weit als EUR/CHF, die Vola steigt trotzdem auf {peak}.",
+        "en": "Volatility measures the daily swings, not the net move: USD/CHF travels less far than EUR/CHF overall, yet its vol still climbs to {peak}.",
+        "pairs": ["USD/CHF"]
+      },
+      {
+        "de": "Tiefzinswährungen wie der Yen finanzieren oft Carry-Trades. Werden diese in der Krise aufgelöst, kaufen viele gleichzeitig Yen zurück.",
+        "en": "Low-yielding currencies such as the yen often fund carry trades. When these are unwound in a crisis, many buy back yen at the same time.",
+        "pairs": ["USD/JPY"]
+      }
+    ],
+    "modules": ["05-greeks", "01-spot"],
+    "sources": ["bis-ar-2009", "snb-speech-2009-09-25", "bis-qr-2009-12-dollar"]
+  },
+  {
+    "id": "floor-2011",
+    "anchorDate": "2011-09-06",
+    "year": "2011",
+    "pairs": ["EUR/CHF", "USD/CHF"],
+    "window": {
+      "from": "2011-08-10",
+      "to": "2011-09-06"
+    },
+    "title": {
+      "de": "Mindestkurs 1.20",
+      "en": "The 1.20 floor"
+    },
+    "dateLabel": {
+      "de": "August bis September 2011",
+      "en": "August to September 2011"
+    },
+    "what": {
+      "de": "Im Sommer 2011 wertet der Franken stark auf. Am 06.09.2011 führt die SNB einen Mindestkurs von 1.20 Franken pro Euro ein und kündigt an, ihn mit unbeschränkten Devisenkäufen durchzusetzen.",
+      "en": "In summer 2011 the franc appreciates sharply. On 6 September 2011 the SNB sets a minimum exchange rate of CHF 1.20 per euro and says it will enforce it by buying foreign currency in unlimited quantities."
+    },
+    "pairNote": {
+      "EUR/CHF": {
+        "de": "Am {fromDate} steht EUR/CHF bei {from}, nahe der Parität. Am {dayDate} springt der Kurs an einem einzigen Tag um {dayMoveAbsPct} auf {to}.",
+        "en": "On {fromDate} EUR/CHF stands at {from}, close to parity. On {dayDate} it jumps {dayMoveAbsPct} in a single day to {to}."
+      },
+      "USD/CHF": {
+        "de": "Der Mindestkurs schwächt den Franken auch gegenüber dem Dollar: USD/CHF springt am {dayDate} um {dayMoveAbsPct}.",
+        "en": "The floor weakens the franc against the dollar too: USD/CHF jumps {dayMoveAbsPct} on {dayDate}."
+      }
+    },
+    "means": [
+      {
+        "de": "Ein einziger Tagessprung hält die 1-Monats-Vola vier Wochen lang hoch: So wirkt ein Fenster von 21 Handelstagen. Fällt der Sprung aus dem Fenster, stürzt die Vola ab.",
+        "en": "A single one-day jump keeps one-month vol high for four weeks: that is how a 21-trading-day window works. Once the jump drops out of the window, vol collapses."
+      },
+      {
+        "de": "Der Markt war schon vor dem Entscheid nervös: Die Vola lag am Vortag bereits bei {volBefore}.",
+        "en": "The market was nervous well before the decision: vol already stood at {volBefore} the day before."
+      },
+      {
+        "de": "Danach liegt die Vola bis Ende 2014 meist sehr tief. Der Mindestkurs wirkt wie eine Barriere.",
+        "en": "Afterwards vol stays mostly very low until the end of 2014. The floor acts like a barrier.",
+        "pairs": ["EUR/CHF"]
+      }
+    ],
+    "modules": ["07-barrier-binary"],
+    "sources": ["snb-2011-09-06"]
+  },
+  {
+    "id": "chf-shock-2015",
+    "anchorDate": "2015-01-15",
+    "year": "2015",
+    "pairs": ["EUR/CHF", "USD/CHF"],
+    "window": {
+      "from": "2015-01-14",
+      "to": "2015-01-23"
+    },
+    "title": {
+      "de": "Frankenschock",
+      "en": "Swiss franc shock"
+    },
+    "dateLabel": {
+      "de": "15. Januar 2015",
+      "en": "15 January 2015"
+    },
+    "what": {
+      "de": "Die SNB hebt den Mindestkurs von 1.20 Franken pro Euro auf und senkt den Zins auf Sichtguthaben auf −0.75 %. Der Franken wertet am selben Tag massiv auf.",
+      "en": "The SNB discontinues the minimum exchange rate of CHF 1.20 per euro and cuts the interest rate on sight deposits to −0.75%. The franc soars the same day."
+    },
+    "pairNote": {
+      "EUR/CHF": {
+        "de": "Im EZB-Fixing vom {dayDate} liegt EUR/CHF {dayMoveAbsPct} tiefer als am Vortag. Bis {toDate} fällt der Kurs auf {to}.",
+        "en": "In the ECB fixing of {dayDate}, EUR/CHF is {dayMoveAbsPct} lower than the day before. By {toDate} it has fallen to {to}."
+      },
+      "USD/CHF": {
+        "de": "Im EZB-Fixing vom {dayDate} liegt USD/CHF {dayMoveAbsPct} tiefer als am Vortag.",
+        "en": "In the ECB fixing of {dayDate}, USD/CHF is {dayMoveAbsPct} lower than the day before."
+      }
+    },
+    "means": [
+      {
+        "de": "Forward: Wer Euro-Einnahmen auf Termin verkauft hatte, war geschützt. Ungesichert verloren sie bis {toDate} in Franken gerechnet {moveAbsPct}.",
+        "en": "Forward: anyone who had sold euro income forward was protected. Unhedged, it lost {moveAbsPct} in franc terms by {toDate}.",
+        "pairs": ["EUR/CHF"]
+      },
+      {
+        "de": "Forward: Auch Dollar-Einnahmen waren nur mit Absicherung geschützt. Ungesichert verloren sie bis {toDate} in Franken gerechnet {moveAbsPct}.",
+        "en": "Forward: dollar income, too, was only protected if hedged. Unhedged, it lost {moveAbsPct} in franc terms by {toDate}.",
+        "pairs": ["USD/CHF"]
+      },
+      {
+        "de": "Optionen: Die 1-Monats-Vola springt von {volBefore} auf bis zu {peak} (Spitze am {peakDate}). Prämien steigen sprunghaft.",
+        "en": "Options: one-month vol leaps from {volBefore} to as much as {peak} (peak on {peakDate}). Premiums jump."
+      },
+      {
+        "de": "Barrieren und Stops: Der Kurs überspringt viele Niveaus (Gap). Stop-Loss-Orders werden zum nächsten verfügbaren Kurs ausgeführt, oft weit schlechter als geplant; Barrieren werden auf einen Schlag gerissen.",
+        "en": "Barriers and stops: the rate jumps over many levels (a gap). Stop-loss orders are filled at the next available price, often far worse than planned; barriers are breached in one go."
+      },
+      {
+        "de": "Ruhe vor dem Sturm: Der Mindestkurs hatte die Vola gedrückt. Tiefe Vola heisst nicht tiefes Risiko.",
+        "en": "Calm before the storm: the floor had held vol down. Low volatility does not mean low risk.",
+        "pairs": ["EUR/CHF"]
+      }
+    ],
+    "modules": ["02-forward", "07-barrier-binary", "08-structured-products"],
+    "sources": ["snb-2015-01-15"]
+  },
+  {
+    "id": "ukraine-2022",
+    "anchorDate": "2022-02-24",
+    "year": "2022",
+    "pairs": ["EUR/CHF", "EUR/USD"],
+    "window": {
+      "from": "2022-02-15",
+      "to": "2022-03-04"
+    },
+    "title": {
+      "de": "Krieg in der Ukraine",
+      "en": "War in Ukraine"
+    },
+    "dateLabel": {
+      "de": "Februar bis März 2022",
+      "en": "February to March 2022"
+    },
+    "what": {
+      "de": "Am 24.02.2022 greift Russland die Ukraine an. Die Unsicherheit steigt weltweit stark.",
+      "en": "On 24 February 2022 Russia invades Ukraine. Uncertainty rises sharply around the world."
+    },
+    "pairNote": {
+      "EUR/CHF": {
+        "de": "Der Franken ist als sicherer Hafen gefragt: Am {toDate} fällt EUR/CHF auf {to}, so tief wie seit Januar 2015 nicht mehr.",
+        "en": "The franc is in demand as a safe haven: on {toDate} EUR/CHF falls to {to}, its lowest since January 2015."
+      },
+      "EUR/USD": {
+        "de": "Auch der Dollar ist gefragt: EUR/USD fällt vom {fromDate} bis {toDate} um {moveAbsPct}.",
+        "en": "The dollar is in demand too: EUR/USD falls {moveAbsPct} from {fromDate} to {toDate}."
+      }
+    },
+    "means": [
+      {
+        "de": "Safe Haven: Geopolitische Schocks stärken den Franken.",
+        "en": "Safe haven: geopolitical shocks strengthen the franc.",
+        "pairs": ["EUR/CHF"]
+      },
+      {
+        "de": "Stufen sind relativ: Jedes Paar wird an seiner eigenen Geschichte gemessen. Für {pair} entspricht die Spitze von {peak} der Stufe {peakLevel}. Wechsle das Paar und vergleiche.",
+        "en": "Levels are relative: each pair is measured against its own history. For {pair}, the peak of {peak} means level {peakLevel}. Switch pairs and compare."
+      },
+      {
+        "de": "Die Vola steigt deutlich, bleibt aber weit unter 2011 und 2015.",
+        "en": "Vol rises clearly but stays far below 2011 and 2015.",
+        "pairs": ["EUR/CHF"]
+      }
+    ],
+    "modules": ["01-spot"],
+    "sources": ["euco-2022-02-24", "snb-2022-03-24"]
+  },
+  {
+    "id": "carry-2024",
+    "anchorDate": "2024-08-05",
+    "year": "2024",
+    "pairs": ["EUR/CHF", "USD/JPY"],
+    "window": {
+      "from": "2024-07-29",
+      "to": "2024-08-05"
+    },
+    "title": {
+      "de": "Carry-Unwind",
+      "en": "Carry unwind"
+    },
+    "dateLabel": {
+      "de": "August 2024",
+      "en": "August 2024"
+    },
+    "what": {
+      "de": "Anfang August 2024 werden Carry-Trades aufgelöst, die in tief verzinsten Währungen wie Yen und Franken finanziert waren. Am 05.08.2024 erreicht der Stress an den Märkten seinen Höhepunkt; die Finanzierungswährungen werten auf.",
+      "en": "In early August 2024 carry trades funded in low-yielding currencies such as the yen and the franc are unwound. Market stress peaks on 5 August 2024; the funding currencies appreciate."
+    },
+    "pairNote": {
+      "EUR/CHF": {
+        "de": "EUR/CHF fällt vom {fromDate} bis {toDate} um {moveAbsPct}.",
+        "en": "EUR/CHF falls {moveAbsPct} from {fromDate} to {toDate}."
+      },
+      "USD/JPY": {
+        "de": "USD/JPY fällt vom {fromDate} bis {toDate} um {moveAbsPct}, allein am {dayDate} um {dayMoveAbsPct}.",
+        "en": "USD/JPY falls {moveAbsPct} from {fromDate} to {toDate}, and {dayMoveAbsPct} on {dayDate} alone."
+      }
+    },
+    "means": [
+      {
+        "de": "Carry: Wer eine Tiefzinswährung leiht, um eine höher verzinste zu kaufen, verdient die Zinsdifferenz, solange der Kurs stillhält.",
+        "en": "Carry: if you borrow a low-yielding currency to buy a higher-yielding one, you earn the interest differential as long as the exchange rate keeps still."
+      },
+      {
+        "de": "Kippt die Stimmung, schliessen viele gleichzeitig: Die Finanzierungswährung wertet sprunghaft auf.",
+        "en": "When sentiment turns, many close at once: the funding currency jumps."
+      },
+      {
+        "de": "Ein Carry-Trade wirkt wie ein gekaufter Forward auf die Hochzinswährung: Er gewinnt, solange der Kurs weniger fällt, als die Forward Points vorwegnehmen.",
+        "en": "A carry trade works like buying the high-yielding currency forward: it wins as long as the rate falls by less than the forward points anticipate."
+      }
+    ],
+    "modules": ["02-forward", "03-fx-swap"],
+    "sources": ["bis-bulletin-90", "bis-qr-2024-09"]
+  },
+  {
+    "id": "fiscal-2025",
+    "anchorDate": "2025-03-05",
+    "year": "2025",
+    "pairs": ["EUR/CHF", "EUR/USD"],
+    "window": {
+      "from": "2025-02-25",
+      "to": "2025-03-12"
+    },
+    "peakRange": {
+      "before": 0,
+      "after": 20
+    },
+    "title": {
+      "de": "Deutsches Fiskalpaket",
+      "en": "German fiscal package"
+    },
+    "dateLabel": {
+      "de": "März 2025",
+      "en": "March 2025"
+    },
+    "what": {
+      "de": "Am Abend des 04.03.2025 kündigen die künftigen Regierungsparteien in Deutschland ein Finanzpaket an: Verteidigungsausgaben über 1 % des BIP sollen nicht mehr unter die Schuldenbremse fallen, dazu kommt ein Sondervermögen von 500 Mrd. Euro für Infrastruktur. Bundestag und Bundesrat beschliessen die Grundgesetzänderung am 18. und 21.03.2025.",
+      "en": "On the evening of 4 March 2025 the parties set to form Germany's next government announce a fiscal package: defence spending above 1% of GDP is to be exempt from the debt brake, plus a special fund of €500 billion for infrastructure. The Bundestag and Bundesrat pass the constitutional amendment on 18 and 21 March 2025."
+    },
+    "pairNote": {
+      "EUR/CHF": {
+        "de": "Am {dayDate}, im ersten Fixing nach der Ankündigung, steigt EUR/CHF um {dayMoveAbsPct}.",
+        "en": "On {dayDate}, in the first fixing after the announcement, EUR/CHF rises {dayMoveAbsPct}."
+      },
+      "EUR/USD": {
+        "de": "Am {dayDate}, im ersten Fixing nach der Ankündigung, steigt EUR/USD um {dayMoveAbsPct}; bis {toDate} sind es {moveAbsPct}.",
+        "en": "On {dayDate}, in the first fixing after the announcement, EUR/USD rises {dayMoveAbsPct}; by {toDate} the gain is {moveAbsPct}."
+      }
+    },
+    "means": [
+      {
+        "de": "Zinsdifferenzen bewegen Währungen: Mehr Staatsanleihen lassen höhere Euro-Zinsen erwarten, und der Euro wird attraktiver.",
+        "en": "Interest rate differentials move currencies: more government bonds point to higher euro rates, which makes the euro more attractive."
+      },
+      {
+        "de": "Die Zinsdifferenz verschiebt auch die Forward Points, über die Zinsparität.",
+        "en": "The rate differential also shifts the forward points, via interest rate parity."
+      },
+      {
+        "de": "Aus der Ruhe gerissen: Vor der Ankündigung lag die Vola bei {volBefore}, danach steigt sie bis auf {peak}, Stufe {peakLevel}.",
+        "en": "Jolted out of the calm: before the announcement vol stood at {volBefore}; afterwards it climbs to {peak}, level {peakLevel}.",
+        "pairs": ["EUR/CHF"]
+      }
+    ],
+    "modules": ["02-forward"],
+    "sources": ["zdf-2025-03-04", "hib-2025-116", "bpb-2025-grundgesetz"]
+  }
+]

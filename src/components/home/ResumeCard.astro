@@ -1,0 +1,171 @@
+---
+/**
+ * "Weiter, wo du warst" card (B-Home). Rendered for "no progress" (start at 01 Spot, section 1);
+ * the client script in HomeView.astro rewrites module, section, pills and button from localStorage.
+ */
+import ArrowIcon from '@/components/layout/ArrowIcon.astro';
+import { FAMILIES, MODULES } from '@/data/modules';
+import { common } from '@/i18n/dict/common';
+import { home } from '@/i18n/dict/home';
+import { modulePath, SECTION_KEYS } from '@/i18n/routes';
+import { translator, type Lang } from '@/i18n/types';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = translator(common, lang);
+const th = translator(home, lang);
+const mod = MODULES[0]!;
+const section = mod.sections[0]!;
+const c = common[lang];
+---
+
+<article
+  class="card resume"
+  data-resume
+  data-family={mod.family}
+  data-tpl-label-resume={c['home.resumeLabel']}
+  data-tpl-label-start={c['home.resumeStartLabel']}
+  data-tpl-cta-resume={c['home.resumeCta']}
+  data-tpl-cta-start={c['home.resumeCtaStart']}
+  data-quiz-label={c['module.quiz']}
+  data-quiz-lead={c['quiz.lead']}
+  data-sr-done={c['home.stationDone']}
+  data-sr-current={home[lang]['home.pillCurrent']}
+  aria-labelledby="resume-h"
+>
+  <div class="resume-head">
+    <span class="resume-label" data-resume-label>{t('home.resumeStartLabel')}</span>
+    <span class="chip chip-family" data-resume-chip>{mod.n} · {FAMILIES[mod.family].label[lang]}</span>
+  </div>
+  <div class="resume-copy">
+    <h2 id="resume-h" class="resume-title" data-resume-title>
+      {mod.title[lang]}: {section.title[lang]}
+    </h2>
+    <p class="resume-teaser" data-resume-teaser>{section.teaser[lang]}</p>
+  </div>
+  <ol class="pills">
+    {
+      SECTION_KEYS.map((key, i) => (
+        <li class="pill" data-pill={key} data-state={i === 0 ? 'current' : 'open'}>
+          <span class="pill-n" aria-hidden="true">
+            {i + 1}
+          </span>
+          <span data-pill-label>{key === 'quiz' ? t('module.quiz') : mod.sections[i]!.short[lang]}</span>
+          <span class="sr-only" data-pill-sr>
+            {i === 0 ? ` · ${th('home.pillCurrent')}` : ''}
+          </span>
+        </li>
+      ))
+    }
+  </ol>
+  <a class="btn btn-dark resume-cta" href={modulePath(lang, mod.slug, '1')} data-resume-cta>
+    <span data-resume-cta-label>{t('home.resumeCtaStart')}</span>
+    <ArrowIcon />
+  </a>
+</article>
+
+<style>
+  .resume {
+    flex: 3 1 520px;
+    min-width: 0;
+    padding: 32px;
+    border-radius: var(--ff-r-hero);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .resume-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .resume-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ff-muted);
+  }
+  .resume-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .resume-title {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+  }
+  .resume-teaser {
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--ff-ink-2);
+  }
+  .pills {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr));
+    gap: 8px;
+  }
+  .pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 0 12px;
+    border-radius: var(--ff-r-control);
+    background: var(--ff-plane);
+    color: var(--ff-ink-2);
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .pill-n {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+    border-radius: var(--ff-r-pill);
+    font-size: 11px;
+    font-weight: 800;
+    background: var(--ff-surface);
+    color: var(--ff-muted);
+  }
+  .pill[data-state='current'] {
+    background: var(--ff-ink);
+    color: #fff;
+  }
+  .pill[data-state='current'] .pill-n {
+    background: #fff;
+    color: var(--ff-ink);
+  }
+  .pill[data-state='done'] {
+    background: var(--ff-good-soft);
+    color: var(--ff-good-text-strong);
+  }
+  .pill[data-state='done'] .pill-n {
+    background: var(--ff-good-text);
+    color: #fff;
+  }
+  .resume-cta {
+    align-self: flex-start;
+    min-height: 46px;
+    padding: 0 22px;
+    font-weight: 800;
+  }
+  @media (max-width: 640px) {
+    .resume {
+      padding: 24px 20px;
+      border-radius: var(--ff-r-card);
+    }
+    .resume-title {
+      font-size: 24px;
+    }
+  }
+</style>

@@ -1,0 +1,334 @@
+---
+/**
+ * Learning path (B-Home): overall progress and nine stations in four families. Rendered for
+ * "no progress"; the client script in HomeView.astro updates states, lines, chips and links from
+ * localStorage. The title span and the node carry view-transition names so that a station grows
+ * into the module header (MASTER_PROMPT §4).
+ */
+import { FAMILIES, MODULES, TOTAL_MINUTES, type Family } from '@/data/modules';
+import { common } from '@/i18n/dict/common';
+import { home } from '@/i18n/dict/home';
+import { modulePath } from '@/i18n/routes';
+import { translator, type Lang } from '@/i18n/types';
+import { fmtNumber, fmtPctValue } from '@/lib/format';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = translator(common, lang);
+const th = translator(home, lang);
+
+/** "3½" for 215 minutes: hours rounded to the nearest half. */
+const halves = Math.round((TOTAL_MINUTES / 60) * 2);
+const hours = `${fmtNumber(Math.floor(halves / 2), lang)}${halves % 2 ? '½' : ''}`;
+
+const families = (Object.keys(FAMILIES) as Family[]).map((key) => {
+  const start = MODULES.findIndex((m) => m.family === key) + 1;
+  const mods = MODULES.filter((m) => m.family === key);
+  return { key, label: FAMILIES[key].label[lang], start, span: mods.length, mods };
+});
+const last = MODULES.length - 1;
+---
+
+<section class="container path" id="lernpfad" aria-labelledby="pfad-h">
+  <div class="path-head">
+    <div class="path-title">
+      <h2 id="pfad-h" class="h2">{t('home.pathTitle')}</h2>
+      <p class="path-lead">{t('home.pathLead', { hours })}</p>
+    </div>
+    <p class="path-progress">
+      <span class="sr-only">{th('home.progressLabel')}: </span>
+      <span class="path-percent" data-overall>{fmtPctValue(0, lang, 0)}</span>
+      <span class="path-done muted" data-done data-tpl={common[lang]['home.pathDone']}>
+        {t('home.pathDone', { done: 0, total: MODULES.length })}
+      </span>
+    </p>
+  </div>
+
+  <div class="path-card card-hero">
+    <ol class="stations" aria-label={th('home.pathAria', { n: MODULES.length })}>
+      {
+        families.map((f) => (
+          <li class="family" data-family={f.key} style={`grid-column:${f.start} / span ${f.span}`}>
+            <span class="dot" style="background: var(--fam)" aria-hidden="true" />
+            {f.label}
+          </li>
+        ))
+      }
+      {
+        MODULES.map((m, i) => (
+          <li class="station-item" style={`grid-column:${i + 1}`}>
+            <a
+              class="station"
+              href={modulePath(lang, m.slug, '1')}
+              data-station={m.slug}
+              data-family={m.family}
+              data-state="open"
+              data-line-l={i === 0 ? 'none' : 'open'}
+              data-line-r={i === last ? 'none' : 'open'}
+            >
+              <span class="node-wrap">
+                <span class="line line-l" aria-hidden="true" />
+                <span class="line line-r" aria-hidden="true" />
+                <span class="node" style={`view-transition-name: ff-node-${m.slug}`}>
+                  <svg class="check" width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+                    <path d="M4 9.4L7.4 12.6L14 5.6" />
+                  </svg>
+                  <span class="num">{m.n}</span>
+                </span>
+              </span>
+              <span class="meta">
+                <span class="title" style={`view-transition-name: ff-title-${m.slug}`}>
+                  {m.title[lang]}
+                </span>
+                <span class="sr-only" data-state-text data-done={t('home.stationDone')} />
+                <span class="min">{t('home.minutes', { min: m.minutes })}</span>
+                <span class="chip chip-family state-chip" data-chip data-tpl={common[lang]['home.inProgress']} hidden />
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .path {
+    padding-top: 72px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+  .path-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .path-title {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .path-lead {
+    font-size: 15px;
+    color: var(--ff-ink-2);
+  }
+  .path-progress {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+  .path-percent {
+    font-size: 48px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .path-done {
+    font-size: 14px;
+  }
+  .path-card {
+    padding: 28px 20px 20px;
+    overflow-x: auto;
+    box-shadow: none;
+  }
+  .stations {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    min-width: 1000px;
+    display: grid;
+    grid-template-columns: repeat(9, minmax(0, 1fr));
+    row-gap: 14px;
+  }
+  .family {
+    grid-row: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 8px;
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--fam-text);
+  }
+  .station-item {
+    grid-row: 2;
+    display: flex;
+  }
+  .station {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    color: var(--ff-ink);
+    border-radius: var(--ff-r-box);
+  }
+  .station:hover {
+    color: var(--ff-ink);
+  }
+  .station:hover .title {
+    text-decoration: underline;
+  }
+  .node-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 48px;
+  }
+  .line {
+    position: absolute;
+    top: 23px;
+    height: 2px;
+    background: var(--ff-line-input);
+  }
+  .line-l {
+    left: 0;
+    right: 50%;
+  }
+  .line-r {
+    left: 50%;
+    right: 0;
+  }
+  .station[data-line-l='none'] .line-l,
+  .station[data-line-r='none'] .line-r {
+    display: none;
+  }
+  .station[data-line-l='done'] .line-l,
+  .station[data-line-r='done'] .line-r {
+    background: var(--ff-ink);
+  }
+  .node {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--ff-r-pill);
+    background: var(--ff-surface);
+    border: 2px solid var(--ff-line-strong);
+    color: var(--ff-muted);
+    font-size: 14px;
+    font-weight: 800;
+    transition:
+      background-color 300ms ease,
+      border-color 300ms ease,
+      box-shadow 300ms ease;
+  }
+  .check {
+    display: none;
+  }
+  .check path {
+    fill: none;
+    stroke: #fff;
+    stroke-width: 2.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .station[data-state='done'] .node {
+    background: var(--ff-ink);
+    border-color: var(--ff-ink);
+    color: #fff;
+  }
+  .station[data-state='done'] .check {
+    display: block;
+  }
+  .station[data-state='done'] .num {
+    display: none;
+  }
+  .station[data-state='current'] .node {
+    border: 3px solid var(--fam);
+    box-shadow: 0 0 0 6px var(--fam-soft);
+    color: var(--fam-text);
+  }
+  .meta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 0 8px;
+    text-align: center;
+  }
+  .title {
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+  .min {
+    font-size: 12px;
+    color: var(--ff-muted);
+  }
+  .state-chip {
+    padding: 3px 10px;
+  }
+  .state-chip[hidden] {
+    display: none;
+  }
+
+  @media (max-width: 640px) {
+    .path {
+      padding-top: 48px;
+      gap: 20px;
+    }
+    .path-percent {
+      font-size: 40px;
+    }
+    .path-card {
+      padding: 12px 16px 16px;
+      overflow: visible;
+    }
+    .stations {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    .family {
+      padding: 16px 0 6px 62px;
+    }
+    .station-item {
+      display: block;
+    }
+    .station {
+      display: grid;
+      grid-template-columns: 48px minmax(0, 1fr);
+      gap: 0 14px;
+      align-items: center;
+      min-height: 72px;
+    }
+    .node-wrap {
+      align-self: stretch;
+      height: auto;
+      min-height: 72px;
+    }
+    .line {
+      left: 23px;
+      right: auto;
+      top: auto;
+      width: 2px;
+      height: auto;
+    }
+    .line-l {
+      top: 0;
+      bottom: 50%;
+    }
+    .line-r {
+      top: 50%;
+      bottom: 0;
+    }
+    .meta {
+      align-items: flex-start;
+      text-align: left;
+      padding: 12px 0;
+      gap: 4px;
+    }
+    .title {
+      font-size: 15px;
+    }
+  }
+</style>
