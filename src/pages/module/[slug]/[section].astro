@@ -1,0 +1,25 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { mdxComponents } from '@/components/content/mdx-components';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('sections');
+  return entries
+    .filter((e) => e.id.split('/')[1] === 'de')
+    .map((e) => {
+      const [slug, , section] = e.id.split('/');
+      return { params: { slug, section }, props: { entry: e } };
+    });
+}
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+---
+
+<BaseLayout lang="de" title="Spike" nav="modules" family="options">
+  <main class="container-module">
+    <article class="prose">
+      <Content components={mdxComponents} />
+    </article>
+  </main>
+</BaseLayout>

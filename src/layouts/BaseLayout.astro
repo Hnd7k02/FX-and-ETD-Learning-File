@@ -1,0 +1,90 @@
+---
+import '@fontsource/plus-jakarta-sans/400.css';
+import '@fontsource/plus-jakarta-sans/500.css';
+import '@fontsource/plus-jakarta-sans/600.css';
+import '@fontsource/plus-jakarta-sans/700.css';
+import '@fontsource/plus-jakarta-sans/800.css';
+import '@fontsource/jetbrains-mono/500.css';
+import '@fontsource/jetbrains-mono/600.css';
+import '@fontsource/stix-two-text/400.css';
+import '@fontsource/stix-two-text/500.css';
+import '@fontsource/stix-two-text/400-italic.css';
+import '@fontsource/stix-two-text/500-italic.css';
+import '@/styles/tokens.css';
+import '@/styles/base.css';
+import { ClientRouter } from 'astro:transitions';
+import TopNav, { type NavKey } from '@/components/layout/TopNav.astro';
+import Footer from '@/components/layout/Footer.astro';
+import { common } from '@/i18n/dict/common';
+import { translator, type Lang } from '@/i18n/types';
+import { switchLangPath } from '@/i18n/routes';
+
+interface Props {
+  lang: Lang;
+  title: string;
+  description?: string;
+  nav?: NavKey;
+  /** Path of the same page in the other language. */
+  altPath?: string;
+  /** Module family for accent colours (module pages). */
+  family?: string;
+  /** Narrow footer container (module pages). */
+  narrowFooter?: boolean;
+}
+
+const { lang, title, description, nav = null, altPath, family, narrowFooter = false } = Astro.props;
+const t = translator(common, lang);
+const other: Lang = lang === 'de' ? 'en' : 'de';
+const otherPath = altPath ?? switchLangPath(Astro.url.pathname, other);
+const site = Astro.site ?? new URL('https://forward-first.pages.dev');
+const canonical = new URL(Astro.url.pathname, site).href;
+const alternate = new URL(otherPath, site).href;
+const desc = description ?? t('site.description');
+const isDeHome = lang === 'de' && Astro.url.pathname === '/';
+---
+
+<!doctype html>
+<html lang={lang} data-family={family}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={desc} />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang={lang} href={canonical} />
+    <link rel="alternate" hreflang={other} href={alternate} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#F4F5F7" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={desc} />
+    <meta property="og:locale" content={lang === 'de' ? 'de_CH' : 'en_GB'} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={new URL('/og.png', site).href} />
+    <meta name="twitter:card" content="summary_large_image" />
+    {isDeHome && <script is:inline>
+      try {
+        if (
+          localStorage.getItem('ff-lang') === 'en' &&
+          !sessionStorage.getItem('ff-lang-checked')
+        ) {
+          sessionStorage.setItem('ff-lang-checked', '1');
+          location.replace('/en/');
+        }
+      } catch {
+        /* storage unavailable */
+      }
+    </script>}
+    <ClientRouter fallback="none" />
+  </head>
+  <body data-family={family}>
+    <a class="skip-link" href="#main">
+      {t('a11y.skip')}
+    </a>
+    <TopNav lang={lang} current={nav} altPath={otherPath} />
+    <div id="main" tabindex="-1">
+      <slot />
+    </div>
+    <Footer lang={lang} wide={!narrowFooter} />
+  </body>
+</html>

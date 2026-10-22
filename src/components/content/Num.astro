@@ -1,0 +1,30 @@
+---
+/**
+ * A number from the calculation core: <Num of="ex.spot" />.
+ * Never type example or reference values into MDX; register them in src/lib/nums instead.
+ */
+import { formatNum, getNum } from '@/lib/nums';
+import type { Lang } from '@/i18n/types';
+import { pageLang } from './lang';
+
+interface Props {
+  of: string;
+  digits?: number;
+  sign?: boolean;
+  lang?: Lang;
+}
+const { of, digits, sign, lang } = Astro.props;
+const l = pageLang(Astro.currentLocale, lang);
+const text = formatNum(getNum(of), l, { digits, sign });
+---
+
+<span class="num" data-num={of}>
+  {text}
+</span>
+
+<style>
+  .num {
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+</style>
