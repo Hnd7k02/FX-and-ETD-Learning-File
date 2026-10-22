@@ -86,7 +86,7 @@ export function RiskometerGauge(p: RiskometerGaugeProps): JSX.Element {
       <g
         class="rk-needle"
         data-enter={entered ? undefined : ''}
-        style={{ '--needle': `${angle.toFixed(2)}deg` } as JSX.CSSProperties}
+        style={`--needle:${angle.toFixed(2)}deg`}
         onAnimationEnd={() => setEntered(true)}
       >
         <path

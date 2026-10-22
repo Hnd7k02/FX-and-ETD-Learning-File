@@ -1,23 +1,37 @@
+import GreeksLabFigure from '@/components/figures/GreeksLabFigure.astro';
+
 {/* 05 Greeks · Section 2 · Delta and gamma. Numbers only via <Num />, registry src/lib/nums/m05.ts. */}
 
 Delta tells you how much the call gains when USD/CHF rises a little. With a delta of 0.50 the option's value moves about half as much as the rate.
 
 Gamma tells you how quickly that delta itself changes. Far out of the money delta is close to zero, deep in the money close to one. Around the strike it changes fastest: that is where gamma is largest.
 
-For the importer this means: his call on <Num of="ex.notional" /> behaves today like a forward on roughly half the amount. If the dollar rises, that share grows; if it falls, it shrinks. Gamma measures exactly this adjustment.
+For the importer this means: his call on <Num of="ex.notional" /> behaves today like a forward on roughly half the amount. If the dollar rises, that share grows; if it falls, it shrinks. Gamma measures exactly this adjustment. It is the reason an option can do more than half a forward.
 
-{/* GreeksLabFigure mode="delta-gamma" — added in phase 3 */}
+<GreeksLabFigure mode="delta-gamma" caption="Drag the spot slider or the black dot itself: the black tangent at the top has slope delta, the tangent below has slope gamma." />
 
-### Gamma in the example
+Try three things in the lab. Drag spot all the way to the right: delta heads towards one and the call turns into a forward. Drag it to the left: delta falls towards zero. Then shorten the time to expiry to a few weeks: the delta curve becomes a steep step, and gamma at the strike shoots up.
 
-With <i>S</i> = <Num of="ex.spot" />, σ = <Num of="ex.vol" />, <i>T</i> = <Num of="m05.T" /> and <i>r</i><sub>f</sub> = <Num of="ex.rf" />, <i>d</i><sub>1</sub> is about <Num of="m05.d1" />. Delta is <i>e</i><sup>−<i>r</i><sub>f</sub><i>T</i></sup> · <i>N</i>(<i>d</i><sub>1</sub>) = <Num of="m05.dff" /> · <Num of="m05.nd1" /> ≈ <Num of="m05.delta" />. For gamma the density φ(<i>d</i><sub>1</sub>) = <Num of="m05.phiD1" /> comes into play:
+### Delta and gamma in the example
+
+With <i>S</i> = <Num of="ex.spot" />, σ = <Num of="ex.vol" />, <i>T</i> = <Num of="m05.T" /> and <i>r</i><sub>f</sub> = <Num of="ex.rf" />, <i>d</i><sub>1</sub> is about <Num of="m05.d1" />. Delta is <i>e</i><sup>−<i>r</i><sub>f</sub><i>T</i></sup> · <i>N</i>(<i>d</i><sub>1</sub>) = <Num of="m05.dff" /> · <Num of="m05.nd1" /> ≈ <Num of="m05.delta" />. If USD/CHF rises by 10 pips, the call therefore gains about <Num of="m05.deltaPnl10Pips" />.
+
+For gamma the density φ(<i>d</i><sub>1</sub>) = <Num of="m05.phiD1" /> comes into play:
 
 <Formula variant="accent"><span>Γ = <Num of="m05.dff" /> · <Num of="m05.phiD1" /> / (<Num of="ex.spot" digits={1} /> · <Num of="m05.volFrac" /> · <Num of="m05.sqrtT" />) = <b><Num of="m05.gamma" /></b></span></Formula>
 
 If USD/CHF rises by one big figure (0.0100), delta rises by about <Num of="m05.deltaChangeApprox" digits={2} sign={false} />: from <Num of="m05.delta" /> to roughly <Num of="m05.deltaUp" />. The lab reproduces the same value numerically.
 
 <Callout variant="good" title="Numerical check">
-  Delta one pip above and one pip below spot, difference divided by two pips: Γ ≈ <Num of="m05.gammaNumeric" />. Formula and difference quotient agree. The exact delta change for a full big figure is <Num of="m05.deltaChangeActual" />, slightly less than Γ · 0.01, because gamma already fades along the way.
+
+Delta one pip above and one pip below spot, difference divided by two pips: Γ ≈ <Num of="m05.gammaNumeric" />. Formula and difference quotient agree. The exact delta change for a full big figure is <Num of="m05.deltaChangeActual" />, slightly less than Γ · 0.01, because gamma already fades along the way.
+
+</Callout>
+
+<Callout title="Spot delta or forward delta?">
+
+The lab shows the spot delta <Num of="m05.delta" />: the number of USD per dollar of notional you would hold in spot today. In the market, delta is often quoted as the forward delta <i>N</i>(<i>d</i><sub>1</sub>) = <Num of="m05.deltaFwd" />, the hedge with a forward to the same expiry. The difference is the factor <i>e</i><sup>−<i>r</i><sub>f</sub><i>T</i></sup>.
+
 </Callout>
 
 <Derivation title="Derivation in four steps">
@@ -30,11 +44,13 @@ If USD/CHF rises by one big figure (0.0100), delta rises by about <Num of="m05.d
 
 <Formula><span>Γ = ∂Δ / ∂<i>S</i> = ∂²<i>V</i> / ∂<i>S</i>²</span></Formula>
 
-**3.** In the Garman-Kohlhagen model the call's delta is Δ = <i>e</i><sup>−<i>r</i><sub>f</sub><i>T</i></sup> · <i>N</i>(<i>d</i><sub>1</sub>). Differentiating with respect to spot touches only <i>N</i>(<i>d</i><sub>1</sub>), by the chain rule. φ is the density of the standard normal distribution.
+**3.** In the Garman-Kohlhagen model the call's delta is Δ = <i>e</i><sup>−<i>r</i><sub>f</sub><i>T</i></sup> · <i>N</i>(<i>d</i><sub>1</sub>). Delta looks this simple because of the identity <i>F</i> · φ(<i>d</i><sub>1</sub>) = <i>K</i> · φ(<i>d</i><sub>2</sub>): when the price is differentiated, the terms coming from <i>d</i><sub>1</sub> and <i>d</i><sub>2</sub> cancel. Differentiating once more with respect to spot touches only <i>N</i>(<i>d</i><sub>1</sub>), by the chain rule. φ is the density of the standard normal distribution.
 
 <Formula><span>∂<i>d</i><sub>1</sub> / ∂<i>S</i> = 1 / (<i>S</i> · σ · √<i>T</i>)</span><span>⇒ Γ = <i>e</i><sup>−<i>r</i><sub>f</sub><i>T</i></sup> · φ(<i>d</i><sub>1</sub>) / (<i>S</i> · σ · √<i>T</i>)</span></Formula>
 
 **4.** Plugging in the example (<i>S</i> = <Num of="ex.spot" />, σ = <Num of="ex.vol" />, <i>T</i> = <Num of="m05.T" />, <i>r</i><sub>f</sub> = <Num of="ex.rf" />, <i>d</i><sub>1</sub> ≈ <Num of="m05.d1" />) gives Γ = <Num of="m05.gamma" />, the value from the worked example above. Gamma is measured in "delta per unit of spot": for every 0.01 move, delta changes by about <Num of="m05.deltaChangeApprox" digits={2} sign={false} />.
+
+The formula also shows why gamma peaks at the strike: φ(<i>d</i><sub>1</sub>) is a bell curve with its maximum at <i>d</i><sub>1</sub> = 0, where the forward is close to the strike. And because √<i>T</i> sits in the denominator, gamma at the strike grows as expiry draws nearer.
 
 </Derivation>
 
@@ -44,10 +60,12 @@ Whoever buys an option is long gamma. Delta-hedging it, they sell after rallies 
 
 <Formula variant="dark"><span>P&L ≈ ½ · Γ · [(Δ<i>S</i>)² − σ²<i>S</i>² · Δ<i>t</i>]</span></Formula>
 
-Break-even per day: σ · <i>S</i> / √365 = <Num of="ex.spot" /> · <Num of="ex.vol" /> / √365 ≈ <b><Num of="m05.breakEvenPips" /> pips</b>. If USD/CHF moves more than the implied daily volatility, the delta-hedged gamma buyer comes out ahead. The gamma share of theta is about <Num of="m05.thetaGammaDay" /> per day; the theta in the lab (<Num of="m05.thetaDay" />) also contains the rate carry of about <Num of="m05.thetaCarryDay" /> per day.
+Break-even per day: σ · <i>S</i> / √365 = <Num of="ex.spot" /> · <Num of="ex.vol" /> / √365 ≈ <b><Num of="m05.breakEvenPips" /> pips</b>. If USD/CHF moves more than the implied daily volatility, the delta-hedged gamma buyer comes out ahead. The gamma share of theta is about <Num of="m05.thetaGammaDay" /> per day; the theta in the lab (<Num of="m05.thetaDay" />) also contains the rate carry of about <Num of="m05.thetaCarryDay" /> per day. Section 4 works through the details.
 
 </Desk>
 
 <Takeaway>
-  Delta is the slope, gamma the curvature. Gamma peaks around the strike, and that is exactly where each day costs the most time value.
+
+Delta is the slope, gamma the curvature. Gamma peaks around the strike, and that is exactly where each day costs the most time value.
+
 </Takeaway>

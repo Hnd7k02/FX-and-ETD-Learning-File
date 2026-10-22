@@ -85,7 +85,10 @@ function useSeriesMorph(target: number[], yMaxTarget: number, instant: boolean):
       setState(
         k >= 1
           ? { vals: target, yMax: yMaxTarget }
-          : { vals: lerpArray(from.vals, target, e), yMax: from.yMax + (yMaxTarget - from.yMax) * e },
+          : {
+              vals: lerpArray(from.vals, target, e),
+              yMax: from.yMax + (yMaxTarget - from.yMax) * e,
+            },
       );
       raf.current = k < 1 ? requestAnimationFrame(step) : null;
     };
@@ -121,7 +124,11 @@ export function RiskometerChart(p: RiskometerChartProps): JSX.Element {
     ? `${line}L${pts[n - 1]![0].toFixed(1)},${axisY}L${pts[0]![0].toFixed(1)},${axisY}Z`
     : '';
 
-  const years = yearTicks(p.dates[0] ?? '2006-01-01', p.dates[n - 1] ?? '2026-01-01', layout.yearStep);
+  const years = yearTicks(
+    p.dates[0] ?? '2006-01-01',
+    p.dates[n - 1] ?? '2026-01-01',
+    layout.yearStep,
+  );
   const yearDays = years.map(yearStart);
   const yearOf = new Map(yearDays.map((d, i) => [d, years[i]!]));
   const xTicks = yearDays.filter((d) => {
@@ -172,7 +179,10 @@ export function RiskometerChart(p: RiskometerChartProps): JSX.Element {
         data-event={k.m.id}
         aria-pressed={on}
         aria-label={k.m.aria}
-        style={{ left: `${((k.px / W) * 100).toFixed(2)}%`, top: `${((k.py / H) * 100).toFixed(2)}%` }}
+        style={{
+          left: `${((k.px / W) * 100).toFixed(2)}%`,
+          top: `${((k.py / H) * 100).toFixed(2)}%`,
+        }}
         onClick={() => p.onSelect(k.m.id)}
       >
         <span class="rk-ev-tag" style={{ bottom: `${30 + row * RISKOMETER_UI.tagRow}px` }}>
@@ -218,7 +228,9 @@ export function RiskometerChart(p: RiskometerChartProps): JSX.Element {
           />
           <path d={area} class="rk-area" />
           <path d={line} class="rk-line" />
-          {sel && <path d={`M${sel.px.toFixed(1)},${sel.py.toFixed(1)}V${axisY}`} class="rk-stem" />}
+          {sel && (
+            <path d={`M${sel.px.toFixed(1)},${sel.py.toFixed(1)}V${axisY}`} class="rk-stem" />
+          )}
           {hover !== null && (
             <g class="rk-hover">
               <path d={`M${hx.toFixed(1)},${layout.top}V${axisY}`} class="rk-cross" />
@@ -255,7 +267,10 @@ export function RiskometerChart(p: RiskometerChartProps): JSX.Element {
           <div
             class="rk-tip"
             data-tip
-            style={{ left: `${tipLeft.toFixed(2)}%`, transform: `translateX(${tipShift(tipLeft)}%)` }}
+            style={{
+              left: `${tipLeft.toFixed(2)}%`,
+              transform: `translateX(${tipShift(tipLeft)}%)`,
+            }}
           >
             <span class="rk-tip-date">{fmtDate(p.dates[hover] ?? '', p.lang)}</span>
             <b>{fmtPctValue(vals[hover] ?? 0, p.lang, 1)}</b>

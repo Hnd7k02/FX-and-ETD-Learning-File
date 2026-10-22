@@ -90,6 +90,7 @@ export const pathsimulator = defineDict({
     'ps.lg.pathGain': 'Pfad mit Gewinn',
     'ps.lg.pathLoss': 'Pfad mit Verlust',
     'ps.lg.mean': 'Mittelwert',
+    'ps.idle': '{scenario}: Der Kurs läuft Tag für Tag durch {n} Fixings. Achte auf die Punkte.',
     'ps.ev.gap': 'Schock: {pair} fällt an einem Tag um {gap}.',
     'ps.ev.leverage.buy':
       'Fixing {i} unter dem Strike: Jetzt kaufst du die doppelte Menge zu {k}, über dem Marktkurs.',
@@ -294,6 +295,7 @@ export const pathsimulator = defineDict({
     'ps.lg.pathGain': 'Path with a gain',
     'ps.lg.pathLoss': 'Path with a loss',
     'ps.lg.mean': 'Mean',
+    'ps.idle': '{scenario}: the rate runs day by day through {n} fixings. Watch the dots.',
     'ps.ev.gap': 'Shock: {pair} falls by {gap} in one day.',
     'ps.ev.leverage.buy':
       'Fixing {i} below the strike: now you buy twice the amount at {k}, above the market rate.',

@@ -156,7 +156,10 @@ describe('selection', () => {
       event: 'gfc-2008',
     });
     expect(resolveSelection(ev, null, null)).toEqual({ pair: 'EUR/CHF', event: 'chf-shock-2015' });
-    expect(resolveSelection(ev, null, 'nope')).toEqual({ pair: 'EUR/CHF', event: 'chf-shock-2015' });
+    expect(resolveSelection(ev, null, 'nope')).toEqual({
+      pair: 'EUR/CHF',
+      event: 'chf-shock-2015',
+    });
   });
 
   it('picks the first pair of an event when no pair is given', () => {
@@ -208,9 +211,7 @@ describe('layout and scales', () => {
   });
 
   it('labels years from the first year in steps', () => {
-    expect(yearTicks('2006-01-06', '2026-09-14', 4)).toEqual([
-      2006, 2010, 2014, 2018, 2022, 2026,
-    ]);
+    expect(yearTicks('2006-01-06', '2026-09-14', 4)).toEqual([2006, 2010, 2014, 2018, 2022, 2026]);
     expect(yearTicks('2006-01-06', '2026-09-14', 5)).toEqual([2006, 2011, 2016, 2021, 2026]);
     expect(yearStart(1970)).toBe(0);
     expect(spanYears('2006-01-06', '2026-09-14')).toBe(20);

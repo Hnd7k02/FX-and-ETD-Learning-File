@@ -41,7 +41,7 @@ export default function BarrierPaths({ lang }: BarrierPathsProps): JSX.Element {
   const width = useElementWidth(box, 620);
   const inView = useInView(box);
   const rm = usePrefersReducedMotion();
-  const L = chartLayout(width, 0.56, 270);
+  const L = chartLayout(width, width < 480 ? 0.8 : 0.56, 270);
   const play = usePlayback(C.days, C.msPerDay, { autoplay: true, reduced: rm, inView });
 
   const S = M07_MARKET.spot;

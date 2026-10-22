@@ -1,0 +1,69 @@
+import GreeksLeversFigure from '@/components/figures/GreeksLeversFigure.astro';
+
+{/* 05 Greeks · Section 1 · Intuition. Numbers only via <Num />, registries src/lib/nums/ex.ts and m05.ts. */}
+
+The importer has bought his USD call: strike <Num of="ex.strike" />, amount <Num of="ex.notional" />, premium <Num of="ex.callChf" />. The next morning the screen shows a different value. He has done nothing. What happened?
+
+The strike and the amount are fixed in the contract. Everything else is moved by the market: the USD/CHF spot rate, the time left to expiry, implied volatility, the CHF rate and the USD rate. These are the five levers of an option. In module 04 you saw which way each lever pushes. Here comes the next question: **by how much?**
+
+That is exactly what the Greeks measure. Each Greek answers a single question: how much does the premium change when one lever moves a little while all the others stand still? Mathematically that is a derivative. Visually it is the slope of a curve.
+
+<GreeksLeversFigure caption="Pick a direction for each lever. The bar shows the exact change in the premium; below it is the estimate from the matching Greek." />
+
+### The six Greeks in the example
+
+Five levers, but six Greeks: spot gets two. Delta measures the slope, gamma the curvature, in other words how quickly delta itself changes.
+
+| Lever | Greek | Derivative | In the example, on USD 1m |
+| --- | --- | --- | --- |
+| Spot | Delta Δ | ∂<i>V</i>/∂<i>S</i> | <Num of="m05.delta" />: reacts like <Num of="m05.deltaUsd" /> in spot |
+| Spot | Gamma Γ | ∂²<i>V</i>/∂<i>S</i>² | <Num of="m05.gamma" />: delta rises by <Num of="m05.deltaChangeApprox" /> per big figure |
+| Time | Theta Θ | ∂<i>V</i>/∂<i>t</i> | <Num of="ex.thetaDayChf" digits={0} /> per day |
+| Vol | Vega ν | ∂<i>V</i>/∂σ | <Num of="ex.vegaChf" /> per vol point |
+| CHF rate | Rho CHF ρ<sub>d</sub> | ∂<i>V</i>/∂<i>r</i><sub>d</sub> | <Num of="ex.rhoDChf" /> per +1% |
+| USD rate | Rho USD ρ<sub>f</sub> | ∂<i>V</i>/∂<i>r</i><sub>f</sub> | <Num of="ex.rhoFChf" /> per +1% |
+
+Read the table as a league table. Spot is by far the strongest lever: one big figure moves the premium by several thousand francs. A vol point is worth about one and a half thousand, one percentage point of interest about a thousand, a day only a few dozen. Theta is small, but it arrives every single day.
+
+### How good are the Greeks' estimates?
+
+If USD/CHF rises by one big figure, delta alone estimates a gain of <Num of="m05.spotUpDeltaChf" />. Gamma adds the curvature: delta plus gamma give <Num of="m05.spotUpDeltaGammaChf" />. The exact repricing delivers <Num of="m05.spotUpChf" />. For small moves the Greeks are very accurate.
+
+For large steps they are less so. A whole month costs the call <Num of="m05.monthChf" />, whereas today's theta times 30 predicts only <Num of="m05.monthThetaChf" />. The reason: a Greek is a snapshot. Time decay speeds up towards expiry, and today's theta cannot see that yet.
+
+<Derivation title="Derivation: the Greeks as a Taylor expansion">
+
+The price of a call in the Garman-Kohlhagen model:
+
+<Formula>
+  <span><i>V</i> = <i>e</i><sup>−<i>r</i><sub>d</sub><i>T</i></sup> · [<i>F</i> · <i>N</i>(<i>d</i><sub>1</sub>) − <i>K</i> · <i>N</i>(<i>d</i><sub>2</sub>)]</span>
+  <span><i>F</i> = <i>S</i> · <i>e</i><sup>(<i>r</i><sub>d</sub> − <i>r</i><sub>f</sub>)<i>T</i></sup>, <i>d</i><sub>1,2</sub> = [ln(<i>F</i>/<i>K</i>) ± ½σ²<i>T</i>] / (σ√<i>T</i>)</span>
+</Formula>
+
+Spot and both rates act through the forward <i>F</i>. Volatility acts only through σ√<i>T</i>. Time acts three ways: through the forward, through σ√<i>T</i> and through discounting.
+
+When all levers move a little, the Taylor expansion splits the price change into contributions. Each contribution is a Greek times the move of its lever:
+
+<Formula variant="accent">
+  d<i>V</i> ≈ Δ · d<i>S</i> + ½ · Γ · (d<i>S</i>)² + ν · dσ + Θ · d<i>t</i> + ρ<sub>d</sub> · d<i>r</i><sub>d</sub> + ρ<sub>f</sub> · d<i>r</i><sub>f</sub>
+</Formula>
+
+Only for spot is the second-order term included. Spot moves the most from day to day, and (d<i>S</i>)² is not negligible there. Cross terms such as spot times vol (vanna) appear in section 4 as an outlook.
+
+A word on units: theta counts the time that passes. It is −∂<i>V</i>/∂<i>T</i> with time to expiry <i>T</i>, shown per calendar day in this tool. Vega is per vol point, rho per percentage point of interest. All values refer to USD 1m and are in CHF.
+
+</Derivation>
+
+<Desk title="The Greeks as the language of risk">
+
+An options desk holds thousands of positions. Nobody looks at each one. The Greeks are added up instead: delta in USD, vega in CHF per vol point, theta per day. That way a whole book can be read in a handful of numbers.
+
+Each Greek has its own tool. Delta is hedged with spot or forwards: against small moves, the importer's call behaves like a spot position of <Num of="m05.deltaUsd" />. Vega can only be hedged with other options, because spot and forwards have no volatility. Theta cannot be hedged on its own, since it always comes together with gamma: it is the price the buyer pays for gamma.
+
+</Desk>
+
+<Takeaway>
+
+Five levers move an option: spot, time, volatility and two interest rates. Each Greek measures how strongly the premium reacts to exactly one lever while the others stand still.
+
+</Takeaway>

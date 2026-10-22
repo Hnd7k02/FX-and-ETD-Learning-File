@@ -22,7 +22,7 @@ export const riskometer = defineDict({
     'rk.today': 'Heute',
     'rk.todaySub': '{pair} · 1 Monat',
     'rk.gaugeAria': 'Tacho: Stufe {level}, Perzentil {pct}',
-    'rk.percentile': 'Höher als an {pct} % aller Handelstage seit {year}.',
+    'rk.percentile': 'Höher als an {pct} aller Handelstage seit {year}.',
     'rk.legendAria': 'Stufen für {pair}',
     'rk.legend.below': 'unter {v}',
     'rk.legend.between': '{a} bis {b}',
@@ -55,7 +55,8 @@ export const riskometer = defineDict({
       'Daten: EZB-Referenzkurse (werktags, ca. 16:00 MEZ); USD/CHF und USD/JPY als Kreuzkurse über den Euro.',
     'rk.footMethod':
       'Realisierte Vola: Standardabweichung von {window} täglichen Log-Renditen (Mittelwert 0), annualisiert mit √{ann}, im Chart als Wochenwerte. Stufen nach Perzentilen aller Tageswerte seit {year}, je Paar: {levels}.',
-    'rk.footLevels': '{l1} unter P{p1}, {l2} bis P{p2}, {l3} bis P{p3}, {l4} bis P{p4}, {l5} ab P{p4}',
+    'rk.footLevels':
+      '{l1} unter P{p1}, {l2} bis P{p2}, {l3} bis P{p3}, {l4} bis P{p4}, {l5} ab P{p4}',
     'rk.footDisclaimer': 'Nur zu Bildungszwecken, keine Anlageberatung.',
     'rk.footLink': 'Methodik und Quellen',
   },
@@ -75,7 +76,7 @@ export const riskometer = defineDict({
     'rk.today': 'Today',
     'rk.todaySub': '{pair} · 1 month',
     'rk.gaugeAria': 'Gauge: level {level}, percentile {pct}',
-    'rk.percentile': 'Higher than on {pct}% of all trading days since {year}.',
+    'rk.percentile': 'Higher than on {pct} of all trading days since {year}.',
     'rk.legendAria': 'Levels for {pair}',
     'rk.legend.below': 'below {v}',
     'rk.legend.between': '{a} to {b}',
@@ -83,7 +84,8 @@ export const riskometer = defineDict({
     'rk.legend.current': 'current level',
     'rk.histTitle': '{years} years of {pair}: realised 1-month volatility',
     'rk.histSub': 'Weekly values {from} to {to} · tap the dots',
-    'rk.chartAria': 'Line chart of the realised volatility of {pair} since {year} with {n} marked events',
+    'rk.chartAria':
+      'Line chart of the realised volatility of {pair} since {year} with {n} marked events',
     'rk.chartSummary':
       'Weekly values from {from} to {to}. Lowest {min} on {minDate}, highest {max} on {maxDate}, currently {current}. The yearly maxima are in the table below the card.',
     'rk.todayTag': 'Today {v}',
