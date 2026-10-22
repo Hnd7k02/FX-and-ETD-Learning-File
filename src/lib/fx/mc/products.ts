@@ -342,7 +342,10 @@ export type Product =
 
 export type ProductKind = Product['kind'];
 export type ProductOf<K extends ProductKind> = Extract<Product, { kind: K }>;
-export type ProductOverrides<K extends ProductKind> = Partial<Omit<ProductOf<K>, 'kind'>>;
+/** Overrides of a product's fields (distributive: for a union of kinds, a union of partials). */
+export type ProductOverrides<K extends ProductKind> = K extends ProductKind
+  ? Partial<Omit<ProductOf<K>, 'kind'>>
+  : never;
 
 /** All Monte Carlo product kinds, in the order of module 08. */
 export const PRODUCT_KINDS: readonly ProductKind[] = [
@@ -440,18 +443,19 @@ export function level(x: number): number {
 export function buildProduct<K extends ProductKind>(
   kind: K,
   market: Market = DEFAULT_MARKET,
-  overrides: ProductOverrides<K> = {},
+  overrides: ProductOverrides<K> = {} as ProductOverrides<K>,
 ): ProductOf<K> {
   const S = market.spot;
   const P = PRODUCT_DEFAULTS;
+  const k: ProductKind = kind;
   let base: Product;
-  switch (kind) {
+  switch (k) {
     case 'accumulator':
     case 'decumulator': {
-      const d = P[kind];
+      const d = P[k];
       const fixingDays = fixingSchedule(d.frequency, d.fixings);
       base = {
-        kind,
+        kind: k,
         fixingDays,
         notional: d.notional,
         leverage: d.leverage,
@@ -549,8 +553,8 @@ export function buildProduct<K extends ProductKind>(
     default:
       throw new RangeError(`buildProduct: unknown product kind ${String(kind)}`);
   }
-  const product = { ...base, ...overrides } as ProductOf<K>;
-  return withConsistentDays(product, overrides);
+  const product = { ...base, ...(overrides as object) } as Product;
+  return withConsistentDays(product, overrides as object) as ProductOf<K>;
 }
 
 /** Observation days of a window barrier: the window days plus the expiry day. */
@@ -561,7 +565,7 @@ export function windowObservationDays(start: number, end: number, expiry: number
 }
 
 /** Recomputes the observation days if window or expiry were overridden but the days were not. */
-function withConsistentDays<P extends Product>(p: P, overrides: Partial<P>): P {
+function withConsistentDays(p: Product, overrides: object): Product {
   if ('fixingDays' in overrides) return p;
   if (p.kind === 'windowBarrier') {
     return {

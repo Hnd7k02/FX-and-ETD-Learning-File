@@ -28,9 +28,9 @@ export function isZeroCost(kind: ProductKind): kind is ZeroCostKind {
  */
 export function fairProduct<K extends ProductKind>(
   kind: K,
-  overrides: ProductOverrides<K> = {},
+  overrides: ProductOverrides<K> = {} as ProductOverrides<K>,
 ): ProductOf<K> {
   if (!isZeroCost(kind)) return buildProduct(kind, DEFAULT_MARKET, overrides);
   const stored = MC_PRODUCTS.products[kind].product as ProductOf<K>;
-  return { ...stored, ...overrides };
+  return { ...stored, ...(overrides as object) } as ProductOf<K>;
 }

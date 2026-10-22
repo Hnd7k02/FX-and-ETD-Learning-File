@@ -874,7 +874,7 @@ const sid = (i: number) => toc[i]!.id;
             <div class="ab-reset card">
               <h3 class="ab-h3">{tr('reset.h')}</h3>
               <p class="ab-small">{t('about.credits.privacy')}</p>
-              <ResetProgress client:visible lang={lang} />
+              <ResetProgress client:load lang={lang} />
             </div>
           </div>
         </section>
