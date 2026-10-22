@@ -1,0 +1,120 @@
+---
+/**
+ * Back/next cards at the end of a section (B-Modul). Section 1 goes back to the learning path,
+ * section 4 forward to the quiz, the quiz forward to the next module's first section and the
+ * last module's quiz back to the learning path.
+ */
+import { MODULES, moduleIndex, type ModuleDef } from '@/data/modules';
+import { common } from '@/i18n/dict/common';
+import { homePath, modulePath, SECTION_KEYS, type SectionKey } from '@/i18n/routes';
+import { translator, type Lang } from '@/i18n/types';
+
+interface Props {
+  lang: Lang;
+  module: ModuleDef;
+  current: SectionKey;
+}
+const { lang, module: m, current } = Astro.props;
+const t = translator(common, lang);
+const pathHref = `${homePath(lang)}#lernpfad`;
+const idx = SECTION_KEYS.indexOf(current);
+const label = (i: number) =>
+  `${i + 1} · ${SECTION_KEYS[i] === 'quiz' ? t('module.quiz') : m.sections[i]!.short[lang]}`;
+
+interface Card {
+  href: string;
+  small: string;
+  big: string;
+}
+
+const back: Card =
+  idx === 0
+    ? { href: pathHref, small: t('module.back'), big: t('module.home') }
+    : { href: modulePath(lang, m.slug, SECTION_KEYS[idx - 1]!), small: t('module.back'), big: label(idx - 1) };
+
+const nextModule = MODULES[moduleIndex(m.slug) + 1];
+const next: Card =
+  current !== 'quiz'
+    ? { href: modulePath(lang, m.slug, SECTION_KEYS[idx + 1]!), small: t('module.next'), big: label(idx + 1) }
+    : nextModule
+      ? {
+          href: modulePath(lang, nextModule.slug, '1'),
+          small: t('module.nextModule'),
+          big: `${nextModule.n} · ${nextModule.title[lang]}`,
+        }
+      : { href: pathHref, small: t('module.next'), big: t('module.toPath') };
+---
+
+<nav class="pager" aria-label={t('a11y.pager')}>
+  <a class="pager-card pager-back" href={back.href} rel="prev">
+    <span class="pager-small">{back.small}</span>
+    <span class="pager-big">{back.big}</span>
+  </a>
+  <a class="pager-card pager-next" href={next.href} rel="next">
+    <span class="pager-small">{next.small}</span>
+    <span class="pager-big">{next.big}</span>
+  </a>
+</nav>
+
+<style>
+  .pager {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 12px;
+    padding-top: 8px;
+    border-top: 1px solid var(--ff-line-input);
+  }
+  .pager-card {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 0 1 auto;
+    min-width: 220px;
+    padding: 16px 20px;
+    border-radius: 18px;
+    transition:
+      background-color 150ms ease,
+      transform 150ms ease;
+  }
+  .pager-card:active {
+    transform: translateY(1px);
+  }
+  .pager-back {
+    border: 1px solid var(--ff-line-input);
+    background: var(--ff-surface);
+    color: var(--ff-ink);
+  }
+  .pager-back:hover {
+    background: var(--ff-chip);
+    color: var(--ff-ink);
+  }
+  .pager-next {
+    align-items: flex-end;
+    text-align: right;
+    background: var(--ff-ink);
+    color: #fff;
+  }
+  .pager-next:hover {
+    background: #262b33;
+    color: #fff;
+  }
+  .pager-small {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ff-muted);
+  }
+  .pager-next .pager-small {
+    color: var(--ff-on-dark-muted);
+  }
+  .pager-big {
+    font-size: 15px;
+    font-weight: 800;
+  }
+  @media (max-width: 640px) {
+    .pager-card {
+      flex: 1 1 100%;
+      min-width: 0;
+    }
+  }
+</style>

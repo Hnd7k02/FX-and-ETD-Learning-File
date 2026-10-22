@@ -1,0 +1,182 @@
+---
+/**
+ * Section stepper of the module header (B-Modul): five items (four sections plus the quiz),
+ * each a 4 px bar and the label "n · short label". Rendered with the current item only; the
+ * script marks done sections from localStorage on every astro:page-load and whenever the
+ * progress changes (the bar turns green the moment the section end is reached).
+ * Each item is a real link, so the stepper also navigates (deviation from the prototype's spans).
+ */
+import type { ModuleDef } from '@/data/modules';
+import { common } from '@/i18n/dict/common';
+import { moduleui } from '@/i18n/dict/moduleui';
+import { modulePath, SECTION_KEYS, type SectionKey } from '@/i18n/routes';
+import { translator, type Lang } from '@/i18n/types';
+
+interface Props {
+  lang: Lang;
+  module: ModuleDef;
+  current: SectionKey;
+}
+const { lang, module: m, current } = Astro.props;
+const t = translator(common, lang);
+const tm = translator(moduleui, lang);
+
+const items = SECTION_KEYS.map((key, i) => ({
+  key,
+  n: i + 1,
+  label: key === 'quiz' ? t('module.quiz') : m.sections[i]!.short[lang],
+  href: modulePath(lang, m.slug, key),
+  current: key === current,
+}));
+---
+
+<ol
+  class="stepper"
+  aria-label={t('a11y.sections')}
+  data-stepper
+  data-slug={m.slug}
+  data-sr-done={tm('stepper.done')}
+  data-sr-current={tm('stepper.current')}
+>
+  {
+    items.map((it) => (
+      <li class="step-item">
+        <a
+          class="step"
+          href={it.href}
+          data-step={it.key}
+          data-state={it.current ? 'current' : 'open'}
+          aria-current={it.current ? 'step' : undefined}
+        >
+          <span class="bar" aria-hidden="true" />
+          <span class="label">
+            <span class="n">{it.n}</span>
+            <span class="sep" aria-hidden="true">
+              {' · '}
+            </span>
+            <span class="txt">{it.label}</span>
+            <span class="sr-only" data-step-sr>
+              {it.current ? ` · ${tm('stepper.current')}` : ''}
+            </span>
+          </span>
+        </a>
+      </li>
+    ))
+  }
+</ol>
+
+<script>
+  import {
+    isQuizPassed,
+    isSectionDone,
+    loadProgress,
+    onProgress,
+    type ContentSection,
+    type Progress,
+  } from '@/lib/progress';
+
+  function apply(p: Progress) {
+    document.querySelectorAll<HTMLElement>('[data-stepper]').forEach((root) => {
+      const slug = root.dataset.slug ?? '';
+      root.querySelectorAll<HTMLElement>('[data-step]').forEach((a) => {
+        const key = a.dataset.step ?? '';
+        const done =
+          key === 'quiz'
+            ? isQuizPassed(p, slug)
+            : isSectionDone(p, slug, key as ContentSection);
+        const current = a.getAttribute('aria-current') === 'step';
+        a.dataset.state = current ? 'current' : done ? 'done' : 'open';
+        a.dataset.done = done ? 'true' : 'false';
+        const sr = a.querySelector('[data-step-sr]');
+        if (sr) {
+          const parts: string[] = [];
+          if (current) parts.push(root.dataset.srCurrent ?? '');
+          if (done) parts.push(root.dataset.srDone ?? '');
+          const text = parts.length ? ` · ${parts.join(', ')}` : '';
+          if (sr.textContent !== text) sr.textContent = text;
+        }
+      });
+    });
+  }
+
+  document.addEventListener('astro:page-load', () => apply(loadProgress()));
+  onProgress(apply);
+</script>
+
+<style>
+  .stepper {
+    margin: 8px 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 8px;
+    max-width: 760px;
+  }
+  .step-item {
+    display: flex;
+    min-width: 0;
+  }
+  .step {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: var(--ff-touch);
+    padding: 2px 0 6px;
+    color: var(--ff-muted);
+    border-radius: 6px;
+  }
+  .step:hover {
+    color: var(--ff-ink);
+  }
+  .step:hover .txt {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .bar {
+    display: block;
+    height: 4px;
+    border-radius: var(--ff-r-pill);
+    background: var(--ff-line-input);
+    transition: background-color 300ms ease;
+  }
+  .label {
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+  .step[data-state='current'] {
+    color: var(--ff-ink);
+  }
+  .step[data-state='current'] .label {
+    font-weight: 800;
+  }
+  .step[data-state='current'] .bar {
+    background: var(--fam, var(--ff-ink));
+  }
+  .step[data-state='done'] {
+    color: var(--ff-ink);
+  }
+  .step[data-state='done'] .bar {
+    background: var(--ff-good);
+  }
+
+  @media (max-width: 640px) {
+    .stepper {
+      gap: 6px;
+    }
+    .step .sep,
+    .step .txt {
+      display: none;
+    }
+    .step[data-step='quiz'] .n {
+      display: none;
+    }
+    .step[data-step='quiz'] .txt {
+      display: inline;
+    }
+  }
+</style>
