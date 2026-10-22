@@ -1,30 +1,41 @@
 # Progress
 
-Working branch: `claude/forward-first-v1`. Mode: phases without stops (D-16).
+Working branch: `claude/forward-first-v1`. Mode: phases without stops (D-16), uncertain choices kept easy to change (D-22).
 
-| Phase | Content                                                                           | Status      |
-| ----- | --------------------------------------------------------------------------------- | ----------- |
-| 0     | Setup: scaffold, tooling, tokens, layout shell, i18n routing, CI, memory files    | done        |
-| 1     | Calculation core without Monte Carlo                                              | in progress |
-| 2     | Design system, home page, Wow moment, module template                             | open        |
-| 3     | Module 05 vertical slice (Greeks lab, content, quiz, progress)                    | open        |
-| 4     | Riskometer: pipeline, method, events, page, mini gauge, GitHub Action             | open        |
-| 5     | Modules 01–04 incl. session clock, calculators, payoff builder                    | open        |
-| 6     | Monte Carlo engine, products, modules 06–09, path simulator, matrix               | open        |
-| 7     | English complete, glossary, about and methodology                                 | open        |
-| 8     | Polish: transitions, micro-interactions, 390 px, visual comparison                | open        |
-| 9     | Verification and launch: tests, E2E, Lighthouse, fact check, README, deploy guide | open        |
+| Phase | Content                                                                           | Status                                                              |
+| ----- | --------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| 0     | Setup: scaffold, tooling, tokens, layout shell, i18n routing, CI, memory files    | done                                                                |
+| 1     | Calculation core without Monte Carlo                                              | done, independently verified (`docs/reference/xcheck/`)             |
+| 2     | Design system, home page, Wow moment, module template                             | done                                                                |
+| 3     | Module 05 vertical slice (Greeks lab, content, quiz, progress)                    | in progress                                                         |
+| 4     | Riskometer: pipeline, method, events, page, mini gauge, GitHub Action             | pipeline + mini gauge done, page in progress                        |
+| 5     | Modules 01–04 incl. session clock, calculators, payoff builder                    | in progress                                                         |
+| 6     | Monte Carlo engine, products, modules 06–09, path simulator, matrix               | engine done and verified; modules in progress                       |
+| 7     | English complete, glossary, about and methodology                                 | glossary (105 terms) + about done; EN written alongside each module |
+| 8     | Polish: transitions, micro-interactions, 390 px, visual comparison                | open                                                                |
+| 9     | Verification and launch: tests, E2E, Lighthouse, fact check, README, deploy guide | open                                                                |
 
 ## Current state
 
-- Phase 0 complete: `npm run check` exit 0, `npm run build` ok, `npm run e2e` 6/6 green (390 px and 1440 px).
-- ECB seed data in `data/raw/ecb-eur-reference.csv` (1999-01-04 … 2026-09-14), see D-15.
+- Calculation core: forward, swap, roll, arbitrage, Garman-Kohlhagen, Black-76, implied vol, delta strikes, six Greeks, smile, digitals, 8 barriers, touch, double no-touch; all §6 reference values within tolerance; cross-checked against independent formulas (max diff 1.8e-13).
+- Monte Carlo: 8 products, fair strikes/coupons with standard errors in `src/data/fx/mc-products.json`, independently re-implemented and reproduced.
+- Riskometer data: ECB seed until 14.09.2026; EUR/CHF 3.9 % (Normal, percentile 45); daily GitHub Action `.github/workflows/data.yml`.
+- Home page with Wow chart, learning path, resume card, mini gauge; module template with stepper, check questions, quiz, progress; glossary; about & methodology.
 
-## Next step
+## Next steps
 
-Phase 1: calculation core (`src/lib/fx`) with tests against `docs/reference/gk_reference.py`.
+1. Finish modules 01–09 (agents running), Riskometer page.
+2. Integration: merge source fragments into `src/content/sources.md`, full `npm run check`, build, e2e.
+3. Review round: fresh agents check finance, numbers, language (DE/EN), facts against sources, accessibility, performance.
+4. Polish (phase 8) and README / deploy guide (phase 9).
 
 ## Open questions for Dario
 
-1. **Production URL:** once the Cloudflare project exists, set `site` in `astro.config.mjs` (currently a placeholder) so canonical and hreflang links are correct.
-2. **Data freshness:** the build sandbox could not reach the ECB API; the Riskometer starts with data until 14.09.2026. The first run of the data workflow on GitHub brings it up to date (D-15).
+1. **Production URL:** set `site` in `astro.config.mjs` once the Cloudflare project exists.
+2. **Data freshness:** the sandbox could not reach the ECB API; data ends 14.09.2026. The first (manual) run of the data workflow on GitHub updates it. If `main` is protected, the workflow's push needs a rule exception.
+3. **2008 event wording (D-30):** the approved prototype named the failed US investment bank; currently neutral because of the no-bank-names rule. Name it as a historical fact?
+4. **Structured product parameters (D-29):** with the §8.7 values the TARF reaches its 500-pip target after ~2.4 fixings in 94 % of paths, TPF/RTPF coupons are ~775–810 pips per fixing. Keep (current: taught as the asymmetry lesson) or change, e.g. TARF target 1’500 pips, strikes relative to the forward? One edit in `MC_CONFIG` + `npm run data:mc`.
+5. **Fiscal package 2025 sources:** the announcement date comes from a public broadcaster, not an official page; the "1 % of GDP" rule from the federal law page. Acceptable?
+6. **Seventh Riskometer event?** The April 2025 US tariff shock (EUR/USD vol 14.1 %, higher than any fiscal-2025 value).
+7. **Source descriptions in English:** the "Belegt" lines in the sources are German; the English About page shows them as is.
+8. **Hedge roll (D-25):** include the interest on the cash settlement in the all-in rate?
