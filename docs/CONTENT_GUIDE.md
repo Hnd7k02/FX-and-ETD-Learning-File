@@ -110,3 +110,17 @@ Each question: `id`, `prompt` {de,en}, 3–4 `options` each with `label` {de,en}
 ## Accessibility for figures
 
 Every chart SVG has `role="img"` and an `aria-label` that states the current values, plus a text alternative (visible summary line or `sr-only` table). Controls are real `<input type="range">`/`<button>` with labels, 44 px touch targets. Respect `prefers-reduced-motion`.
+
+## Building islands (interactive figures)
+
+Use the shared building blocks so every lab looks the same:
+
+- `src/lib/chart.ts`: `scaleLinear`, `niceTicks`, `sample`, `linePath`, `areaPath`, `project`, `tangentSegment`, `lerpPoints`, `easeInOutCubic`, `easeOutCubic`, `nearestIndex`, `clamp`.
+- `src/components/ui/Chart.tsx`: `ChartSvg` (responsive SVG with `role="img"` + `aria-label`), `GridY` (1 px gridlines, darker axis at 0, left labels), `AxisX` (tick labels and axis title), `RefLineX` (dashed strike/barrier line with label).
+- `src/components/ui/Slider.tsx` (labelled range input with mono value), `Segmented.tsx` (pill toggle with `aria-pressed`), `Legend.tsx`, `Stat.tsx` (`StatTable`, `StatHero` dark premium row, `StatRow` Greek-style rows).
+- `src/components/ui/hooks.ts`: `usePrefersReducedMotion`, `useElementWidth` (switch to a compact viewBox under ~640 px so labels stay ≥ 11 px), `useInView` (pause animations off-screen), `useTween` (smooth 300 ms transitions, instant under reduced motion).
+- CSS classes in `src/styles/ui.css`: `.ff-lab` / `.ff-lab-main` / `.ff-lab-side` (chart left, controls right, controls below on phones), `.ff-lab-head`, `.ff-lab-title`, `.ff-lab-sub`, `.ff-pill-note`, `.ff-check` (green "numerischer Check" box), `.ff-table` (+ `td.num`), `.ff-scroll-x`, plus `.panel`, `.segmented`, `.range`, `.field-label` from base.css.
+
+Chart colour semantics: long/call/option value `var(--ff-long)` blue, short/put sold `var(--ff-short)` orange, forward/sum/tangents `var(--ff-forward)` black, time value area blue at 10 % (`var(--ff-timevalue)`), payoff at expiry `var(--ff-payoff)` grey dashed `6 6`, strike line `var(--ff-ref)` dashed `4 5`, gridlines `var(--ff-grid)`, axis `var(--ff-axis)`. Stroke widths: main curve 3, comparison 1.75 dashed, tangent 2.25.
+
+Pure maths for an island (payoffs, scenario logic) goes into `src/lib/…` with unit tests, not into the `.tsx` file. Islands receive `lang` as a prop and take every string from a dictionary.
