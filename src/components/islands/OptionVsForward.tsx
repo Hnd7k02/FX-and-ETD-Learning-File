@@ -29,6 +29,9 @@ import {
   type HedgeSetup,
 } from '@/lib/hedge-cost';
 
+/** lo ≤ v ≤ hi. */
+const inside = (v: number, lo: number, hi: number): boolean => lo <= v && v <= hi;
+
 export interface OptionVsForwardProps {
   lang: Lang;
 }
@@ -110,8 +113,8 @@ export default function OptionVsForward({ lang }: OptionVsForwardProps): JSX.Ele
   }, []);
   const path = (pts: Array<[number, number]>) =>
     linePath(pts.map(([x, y]): Point => [sx(x), yk(y)]));
-  const xTicks = niceTicks(ST_RANGE[0], ST_RANGE[1], L.compact ? 4 : 8).filter(
-    (v) => v > ST_RANGE[0] + 1e-9 && v < ST_RANGE[1] - 1e-9,
+  const xTicks = niceTicks(ST_RANGE[0], ST_RANGE[1], L.compact ? 4 : 8).filter((v) =>
+    inside(v, ST_RANGE[0] + 1e-9, ST_RANGE[1] - 1e-9),
   );
   const yTicks = niceTicks(Y_DOMAIN[0], Y_DOMAIN[1], L.compact ? 4 : 5);
 
@@ -405,7 +408,7 @@ export default function OptionVsForward({ lang }: OptionVsForwardProps): JSX.Ele
   );
 }
 
-function lineStyle(color: string, width: number): JSX.CSSProperties {
+function lineStyle(color: string, width: number) {
   return {
     fill: 'none',
     stroke: color,

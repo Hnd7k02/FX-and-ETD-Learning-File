@@ -31,6 +31,9 @@ import {
   type OptionMarket,
 } from '@/lib/moneyness';
 
+/** lo ≤ v ≤ hi. */
+const inside = (v: number, lo: number, hi: number): boolean => lo <= v && v <= hi;
+
 export interface MoneynessExplorerProps {
   lang: Lang;
   /** Start type (default call). */
@@ -106,8 +109,8 @@ export default function MoneynessExplorer(props: MoneynessExplorerProps): JSX.El
   const n = SAMPLES + 1;
   const pricePts = KS.map((k, i): Point => [sx(k), sy(ys[i] ?? 0)]);
   const intrPts = KS.map((k, i): Point => [sx(k), sy(ys[n + i] ?? 0)]);
-  const xTicks = niceTicks(K_RANGE[0], K_RANGE[1], L.compact ? 4 : 6).filter(
-    (v) => v > K_RANGE[0] + 1e-9 && v < K_RANGE[1] - 1e-9,
+  const xTicks = niceTicks(K_RANGE[0], K_RANGE[1], L.compact ? 4 : 6).filter((v) =>
+    inside(v, K_RANGE[0] + 1e-9, K_RANGE[1] - 1e-9),
   );
   const yTicks = niceTicks(Y_DOMAIN[0], Y_DOMAIN[1], L.compact ? 3 : 6);
 

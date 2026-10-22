@@ -54,7 +54,12 @@ const N = E.notional;
 const PIP = 1e-4;
 const call = gkPrice(E.spot, K, E.T, E.vol, E.rd, E.rf, 'call');
 const put = gkPrice(E.spot, K, E.T, E.vol, E.rd, E.rf, 'put');
-const L = (side: Leg['side'], kind: Leg['kind'], strike = K, notional = N): Leg => ({
+const L = (
+  side: Leg['side'],
+  kind: Leg['kind'],
+  strike: number = K,
+  notional: number = N,
+): Leg => ({
   side,
   kind,
   strike,

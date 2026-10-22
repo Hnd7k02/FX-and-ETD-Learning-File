@@ -1,0 +1,210 @@
+/**
+ * Numbers of module 04 (Vanilla Options) for <Num of="m04.…" />. Everything is computed from the
+ * running example (src/lib/fx/example.ts) with the calculation core; nothing is typed in.
+ * Scenario rates (0.8400, 0.7600, 0.8200, 0.7990) and the strikes of the moneyness examples
+ * are teaching choices, kept in M04_SCENARIOS so they are easy to change (D-22).
+ *
+ * USD call / CHF put, S = 0.8000, K = 0.7930 (ATMF rounded), T = 0.25, σ = 8 %, rd = 0, rf = 3.5 %.
+ */
+import { EXAMPLE as E, EXAMPLE_FORWARD as F, EXAMPLE_STRIKE as K } from '@/lib/fx/example';
+import { normCdf } from '@/lib/fx/normal';
+import { d1d2, gkPrice } from '@/lib/fx/vanilla';
+import { greeks } from '@/lib/fx/greeks';
+import { atmDnsStrike, strikeFromDelta } from '@/lib/fx/implied';
+import { pipSize } from '@/lib/format';
+import { roundStrike } from '@/lib/payoff';
+import type { NumTable } from './types';
+
+const { spot: S, T, vol, rd, rf, notional: N } = E;
+const PIP = pipSize(E.pair);
+const pips = (x: number) => x / PIP;
+
+/** Teaching scenarios (rates at expiry and strikes of the examples). */
+export const M04_SCENARIOS = {
+  /** Strong dollar at expiry (the importer's fear). */
+  stUp: 0.84,
+  /** Weak dollar at expiry. */
+  stDown: 0.76,
+  /** Rate at expiry for the long-call P&L example. */
+  stPnl: 0.82,
+  /** A strike between forward and spot: below spot, above forward. */
+  kMid: 0.799,
+  /** Arbitrage example: call quoted this many pips too high. */
+  arbPips: 5,
+} as const;
+const SC = M04_SCENARIOS;
+
+const call = gkPrice(S, K, T, vol, rd, rf, 'call');
+const put = gkPrice(S, K, T, vol, rd, rf, 'put');
+const growth = Math.exp(rd * T);
+const dfd = Math.exp(-rd * T);
+const { d1, d2 } = d1d2(S, K, T, vol, rd, rf);
+const call25 = strikeFromDelta(0.25, S, T, vol, rd, rf, 'call');
+const put25 = strikeFromDelta(-0.25, S, T, vol, rd, rf, 'put');
+const call10 = strikeFromDelta(0.1, S, T, vol, rd, rf, 'call');
+const put10 = strikeFromDelta(-0.1, S, T, vol, rd, rf, 'put');
+const dns = atmDnsStrike(S, T, vol, rd, rf);
+const kItm = roundStrike(put25);
+const kOtm = roundStrike(call25);
+const atmf = gkPrice(S, F, T, vol, rd, rf, 'call');
+const itm = gkPrice(S, kItm, T, vol, rd, rf, 'call');
+const itmIntrinsic = dfd * Math.max(F - kItm, 0);
+const cost = (st: number) => (Math.min(st, K) + call * growth) * N;
+
+/** Raw values for the quiz file and tests (quote currency per 1 USD unless noted). */
+export const M04 = {
+  call,
+  put,
+  callPips: pips(call),
+  putPips: pips(put),
+  callChf: call * N,
+  putChf: put * N,
+  F,
+  K,
+  /** Option cap per USD: K + premium carried to expiry. */
+  cap: K + call * growth,
+  /** Below this rate at expiry the call beats the forward: F − premium. */
+  beatFwd: F - call * growth,
+  /** Long put / short put break-even: K − put premium. */
+  bePut: K - put * growth,
+  costUp: cost(SC.stUp),
+  costDown: cost(SC.stDown),
+  fwdChf: F * N,
+  parityPips: pips(call - put),
+  deltaCall: greeks(S, K, T, vol, rd, rf, 'call').delta,
+  deltaPut: greeks(S, K, T, vol, rd, rf, 'put').delta,
+  dff: Math.exp(-rf * T),
+  dns,
+  call25,
+  put25,
+} as const;
+
+export const nums: NumTable = {
+  // Section 1: intuition
+  'm04.strikeInv': {
+    value: 1 / K,
+    kind: 'rate',
+    note: 'Strike of the CHF put in USD per CHF, 1/K',
+  },
+  'm04.chfNotional': { value: K * N, kind: 'money', note: 'CHF notional of the CHF put, K·N' },
+  'm04.fwdChf': { value: F * N, kind: 'money', note: 'CHF paid with the forward, F·N' },
+  'm04.capRate': { value: M04.cap, kind: 'rate', note: 'Worst rate with the call: K + premium' },
+  'm04.capChf': { value: M04.cap * N, kind: 'money', note: 'Worst case with the call in CHF' },
+  'm04.beatFwdRate': {
+    value: M04.beatFwd,
+    kind: 'rate',
+    note: 'Below this rate the call beats the forward: F − premium',
+  },
+  'm04.stUp': { value: SC.stUp, kind: 'rate', note: 'Scenario: strong dollar' },
+  'm04.stDown': { value: SC.stDown, kind: 'rate', note: 'Scenario: weak dollar' },
+  'm04.unhedgedUpChf': { value: SC.stUp * N, kind: 'money' },
+  'm04.unhedgedDownChf': { value: SC.stDown * N, kind: 'money' },
+  'm04.optionDownChf': { value: M04.costDown, kind: 'money' },
+  'm04.saveUpChf': {
+    value: SC.stUp * N - M04.costUp,
+    kind: 'money',
+    note: 'Saving of the call against unhedged at the strong-dollar scenario',
+  },
+  'm04.saveDownChf': {
+    value: M04.fwdChf - M04.costDown,
+    kind: 'money',
+    note: 'Saving of the call against the forward at the weak-dollar scenario',
+  },
+
+  // Section 2: four positions
+  'm04.stPnl': { value: SC.stPnl, kind: 'rate' },
+  'm04.payoffPnlPips': {
+    value: pips(SC.stPnl - K),
+    kind: 'pips',
+    note: 'Long call payoff at expiry at stPnl',
+  },
+  'm04.pnlPips': {
+    value: pips(SC.stPnl - K - call * growth),
+    kind: 'pips',
+    note: 'Long call P&L after premium at stPnl',
+  },
+  'm04.pnlChf': { value: (SC.stPnl - K - call * growth) * N, kind: 'money' },
+  'm04.beCall': { value: M04.cap, kind: 'rate', note: 'Long call break-even K + premium' },
+  'm04.bePut': { value: M04.bePut, kind: 'rate', note: 'Put break-even K − premium' },
+  'm04.shortPutMaxLossChf': {
+    value: M04.bePut * N,
+    kind: 'money',
+    note: 'Short put loss if the rate fell to zero: (K − premium)·N',
+  },
+
+  // Section 3: moneyness and premium
+  'm04.kMid': { value: SC.kMid, kind: 'rate' },
+  'm04.kMidOtmPips': {
+    value: pips(SC.kMid - F),
+    kind: 'pips',
+    note: 'How far the kMid call is out of the money against the forward',
+  },
+  'm04.kMidSpotPips': {
+    value: pips(S - SC.kMid),
+    kind: 'pips',
+    digits: 0,
+    note: 'How far kMid sits below spot',
+  },
+  'm04.atmfPips': { value: pips(atmf), kind: 'pips', note: 'Call at K = F: pure time value' },
+  'm04.atmfApproxPips': {
+    value: pips((dfd * F * vol * Math.sqrt(T)) / Math.sqrt(2 * Math.PI)),
+    kind: 'pips',
+    note: 'Rule of thumb DF·F·σ√T/√(2π) ≈ 0.4·F·σ√T',
+  },
+  'm04.sigmaSqrtT': { value: vol * Math.sqrt(T), kind: 'num', digits: 2, note: 'σ√T' },
+  'm04.kItm': {
+    value: kItm,
+    kind: 'rate',
+    note: 'ITM call example strike (25Δ put strike rounded)',
+  },
+  'm04.itmPips': { value: pips(itm), kind: 'pips' },
+  'm04.itmIntrinsicPips': { value: pips(itmIntrinsic), kind: 'pips' },
+  'm04.itmTimePips': { value: pips(itm - itmIntrinsic), kind: 'pips' },
+  'm04.kOtm': {
+    value: kOtm,
+    kind: 'rate',
+    note: 'OTM call example strike (25Δ call strike rounded)',
+  },
+  'm04.otmPips': { value: pips(gkPrice(S, kOtm, T, vol, rd, rf, 'call')), kind: 'pips' },
+  'm04.otmChf': { value: gkPrice(S, kOtm, T, vol, rd, rf, 'call') * N, kind: 'money' },
+  'm04.call25': { value: call25, kind: 'rate' },
+  'm04.put25': { value: put25, kind: 'rate' },
+  'm04.call10': { value: call10, kind: 'rate' },
+  'm04.put10': { value: put10, kind: 'rate' },
+  'm04.dns': { value: dns, kind: 'rate', note: 'ATM delta-neutral straddle strike F·e^(½σ²T)' },
+  'm04.dnsGapPips': { value: pips(dns - F), kind: 'pips', note: 'DNS strike above the forward' },
+  'm04.dnsDelta': {
+    value: greeks(S, dns, T, vol, rd, rf, 'call').delta,
+    kind: 'num',
+    digits: 4,
+    note: 'Call spot delta at the DNS strike, = ½·e^(−rf T)',
+  },
+  'm04.callUsd': { value: (call * N) / S, kind: 'money', ccy: 'USD', note: 'Premium in USD' },
+  'm04.callPctUsd': {
+    value: call / S,
+    kind: 'pct',
+    digits: 2,
+    note: 'Premium in % of the USD notional',
+  },
+  'm04.deltaPut': { value: M04.deltaPut, kind: 'num', digits: 3 },
+  'm04.deltaCall': { value: M04.deltaCall, kind: 'num', digits: 3 },
+
+  // Section 4: pricing and parity
+  'm04.nd1': { value: normCdf(d1), kind: 'num', digits: 4, note: 'N(d1)' },
+  'm04.nd2': { value: normCdf(d2), kind: 'num', digits: 4, note: 'N(d2)' },
+  'm04.dfd': { value: dfd, kind: 'num', digits: 4, note: 'e^(−rd T)' },
+  'm04.parityGapPips': {
+    value: pips(F - K),
+    kind: 'pips',
+    digits: 2,
+    note: 'F − K in pips (forward above the rounded strike)',
+  },
+  'm04.arbPips': { value: SC.arbPips, kind: 'pips', digits: 0 },
+  'm04.arbChf': { value: SC.arbPips * PIP * N, kind: 'money' },
+  'm04.synthDelta': {
+    value: M04.deltaCall - M04.deltaPut,
+    kind: 'num',
+    digits: 4,
+    note: 'Spot delta of long call + short put = e^(−rf T)',
+  },
+};

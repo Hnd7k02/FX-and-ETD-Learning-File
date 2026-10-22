@@ -31,6 +31,9 @@ import {
   type DriverValues,
 } from '@/lib/price-drivers';
 
+/** lo ≤ v ≤ hi. */
+const inside = (v: number, lo: number, hi: number): boolean => lo <= v && v <= hi;
+
 export interface PriceDriversProps {
   lang: Lang;
 }
@@ -152,8 +155,8 @@ export default function PriceDrivers({ lang }: PriceDriversProps): JSX.Element {
   const dfd = Math.exp(-v.rd * (v.weeks / 52));
   const parity = (dfd * (F - v.K)) / 1e-4;
   const bump = (type: OptionType) => signed(bumpEffect(v, active, type));
-  const xTicks = niceTicks(def.min, def.max, L.compact ? 4 : 6).filter(
-    (x) => x >= def.min - 1e-9 && x <= def.max + 1e-9,
+  const xTicks = niceTicks(def.min, def.max, L.compact ? 4 : 6).filter((x) =>
+    inside(x, def.min - 1e-9, def.max + 1e-9),
   );
   const yTicks = niceTicks(dom[0]!, dom[1]!, L.compact ? 4 : 5).filter((y) => y <= dom[1]! + 1e-9);
   const fs = `${L.font}px`;
@@ -269,7 +272,12 @@ export default function PriceDrivers({ lang }: PriceDriversProps): JSX.Element {
               <text
                 x={L.width - L.right}
                 y={L.height - 4}
-                style={{ fontSize: fs, fontWeight: 600, fill: 'var(--ff-muted)', textAnchor: 'end' }}
+                style={{
+                  fontSize: fs,
+                  fontWeight: 600,
+                  fill: 'var(--ff-muted)',
+                  textAnchor: 'end',
+                }}
               >
                 {t(`pd.x${active}`, { pair: PAIR })}
               </text>

@@ -55,6 +55,9 @@ import {
   type TemplateId,
 } from '@/lib/payoff';
 
+/** lo ≤ v ≤ hi. */
+const inside = (v: number, lo: number, hi: number): boolean => lo <= v && v <= hi;
+
 export interface PayoffBuilderProps {
   lang: Lang;
   templates?: string[];
@@ -325,11 +328,11 @@ export default function PayoffBuilder(props: PayoffBuilderProps): JSX.Element {
   const L = layout;
   const sx = scaleLinear([X_RANGE[0], X_RANGE[1]], [L.left, L.width - L.right]);
   const sy = scaleLinear([dom[0]!, dom[1]!], [L.plotBottom, L.top]);
-  const yTicks = niceTicks(dom[0]!, dom[1]!, L.compact ? 4 : 6).filter(
-    (v) => v >= dom[0]! - 1e-9 && v <= dom[1]! + 1e-9,
+  const yTicks = niceTicks(dom[0]!, dom[1]!, L.compact ? 4 : 6).filter((v) =>
+    inside(v, dom[0]! - 1e-9, dom[1]! + 1e-9),
   );
-  const xTicks = niceTicks(X_RANGE[0], X_RANGE[1], L.compact ? 4 : 7).filter(
-    (v) => v > X_RANGE[0] + 1e-9 && v < X_RANGE[1] - 1e-9,
+  const xTicks = niceTicks(X_RANGE[0], X_RANGE[1], L.compact ? 4 : 7).filter((v) =>
+    inside(v, X_RANGE[0] + 1e-9, X_RANGE[1] - 1e-9),
   );
   const n = SAMPLES + 1;
   const payoffPath = pathOf(net.slice(0, n), sx, sy);
@@ -685,7 +688,7 @@ export default function PayoffBuilder(props: PayoffBuilderProps): JSX.Element {
               {/* break-evens (P&L view) */}
               {view === 'pnl' &&
                 calc.be
-                  .filter((b) => b > X_RANGE[0] && b < X_RANGE[1])
+                  .filter((b) => inside(b, X_RANGE[0], X_RANGE[1]))
                   .map((b) => (
                     <g key={`be${b.toFixed(6)}`}>
                       <circle
