@@ -114,6 +114,12 @@ export interface WowLayout {
   xStep: number;
 }
 
+/** Chart height for a width: the prototype ratio 410/1000, never below MIN_HEIGHT on phones. */
+export const HEIGHT_RATIO = 0.41;
+export const MIN_HEIGHT = 260;
+export const chartHeight = (width: number): number =>
+  Math.max(MIN_HEIGHT, Math.round(width * HEIGHT_RATIO));
+
 /**
  * Layout for a container width in CSS px. The SVG viewBox is 1:1 with CSS pixels, so text
  * stays readable at every width (prototype: 1000 × 410 with 13 px labels at 1000 px width).
@@ -123,7 +129,7 @@ export function layoutFor(width: number): WowLayout {
   if (w >= 640) {
     return {
       width: w,
-      height: Math.round(w * 0.41),
+      height: chartHeight(w),
       left: 64,
       right: 24,
       top: 24,
@@ -137,7 +143,7 @@ export function layoutFor(width: number): WowLayout {
   }
   return {
     width: w,
-    height: Math.round(clamp(w * 0.82, 250, 330)),
+    height: chartHeight(w),
     left: 46,
     right: 14,
     top: 22,

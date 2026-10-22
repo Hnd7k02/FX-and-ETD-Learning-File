@@ -14,10 +14,12 @@
  *   {moveAbsPct}   the same without sign                              ("10.3 %")
  *   {dayDate}      first fixing on/after anchorDate (the day the event shows in the fixings)
  *   {dayMovePct}   change on {dayDate} against the fixing before, signed
+ *   {dayMoveAbsPct} the same without sign
  *   {volBefore}    1-month realised vol on the fixing before {dayDate} ("1.3 %")
  *   {peak}         highest 1-month vol from `peakRange.before` trading days before to
  *                  `peakRange.after` trading days after {dayDate} (default 10 and 60)
  *   {peakDate}     date of that peak
+ *   {peakLevel}    Riskometer level of that peak for this pair ("Hoch" / "High")
  *
  * Sourced historical facts (dates, the 1.20 floor, −0.75 %) are plain text; every event lists
  * the ids of its sources (src/content/sources/riskometer.md). Pair-specific sentences go into
@@ -27,8 +29,11 @@
  */
 import { fmtDate, fmtPctValue, fmtRate } from '@/lib/format';
 import { fill, type L10n, type Lang } from '@/i18n/types';
+import { levels, type LevelIndex } from '@/i18n/dict/levels';
 import { isIsoDate } from './dates';
+import { levelOf } from './levels';
 import { indexOnOrAfter, indexOnOrBefore, isPair, type Pair, type Point } from './series';
+import type { Thresholds } from './stats';
 
 export const PLACEHOLDERS = [
   'pair',
@@ -40,9 +45,11 @@ export const PLACEHOLDERS = [
   'moveAbsPct',
   'dayDate',
   'dayMovePct',
+  'dayMoveAbsPct',
   'volBefore',
   'peak',
   'peakDate',
+  'peakLevel',
 ] as const;
 export type Placeholder = (typeof PLACEHOLDERS)[number];
 
@@ -100,17 +107,23 @@ export interface EventMetrics {
   /** Highest vol (percent) in the peak range and its date. */
   peak: number;
   peakDate: string;
+  /** Level of the peak by the pair's thresholds. */
+  peakLevel: LevelIndex;
+  /** True if the peak is the highest daily value of the percentile base (since 2006). */
+  isRecord: boolean;
 }
 
 /**
  * Key figures of an event for one pair.
  * @param pair   daily exchange rates of the pair (ascending)
  * @param vol    daily realised vol of the pair in percent (ascending)
+ * @param t      level thresholds of the pair (for peakLevel and isRecord)
  */
 export function eventMetrics(
   event: Pick<MarketEvent, 'id' | 'anchorDate' | 'window' | 'peakRange'>,
   pair: readonly Point[],
   vol: readonly Point[],
+  t: Thresholds,
 ): EventMetrics {
   const iFrom = indexOnOrAfter(pair, event.window.from);
   const iTo = indexOnOrBefore(pair, event.window.to);
@@ -143,6 +156,8 @@ export function eventMetrics(
     volBefore: vol[a - 1]!.value,
     peak: peak.value,
     peakDate: peak.date,
+    peakLevel: levelOf(peak.value, t),
+    isRecord: peak.date === t.maxDate,
   };
 }
 
@@ -158,9 +173,11 @@ export function eventVars(m: EventMetrics, pair: Pair, lang: Lang): Record<Place
     moveAbsPct: fmtPctValue(Math.abs(m.movePct), lang, 1),
     dayDate: fmtDate(m.dayDate, lang),
     dayMovePct: fmtPctValue(m.dayMovePct, lang, 1, true),
+    dayMoveAbsPct: fmtPctValue(Math.abs(m.dayMovePct), lang, 1),
     volBefore: fmtPctValue(m.volBefore, lang, 1),
     peak: fmtPctValue(m.peak, lang, 1),
     peakDate: fmtDate(m.peakDate, lang),
+    peakLevel: levels[lang][`level.${m.peakLevel}`],
   };
 }
 

@@ -138,7 +138,9 @@ describe('wow: layout and frame', () => {
     const l = layoutFor(318);
     expect(l.compact).toBe(true);
     expect(l.font).toBeGreaterThanOrEqual(11);
-    expect(l.height).toBeGreaterThanOrEqual(250);
+    expect(l.height).toBe(260);
+    expect(layoutFor(639).height).toBe(262);
+    expect(layoutFor(640).height).toBe(262);
     expect(xTicks(l)).toEqual([0.72, 0.76, 0.8, 0.84]);
     expect(layoutFor(100).width).toBe(280);
   });

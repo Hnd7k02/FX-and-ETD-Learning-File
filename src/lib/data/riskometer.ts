@@ -48,8 +48,6 @@ export interface CurrentReading {
 }
 
 export interface PairEvent extends EventMetrics {
-  /** True if the peak is the highest daily value of the whole base (since 2006). */
-  isRecord: boolean;
   /** Index into `weekly` of the week of the anchor fixing (chart marker). */
   anchorWeekIndex: number;
   /** Index into `weekly` of the week of the peak. */
@@ -90,7 +88,7 @@ function buildPair(rows: readonly RawRow[], pair: Pair, events: readonly MarketE
 
   const ev: Record<string, PairEvent> = {};
   for (const e of eventsForPair(events, pair)) {
-    const m = eventMetrics(e, series, vol);
+    const m = eventMetrics(e, series, vol, t);
     ev[e.id] = {
       from: round(m.from, 6),
       fromDate: m.fromDate,
@@ -102,7 +100,8 @@ function buildPair(rows: readonly RawRow[], pair: Pair, events: readonly MarketE
       volBefore: r2(m.volBefore),
       peak: r2(m.peak),
       peakDate: m.peakDate,
-      isRecord: m.peakDate === t.maxDate,
+      peakLevel: m.peakLevel,
+      isRecord: m.isRecord,
       anchorWeekIndex: weekIndexOf(w, m.dayDate),
       peakWeekIndex: weekIndexOf(w, m.peakDate),
     };
