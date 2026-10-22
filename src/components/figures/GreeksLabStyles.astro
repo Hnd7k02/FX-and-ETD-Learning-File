@@ -1,0 +1,331 @@
+---
+/**
+ * Styles of the Greeks lab and of the gamma-theta figure (shared chart look: grid, tangent,
+ * draggable dot, annotation). Included by GreeksLabFigure and GammaThetaFigure; Astro emits
+ * them once per page.
+ */
+---
+
+<style is:global>
+  .gl {
+    color: var(--ff-ink);
+  }
+  .gl .ff-lab-head {
+    margin-bottom: 18px;
+  }
+  .gl-titles {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+  .gl-money {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: var(--ff-r-pill);
+    background: var(--ff-chip);
+    color: var(--ff-ink);
+    font-size: 13px;
+    font-weight: 600;
+    transition:
+      background-color 300ms ease,
+      color 300ms ease;
+  }
+  .gl-money b {
+    font-weight: 800;
+  }
+  .gl-money.is-itm {
+    background: var(--ff-good-soft);
+    color: var(--ff-good-text-strong);
+  }
+  .gl-money.is-otm {
+    background: var(--ff-exotics-soft);
+    color: #9a3412;
+  }
+  .gl-main {
+    container-type: inline-size;
+  }
+  .gl-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .gl-chart + .gl-head {
+    margin-top: 6px;
+  }
+  .gl-legend {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .gl-swatch {
+    width: 18px;
+    border-top: 3px solid var(--ff-long);
+  }
+  .gl-sym {
+    font-family: var(--ff-font-math);
+    font-size: 1.12em;
+    line-height: 1;
+  }
+  .gl-title-bg {
+    fill: #fff;
+    fill-opacity: 0.9;
+  }
+  .gl-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: var(--ff-r-pill);
+    font-size: 13px;
+    color: var(--ff-ink);
+  }
+  .gl-pill b {
+    font-variant-numeric: tabular-nums;
+  }
+  .gl-slope-short {
+    display: none;
+  }
+  @container (max-width: 479px) {
+    .gl-slope-long {
+      display: none;
+    }
+    .gl-slope-short {
+      display: inline;
+    }
+  }
+  .gl-nowrap {
+    white-space: nowrap;
+  }
+  .gl-pill sub,
+  .gl .ff-stat-symbol sub {
+    font-size: 11px;
+    font-style: normal;
+  }
+  .gl-pill-line {
+    flex: 0 0 16px;
+    width: 16px;
+    border-top: 2px solid var(--ff-forward);
+  }
+  .gl-pill-dot {
+    flex: 0 0 8px;
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--ff-forward);
+  }
+  .gl-chart {
+    width: 100%;
+  }
+  .gl-svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    font-family: var(--ff-font-ui);
+    touch-action: pan-y;
+    cursor: grab;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .gl-svg.is-dragging {
+    cursor: grabbing;
+  }
+  .gl-grid {
+    fill: none;
+    stroke: var(--ff-grid);
+    stroke-width: 1;
+  }
+  .gl-axis {
+    fill: none;
+    stroke: var(--ff-axis);
+    stroke-width: 1;
+  }
+  .gl-tick {
+    font-size: 12px;
+    fill: var(--ff-muted);
+  }
+  .gl-axis-title,
+  .gl-label {
+    font-size: 12px;
+    font-weight: 600;
+    fill: var(--ff-muted);
+    paint-order: stroke;
+    stroke: #fff;
+    stroke-width: 4px;
+    stroke-linejoin: round;
+  }
+  .gl-ref {
+    fill: none;
+    stroke: var(--ff-ref);
+    stroke-width: 1;
+    stroke-dasharray: 4 5;
+  }
+  .gl-ref-label {
+    font-size: 12px;
+    font-weight: 600;
+    fill: var(--ff-ink-2);
+    paint-order: stroke;
+    stroke: #fff;
+    stroke-width: 4px;
+    stroke-linejoin: round;
+  }
+  .gl-guide {
+    fill: none;
+    stroke: var(--ff-axis);
+    stroke-width: 1;
+    stroke-dasharray: 2 4;
+  }
+  .gl-payoff {
+    fill: none;
+    stroke: var(--ff-payoff);
+    stroke-width: 1.5;
+    stroke-dasharray: 6 6;
+  }
+  .gl-ghost {
+    fill: none;
+    stroke: var(--ff-ref);
+    stroke-width: 1.75;
+    stroke-dasharray: 6 6;
+  }
+  .gl-curve {
+    fill: none;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .gl-tangent {
+    fill: none;
+    stroke: var(--ff-forward);
+    stroke-width: 2.25;
+    stroke-linecap: round;
+  }
+  .gl-peak {
+    fill: #fff;
+    stroke: var(--ff-delta-curve);
+    stroke-width: 2;
+  }
+  .gl-dot {
+    fill: var(--ff-forward);
+    stroke: #fff;
+    stroke-width: 2.5;
+    transition: r 150ms ease;
+  }
+  .gl-halo {
+    fill: var(--ff-forward);
+    fill-opacity: 0.1;
+    stroke: none;
+  }
+  .gl-aha {
+    pointer-events: none;
+  }
+  .gl-aha-leader {
+    fill: none;
+    stroke: #c4b5fd;
+    stroke-width: 1.25;
+  }
+  .gl-aha-box {
+    fill: var(--ff-options-soft);
+    stroke: #ddd0fb;
+    stroke-width: 1;
+  }
+  .gl-aha-title {
+    font-size: 12px;
+    font-weight: 800;
+    fill: var(--ff-options-text);
+  }
+  .gl-aha-text {
+    font-size: 12px;
+    font-weight: 500;
+    fill: var(--ff-ink-2);
+  }
+  .gl .gl-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+    font-size: 12px;
+    color: var(--ff-muted);
+  }
+  .gl-hint svg path {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .gl-reset {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 0 14px;
+    border: 1px solid var(--ff-line-strong);
+    border-radius: var(--ff-r-pill);
+    background: var(--ff-surface);
+    color: var(--ff-ink);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .gl-reset:hover:not(:disabled) {
+    background: var(--ff-chip);
+  }
+  .gl-reset:disabled {
+    cursor: default;
+    color: var(--ff-muted);
+    border-color: var(--ff-line);
+  }
+  .gl-reset svg path {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .gl .ff-stat-value {
+    font-variant-numeric: tabular-nums;
+  }
+  .gl-check-body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+  .gl-check-title {
+    font-weight: 800;
+  }
+  .gl-check-f {
+    font-size: 17px;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+  .gl-check-f sub {
+    font-size: 11px;
+  }
+  /* gamma against theta (GammaTheta island) */
+  .gt-gain {
+    fill: var(--ff-good);
+    fill-opacity: 0.12;
+    stroke: none;
+  }
+  .gt-loss {
+    fill: var(--ff-bad);
+    fill-opacity: 0.1;
+    stroke: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .gl-money,
+    .gl-dot {
+      transition: none;
+    }
+  }
+</style>

@@ -8,7 +8,7 @@
  * Maths: src/lib/greeksfigures.ts. Strings: src/i18n/dict/gammatheta.ts.
  */
 import type { JSX } from 'preact';
-import { useMemo, useRef, useState } from 'preact/hooks';
+import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { Slider } from '@/components/ui/Slider';
 import { StatHero, StatRow, StatTable } from '@/components/ui/Stat';
 import { useElementWidth, usePrefersReducedMotion, useTween } from '@/components/ui/hooks';
@@ -50,6 +50,17 @@ export default function GammaTheta({ lang }: GammaThetaProps): JSX.Element {
   const dom = useTween(target.domain, 300, rm);
   const zone = gammaThetaZone(move, volPct);
 
+  useEffect(() => {
+    if (!sliderDrag) return;
+    const up = () => setSliderDrag(false);
+    window.addEventListener('pointerup', up);
+    window.addEventListener('pointercancel', up);
+    return () => {
+      window.removeEventListener('pointerup', up);
+      window.removeEventListener('pointercancel', up);
+    };
+  }, [sliderDrag]);
+
   const box = useRef<HTMLDivElement>(null);
   const width = Math.max(260, Math.round(useElementWidth(box, 560)));
   const height = Math.max(MIN_H, Math.round(width * RATIO));
@@ -57,7 +68,8 @@ export default function GammaTheta({ lang }: GammaThetaProps): JSX.Element {
   const left = 52;
   const right = 12;
   const top = 16;
-  const bottom = height - 36;
+  // the x-axis title sits under the tick labels, so it never covers the curve
+  const bottom = height - 54;
   const x = scaleLinear([M.min, M.max], [left, width - right]);
   const y = scaleLinear([dom[0]!, dom[1]!], [bottom, top]);
   const xRef = useRef(x);
@@ -71,9 +83,7 @@ export default function GammaTheta({ lang }: GammaThetaProps): JSX.Element {
   const right0 = curve.filter(([m]) => m >= be);
   const mid = curve.filter(([m]) => m >= -be && m <= be);
   const area = (pts: Point[], from: number, to: number) =>
-    pts.length
-      ? `${P([[from, 0], ...pts, [to, 0]])}Z`
-      : '';
+    pts.length ? `${P([[from, 0], ...pts, [to, 0]])}Z` : '';
   const cx = x(mv);
   const cy = clamp(y(n.pnlChf), top, bottom);
 
@@ -132,7 +142,13 @@ export default function GammaTheta({ lang }: GammaThetaProps): JSX.Element {
   const w = Math.ceil(Math.max(l1.length * 7.1, l2.length * 6.3)) + 20;
   const obstacles: Point[] = curve.map(([a, b]) => [x(a), y(b)]);
   for (let px = x(-be) - 40; px <= x(be) + 40; px += 8) obstacles.push([px, top + 10]);
-  const b = placeCallout([cx, cy], { w, h: 44 }, { x0: left + 2, x1: width - right - 2, y0: top + 24, y1: bottom - 2 }, obstacles, 14);
+  const b = placeCallout(
+    [cx, cy],
+    { w, h: 44 },
+    { x0: left + 2, x1: width - right - 2, y0: top + 24, y1: bottom - 2 },
+    obstacles,
+    14,
+  );
 
   return (
     <div class="gt" data-gammatheta data-zone={zone}>
@@ -168,7 +184,12 @@ export default function GammaTheta({ lang }: GammaThetaProps): JSX.Element {
             >
               <defs>
                 <clipPath id="gt-clip">
-                  <rect x={left} y={top - 4} width={width - right - left} height={bottom - top + 8} />
+                  <rect
+                    x={left}
+                    y={top - 4}
+                    width={width - right - left}
+                    height={bottom - top + 8}
+                  />
                 </clipPath>
               </defs>
               {ticks.map((v) => (
@@ -197,7 +218,7 @@ export default function GammaTheta({ lang }: GammaThetaProps): JSX.Element {
                     class="gl-ref-label"
                     text-anchor={v > 0 ? 'start' : 'end'}
                   >
-                    {pipsText(v)}
+                    {fmtPips(v, lang, 1, true)}
                   </text>
                 </g>
               ))}
@@ -208,19 +229,11 @@ export default function GammaTheta({ lang }: GammaThetaProps): JSX.Element {
               {dragging && <circle cx={cx} cy={cy} r={16} class="gl-halo" />}
               <circle cx={cx} cy={cy} r={dragging ? 8 : 6} class="gl-dot" />
               {xt.map((v) => (
-                <text key={`x${v}`} x={x(v)} y={height - 12} class="gl-tick" text-anchor="middle">
+                <text key={`x${v}`} x={x(v)} y={height - 32} class="gl-tick" text-anchor="middle">
                   {fmtNumber(v, lang, { sign: true })}
                 </text>
               ))}
-              <rect
-                x={width - right - t('gt.axisX').length * 6.8 - 4}
-                y={bottom - 21}
-                width={t('gt.axisX').length * 6.8 + 8}
-                height={17}
-                rx={4}
-                class="gl-title-bg"
-              />
-              <text x={width - right} y={bottom - 8} class="gl-axis-title" text-anchor="end">
+              <text x={width - right} y={height - 8} class="gl-axis-title" text-anchor="end">
                 {t('gt.axisX')}
               </text>
               <g class="gl-aha" data-aha={zone}>
@@ -237,7 +250,7 @@ export default function GammaTheta({ lang }: GammaThetaProps): JSX.Element {
         </div>
 
         <div class="ff-lab-side">
-          <div class="panel" onPointerDown={() => setSliderDrag(true)} onPointerUp={() => setSliderDrag(false)}>
+          <div class="panel" onPointerDown={() => setSliderDrag(true)}>
             <Slider
               id="gt-move"
               label={t('gt.slider.move')}
@@ -261,7 +274,12 @@ export default function GammaTheta({ lang }: GammaThetaProps): JSX.Element {
               value={chf(n.pnlChf)}
               sub={t('gt.netSub', { notional })}
             />
-            <StatRow symbol="Γ" label={t('gt.gain')} sub={t('gt.gainSub')} value={chf(n.gammaGainChf)} />
+            <StatRow
+              symbol="Γ"
+              label={t('gt.gain')}
+              sub={t('gt.gainSub')}
+              value={chf(n.gammaGainChf)}
+            />
             <StatRow
               symbol={
                 <>

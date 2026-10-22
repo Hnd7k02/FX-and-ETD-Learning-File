@@ -1,7 +1,61 @@
+import FourPositionsFigure from '@/components/figures/FourPositionsFigure.astro';
 import PayoffBuilderFigure from '@/components/figures/PayoffBuilderFigure.astro';
 
-Platzhalter.
+Jede Option hat zwei Seiten. Der Käufer ist **long**: Er zahlt die Prämie und erhält ein Recht. Der Verkäufer ist **short**: Er erhält die Prämie und übernimmt eine Pflicht. Man nennt ihn auch Stillhalter, weil er abwarten muss, was der Käufer entscheidet.
 
-<PayoffBuilderFigure templates={['long-call', 'short-call', 'long-put', 'short-put']} caption="Test" />
+Dazu kommen zwei Typen. Ein **Call** ist das Recht, die Base-Währung zum Strike zu kaufen, in USD/CHF also USD. Ein **Put** ist das Recht, sie zum Strike zu verkaufen. Zwei Seiten mal zwei Typen ergeben vier Grundpositionen.
 
-<PayoffBuilderFigure caption="Alle Vorlagen" initial="risk-reversal" />
+<FourPositionsFigure caption="Die vier Grundpositionen bei Verfall, nach Prämie, alle mit dem Strike am Forward. Blau sind die gekauften, orange die verkauften Optionen." />
+
+Unser Importeur ist **long Call**: Er fürchtet einen steigenden Dollar. Ein Exporteur, der in 3 Monaten USD erhält, fürchtet das Gegenteil und kauft einen **Put**. Auf der anderen Seite stehen Verkäufer, die für das Risiko die Prämie kassieren.
+
+<PayoffBuilderFigure templates={['long-call', 'short-call', 'long-put', 'short-put']} initial="long-call" caption="Wechsle die Vorlage oder schalte im Bein zwischen Long und Short, Call und Put. Zieh den Strike K1 direkt an der Achse. Mit «G&V nach Prämie» siehst du den Break-even." />
+
+### Auszahlung und Gewinn
+
+Der Payoff-Builder zeigt zwei Linien. Grau gestrichelt ist die **Auszahlung bei Verfall**: Was die Option dann wert ist. Blau ist der **Wert heute**, drei Monate vor Verfall. Der blaue Punkt beim Spot ist genau die Prämie. Schaltest du auf «G&V nach Prämie», wird die Prämie abgezogen: Jetzt siehst du, ob sich das Geschäft gelohnt hat.
+
+Ein Rechenbeispiel mit dem Long Call, Strike <Num of="ex.strike" />, Prämie <Num of="ex.callPips" /> Pips:
+
+- Steht USD/CHF bei Verfall auf <Num of="m04.stPnl" />, zahlt der Call <Num of="m04.payoffPnlPips" /> Pips aus. Nach Abzug der Prämie bleiben <Num of="m04.pnlPips" /> Pips Gewinn, also <Num of="m04.pnlChf" /> auf USD 1 Mio.
+- Der **Break-even** liegt bei Strike plus Prämie: <Num of="m04.beCall" />. Erst darüber verdient der Käufer.
+- Unter dem Strike verfällt der Call wertlos. Der Verlust ist die Prämie, <Num of="ex.callChf" />, und nicht mehr.
+
+Jetzt die Gegenseite, der **Short Put** mit demselben Strike. Der Verkäufer erhält <Num of="ex.putPips" /> Pips, also <Num of="ex.putChf" />. Solange USD/CHF über dem Strike bleibt, behält er die ganze Prämie. Unter <Num of="m04.bePut" /> macht er Verlust. Fiele der Kurs auf null, wären es <Num of="m04.shortPutMaxLossChf" />: begrenzt, aber gross.
+
+Long und Short sind Spiegelbilder an der Nulllinie. Was der Käufer gewinnt, verliert der Verkäufer, vor Kosten. Darum kann der Käufer höchstens die Prämie verlieren, und der Verkäufer kann höchstens die Prämie verdienen.
+
+<Derivation title="Herleitung: Auszahlung, G&V und Break-even">
+
+Bei Verfall zählt nur, wo der Kurs <i>S</i><sub>T</sub> gegenüber dem Strike <i>K</i> steht. Pro USD Nominal gilt:
+
+<Formula>
+  <span>Long Call: max(<i>S</i><sub>T</sub> − <i>K</i>, 0)</span>
+  <span>Short Call: −max(<i>S</i><sub>T</sub> − <i>K</i>, 0)</span>
+  <span>Long Put: max(<i>K</i> − <i>S</i><sub>T</sub>, 0)</span>
+  <span>Short Put: −max(<i>K</i> − <i>S</i><sub>T</sub>, 0)</span>
+</Formula>
+
+Für G&V ziehst du die Prämie ab (Käufer) oder zählst sie dazu (Verkäufer), aufgezinst mit e<sup><i>r</i><sub>d</sub><i>T</i></sup>. Beim Long Call mit Prämie <i>c</i> ist die G&V bei Verfall gleich null, wenn
+
+<Formula variant="accent">
+  <i>S</i><sub>T</sub> − <i>K</i> − <i>c</i> = 0 ⇒ <i>S</i><sub>T</sub> = <i>K</i> + <i>c</i>
+</Formula>
+
+Beim Put mit Prämie <i>p</i> liegt der Break-even entsprechend bei <i>K</i> − <i>p</i>. Der grösste Verlust des Short Puts entsteht, wenn der Kurs gegen null geht: −(<i>K</i> − <i>p</i>) pro USD. Beim Short Call gibt es keine Grenze nach oben, sein Verlust ist unbegrenzt.
+
+</Derivation>
+
+<Desk title="Wer verkauft Optionen?">
+
+Banken stellen als Market Maker Kurse für Käufer und Verkäufer. Sie halten eine verkaufte Option nicht einfach offen, sondern sichern ihr Risiko laufend mit Spot und Forwards ab. Wie das geht, zeigt Modul 05 mit dem Delta.
+
+Eine Firma verkauft Optionen selten allein. Meist ist der Verkauf Teil einer Struktur, die den Kauf finanziert, zum Beispiel ein Zero-Cost-Collar (Modul 06). Wer short ist, muss bei Verfall liefern können. Darum braucht er Kreditlinien oder Sicherheiten.
+
+</Desk>
+
+<Takeaway>
+
+Long heisst: Recht gekauft, Prämie bezahlt, Verlust höchstens die Prämie. Short heisst: Pflicht übernommen, Prämie erhalten, Gewinn höchstens die Prämie.
+
+</Takeaway>

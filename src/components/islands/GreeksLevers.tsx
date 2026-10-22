@@ -102,13 +102,13 @@ export default function GreeksLevers({ lang }: GreeksLeversProps): JSX.Element {
           const dir = up ? t('glv.more') : t('glv.less');
           return (
             <div class="glv-row" key={e.key} data-lever={e.key} data-sign={up ? 'up' : 'down'}>
-              <div class="glv-top">
-                <span class="glv-name">
-                  <span class="glv-sym" aria-hidden="true">
-                    {SYMBOL[e.key]}
-                  </span>
-                  {name}
+              <span class="glv-name">
+                <span class="glv-sym" aria-hidden="true">
+                  <span>{SYMBOL[e.key]}</span>
                 </span>
+                {name}
+              </span>
+              <div class="glv-ctrl">
                 <Segmented
                   label={t('glv.choice', { lever: name })}
                   options={C.choices[e.key].map((c) => ({ value: c, label: optLabel(e.key, c) }))}
@@ -116,27 +116,25 @@ export default function GreeksLevers({ lang }: GreeksLeversProps): JSX.Element {
                   onChange={(v) => setChoice((s) => ({ ...s, [e.key]: v }))}
                 />
               </div>
-              <div class="glv-barline">
-                <div
-                  class="glv-track"
-                  role="img"
-                  aria-label={t('glv.bar', { lever: name, v: chf(e.exact), dir })}
-                >
-                  <span class="glv-zero" aria-hidden="true" />
-                  <span
-                    class={`glv-bar ${up ? 'is-up' : 'is-down'}`}
-                    aria-hidden="true"
-                    style={{
-                      left: up ? '50%' : `${50 - share * 50}%`,
-                      width: `${share * 50}%`,
-                    }}
-                  />
-                </div>
-                <span class={`glv-value ${up ? 'is-up' : 'is-down'}`} data-value>
-                  {chf(exact)}
-                  <small>{dir}</small>
-                </span>
+              <div
+                class="glv-track"
+                role="img"
+                aria-label={t('glv.bar', { lever: name, v: chf(e.exact), dir })}
+              >
+                <span class="glv-zero" aria-hidden="true" />
+                <span
+                  class={`glv-bar ${up ? 'is-up' : 'is-down'}`}
+                  aria-hidden="true"
+                  style={{
+                    left: up ? '50%' : `${50 - share * 50}%`,
+                    width: `${share * 50}%`,
+                  }}
+                />
               </div>
+              <span class={`glv-value ${up ? 'is-up' : 'is-down'}`} data-value>
+                {chf(exact)}
+                <small>{dir}</small>
+              </span>
               <div class="glv-foot">
                 <span class="glv-why">{why(e.key, choice[e.key])}</span>
                 <span class="glv-est">{t(`glv.estimate.${e.key}`, { v: chf(est) })}</span>

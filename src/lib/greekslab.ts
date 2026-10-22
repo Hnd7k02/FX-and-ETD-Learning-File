@@ -404,8 +404,7 @@ export function panels(mode: LabMode, p: LabParams, n = labNumbers(p)): [PanelSp
       ghost: null,
       peak: null,
     };
-    const deltaAt = (S: number) =>
-      greeks(S, K, base.T, base.vol, base.rd, base.rf, TYPE).delta;
+    const deltaAt = (S: number) => greeks(S, K, base.T, base.vol, base.rd, base.rf, TYPE).delta;
     const bottom: PanelSpec = {
       id: 'bottom',
       x: 'spot',
@@ -613,7 +612,9 @@ export function aha(mode: LabMode, p: LabParams, n = labNumbers(p)): Aha | null 
       return { key: 'thetaAccel', panel: 'bottom' };
     return null;
   }
-  return Math.abs(p.rdPct - p.rfPct) <= A.equalRatesPct ? { key: 'equalRates', panel: 'top' } : null;
+  return Math.abs(p.rdPct - p.rfPct) <= A.equalRatesPct
+    ? { key: 'equalRates', panel: 'top' }
+    : null;
 }
 
 /* ---------- Layout ---------- */

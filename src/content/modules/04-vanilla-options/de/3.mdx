@@ -1,5 +1,82 @@
 import MoneynessExplorerFigure from '@/components/figures/MoneynessExplorerFigure.astro';
 
-Test.
+Der Importeur kann den Strike frei wählen. Ein höherer Strike schützt erst später, ist aber billiger. Ein tieferer Strike schützt früher und kostet mehr. Wie weit ein Strike «im Geld» liegt, nennt man **Moneyness**.
 
-<MoneynessExplorerFigure caption="Test" />
+Gemessen wird gegen den **Forward**, nicht gegen den Spot. Die Option wird erst in 3 Monaten ausgeübt, und der faire Kurs für diesen Tag ist der Forward. Ein Beispiel: Ein USD Call mit Strike <Num of="m04.kMid" /> liegt <Num of="m04.kMidSpotPips" /> Pips unter dem Spot und wirkt im Geld. Gegen den Forward von <Num of="ex.forward" digits={4} /> liegt er aber <Num of="m04.kMidOtmPips" /> Pips darüber. Er ist aus dem Geld.
+
+- **ATMF** (at the money forward): Strike gleich Forward.
+- **ITM** (in the money): Beim Call liegt der Strike unter dem Forward, beim Put darüber.
+- **OTM** (out of the money): Beim Call liegt der Strike über dem Forward, beim Put darunter.
+
+<MoneynessExplorerFigure caption="Zieh den Strike oder wähle einen Desk-Strike. Grau ist der innere Wert gegen den Forward, die blaue Fläche der Zeitwert. Schalte zwischen USD Call und USD Put." />
+
+### Prämie = innerer Wert + Zeitwert
+
+Der **innere Wert** ist, was du heute schon sicher hättest: Du könntest den Call ausüben und die Dollars gleichzeitig per Forward verkaufen. Beim Call ist das max(F − K, 0), abgezinst auf heute. Der **Zeitwert** ist der Rest. Er bezahlt die Chance, dass sich der Kurs bis zum Verfall noch zu deinen Gunsten bewegt.
+
+Drei USD Calls mit 3 Monaten Laufzeit:
+
+- **ATMF**, Strike am Forward: <Num of="m04.atmfPips" /> Pips. Das ist reiner Zeitwert.
+- **ITM**, Strike <Num of="m04.kItm" />: <Num of="m04.itmPips" /> Pips. Davon sind <Num of="m04.itmIntrinsicPips" /> Pips innerer Wert und <Num of="m04.itmTimePips" /> Pips Zeitwert.
+- **OTM**, Strike <Num of="m04.kOtm" />: <Num of="m04.otmPips" /> Pips, also <Num of="m04.otmChf" />. Auch das ist reiner Zeitwert.
+
+Der Zeitwert ist am Forward am grössten und wird gegen beide Flügel kleiner. Tief im Geld verhält sich die Option fast wie ein Forward, weit aus dem Geld ist sie fast wertlos.
+
+### Delta statt Kurs: 25Δ und 10Δ
+
+Am Desk nennt man Strikes oft nicht als Kurs, sondern über das **Delta**. Delta sagt, wie stark der Optionswert auf den Spot reagiert. Grob ist es auch die Chance, dass die Option im Geld verfällt. Ein 25Δ Call hat also etwa eine Chance von eins zu vier.
+
+Im Beispiel liegt der 25Δ Call bei <Num of="m04.call25" />, der 25Δ Put bei <Num of="m04.put25" />. Weiter draussen liegen die 10Δ-Strikes, <Num of="m04.call10" /> und <Num of="m04.put10" />. Der Vorteil: «25Δ» bedeutet in jedem Paar, bei jeder Laufzeit und jeder Vola dieselbe Moneyness.
+
+Auch «ATM» hat am Desk eine eigene Bedeutung. Gemeint ist meist der **delta-neutrale Straddle** (ATM DNS): der Strike, bei dem sich Call-Delta und Put-Delta genau aufheben. Er liegt bei <Num of="m04.dns" />, also <Num of="m04.dnsGapPips" /> Pips über dem Forward. Das Call-Delta ist dort <Num of="m04.dnsDelta" />, das Put-Delta gleich gross mit negativem Vorzeichen.
+
+### Pips oder Prozent
+
+Die Prämie unseres Calls lässt sich zweimal schreiben. In CHF-Pips: <Num of="ex.callPips" /> Pips, das sind <Num of="ex.callChf" /> auf USD 1 Mio. Oder in Prozent vom Nominal: Die Prämie in USD umgerechnet ergibt <Num of="m04.callUsd" />, also <Num of="m04.callPctUsd" /> des USD-Nominals. Gleicher Preis, andere Einheit. Frag deshalb immer, wie quotiert wird.
+
+### Europäisch oder amerikanisch
+
+Eine **europäische** Option kannst du nur am Verfallstag ausüben, eine **amerikanische** jederzeit bis dahin. Im OTC-Devisenmarkt ist die europäische Form der Standard. Eine amerikanische Option ist mindestens so viel wert wie die europäische, denn sie gibt dir ein zusätzliches Recht. In diesem Tool sind alle Optionen europäisch.
+
+<Derivation title="Herleitung: innerer Wert, Faustregel und Strike aus Delta">
+
+**Innerer Wert gegen den Forward.** Übst du den Call bei Verfall aus und verkaufst die Dollars heute schon per Forward, erhältst du bei Verfall sicher F − K pro USD. Heute ist das abgezinst wert:
+
+<Formula>
+  innerer Wert = e<sup>−<i>r</i><sub>d</sub><i>T</i></sup> · max(<i>F</i> − <i>K</i>, 0)
+</Formula>
+
+**Faustregel für ATMF.** Mit <i>K</i> = <i>F</i> wird aus Garman-Kohlhagen näherungsweise
+
+<Formula variant="accent">
+  <span><i>C</i><sub>ATMF</sub> ≈ e<sup>−<i>r</i><sub>d</sub><i>T</i></sup> · <i>F</i> · σ√<i>T</i> / √(2π) ≈ 0.4 · <i>F</i> · σ√<i>T</i></span>
+</Formula>
+
+Mit σ√<i>T</i> = <Num of="m04.sigmaSqrtT" /> ergibt das <Num of="m04.atmfApproxPips" /> Pips. Die Prämie wächst also mit der Vola und mit der Wurzel der Laufzeit.
+
+**Strike aus Delta.** Das Spot-Delta des Calls ist e<sup>−<i>r</i><sub>f</sub><i>T</i></sup> · N(<i>d</i><sub>1</sub>). Für ein Ziel-Delta löst du nach <i>d</i><sub>1</sub> auf und setzt ein:
+
+<Formula>
+  <span><i>d</i><sub>1</sub> = N<sup>−1</sup>(Δ · e<sup><i>r</i><sub>f</sub><i>T</i></sup>)</span>
+  <span><i>K</i> = <i>F</i> · e<sup>−<i>d</i><sub>1</sub>σ√<i>T</i> + ½σ²<i>T</i></sup></span>
+</Formula>
+
+**ATM DNS.** Call- und Put-Delta heben sich auf, wenn N(<i>d</i><sub>1</sub>) = ½, also <i>d</i><sub>1</sub> = 0. Daraus folgt <i>K</i> = <i>F</i> · e<sup>½σ²<i>T</i></sup>, leicht über dem Forward.
+
+**Ein schöner Zusammenhang.** Der Zeitwert des ITM Calls oben, <Num of="m04.itmTimePips" /> Pips, ist genau der Preis des OTM Puts mit gleichem Strike. Das folgt aus der Put-Call-Parität in Abschnitt 4.
+
+</Derivation>
+
+<Desk title="Welches ATM ist gemeint?">
+
+ATM kann den Spot, den Forward oder den delta-neutralen Straddle meinen. Im Interbankmarkt ist für Vola-Quotes meist ATM DNS gemeint. Zusammen mit dem 25Δ Risk Reversal und dem 25Δ Butterfly beschreibt es den ganzen Vola-Smile (Modul 06).
+
+Wird die Prämie in USD bezahlt, rechnet der Desk oft mit einem prämienadjustierten Delta. Die Strikes verschieben sich dann leicht. Frag bei jedem Delta-Strike, welche Konvention gilt.
+
+</Desk>
+
+<Takeaway>
+
+Moneyness misst den Strike am Forward, nicht am Spot. Die Prämie besteht aus innerem Wert und Zeitwert; am Forward ist sie reiner Zeitwert.
+
+</Takeaway>

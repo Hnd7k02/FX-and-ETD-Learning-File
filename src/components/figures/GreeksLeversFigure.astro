@@ -52,21 +52,48 @@ const lang = pageLang(Astro.currentLocale);
     overflow: hidden;
   }
   .glv-row {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'name ctrl'
+      'bar value'
+      'foot foot';
+    align-items: center;
+    gap: 8px 16px;
     padding: 14px 16px;
     border-top: 1px solid var(--ff-row);
   }
   .glv-row:first-child {
     border-top: 0;
   }
-  .glv-top {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px 16px;
+  .glv-name {
+    grid-area: name;
+  }
+  .glv-ctrl {
+    grid-area: ctrl;
+    justify-self: end;
+  }
+  .glv-track {
+    grid-area: bar;
+  }
+  .glv-value {
+    grid-area: value;
+  }
+  .glv-foot {
+    grid-area: foot;
+  }
+  @media (max-width: 640px) {
+    .glv-row {
+      grid-template-areas:
+        'name value'
+        'ctrl ctrl'
+        'bar bar'
+        'foot foot';
+      padding: 12px;
+    }
+    .glv-ctrl {
+      justify-self: start;
+    }
   }
   .glv-name {
     display: inline-flex;
@@ -76,8 +103,8 @@ const lang = pageLang(Astro.currentLocale);
     font-weight: 800;
   }
   .glv-sym {
-    display: inline-flex;
-    justify-content: center;
+    display: inline-block;
+    text-align: center;
     min-width: 40px;
     padding: 3px 8px;
     border-radius: var(--ff-r-pill);
@@ -94,14 +121,8 @@ const lang = pageLang(Astro.currentLocale);
   .glv .segmented > button {
     min-height: 44px;
   }
-  .glv-barline {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-  }
   .glv-track {
     position: relative;
-    flex: 1 1 auto;
     min-width: 0;
     height: 14px;
     border-radius: 999px;
@@ -128,7 +149,6 @@ const lang = pageLang(Astro.currentLocale);
     background: var(--ff-bad);
   }
   .glv-value {
-    flex: 0 0 auto;
     min-width: 128px;
     display: inline-flex;
     flex-direction: column;
@@ -167,11 +187,8 @@ const lang = pageLang(Astro.currentLocale);
     font-variant-numeric: tabular-nums;
   }
   @media (max-width: 640px) {
-    .glv-row {
-      padding: 12px;
-    }
     .glv-value {
-      min-width: 104px;
+      min-width: 0;
       font-size: 14px;
     }
   }

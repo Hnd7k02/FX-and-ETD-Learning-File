@@ -1,0 +1,18 @@
+---
+/** "Gamma against theta" figure for module 05, section 4: <GammaThetaFigure caption="…" />. */
+import Figure from '@/components/content/Figure.astro';
+import GammaTheta from '@/components/islands/GammaTheta';
+import { pageLang } from '@/components/content/lang';
+import GreeksLabStyles from './GreeksLabStyles.astro';
+
+interface Props {
+  caption?: string;
+}
+const { caption } = Astro.props;
+const lang = pageLang(Astro.currentLocale);
+---
+
+<GreeksLabStyles />
+<Figure caption={caption}>
+  <GammaTheta client:visible lang={lang} />
+</Figure>

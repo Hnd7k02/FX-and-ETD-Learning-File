@@ -1,5 +1,60 @@
 import OptionVsForwardFigure from '@/components/figures/OptionVsForwardFigure.astro';
 
-Test.
+Unser Importeur muss in 3 Monaten USD 1 Mio. bezahlen. Mit dem Forward aus Modul 02 fixiert er den Kurs schon heute: Er kauft die Dollars zu <Num of="ex.forward" digits={4} /> CHF je USD. Das schützt ihn vor einem starken Dollar. Es nimmt ihm aber auch jede Chance. Fällt USD/CHF, zahlt er trotzdem den Forward-Kurs.
 
-<OptionVsForwardFigure caption="Test" />
+Eine Option trennt die gute von der schlechten Seite. Sie gibt ihm das **Recht, aber nicht die Pflicht**, in 3 Monaten USD 1 Mio. zum **Strike** von <Num of="ex.strike" /> zu kaufen. Steigt der Dollar über den Strike, übt er aus und kauft zum Strike. Fällt der Dollar, lässt er die Option verfallen und kauft günstiger am Markt.
+
+Dieses Recht hat einen Preis. Der Verkäufer der Option verlangt heute eine **Prämie**: <Num of="ex.callPips" /> Pips, also <Num of="ex.callChf" /> auf USD 1 Mio. Wie bei einer Versicherung zahlst du die Prämie im Voraus, ob der Schadenfall eintritt oder nicht.
+
+### Ein USD Call ist ein CHF Put
+
+Im Devisenmarkt tauschst du immer zwei Währungen gegeneinander. Das Recht, USD gegen CHF zu kaufen, ist dasselbe wie das Recht, CHF gegen USD zu verkaufen. Ein **USD Call** ist darum zugleich ein **CHF Put**.
+
+Aus Sicht des Frankens sieht dieselbe Option so aus: Nominal <Num of="m04.chfNotional" />, Strike <Num of="m04.strikeInv" /> USD je CHF. Gleiches Geschäft, andere Brille. Deshalb nennt man am Desk immer beide Währungen.
+
+<OptionVsForwardFigure caption="Zieh am Kurs bei Verfall. Die Option (blau) ist im Nachhinein nie die günstigste Wahl. Sie schützt dich aber vor der teuersten, sobald sich der Kurs deutlich bewegt." />
+
+### Drei Szenarien in Zahlen
+
+Mit dem Forward zahlt der Importeur in jedem Fall <Num of="m04.fwdChf" />. Mit dem Call rechnet er so: Er kauft zum tieferen der beiden Kurse, Kurs bei Verfall oder Strike, und dazu kommt die Prämie.
+
+- **Der Dollar steigt auf <Num of="m04.stUp" />.** Ohne Absicherung zahlt er <Num of="m04.unhedgedUpChf" />. Mit dem Call übt er aus und zahlt <Num of="m04.capChf" />, also Strike plus Prämie. Er spart <Num of="m04.saveUpChf" />.
+- **Der Dollar fällt auf <Num of="m04.stDown" />.** Der Forward kostet ihn weiterhin <Num of="m04.fwdChf" />. Mit dem Call kauft er am Markt und zahlt <Num of="m04.optionDownChf" /> inklusive Prämie: <Num of="m04.saveDownChf" /> weniger als mit dem Forward.
+- **Der Kurs bewegt sich kaum.** Dann ist die Option die teuerste Wahl. Die Prämie war der Preis einer Versicherung, die er nicht gebraucht hat.
+
+Die Option deckelt seinen Kurs bei <Num of="m04.capRate" />: Strike plus Prämie pro USD. Gegen den Forward lohnt sie sich im Nachhinein erst, wenn USD/CHF bei Verfall unter <Num of="m04.beatFwdRate" /> liegt. Dafür muss der Importeur heute nicht wissen, wohin der Kurs geht.
+
+<Derivation title="Herleitung: Kosten mit Call und die Sicht als CHF Put">
+
+Bei Verfall zahlt der Call mit Nominal <i>N</i> und Strike <i>K</i> den Betrag <i>N</i> · max(<i>S</i><sub>T</sub> − <i>K</i>, 0) in CHF. Der Importeur kauft seine Dollars am Markt zu <i>S</i><sub>T</sub> und verrechnet die Auszahlung:
+
+<Formula>
+  <span>Kosten = <i>N</i> · <i>S</i><sub>T</sub> − <i>N</i> · max(<i>S</i><sub>T</sub> − <i>K</i>, 0) + Prämie</span>
+  <span>= <i>N</i> · min(<i>S</i><sub>T</sub>, <i>K</i>) + Prämie</span>
+</Formula>
+
+Die Prämie fliesst heute, die Kosten erst bei Verfall. Streng genommen zählt darum die Prämie aufgezinst mit dem CHF-Zins, Prämie · e<sup><i>r</i><sub>d</sub><i>T</i></sup>. Im Beispiel ist der CHF-Zins <Num of="ex.rd" />, der Faktor also 1.
+
+Dieselbe Option als CHF Put: Nominal <i>N</i><sub>CHF</sub> = <i>K</i> · <i>N</i>, Strike 1/<i>K</i> in USD je CHF. Sie zahlt in USD <i>K</i> · <i>N</i> · max(1/<i>K</i> − 1/<i>S</i><sub>T</sub>, 0). Umgerechnet zum Kurs <i>S</i><sub>T</sub> in CHF ergibt das:
+
+<Formula variant="accent">
+  <i>K</i> · <i>N</i> · <i>S</i><sub>T</sub> · max(1/<i>K</i> − 1/<i>S</i><sub>T</sub>, 0) = <i>N</i> · max(<i>S</i><sub>T</sub> − <i>K</i>, 0)
+</Formula>
+
+Das ist genau die Auszahlung des USD Calls. Zwei Namen, ein Geschäft.
+
+</Derivation>
+
+<Desk title="So spricht der Desk">
+
+Im FX-Optionsmarkt ist «Call» allein mehrdeutig. Du nennst deshalb Paar, Laufzeit, Strike und beide Währungen: «USD/CHF 3 Monate, Strike <Num of="ex.strike" />, USD Call / CHF Put, USD 1 Mio.».
+
+Dazu gehört, in welcher Währung die Prämie bezahlt wird und wie sie quotiert ist, in CHF-Pips oder in Prozent vom Nominal. Abschnitt 3 zeigt, wie beides zusammenhängt.
+
+</Desk>
+
+<Takeaway>
+
+Eine Option ist ein Recht, keine Pflicht: Du zahlst heute die Prämie, deckelst damit deinen Kurs und behältst die Chance auf einen günstigeren Dollar. Ein USD Call ist immer auch ein CHF Put.
+
+</Takeaway>

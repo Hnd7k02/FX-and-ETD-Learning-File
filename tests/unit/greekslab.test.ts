@@ -43,7 +43,7 @@ describe('greeks lab: sliders and conversions', () => {
   it('snaps to the slider step and clamps to the range', () => {
     const R = LAB_CONFIG.ranges;
     expect(snap(0.80037, R.spot)).toBe(0.8005);
-    expect(snap(0.70, R.spot)).toBe(0.76);
+    expect(snap(0.7, R.spot)).toBe(0.76);
     expect(snap(9, R.spot)).toBe(0.84);
     expect(snap(7.74, R.volPct)).toBe(7.5);
     expect(snap(-3, R.rdPct)).toBe(-1);
@@ -285,7 +285,10 @@ describe('greeks lab: layout and ticks', () => {
 
   it('finds nice domains', () => {
     expect(niceDomain(-135, -4, { withZero: true })).toEqual({ domain: [-150, 0], step: 50 });
-    expect(niceDomain(65, 73, { minSpan: 100 }).domain[1] - niceDomain(65, 73, { minSpan: 100 }).domain[0]).toBeGreaterThanOrEqual(100);
+    expect(
+      niceDomain(65, 73, { minSpan: 100 }).domain[1] -
+        niceDomain(65, 73, { minSpan: 100 }).domain[0],
+    ).toBeGreaterThanOrEqual(100);
     expect(niceDomain(5, 5).domain[1]).toBeGreaterThan(5);
     expect(niceDomain(10, 20, { withZero: true, minSpan: 40 }).domain).toEqual([0, 40]);
   });
@@ -301,7 +304,10 @@ describe('greeks lab: callout placement and percent digits', () => {
       h: 40,
     });
     // a curve running right-below pushes the box to the right-above
-    const curve: [number, number][] = Array.from({ length: 50 }, (_, i) => [100 + i * 4, 50 + i * 2]);
+    const curve: [number, number][] = Array.from({ length: 50 }, (_, i) => [
+      100 + i * 4,
+      50 + i * 2,
+    ]);
     const b = placeCallout([100, 50], { w: 120, h: 30 }, plot, curve);
     expect(b.y + b.h).toBeLessThanOrEqual(50);
   });

@@ -173,11 +173,10 @@ export const nums: NumTable = {
   'm07.digitalProb': { value: digital / dfd, kind: 'pct', digits: 1, note: 'N(d2) at K' },
   'm07.spreadPips': { value: C.touch.spreadExamplePips, kind: 'pips', digits: 0 },
   'm07.spreadChf': { value: spread * P, kind: 'money' },
-  'm07.spreadDiffChf': { value: (spread - digital) * P, kind: 'money', sign: true },
+  'm07.spreadDiffChf': { value: (spread - digital) * P, kind: 'money', digits: 2, sign: true },
   'm07.otChf': { value: ot * P, kind: 'money', note: 'One-touch 0.8240, paid at expiry' },
   'm07.ntChf': { value: nt * P, kind: 'money' },
   'm07.otNtSumChf': { value: (ot + nt) * P, kind: 'money', note: '= payout · e^(−rd T)' },
-  'm07.otRatio': { value: ot / digital, kind: 'num', digits: 1, note: 'OT / digital at K' },
   'm07.otVsDigitalH': {
     value: ot / (endAboveUp * dfd),
     kind: 'num',

@@ -11,14 +11,7 @@
  */
 import { niceStep, sample, type Point } from '@/lib/chart';
 import { EXAMPLE, EXAMPLE_STRIKE } from '@/lib/fx/example';
-import {
-  DAY,
-  PIP,
-  breakEvenMove,
-  deltaGammaPnl,
-  greeks,
-  thetaGammaShare,
-} from '@/lib/fx/greeks';
+import { DAY, PIP, breakEvenMove, deltaGammaPnl, greeks, thetaGammaShare } from '@/lib/fx/greeks';
 import { gkPrice } from '@/lib/fx/vanilla';
 
 const { spot: S0, T: T0, vol: V0, rd: RD0, rf: RF0, notional: N } = EXAMPLE;
@@ -185,11 +178,11 @@ export function gammaThetaDomain(volPct: number): { domain: [number, number]; st
 
 export type GammaThetaZone = 'flat' | 'loss' | 'breakEven' | 'gain';
 
-/** Where the move sits relative to the break-even (±0.5 pip counts as "at break-even"). */
+/** Where the move sits relative to the break-even (within 1 pip counts as "at break-even"). */
 export function gammaThetaZone(movePips: number, volPct: number): GammaThetaZone {
   const be = gammaTheta(0, volPct).breakEvenPips;
   const m = Math.abs(movePips);
   if (m === 0) return 'flat';
-  if (Math.abs(m - be) <= 0.5) return 'breakEven';
+  if (Math.abs(m - be) <= 1) return 'breakEven';
   return m < be ? 'loss' : 'gain';
 }

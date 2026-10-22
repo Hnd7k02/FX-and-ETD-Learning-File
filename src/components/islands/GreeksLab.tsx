@@ -406,8 +406,7 @@ export default function GreeksLab({ lang, mode = 'delta-gamma' }: GreeksLabProps
     const px = projected(spec.points, x, y);
     const crowd = (a: number, b: number) =>
       px.filter(([u, v]) => u >= a - 4 && u <= b + 4 && v >= g.plotBottom - 24).length;
-    const titleRight =
-      crowd(x1 - titleW, x1) <= crowd(x0 + 4, x0 + 4 + titleW);
+    const titleRight = crowd(x1 - titleW, x1) <= crowd(x0 + 4, x0 + 4 + titleW);
     const titleBox = titleRight ? { a: x1 - titleW, b: x1 } : { a: x0 + 4, b: x0 + 4 + titleW };
     const strikeLabel =
       (which === 'top' && spec.x === 'spot') || (which === 'bottom' && mode === 'vega');
@@ -509,10 +508,7 @@ export default function GreeksLab({ lang, mode = 'delta-gamma' }: GreeksLabProps
             const isAxis = zeroIn && Math.abs(v) < 1e-9;
             return (
               <g key={`g${v}`}>
-                <path
-                  d={`M${x0},${yy.toFixed(1)}H${x1}`}
-                  class={isAxis ? 'gl-axis' : 'gl-grid'}
-                />
+                <path d={`M${x0},${yy.toFixed(1)}H${x1}`} class={isAxis ? 'gl-axis' : 'gl-grid'} />
                 {label !== null && (
                   <text x={x0 - 8} y={yy + 4} class="gl-tick" text-anchor="end">
                     {label}
@@ -694,7 +690,8 @@ export default function GreeksLab({ lang, mode = 'delta-gamma' }: GreeksLabProps
         return (
           <>
             <span class="gl-check-f math">
-              [Δ(<i>S</i> + <i>h</i>) − Δ(<i>S</i> − <i>h</i>)] / 2<i>h</i> = {num(n.check.gamma, 2)}
+              [Δ(<i>S</i> + <i>h</i>) − Δ(<i>S</i> − <i>h</i>)] / 2<i>h</i> ={' '}
+              {num(n.check.gamma, 2)}
             </span>
             <span>{greek(t('gl.check.gamma', { v: num(n.gamma, 2) }))}</span>
           </>
@@ -723,9 +720,7 @@ export default function GreeksLab({ lang, mode = 'delta-gamma' }: GreeksLabProps
     rhoF: chf(n.rhoFChf, 0, true),
   });
 
-  const sliderWrap = (el: JSX.Element) => (
-    <div onPointerDown={() => setSliderDrag(true)}>{el}</div>
-  );
+  const sliderWrap = (el: JSX.Element) => <div onPointerDown={() => setSliderDrag(true)}>{el}</div>;
 
   return (
     <div class="gl" data-greekslab data-mode={mode} data-dragging={dragPanel ? 'true' : 'false'}>
@@ -975,4 +970,3 @@ function path(pts: Point[], x: Scale, y: Scale): string {
   }
   return d;
 }
-

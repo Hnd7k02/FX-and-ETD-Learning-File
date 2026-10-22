@@ -142,7 +142,7 @@ export const M07_CONFIG = {
     /** Example of section 3: one-touch paid at hit vs at expiry with a CHF rate of 1 %. */
     rdExample: 0.01,
     /** Example of section 3: call-spread width for the digital (pips). */
-    spreadExamplePips: 10,
+    spreadExamplePips: 50,
     /** DNT vol example (section 3): ±2 vol points around the example vol. */
     volBumpPct: 2,
   },
