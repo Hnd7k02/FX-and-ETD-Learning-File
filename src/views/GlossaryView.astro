@@ -448,16 +448,11 @@ const familyCounts = Object.fromEntries(
   .gl-see li {
     display: inline;
   }
-  /* separator dot drawn in CSS: the offline file is plain ASCII (D-41) */
+  /* the offline build writes · as the tested CSS escape \B7 (D-41) */
   .gl-see li + li::before {
-    content: '';
-    display: inline-block;
-    width: 3px;
-    height: 3px;
-    border-radius: 50%;
-    background: var(--ff-axis);
-    vertical-align: middle;
+    content: '·';
     margin-right: 8px;
+    color: var(--ff-axis);
   }
   .gl-see a {
     color: var(--ff-ink-2);

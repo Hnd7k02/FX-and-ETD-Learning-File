@@ -61,6 +61,8 @@ interface OfflineData {
 declare global {
   interface Window {
     __FF_OFFLINE__?: boolean;
+    /** set once the first page is on screen; the start diagnostics waits for it (D-41) */
+    __FF_READY__?: boolean;
   }
 }
 
@@ -339,6 +341,7 @@ function show(force = false): void {
       window.scrollTo(0, y ?? 0);
     }
     document.dispatchEvent(new Event('astro:page-load'));
+    if (wasFirst) window.__FF_READY__ = true;
     if (!wasFirst) {
       if (!jumped) main.focus({ preventScroll: true });
       if (announcer) announcer.textContent = page.t;

@@ -41,7 +41,8 @@ function CrossIcon() {
 
 /** Explanations sometimes start with their own verdict ("Richtig. …"); the card already shows one. */
 const VERDICT =
-  /^\s*(?:richtig|correct|genau|exactly|falsch|wrong|incorrect|nicht ganz|not quite)\s*[.!:–—-]\s*/i;
+  // en dash and em dash as \u escapes: esbuild leaves raw non-ASCII inside regex literals (D-41)
+  /^\s*(?:richtig|correct|genau|exactly|falsch|wrong|incorrect|nicht ganz|not quite)\s*[.!:\u2013\u2014-]\s*/i;
 export function stripVerdict(text: string): string {
   return text.replace(VERDICT, '');
 }

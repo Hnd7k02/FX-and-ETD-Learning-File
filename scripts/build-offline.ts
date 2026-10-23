@@ -17,39 +17,32 @@
  * inline scripts instead of a hash (a changed character must not block the script silently), and
  * the build fails if anything unsafe is left.
  */
+import { createHash } from 'node:crypto';
 import {
   copyFileSync,
   existsSync,
   mkdirSync,
   readdirSync,
   readFileSync,
+  renameSync,
+  rmSync,
   statSync,
   writeFileSync,
 } from 'node:fs';
 import { basename, join, relative, resolve } from 'node:path';
-import { Script } from 'node:vm';
 import { gzipSync } from 'node:zlib';
 import { build, type Plugin } from 'esbuild';
 import { fmtDate } from '../src/lib/format';
-import {
-  cssAscii,
-  htmlAscii,
-  rewriteJsEscapes,
-  simulateMail,
-  transportProblems,
-} from './lib/transport';
-
-/**
- * Version of the offline file: shown while loading, on the About page and in the name of the
- * copy release/forward-first-v<number>.html. The date is the build date in Zurich.
- */
-export const OFFLINE_VERSION = { number: 5 } as const;
+import { fileProblems } from './lib/filecheck';
+import { cssAscii, htmlAscii, rewriteJsEscapes } from './lib/transport';
+import { buildDate, OFFLINE_VERSION, versionedFileName } from './lib/version';
 
 const ROOT = process.cwd();
 const DIST = join(ROOT, 'dist');
 const OUT_DIR = join(ROOT, 'release');
 const OUT = join(OUT_DIR, 'forward-first.html');
-const OUT_VERSIONED = join(OUT_DIR, `forward-first-v${OFFLINE_VERSION.number}.html`);
+const OUT_VERSIONED = join(OUT_DIR, versionedFileName());
+const OUT_TMP = join(OUT_DIR, '.forward-first.tmp.html');
 const MB = 1024 * 1024;
 const TARGET_BYTES = 3 * MB;
 const MAX_BYTES = 5 * MB;
@@ -209,7 +202,22 @@ function islandsPlugin(names: string[]): Plugin {
   };
 }
 
-async function bundleJs(islandNames: string[]): Promise<string> {
+/** A script as esbuild wrote it and as it goes into the file. */
+interface InlineScript {
+  original: string;
+  js: string;
+}
+
+/**
+ * esbuild options shared by both scripts. ASCII output; characters above U+FFFF as surrogate
+ * pairs (\uD83D\uDE00) instead of the code point form \u{…}, which is not on the tested list.
+ */
+const ASCII_OUTPUT = {
+  charset: 'ascii',
+  supported: { 'unicode-escapes': false },
+} as const;
+
+async function bundleJs(islandNames: string[]): Promise<InlineScript> {
   const res = await build({
     entryPoints: [join(ROOT, 'src/offline/main.tsx')],
     bundle: true,
@@ -219,7 +227,7 @@ async function bundleJs(islandNames: string[]): Promise<string> {
     minify: process.env.FF_DEBUG !== '1',
     legalComments: 'none',
     // ASCII only: every non-ASCII character becomes an escape (rewritten below)
-    charset: 'ascii',
+    ...ASCII_OUTPUT,
     target: ['chrome100', 'edge100', 'safari15'],
     jsx: 'automatic',
     jsxImportSource: 'preact',
@@ -238,21 +246,18 @@ async function bundleJs(islandNames: string[]): Promise<string> {
 }
 
 /**
- * Makes a script safe to inline and to send by mail: no "</script" or "<!--", every escape in a
- * transport-safe form, no String.raw (raw template strings would keep the original escapes), and
- * it must still compile.
+ * Makes a script safe to inline and to send by mail: no "</script" or "<!--" and the few escapes
+ * with a transport-safe twin rewritten. No String.raw (the tag sees the raw escapes). Whether the
+ * result is transport-safe, compiles and still means the same is checked on the written file
+ * (scripts/lib/filecheck.ts).
  */
-function inlineScript(code: string, label: string): string {
+function inlineScript(code: string, label: string): InlineScript {
+  const original = code.trim();
+  if (original.includes('String.raw')) fail(`${label} contains String.raw`);
   const js = rewriteJsEscapes(
-    code.replace(/<\/(script)/gi, '<\\/$1').replace(/<!--/g, '<\\u0021--'),
-  ).trim();
-  if (js.includes('String.raw')) fail(`${label} contains String.raw`);
-  try {
-    new Script(js, { filename: label });
-  } catch (e) {
-    fail(`${label} does not compile after the escape rewrite: ${String(e)}`);
-  }
-  return js;
+    original.replace(/<\/(script)/gi, '<\\/$1').replace(/<!--/g, '<\\u0021--'),
+  );
+  return { original, js };
 }
 
 /** Start diagnostics, bundled like the main script with the values measured at build time. */
@@ -264,7 +269,7 @@ async function bundleDiagnose(values: { v: number; d: string; ld: number; lm: nu
     format: 'iife',
     minify: true,
     legalComments: 'none',
-    charset: 'ascii',
+    ...ASCII_OUTPUT,
     target: ['chrome100', 'edge100', 'safari15'],
     define: { __FF_DIAG__: JSON.stringify(values) },
     logLevel: 'warning',
@@ -272,15 +277,8 @@ async function bundleDiagnose(values: { v: number; d: string; ld: number; lm: nu
   return inlineScript(res.outputFiles[0]!.text, 'diagnostics script');
 }
 
-/** Build date in Zurich as ISO date (yyyy-mm-dd). */
-function zurichDate(): string {
-  return new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'Europe/Zurich',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).format(new Date());
-}
+/** SHA-256 of a file as read from disk (hex). */
+const sha256 = (file: string) => createHash('sha256').update(readFileSync(file)).digest('hex');
 
 /* ---------------------------------------------------------------------------------------- */
 
@@ -358,7 +356,8 @@ async function main(): Promise<void> {
       fail(`external reference left in ${route}: …${p.h.slice(bad.index - 40, bad.index + 60)}…`);
   }
 
-  const cssAsciiResult = cssAscii(processCss([...cssParts, ...bodyCss].join('\n')));
+  const cssSource = processCss([...cssParts, ...bodyCss].join('\n'));
+  const cssAsciiResult = cssAscii(cssSource);
   const css = cssAsciiResult.css;
   if (/url\(\s*(?!["']?data:)/.test(css)) fail('CSS still references external files');
   if (cssAsciiResult.unsafe.length)
@@ -369,14 +368,15 @@ async function main(): Promise<void> {
     if (!existsSync(join(ROOT, 'src/components/islands', `${n}.tsx`)))
       fail(`island source ${n}.tsx not found`);
   }
-  const js = await bundleJs(names);
+  const main = await bundleJs(names);
+  const js = main.js;
 
   const riskometer = JSON.parse(
     readFileSync(join(ROOT, 'src/data/fx/riskometer.json'), 'utf8'),
   ) as {
     asOf: string;
   };
-  const built = zurichDate();
+  const built = buildDate();
   const version = { number: OFFLINE_VERSION.number, date: built };
   const versionLabel = `${OFFLINE_VERSION.number} (${fmtDate(built, 'de')})`;
   const data = {
@@ -412,7 +412,7 @@ async function main(): Promise<void> {
   const icon =
     "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'%3E%3Crect width='36' height='36' rx='11' fill='%230E1116'/%3E%3Cpath d='M8.3 25.9H19.6L30.6 12.6' fill='none' stroke='%23fff' stroke-width='3.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E";
 
-  const diag = await bundleDiagnose({
+  const diagnose = await bundleDiagnose({
     v: OFFLINE_VERSION.number,
     d: fmtDate(built, 'de'),
     ld: packed.length,
@@ -445,27 +445,34 @@ async function main(): Promise<void> {
 <div id="main" tabindex="-1"><p class="container" id="ff-loading" style="padding:48px 16px;font-family:system-ui,sans-serif">${loading}</p></div>
 <div id="ff-bottom"></div>
 <div id="ff-announcer" class="sr-only" aria-live="polite"></div>
-<script id="ff-diag">${diag}</script>
+<script id="ff-diag">${diagnose.js}</script>
 <script id="ff-data" type="application/octet-stream">${packed}</script>
 <script id="ff-main">${js}</script>
 </body>
 </html>
 `;
 
-  // transport check of the finished file: ASCII only, no unsafe escape, the mail simulation
-  // (also the worst case with \r and \t) changes nothing
-  const problems = transportProblems(html);
-  if (problems.length) {
-    fail(
-      `file is not transport-safe:\n${problems.map((p) => `  ${p.kind} @${p.index}: ${p.text}`).join('\n')}`,
-    );
-  }
-  if (simulateMail(html, true) !== html) fail('mail simulation changes the file');
-
+  // Write to a temporary file and check the bytes read back from disk (D-41): ASCII only, only
+  // tested escapes, mail simulation without effect, no ES module, classic scripts compile and
+  // mean the same as the esbuild output, CSS decodes to its source, lengths as the diagnostics
+  // expects them. Only then the release files are replaced.
   mkdirSync(OUT_DIR, { recursive: true });
-  writeFileSync(OUT, html);
+  writeFileSync(OUT_TMP, html);
+  const problems = fileProblems(readFileSync(OUT_TMP), {
+    scripts: { 'ff-diag': diagnose.original, 'ff-main': main.original },
+    css: cssSource,
+    lengths: { 'ff-main': js.length },
+  });
+  if (problems.length) {
+    rmSync(OUT_TMP, { force: true });
+    fail(`file is not transport-safe:\n${problems.map((p) => `  ${p}`).join('\n')}`);
+  }
+  renameSync(OUT_TMP, OUT);
   copyFileSync(OUT, OUT_VERSIONED);
-  const size = Buffer.byteLength(html);
+  const hash = sha256(OUT);
+  if (sha256(OUT_VERSIONED) !== hash)
+    fail(`${basename(OUT_VERSIONED)} differs from ${basename(OUT)}`);
+  const size = statSync(OUT).size;
   const kb = (n: number) => `${(n / 1024).toFixed(0)} KB`;
   log(
     `pages ${Object.keys(pages).length}, aliases ${Object.keys(aliases).length}, islands ${names.length}`,
@@ -475,6 +482,7 @@ async function main(): Promise<void> {
   );
   log(`${basename(OUT)}: ${(size / MB).toFixed(2)} MB → ${relative(ROOT, OUT)}`);
   log(`version ${versionLabel} · copy ${relative(ROOT, OUT_VERSIONED)} · transport check passed`);
+  log(`sha256 ${hash} (both files)`);
   if (size > MAX_BYTES) fail(`file is larger than 5 MB`);
   if (size > TARGET_BYTES) console.warn('[offline] WARNING: file is larger than the 3 MB target');
 }
