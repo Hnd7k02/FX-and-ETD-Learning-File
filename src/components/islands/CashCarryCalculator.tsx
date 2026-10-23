@@ -79,7 +79,11 @@ export default function CashCarryCalculator({ lang }: CashCarryCalculatorProps):
 
   const r = carryFor(market);
   const dir: Dir =
-    r.direction === 'borrowQuoteBuyBase' ? 'rich' : r.direction === 'borrowBaseSellBase' ? 'cheap' : 'none';
+    r.direction === 'borrowQuoteBuyBase'
+      ? 'rich'
+      : r.direction === 'borrowBaseSellBase'
+        ? 'cheap'
+        : 'none';
   const groups = groupSteps(r);
   const order = revealOrder(r);
   const net = netFlows(r);
@@ -168,7 +172,8 @@ export default function CashCarryCalculator({ lang }: CashCarryCalculatorProps):
   const gapX = clamp((x0 + xm) / 2, L.pad + gapW / 2, L.width - L.pad - gapW / 2);
   const mTxt = fmtRate(market, PAIR, FD);
 
-  const chipKey = dir === 'rich' ? 'cc.chip.rich' : dir === 'cheap' ? 'cc.chip.cheap' : 'cc.chip.none';
+  const chipKey =
+    dir === 'rich' ? 'cc.chip.rich' : dir === 'cheap' ? 'cc.chip.cheap' : 'cc.chip.none';
   const aha = reacted !== null && !reacting && dir === 'none';
   const insight = aha
     ? t(reacted === 'cheap' ? 'cc.aha.textCheap' : 'cc.aha.text')
@@ -186,7 +191,9 @@ export default function CashCarryCalculator({ lang }: CashCarryCalculatorProps):
   const rateText = (s: CarryStep) => {
     const kind = stepRateKind(s.key);
     if (kind === 'none' || s.rate === undefined) return '';
-    return kind === 'pct' ? fmtPct(s.rate, lang, 2) : fmtRate(s.rate, PAIR, s.key.includes('Spot') ? 4 : FD);
+    return kind === 'pct'
+      ? fmtPct(s.rate, lang, 2)
+      : fmtRate(s.rate, PAIR, s.key.includes('Spot') ? 4 : FD);
   };
   const ccyClass = (ccy: string) => (ccy === M.base ? 'is-usd' : 'is-chf');
 
@@ -215,7 +222,12 @@ export default function CashCarryCalculator({ lang }: CashCarryCalculatorProps):
     );
   };
 
-  const netRow = (label: string, flows: Record<string, number>, visible: boolean, zeroNote: boolean) => (
+  const netRow = (
+    label: string,
+    flows: Record<string, number>,
+    visible: boolean,
+    zeroNote: boolean,
+  ) => (
     <div class={`cc-net${visible ? '' : ' is-todo'}`}>
       <span class="cc-net-label">{label}</span>
       <span class="cc-net-vals mono">
@@ -264,7 +276,12 @@ export default function CashCarryCalculator({ lang }: CashCarryCalculatorProps):
               <text x={L.pad} y={16} class="cc-region" style={{ fontSize: fs }}>
                 {t('cc.ruler.cheap')}
               </text>
-              <text x={L.width - L.pad} y={16} class="cc-region" style={{ fontSize: fs, textAnchor: 'end' }}>
+              <text
+                x={L.width - L.pad}
+                y={16}
+                class="cc-region"
+                style={{ fontSize: fs, textAnchor: 'end' }}
+              >
                 {t('cc.ruler.rich')}
               </text>
               <text x={x0} y={16} class="cc-fair-label" style={{ fontSize: fs }}>
@@ -296,13 +313,29 @@ export default function CashCarryCalculator({ lang }: CashCarryCalculatorProps):
               )}
               <path d={`M${x0.toFixed(1)},${24}V${L.track + 16}`} class="cc-fair" />
               {dir !== 'none' && (
-                <text x={gapX} y={L.height - 6} class="cc-gap-label" style={{ fontSize: `${L.font + 1}px` }}>
+                <text
+                  x={gapX}
+                  y={L.height - 6}
+                  class="cc-gap-label"
+                  style={{ fontSize: `${L.font + 1}px` }}
+                >
                   {gapLabel}
                 </text>
               )}
-              <g class={`m2-handle${drag.dragging ? ' is-active' : ''}`} data-handle {...drag.handlers}>
+              <g
+                class={`m2-handle${drag.dragging ? ' is-active' : ''}`}
+                data-handle
+                {...drag.handlers}
+              >
                 <rect x={0} y={L.track - 26} width={L.width} height={52} class="m2-hit" />
-                <rect x={xm - 38} y={L.track - 12} width={76} height={24} rx={12} class="m2-handle-pill" />
+                <rect
+                  x={xm - 38}
+                  y={L.track - 12}
+                  width={76}
+                  height={24}
+                  rx={12}
+                  class="m2-handle-pill"
+                />
                 <text x={xm} y={L.track + 4} class="m2-handle-text">
                   {mTxt}
                 </text>
@@ -426,11 +459,23 @@ export default function CashCarryCalculator({ lang }: CashCarryCalculatorProps):
           </div>
 
           <StatTable>
-            <StatRow label={t('cc.row.fair')} sub={t('cc.row.fairSub')} value={fmtRate(FAIR, PAIR, FD)} />
+            <StatRow
+              label={t('cc.row.fair')}
+              sub={t('cc.row.fairSub')}
+              value={fmtRate(FAIR, PAIR, FD)}
+            />
             <StatRow label={t('cc.row.market')} sub={t('cc.row.marketSub')} value={mTxt} />
-            <StatRow label={t('cc.row.gap')} sub={t('cc.row.gapSub')} value={pipsTxt(gapPips)} highlight />
+            <StatRow
+              label={t('cc.row.gap')}
+              sub={t('cc.row.gapSub')}
+              value={pipsTxt(gapPips)}
+              highlight
+            />
           </StatTable>
-          <div class={`cc-hero${profitOn || dir === 'none' ? '' : ' is-todo'}`} data-profit={r.profitQuote.toFixed(2)}>
+          <div
+            class={`cc-hero${profitOn || dir === 'none' ? '' : ' is-todo'}`}
+            data-profit={r.profitQuote.toFixed(2)}
+          >
             <StatHero
               label={t('cc.profit')}
               value={dir === 'none' ? chf(0) : chf(profitOn ? profitShown : 0, true)}

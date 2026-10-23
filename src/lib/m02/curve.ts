@@ -114,7 +114,10 @@ export function matchPreset(
 }
 
 /** Index of the tenor closest to `days` (for click/drag selection on the chart). */
-export function nearestTenor(days: number, tenors: readonly Tenor[] = M02_CONFIG.curve.tenors): number {
+export function nearestTenor(
+  days: number,
+  tenors: readonly Tenor[] = M02_CONFIG.curve.tenors,
+): number {
   let best = 0;
   tenors.forEach((t, i) => {
     if (Math.abs(t.days - days) < Math.abs(tenors[best]!.days - days)) best = i;

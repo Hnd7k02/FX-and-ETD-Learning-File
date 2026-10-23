@@ -23,4 +23,4 @@ sandbox (network policy); see the open questions in the module report.
 - Herausgeber: Europäische Zentralbank (EZB) / European Central Bank
 - Datum: laufend / ongoing
 - URL: https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html
-- Belegt: Die Referenzkurse beruhen auf einem täglichen Abstimmungsverfahren zwischen Zentralbanken, das normalerweise um ca. 14:10 MEZ stattfindet; Veröffentlichung um ca. 16:00 MEZ an jedem Arbeitstag; nur zu Informationszwecken. Fakt `m07-ecb-time`. Geprüft per Websuche (22.10.2026), Seite aus der Sandbox nicht erreichbar.
+- Belegt: Die Referenzkurse beruhen auf einem täglichen Abstimmungsverfahren zwischen Zentralbanken, das normalerweise um ca. 14:10 MEZ stattfindet; Veröffentlichung um ca. 16:00 MEZ an jedem Arbeitstag; nur zu Informationszwecken. Fakt `m07-ecb-time`. Geprüft per Websuche (22.10.2026, erneut 23.10.2026: «normally takes place around 14:10 CET»), Seite aus der Sandbox nicht erreichbar.

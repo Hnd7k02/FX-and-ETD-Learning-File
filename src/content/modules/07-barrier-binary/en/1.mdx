@@ -17,7 +17,7 @@ Both make the option cheaper. You no longer buy every scenario, only some of the
 
 With the barrier <Num of="m07.barrierPct" /> above spot, at <Num of="m07.barrierUp" />, the **up-and-out call** costs just <Num of="m07.uocPips" /> pips instead of <Num of="m07.vanillaPips" />. It is about <Num of="m07.uocDiscount" /> cheaper. With the barrier the same distance below, at <Num of="m07.barrierDown" />, the **down-and-out call** costs <Num of="m07.docPips" /> pips. That is only <Num of="m07.docDiscount" /> less.
 
-| Option, strike <Num of="ex.strike" /> | Barrier | Price | Touched with |
+| Option, strike <Num of="ex.strike" /> | Barrier | Price | Touch probability |
 | --- | --- | --- | --- |
 | Vanilla call | none | <Num of="m07.vanillaPips" /> pips · <Num of="ex.callChf" /> | – |
 | Up-and-out call | <Num of="m07.barrierUp" /> | <Num of="m07.uocPips" /> pips · <Num of="m07.uocChf" /> | <Num of="m07.touchUp" /> |
@@ -54,7 +54,7 @@ The first term is P(<i>S</i><sub><i>T</i></sub> ≥ <i>H</i>); the second counts
 
 <Desk title="American or European monitoring">
 
-The barriers in this module apply throughout the option's life. In the market they are called "American". There are also "European" barriers, checked only at expiry. Then the option is no longer path-dependent: a European up-and-out call is simply a call spread between strike and barrier minus digitals at the barrier (section 3).
+The barriers in this module apply throughout the option's life. In the market they are called "American". There are also "European" barriers, checked only at expiry. Then the option is no longer path-dependent: a European up-and-out call is simply a call spread between strike and barrier minus a digital at the barrier that pays the width <i>H</i> − <i>K</i> (section 3).
 
 That is why every term sheet states when, and against which rate, the barrier is checked. One word in the contract changes the price a lot.
 

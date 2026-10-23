@@ -787,7 +787,7 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
         label: t('ps.st.forward'),
         value: rate(fair.forwardAvg),
         sub: t('ps.st.forwardSub', {
-          d: pipsTxt(Math.abs(d)),
+          d: pipsTxt(Math.abs(d), 0),
           side: t(d < 0 ? 'ps.st.better.below' : 'ps.st.better.above'),
         }),
       };

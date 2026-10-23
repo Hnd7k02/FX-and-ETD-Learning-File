@@ -60,7 +60,7 @@ function layoutFor(w: number) {
   const compact = width < 560;
   const height = compact ? 340 : Math.round(clamp(width * 0.55, 350, 420));
   const font = compact ? 11 : 12;
-  const strip = compact ? 74 : 92;
+  const strip = compact ? 84 : 92;
   const left = compact ? 36 : 44;
   const right = 6;
   const top = 36;
@@ -273,7 +273,12 @@ export default function HedgeOutcome({ lang }: HedgeOutcomeProps): JSX.Element {
 
               {/* forward reference */}
               <path d={`M${xF.toFixed(1)},${L.top}V${L.plotBottom}`} class="m2-ref" />
-              <text x={xF + 6} y={L.top + L.font + 6} class="m2-ref-label" style={{ fontSize: fs }}>
+              <text
+                x={xF + 6}
+                y={L.top + (L.compact ? 2 : 1) * (L.font + 6)}
+                class="m2-ref-label"
+                style={{ fontSize: fs }}
+              >
                 {t('ho.fLabel', { fwd: fwdTxt })}
               </text>
 

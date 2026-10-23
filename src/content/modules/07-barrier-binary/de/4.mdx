@@ -23,7 +23,8 @@ Das Fenster ist ein Kompromiss. Es kostet <Num of="m07.windowExtraChf" /> mehr a
 **1.** Simuliere viele Pfade für USD/CHF in Tagesschritten (Δ<i>t</i> = 1/365) mit der risikoneutralen Drift <i>r</i><sub>d</sub> − <i>r</i><sub>f</sub>:
 
 <Formula>
-  <span><i>S</i><sub><i>t</i>+Δ<i>t</i></sub> = <i>S</i><sub><i>t</i></sub> · exp((<i>r</i><sub>d</sub> − <i>r</i><sub>f</sub> − ½σ²) Δ<i>t</i> + σ √Δ<i>t</i> · <i>Z</i>), <i>Z</i> ~ <i>N</i>(0, 1)</span>
+  <span><i>S</i><sub><i>t</i>+Δ<i>t</i></sub> = <i>S</i><sub><i>t</i></sub> · exp(ν Δ<i>t</i> + σ √Δ<i>t</i> · <i>Z</i>)</span>
+  <span>ν = <i>r</i><sub>d</sub> − <i>r</i><sub>f</sub> − ½σ², <i>Z</i> ~ <i>N</i>(0, 1)</span>
 </Formula>
 
 **2.** Prüf auf jedem Pfad die Barriere nur an den Fenstertagen. Wird sie berührt, zahlt der Pfad null. Sonst zahlt er bei Verfall (<i>S</i><sub><i>T</i></sub> − <i>K</i>)<sup>+</sup> auf USD 1 Mio.

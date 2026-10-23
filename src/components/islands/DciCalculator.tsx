@@ -458,8 +458,8 @@ export default function DciCalculator(props: DciCalculatorProps): JSX.Element {
             <StatRow
               label={t('dci.strike')}
               sub={t('dci.strikeSub', {
-                spot: fmtPips(view.strikeVsSpotPips, lang, 1, true),
-                fwd: fmtPips(view.strikeVsForwardPips, lang, 1, true),
+                spot: fmtPips(view.strikeVsSpotPips, lang, 0, true),
+                fwd: fmtPips(view.strikeVsForwardPips, lang, 0, true),
               })}
               value={rate(K)}
             />

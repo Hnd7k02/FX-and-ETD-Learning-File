@@ -23,7 +23,8 @@ The window is a compromise. It costs <Num of="m07.windowExtraChf" /> more than t
 **1.** Simulate many USD/CHF paths in daily steps (Δ<i>t</i> = 1/365) with the risk-neutral drift <i>r</i><sub>d</sub> − <i>r</i><sub>f</sub>:
 
 <Formula>
-  <span><i>S</i><sub><i>t</i>+Δ<i>t</i></sub> = <i>S</i><sub><i>t</i></sub> · exp((<i>r</i><sub>d</sub> − <i>r</i><sub>f</sub> − ½σ²) Δ<i>t</i> + σ √Δ<i>t</i> · <i>Z</i>), <i>Z</i> ~ <i>N</i>(0, 1)</span>
+  <span><i>S</i><sub><i>t</i>+Δ<i>t</i></sub> = <i>S</i><sub><i>t</i></sub> · exp(ν Δ<i>t</i> + σ √Δ<i>t</i> · <i>Z</i>)</span>
+  <span>ν = <i>r</i><sub>d</sub> − <i>r</i><sub>f</sub> − ½σ², <i>Z</i> ~ <i>N</i>(0, 1)</span>
 </Formula>
 
 **2.** On each path, check the barrier on the window days only. If it is touched, the path pays nothing. Otherwise it pays (<i>S</i><sub><i>T</i></sub> − <i>K</i>)<sup>+</sup> on USD 1m at expiry.

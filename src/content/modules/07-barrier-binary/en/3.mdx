@@ -19,7 +19,7 @@ The digital call costs <Num of="m07.digitalChf" />. That is no coincidence: the 
 
 Why not exactly 50%? The strike sits at the forward, and the forward is the average of all possible rates at expiry. The rate can swing further up than down. So the middle of the distribution lies slightly below the average, and USD/CHF ends a little more often below the forward than above it.
 
-The same holds for touch products. The one-touch at <Num of="m07.barrierUp" /> costs <Num of="m07.otChf" />, the no-touch <Num of="m07.ntChf" />. Together they make <Num of="m07.otNtSumChf" />: on every path exactly one of the two pays. Know one price and you know the other.
+The same holds for touch products. The one-touch at <Num of="m07.barrierUp" /> costs <Num of="m07.otChf" />, or <Num of="m07.touchUp1" /> of the payout: exactly the touch probability from section 1. The no-touch costs <Num of="m07.ntChf" />. Together they make <Num of="m07.otNtSumChf" />: on every path exactly one of the two pays. Know one price and you know the other.
 
 A rule of thumb from the desk: a one-touch costs about twice as much as a digital struck at the barrier. That is the reflection principle from section 1. In the example it is <Num of="m07.otVsDigitalH" /> times, because the forward lies below spot.
 
@@ -35,10 +35,11 @@ The double no-touch pays if USD/CHF stays within a corridor of ±<Num of="m07.dn
 
 <Derivation title="Derivation: the digital as the limit of a call spread">
 
-**1.** A call pays (<i>S</i><sub><i>T</i></sub> − <i>K</i>)<sup>+</sup>. Raise the strike by a small ε and it pays ε less in every scenario above the strike. So the derivative with respect to the strike measures the probability of ending above it:
+**1.** A call pays (<i>S</i><sub><i>T</i></sub> − <i>K</i>)<sup>+</sup>. Raise the strike by a small ε and it pays exactly ε less in every scenario above the new strike. So the derivative with respect to the strike measures the probability of ending above it:
 
 <Formula>
-  <span>∂<i>C</i> / ∂<i>K</i> = −<i>e</i><sup>−<i>r</i><sub>d</sub><i>T</i></sup> · P(<i>S</i><sub><i>T</i></sub> &gt; <i>K</i>) = −<i>e</i><sup>−<i>r</i><sub>d</sub><i>T</i></sup> · <i>N</i>(<i>d</i><sub>2</sub>)</span>
+  <span>∂<i>C</i> / ∂<i>K</i> = −<i>e</i><sup>−<i>r</i><sub>d</sub><i>T</i></sup> · P(<i>S</i><sub><i>T</i></sub> &gt; <i>K</i>)</span>
+  <span>= −<i>e</i><sup>−<i>r</i><sub>d</sub><i>T</i></sup> · <i>N</i>(<i>d</i><sub>2</sub>)</span>
 </Formula>
 
 **2.** A digital paying 1 is therefore minus this derivative:

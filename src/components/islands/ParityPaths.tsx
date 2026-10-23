@@ -290,13 +290,23 @@ export default function ParityPaths({ lang }: ParityPathsProps): JSX.Element {
               class="m2-svg pp-svg"
             >
               {/* lane titles */}
-              <text x={L.laneA.x + 2} y={L.titleY} class="pp-lane-title" style={{ fontSize: `${L.font + 2}px` }}>
+              <text
+                x={L.laneA.x + 2}
+                y={L.titleY}
+                class="pp-lane-title"
+                style={{ fontSize: `${L.font + 2}px` }}
+              >
                 {t('pp.laneA')}
               </text>
               <text x={L.laneA.x + 2} y={L.subY} class="pp-lane-sub" style={{ fontSize: fs }}>
                 {t('pp.laneASub')}
               </text>
-              <text x={L.laneB.x + 2} y={L.titleY} class="pp-lane-title" style={{ fontSize: `${L.font + 2}px` }}>
+              <text
+                x={L.laneB.x + 2}
+                y={L.titleY}
+                class="pp-lane-title"
+                style={{ fontSize: `${L.font + 2}px` }}
+              >
                 {t('pp.laneB')}
               </text>
               <text x={L.laneB.x + 2} y={L.subY} class="pp-lane-sub" style={{ fontSize: fs }}>
@@ -309,10 +319,7 @@ export default function ParityPaths({ lang }: ParityPathsProps): JSX.Element {
               ))}
               <path d={`M${L.spine},${L.todayY}V${L.result.y - 6}`} class="pp-spine" />
               {termRun && (
-                <path
-                  d={`M${L.spine},${L.termY}V${dotY.toFixed(1)}`}
-                  class="pp-spine-run"
-                />
+                <path d={`M${L.spine},${L.termY}V${dotY.toFixed(1)}`} class="pp-spine-run" />
               )}
 
               {/* lane A: the forward waits through the term */}
@@ -325,7 +332,12 @@ export default function ParityPaths({ lang }: ParityPathsProps): JSX.Element {
                   <text
                     key={i}
                     x={laneACx}
-                    y={C.B2.y + C.B2.h / 2 + i * (L.font + 3) - ((noteLines.length - 1) * (L.font + 3)) / 2}
+                    y={
+                      C.B2.y +
+                      C.B2.h / 2 +
+                      i * (L.font + 3) -
+                      ((noteLines.length - 1) * (L.font + 3)) / 2
+                    }
                     class="pp-note"
                     style={{ fontSize: fs }}
                   >
@@ -341,10 +353,20 @@ export default function ParityPaths({ lang }: ParityPathsProps): JSX.Element {
                     height={40}
                     rx={10}
                   />
-                  <text x={laneACx} y={L.termMid - 5} style={{ fontSize: fs }} class="pp-lock-label">
+                  <text
+                    x={laneACx}
+                    y={L.termMid - 5}
+                    style={{ fontSize: fs }}
+                    class="pp-lock-label"
+                  >
                     {t('pp.term.waiting')}
                   </text>
-                  <text x={laneACx} y={L.termMid + 12} style={{ fontSize: `${L.mono}px` }} class="pp-lock-value">
+                  <text
+                    x={laneACx}
+                    y={L.termMid + 12}
+                    style={{ fontSize: `${L.mono}px` }}
+                    class="pp-lock-value"
+                  >
                     {fwdTxt}
                   </text>
                 </g>
@@ -355,23 +377,50 @@ export default function ParityPaths({ lang }: ParityPathsProps): JSX.Element {
               {connector(C.B2, C.B3, S.B3.k, 'c23')}
               {(
                 [
-                  { y: L.balanceY[0], label: t('pp.term.usd'), v: usdBal, color: COLOR.usd, text: COLOR.usdText },
-                  { y: L.balanceY[1], label: t('pp.term.chf'), v: chfBal, color: COLOR.chf, text: COLOR.chfText },
+                  {
+                    y: L.balanceY[0],
+                    label: t('pp.term.usd'),
+                    v: usdBal,
+                    color: COLOR.usd,
+                    text: COLOR.usdText,
+                  },
+                  {
+                    y: L.balanceY[1],
+                    label: t('pp.term.chf'),
+                    v: chfBal,
+                    color: COLOR.chf,
+                    text: COLOR.chfText,
+                  },
                 ] as const
               ).map((b) => (
                 <g key={b.label} class="pp-balance">
-                  <text x={L.laneB.x + 2} y={b.y - 6} style={{ fontSize: fs }} class="pp-balance-label">
+                  <text
+                    x={L.laneB.x + 2}
+                    y={b.y - 6}
+                    style={{ fontSize: fs }}
+                    class="pp-balance-label"
+                  >
                     {b.label}
                   </text>
                   <text
                     x={L.laneB.x + L.laneB.w - 2}
                     y={b.y - 6}
-                    style={{ fontSize: `${L.mono}px`, fill: balanceShown ? b.text : 'var(--ff-muted)' }}
+                    style={{
+                      fontSize: `${L.mono}px`,
+                      fill: balanceShown ? b.text : 'var(--ff-muted)',
+                    }}
                     class="pp-balance-value"
                   >
                     {balanceShown ? num(b.v) : '–'}
                   </text>
-                  <rect x={L.laneB.x} y={b.y} width={L.laneB.w} height={4} rx={2} class="pp-track" />
+                  <rect
+                    x={L.laneB.x}
+                    y={b.y}
+                    width={L.laneB.w}
+                    height={4}
+                    rx={2}
+                    class="pp-track"
+                  />
                   <rect
                     x={L.laneB.x}
                     y={b.y}
@@ -563,7 +612,12 @@ export default function ParityPaths({ lang }: ParityPathsProps): JSX.Element {
                   <path d="M10 3.5L5.5 8L10 12.5" class="m2-icon-stroke" />
                 </svg>
               </button>
-              <button type="button" class="m2-btn m2-btn-dark pp-play" onClick={play.toggle} data-play>
+              <button
+                type="button"
+                class="m2-btn m2-btn-dark pp-play"
+                onClick={play.toggle}
+                data-play
+              >
                 <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
                   {play.playing ? (
                     <path d="M4 2.5V11.5M10 2.5V11.5" class="m2-icon-stroke" />
@@ -630,7 +684,9 @@ export default function ParityPaths({ lang }: ParityPathsProps): JSX.Element {
               value={chf(N * fwd)}
             />
             <StatRow
-              symbol={<span aria-hidden="true" class="m2-sw" style={{ borderTopColor: COLOR.chf }} />}
+              symbol={
+                <span aria-hidden="true" class="m2-sw" style={{ borderTopColor: COLOR.chf }} />
+              }
               label={t('pp.row.b')}
               sub={t('pp.row.bSub', { chfLoan: num(chfLoan) })}
               value={chf(chfRepay)}
@@ -655,7 +711,9 @@ export default function ParityPaths({ lang }: ParityPathsProps): JSX.Element {
               </div>
               <div>
                 <dt>{t('pp.cont.diff')}</dt>
-                <dd class="mono">{t('pp.cont.diffVal', { pips: fmtPips(r.diffPips, lang, 2, true) })}</dd>
+                <dd class="mono">
+                  {t('pp.cont.diffVal', { pips: fmtPips(r.diffPips, lang, 2, true) })}
+                </dd>
               </div>
             </dl>
           </div>

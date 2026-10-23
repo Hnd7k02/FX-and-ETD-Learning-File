@@ -17,7 +17,7 @@ Beides macht die Option billiger. Du kaufst nicht mehr alle Szenarien, sondern n
 
 Liegt die Barriere <Num of="m07.barrierPct" /> über dem Spot, also bei <Num of="m07.barrierUp" />, kostet der **Up-and-out Call** nur <Num of="m07.uocPips" /> Pips statt <Num of="m07.vanillaPips" />. Er ist rund <Num of="m07.uocDiscount" /> billiger. Liegt die Barriere gleich weit darunter, bei <Num of="m07.barrierDown" />, kostet der **Down-and-out Call** <Num of="m07.docPips" /> Pips. Das ist nur <Num of="m07.docDiscount" /> weniger.
 
-| Option, Strike <Num of="ex.strike" /> | Barriere | Preis | Berührt mit |
+| Option, Strike <Num of="ex.strike" /> | Barriere | Preis | Berührwahrscheinlichkeit |
 | --- | --- | --- | --- |
 | Vanilla Call | keine | <Num of="m07.vanillaPips" /> Pips · <Num of="ex.callChf" /> | – |
 | Up-and-out Call | <Num of="m07.barrierUp" /> | <Num of="m07.uocPips" /> Pips · <Num of="m07.uocChf" /> | <Num of="m07.touchUp" /> |
@@ -54,7 +54,7 @@ Der erste Term ist P(<i>S</i><sub><i>T</i></sub> ≥ <i>H</i>), der zweite zähl
 
 <Desk title="Amerikanisch oder europäisch beobachtet">
 
-Die Barrieren in diesem Modul gelten während der ganzen Laufzeit. Im Handel heissen sie «amerikanisch». Es gibt auch «europäische» Barrieren: Sie werden nur bei Verfall geprüft. Dann ist die Option nicht mehr pfadabhängig. Ein europäischer Up-and-out Call ist einfach ein Call Spread zwischen Strike und Barriere minus Digitals an der Barriere (Abschnitt 3).
+Die Barrieren in diesem Modul gelten während der ganzen Laufzeit. Im Handel heissen sie «amerikanisch». Es gibt auch «europäische» Barrieren: Sie werden nur bei Verfall geprüft. Dann ist die Option nicht mehr pfadabhängig. Ein europäischer Up-and-out Call ist einfach ein Call Spread zwischen Strike und Barriere minus ein Digital an der Barriere, das die Breite <i>H</i> − <i>K</i> zahlt (Abschnitt 3).
 
 Darum steht in jedem Term Sheet, wann und gegen welchen Kurs die Barriere geprüft wird. Ein Wort im Vertrag verändert den Preis stark.
 

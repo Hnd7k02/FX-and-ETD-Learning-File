@@ -74,7 +74,7 @@ function layoutFor(w: number) {
     width,
     compact,
     font: compact ? 11 : 12,
-    left: compact ? 52 : 62,
+    left: compact ? 56 : 62,
     right: compact ? 12 : 18,
     top: 30,
     height: compact ? 280 : Math.round(clamp(width * 0.5, 300, 380)),
@@ -349,12 +349,72 @@ export default function StructureBlocks(props: StructureBlocksProps): JSX.Elemen
     }
     const xm = b.shape === 'rangeDigital' ? (b.level + (b.upper ?? b.level)) / 2 : xr;
     const y = blockValue(b, xm) * N;
+    // a steep block leaves the plot before the label point: label it where it crosses the edge
+    if ((b.shape === 'call' || b.shape === 'put') && (y > domain[1] || domain[0] > y)) {
+      const edge = y > domain[1] ? domain[1] : domain[0];
+      const slope = b.sign * b.ratio * N * (b.shape === 'call' ? 1 : -1);
+      const xc = b.level + edge / slope;
+      if (xc > X_RANGE[0] && X_RANGE[1] > xc) {
+        const gap = 6;
+        const lx = xs(xc) + (b.shape === 'call' ? -gap : gap);
+        const ly = edge === domain[1] ? ys(edge) + L.font + 2 : ys(edge) - 6;
+        return [lx, ly, b.shape === 'call' ? 'end' : 'start'];
+      }
+    }
     return [
       xs(xm),
       ys(y) + (b.sign > 0 ? -8 : 16),
       b.shape === 'rangeDigital' ? 'start' : (anchorOut ?? (right ? 'end' : 'start')),
     ];
   };
+
+  /* block labels: placed, then dropped where they would overlap an earlier label (phones) */
+  const targetRight = kind === 'pivotTarf';
+  const boxes: Array<[number, number, number, number]> = [];
+  const boxOf = (x: number, y: number, anchor: 'start' | 'end', text: string) => {
+    const w = text.length * L.font * 0.56;
+    const x0 = anchor === 'end' ? x - w : x;
+    return [x0, y - L.font, x0 + w, y + 3] as [number, number, number, number];
+  };
+  const overlaps = (a: [number, number, number, number]) =>
+    boxes.some((b) => a[0] < b[2] && b[0] < a[2] && a[1] < b[3] && b[1] < a[3]);
+  if (targetY !== null && featureAlpha > 0.5) {
+    const text = t('sb.targetLine');
+    boxes.push(
+      boxOf(
+        targetRight ? L.width - L.right - 6 : L.left + 6,
+        targetY - 6,
+        targetRight ? 'end' : 'start',
+        text,
+      ),
+    );
+  }
+  const blockLabels: Array<{
+    key: string;
+    x: number;
+    y: number;
+    anchor: 'start' | 'end';
+    text: string;
+    long: boolean;
+  }> = [];
+  stage.blocks.forEach((b, i) => {
+    const [bx, by, anchor] = blockLabelPos(b);
+    const name = t(`sb.b.${b.key}` as Parameters<typeof t>[0]);
+    const text =
+      Math.abs(b.ratio - 1) < 0.05
+        ? name
+        : t('sb.ratio', {
+            r: fmtNumber(b.ratio, lang, {
+              digits: Math.abs(b.ratio - Math.round(b.ratio)) < 0.05 ? 0 : 1,
+            }),
+            name,
+          });
+    const y = clamp(by, L.top + L.font, plotBottom - 4);
+    const box = boxOf(bx, y, anchor, text);
+    if (overlaps(box)) return;
+    boxes.push(box);
+    blockLabels.push({ key: `bl${i}`, x: bx, y, anchor, text, long: b.sign > 0 });
+  });
 
   return (
     <div class="sb" ref={root} data-sb data-product={kind} data-step={stepNow + 1}>
@@ -527,10 +587,10 @@ export default function StructureBlocks(props: StructureBlocksProps): JSX.Elemen
             <g style={{ opacity: featureAlpha }}>
               <path d={`M${L.left},${targetY.toFixed(1)}H${L.width - L.right}`} class="sb-target" />
               <text
-                x={L.left + 6}
+                x={targetRight ? L.width - L.right - 6 : L.left + 6}
                 y={targetY - 6}
                 class="sb-target-label"
-                style={{ fontSize: fs, ...halo }}
+                style={{ fontSize: fs, textAnchor: targetRight ? 'end' : 'start', ...halo }}
               >
                 {t('sb.targetLine')}
               </text>
@@ -558,34 +618,21 @@ export default function StructureBlocks(props: StructureBlocksProps): JSX.Elemen
             <path d={productD} class="sb-product" />
           </g>
           {blocks &&
-            stage.blocks.map((b, i) => {
-              const [bx, by, anchor] = blockLabelPos(b);
-              const name = t(`sb.b.${b.key}` as Parameters<typeof t>[0]);
-              const label =
-                Math.abs(b.ratio - 1) < 0.05
-                  ? name
-                  : t('sb.ratio', {
-                      r: fmtNumber(b.ratio, lang, {
-                        digits: Math.abs(b.ratio - Math.round(b.ratio)) < 0.05 ? 0 : 1,
-                      }),
-                      name,
-                    });
-              return (
-                <text
-                  key={`bl${i}`}
-                  x={bx}
-                  y={clamp(by, L.top + L.font, plotBottom - 4)}
-                  class={
-                    b.sign > 0
-                      ? 'sb-block-label sb-block-label--long'
-                      : 'sb-block-label sb-block-label--short'
-                  }
-                  style={{ fontSize: fs, textAnchor: anchor, ...halo }}
-                >
-                  {label}
-                </text>
-              );
-            })}
+            blockLabels.map((l) => (
+              <text
+                key={l.key}
+                x={l.x}
+                y={l.y}
+                class={
+                  l.long
+                    ? 'sb-block-label sb-block-label--long'
+                    : 'sb-block-label sb-block-label--short'
+                }
+                style={{ fontSize: fs, textAnchor: l.anchor, ...halo }}
+              >
+                {l.text}
+              </text>
+            ))}
 
           {/* strike and forward markers on the x axis */}
           {story && (

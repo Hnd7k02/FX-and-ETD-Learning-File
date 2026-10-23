@@ -66,8 +66,7 @@ export const cashcarry = defineDict({
       'Viele machen denselben Trade: Sie verkaufen den teuren Forward und kaufen den billigen Weg. Der Forward wird billiger, bis kein Gewinn mehr bleibt. Darum steht er im Markt beim fairen Wert.',
     'cc.aha.textCheap':
       'Viele machen denselben Trade: Sie kaufen den billigen Forward und verkaufen den teuren Weg. Der Forward wird teurer, bis kein Gewinn mehr bleibt. Darum steht er im Markt beim fairen Wert.',
-    'cc.aria':
-      'Forward im Markt {market}, fairer Forward {fair}, Abweichung {pips} Pips. {result}',
+    'cc.aria': 'Forward im Markt {market}, fairer Forward {fair}, Abweichung {pips} Pips. {result}',
     'cc.ariaProfit': 'Cash and Carry bringt bei Fälligkeit {profit}.',
     'cc.ariaNone': 'Keine Arbitrage.',
     'cc.hint': 'Zieh den schwarzen Anfasser auf dem Lineal oder tipp rechts einen Kurs ein.',

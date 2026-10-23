@@ -41,7 +41,8 @@ export const paritypaths = defineDict({
       'Die Zeit läuft. Die USD-Anlage wächst mit {rf}, der CHF-Kredit mit {rd}. Der Forward in Weg A wartet einfach.',
     'pp.step.B4': 'Die Anlage ist fällig: Du erhältst USD {notional}, davon {usdInterest} Zins.',
     'pp.step.B5': 'Du zahlst den Kredit zurück: {chfRepay}, davon {chfInterest} Zins.',
-    'pp.step.A2': 'Weg A: Der Forward wird erfüllt. Du zahlst {chfFwd} und erhältst USD {notional}.',
+    'pp.step.A2':
+      'Weg A: Der Forward wird erfüllt. Du zahlst {chfFwd} und erhältst USD {notional}.',
     'pp.idle': 'Drück auf Abspielen: Beide Wege laufen Schritt für Schritt nebeneinander.',
     'pp.aha.title': 'Zwei sichere Wege, ein Preis',
     'pp.aha.text':

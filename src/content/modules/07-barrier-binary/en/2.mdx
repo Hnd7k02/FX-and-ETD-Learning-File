@@ -39,7 +39,7 @@ Some knock-outs pay a fixed compensation when they are knocked out, the rebate. 
 
 <Derivation title="Derivation: the method of images">
 
-**1.** Take the regular down-and-out call with barrier <i>H</i> below strike <i>K</i>. We want a formula that matches the vanilla price everywhere, except that the value is zero at the barrier.
+**1.** Take the regular down-and-out call with barrier <i>H</i> below strike <i>K</i>. We want a price with two properties: at expiry, above the barrier, it pays the same as the vanilla. At the barrier, it is zero.
 
 **2.** The idea comes from physics: next to the vanilla, place a mirrored vanilla whose spot is reflected at the barrier, <i>H</i>²/<i>S</i>. Subtract it with the right weight:
 
@@ -48,7 +48,7 @@ Some knock-outs pay a fixed compensation when they are knocked out, the rebate. 
   <span>μ = (<i>r</i><sub>d</sub> − <i>r</i><sub>f</sub> − ½σ²) / σ²</span>
 </Formula>
 
-**3.** At the barrier <i>S</i> = <i>H</i>. Then <i>H</i>²/<i>S</i> = <i>H</i> and the weight is 1: both terms are equal and the option is worth zero. That is exactly what a knock-out requires.
+**3.** Both properties hold. At the barrier <i>S</i> = <i>H</i>, so <i>H</i>²/<i>S</i> = <i>H</i> and the weight is 1: both terms are equal and the difference is zero. At expiry the mirrored spot <i>H</i>²/<i>S</i> lies below <i>H</i> and hence below the strike: the mirror call pays nothing and the vanilla is left. The weight makes sure the mirror term is a fair price too; it satisfies the same pricing equation as the vanilla.
 
 **4.** In the example with <i>H</i> = <Num of="m07.barrierDown" />: μ = <Num of="m07.mirrorMu" />, mirror spot <Num of="m07.mirrorSpot" />, weight <Num of="m07.mirrorWeight" />, mirrored call <Num of="m07.mirrorCallPips" /> pips. The mirror term is <Num of="m07.mirrorPips" /> pips, and <Num of="m07.vanillaPips" /> − <Num of="m07.mirrorPips" /> = <Num of="m07.docPips" /> pips is the down-and-out call.
 

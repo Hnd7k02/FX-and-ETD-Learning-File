@@ -56,8 +56,7 @@ export function hedgeOutcome(st: number, F: number, notional: number): HedgeOutc
   const unhedged = notional * st;
   const hedged = notional * F;
   const diff = unhedged - hedged;
-  const verdict: HedgeVerdict =
-    Math.abs(diff) < EQUAL_CHF ? 'equal' : diff > 0 ? 'saves' : 'costs';
+  const verdict: HedgeVerdict = Math.abs(diff) < EQUAL_CHF ? 'equal' : diff > 0 ? 'saves' : 'costs';
   return { st, unhedged, hedged, diff, verdict };
 }
 
@@ -110,7 +109,11 @@ export interface ScenarioStats {
 }
 
 /** Statistics of the unhedged CHF cost over the scenarios; the forward cost is N · F always. */
-export function scenarioStats(rates: readonly number[], F: number, notional: number): ScenarioStats {
+export function scenarioStats(
+  rates: readonly number[],
+  F: number,
+  notional: number,
+): ScenarioStats {
   if (rates.length === 0) {
     return { n: 0, min: 0, max: 0, spread: 0, mean: 0, forwardCheaper: 0, forwardDearer: 0 };
   }

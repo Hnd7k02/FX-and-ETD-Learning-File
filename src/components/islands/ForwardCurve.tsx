@@ -45,9 +45,13 @@ const START = Math.max(
   TENORS.findIndex((t) => t.id === CC.defaultTenor),
 );
 const START_WORDING = premiumWording(
-  forwardCurve({ spot: M.spot, rd: M.rd, rf: M.rf, basisQuote: M.basisQuote, basisBase: M.basisBase })[
-    START
-  ]!.points,
+  forwardCurve({
+    spot: M.spot,
+    rd: M.rd,
+    rf: M.rf,
+    basisQuote: M.basisQuote,
+    basisBase: M.basisBase,
+  })[START]!.points,
 );
 
 /** Colour semantics: cost (CHF financing, short) orange, benefit (USD held, long) blue, points black. */
@@ -138,7 +142,11 @@ export default function ForwardCurve({ lang }: ForwardCurveProps): JSX.Element {
   const labelX = clamp(xSel, L.left + labelW / 2 + 2, L.width - L.right - labelW / 2 - 2);
 
   const chipKey =
-    wording === 'premium' ? 'fc.chip.premium' : wording === 'discount' ? 'fc.chip.discount' : 'fc.chip.flat';
+    wording === 'premium'
+      ? 'fc.chip.premium'
+      : wording === 'discount'
+        ? 'fc.chip.discount'
+        : 'fc.chip.flat';
   const insightKey =
     wording === 'premium'
       ? 'fc.insight.premium'
@@ -260,7 +268,11 @@ export default function ForwardCurve({ lang }: ForwardCurveProps): JSX.Element {
               })}
 
               {/* forward points line and dots */}
-              <path d={netLine} class="m2-line" style={{ stroke: COLOR.points, strokeWidth: 2.25 }} />
+              <path
+                d={netLine}
+                class="m2-line"
+                style={{ stroke: COLOR.points, strokeWidth: 2.25 }}
+              />
               <circle cx={sx(0)} cy={sy(0)} r={4.5} class="fc-spot" />
               {TENORS.map((tn, i) => (
                 <circle
@@ -274,10 +286,20 @@ export default function ForwardCurve({ lang }: ForwardCurveProps): JSX.Element {
 
               {/* selected label */}
               <g class="fc-label" style={{ textAnchor: 'middle' }}>
-                <text x={labelX} y={labelY} style={{ fontSize: `${L.font + 1}px` }} class="fc-label-main">
+                <text
+                  x={labelX}
+                  y={labelY}
+                  style={{ fontSize: `${L.font + 1}px` }}
+                  class="fc-label-main"
+                >
                   {selText}
                 </text>
-                <text x={labelX} y={labelY + L.font + 4} style={{ fontSize: fs }} class="fc-label-sub">
+                <text
+                  x={labelX}
+                  y={labelY + L.font + 4}
+                  style={{ fontSize: fs }}
+                  class="fc-label-sub"
+                >
                   {selFwd}
                 </text>
               </g>
@@ -297,7 +319,13 @@ export default function ForwardCurve({ lang }: ForwardCurveProps): JSX.Element {
                 ) : null,
               )}
               {/* invisible hit area so a tap anywhere picks the nearest tenor */}
-              <rect x={L.left} y={L.top} width={L.width - L.left - L.right} height={L.height - L.top} class="m2-hit" />
+              <rect
+                x={L.left}
+                y={L.top}
+                width={L.width - L.left - L.right}
+                height={L.height - L.top}
+                class="m2-hit"
+              />
             </svg>
           </div>
           <div class={`m2-insight${aha ? ' is-aha' : ''}`} data-insight>
@@ -337,14 +365,14 @@ export default function ForwardCurve({ lang }: ForwardCurveProps): JSX.Element {
                 {t('fc.presets')}
               </span>
               <Segmented
-              label={t('fc.presets')}
-              value={preset ?? ''}
-              options={CC.presets.map((p) => ({
-                value: p.id,
-                label: t(`fc.preset.${p.id}` as 'fc.preset.example'),
-              }))}
-              onChange={choosePreset}
-            />
+                label={t('fc.presets')}
+                value={preset ?? ''}
+                options={CC.presets.map((p) => ({
+                  value: p.id,
+                  label: t(`fc.preset.${p.id}` as 'fc.preset.example'),
+                }))}
+                onChange={choosePreset}
+              />
             </div>
             <div onPointerDown={onSlide} class="m2-sliders">
               <Slider
@@ -382,7 +410,11 @@ export default function ForwardCurve({ lang }: ForwardCurveProps): JSX.Element {
 
           <div class="m2-eq-head">{t('fc.eq.title', { tenor: cur.id })}</div>
           <StatTable>
-            <StatRow label={t('fc.eq.spot')} sub={t('fc.eq.spotSub')} value={fmtRate(M.spot, PAIR, FD)} />
+            <StatRow
+              label={t('fc.eq.spot')}
+              sub={t('fc.eq.spotSub')}
+              value={fmtRate(M.spot, PAIR, FD)}
+            />
             <StatRow
               symbol={<span aria-hidden="true" class="m2-sq" style={{ background: COLOR.cost }} />}
               label={t('fc.eq.cost')}
@@ -390,7 +422,9 @@ export default function ForwardCurve({ lang }: ForwardCurveProps): JSX.Element {
               value={signed(cur.costPips * PIP)}
             />
             <StatRow
-              symbol={<span aria-hidden="true" class="m2-sq" style={{ background: COLOR.benefit }} />}
+              symbol={
+                <span aria-hidden="true" class="m2-sq" style={{ background: COLOR.benefit }} />
+              }
               label={t('fc.eq.benefit')}
               sub={t('fc.eq.benefitSub', { pips: pips(-cur.benefitPips) })}
               value={signed(-cur.benefitPips * PIP)}

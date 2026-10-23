@@ -39,7 +39,7 @@ Manche Knock-outs zahlen bei der Berührung eine feste Entschädigung, das Rebat
 
 <Derivation title="Herleitung: die Spiegel-Methode">
 
-**1.** Nimm den regulären Down-and-out Call mit Barriere <i>H</i> unter dem Strike <i>K</i>. Gesucht ist eine Formel, die überall den Vanilla-Preis abbildet, ausser dass der Wert an der Barriere null wird.
+**1.** Nimm den regulären Down-and-out Call mit Barriere <i>H</i> unter dem Strike <i>K</i>. Gesucht ist ein Preis mit zwei Eigenschaften: Bei Verfall zahlt er oberhalb der Barriere dasselbe wie der Vanilla. An der Barriere ist er null.
 
 **2.** Die Idee aus der Physik: Stell neben den Vanilla einen gespiegelten Vanilla, dessen Spot an der Barriere reflektiert ist: <i>H</i>²/<i>S</i>. Mit dem passenden Gewicht ziehst du ihn ab:
 
@@ -48,7 +48,7 @@ Manche Knock-outs zahlen bei der Berührung eine feste Entschädigung, das Rebat
   <span>μ = (<i>r</i><sub>d</sub> − <i>r</i><sub>f</sub> − ½σ²) / σ²</span>
 </Formula>
 
-**3.** An der Barriere ist <i>S</i> = <i>H</i>. Dann ist <i>H</i>²/<i>S</i> = <i>H</i> und das Gewicht 1: Beide Terme sind gleich, die Option ist null wert. Genau das verlangt der Knock-out.
+**3.** Beide Eigenschaften stimmen. An der Barriere ist <i>S</i> = <i>H</i>, also <i>H</i>²/<i>S</i> = <i>H</i> und das Gewicht 1: Beide Terme sind gleich, die Differenz ist null. Bei Verfall liegt der gespiegelte Spot <i>H</i>²/<i>S</i> unter <i>H</i> und damit unter dem Strike: Der Spiegel-Call zahlt nichts, es bleibt der Vanilla. Das Gewicht sorgt dafür, dass auch der Spiegel-Term ein fairer Preis ist; er erfüllt dieselbe Bewertungsgleichung wie der Vanilla.
 
 **4.** Im Beispiel mit <i>H</i> = <Num of="m07.barrierDown" />: μ = <Num of="m07.mirrorMu" />, Spiegel-Spot <Num of="m07.mirrorSpot" />, Gewicht <Num of="m07.mirrorWeight" />, gespiegelter Call <Num of="m07.mirrorCallPips" /> Pips. Der Spiegel-Term ist <Num of="m07.mirrorPips" /> Pips, und <Num of="m07.vanillaPips" /> − <Num of="m07.mirrorPips" /> = <Num of="m07.docPips" /> Pips ist der Down-and-out Call.
 
