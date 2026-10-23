@@ -6,7 +6,7 @@ Our importer has to pay USD 1m in 3 months. Today USD/CHF stands at <Num of="ex.
 
 A **forward** solves the problem. It is a contract the importer agrees with his bank today: in 3 months he buys USD 1m at a rate that is fixed today. No money changes hands today. On the maturity date the bank delivers the dollars and the importer pays the agreed francs. Fix the rate today, deliver later.
 
-Forwards are nothing exotic. In <Fact id="m02-bis-month" /> outright forwards made up <Fact id="m02-bis-fwd-share" /> of global FX trading, <Fact id="m02-bis-fwd-growth" /> more than three years earlier (preliminary BIS figures).
+Forwards are nothing exotic. In <Fact id="m02-bis-month" /> outright forwards made up <Fact id="m02-bis-fwd-share" /> of global FX trading. Their turnover was <Fact id="m02-bis-fwd-growth" /> higher than three years earlier (preliminary BIS figures).
 
 ### What the forward costs
 
@@ -33,7 +33,7 @@ The model is centred on the forward. On average, the unhedged dollars therefore 
 
 - **He gains predictability.** Costs, selling prices and margin are fixed today. A strong dollar can no longer hurt him.
 - **He gives up the upside.** If the dollar falls, he does not benefit.
-- **He takes on an obligation.** The forward must be settled even if the deal with his supplier falls through. A right without an obligation is an option, the subject of module 04.
+- **He takes on an obligation.** The forward must be settled even if the deal with his supplier falls through. He can then only close it out at its current market value, which may go against him. A right without an obligation is an option, the subject of module 04.
 
 <Derivation title="Derivation: why the forward fixes the cost">
 
@@ -41,7 +41,7 @@ The forward is a contract in its own right. At maturity it is worth as much to t
 
 <Formula>Value at maturity = <i>N</i> · (<i>S</i><sub>T</sub> − <i>F</i>)</Formula>
 
-With <i>N</i> = USD 1m it is worth <Num of="m02.fwdValueUp" /> at <i>S</i><sub>T</sub> = <Num of="m02.stUp" />, and <Num of="m02.fwdValueDown" /> at <i>S</i><sub>T</sub> = <Num of="m02.stDown" />. The payoff is a straight line with slope 1: the forward is the linear building block to which module 04 reduces options.
+With <i>N</i> = USD 1m it is worth <Num of="m02.fwdValueUp" /> at <i>S</i><sub>T</sub> = <Num of="m02.stUp" />, and <Num of="m02.fwdValueDown" /> at <i>S</i><sub>T</sub> = <Num of="m02.stDown" />. Per dollar, the payoff is a straight line with slope 1: the forward is the linear building block to which module 04 reduces options.
 
 Unhedged, the importer pays <i>N</i> · <i>S</i><sub>T</sub>. Add the value of the forward and the same amount is left in every scenario:
 
@@ -57,7 +57,7 @@ The rate at maturity cancels out. That is why the black line in the chart is fla
 
 When it is agreed, a fair forward is worth zero to both sides. That is why nobody pays anything today. The bank earns the margin built into the rate.
 
-Because the forward can become valuable later, to one side or the other, the bank checks the client's creditworthiness first. It grants a line up to which it will trade forwards with him. On the desk a plain forward is called an **outright forward**, or simply an outright.
+Because the forward can become valuable later, to one side or the other, the bank checks the client's creditworthiness first. It grants a credit line up to which it will trade forwards with him. On the desk a plain forward is called an **outright forward**, or simply an outright.
 
 </Desk>
 

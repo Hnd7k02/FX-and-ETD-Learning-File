@@ -50,11 +50,12 @@ export const cashcarry = defineDict({
     'cc.profitSub': 'Barwert heute {pv}',
     'cc.profitNone': 'kein Gewinn',
     'cc.row.fair': 'Fairer Forward',
-    'cc.row.fairSub': 'S · (1 + r_CHF · t) / (1 + r_USD · t)',
+    'cc.row.fairSub': 'Spot · Zinsfaktor CHF / Zinsfaktor USD',
     'cc.row.market': 'Forward im Markt',
     'cc.row.marketSub': 'eingegeben oder gezogen',
     'cc.row.gap': 'Abweichung',
     'cc.row.gapSub': 'Markt minus fair',
+    'cc.row.gapVal': '{pips} Pips',
     'cc.insight.rich':
       'Der Forward ist zu teuer. Also verkaufst du USD forward und kaufst sie über den Geldmarkt zum fairen Kurs: CHF leihen, USD spot kaufen, USD anlegen. Heute fliesst netto kein Geld, bei Fälligkeit bleiben {profit}.',
     'cc.insight.cheap':
@@ -119,11 +120,12 @@ export const cashcarry = defineDict({
     'cc.profitSub': 'present value today {pv}',
     'cc.profitNone': 'no profit',
     'cc.row.fair': 'Fair forward',
-    'cc.row.fairSub': 'S · (1 + r_CHF · t) / (1 + r_USD · t)',
+    'cc.row.fairSub': 'spot · CHF interest factor / USD interest factor',
     'cc.row.market': 'Market forward',
     'cc.row.marketSub': 'typed or dragged',
     'cc.row.gap': 'Mispricing',
     'cc.row.gapSub': 'market minus fair',
+    'cc.row.gapVal': '{pips} pips',
     'cc.insight.rich':
       'The forward is too dear. So you sell USD forward and buy them through the money market at the fair rate: borrow CHF, buy USD spot, invest the USD. No net cash moves today; at maturity {profit} is left over.',
     'cc.insight.cheap':

@@ -3,9 +3,9 @@
  * Every number in a prompt, label or explanation is computed from the running example, the
  * calculation core (forward, cash and carry) and the module logic (src/lib/m02 → M02 in
  * src/lib/nums/m02.ts), and formatted with src/lib/format.ts. Distractors are the typical
- * mistakes: the rate at maturity instead of the forward, sign errors, rates swapped, the
- * continuous instead of the money-market forward, a forward read as a forecast, the arbitrage
- * run in the wrong direction, pips off by a factor of ten.
+ * mistakes: the rate at maturity instead of the forward, the hedge result read as the payment,
+ * sign errors, rates swapped, the continuous instead of the money-market forward, a forward read
+ * as a forecast, the arbitrage run in the wrong direction, pips off by a factor of ten.
  */
 import type { Lang } from '@/i18n/types';
 import { fmtMoney, fmtPct, fmtPips, fmtRate } from '@/lib/format';
@@ -68,11 +68,11 @@ const check1: QuizQuestion = {
       },
     },
     {
-      label: money(M02.downChf - (M02.fwdChf - M02.downChf)),
+      label: money(M02.fwdChf - M02.downChf),
       mono: true,
       explain: {
-        de: `Hier wurde die Differenz zum Forward abgezogen statt dazugezählt. Mit dem Forward zahlt er genau ${money(M02.fwdChf).de}.`,
-        en: `Here the difference to the forward was subtracted instead of added. With the forward he pays exactly ${money(M02.fwdChf).en}.`,
+        de: `Das ist nur der Unterschied zum Kauf ohne Absicherung, also die Chance, die er abgegeben hat. Für die Dollars zahlt er den vollen Forward-Betrag: ${money(M02.fwdChf).de}.`,
+        en: `That is only the difference from buying unhedged, the chance he gave up. For the dollars he pays the full forward amount: ${money(M02.fwdChf).en}.`,
       },
     },
   ],

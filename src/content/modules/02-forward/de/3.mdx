@@ -2,7 +2,7 @@ import ForwardCurveFigure from '@/components/figures/ForwardCurveFigure.astro';
 
 {/* 02 Forward · Abschnitt 3 · Forward Points und Carry. Zahlen nur über <Num />, Register src/lib/nums/ex.ts und m02.ts. */}
 
-Im Markt nennt dir niemand den Forward als ganzen Kurs. Man nennt die **Forward Points**: den Abstand zum Spot in Pips. Für 3 Monate sind das im Beispiel <Num of="ex.fwdPointsMM" /> Pips. Den Forward rechnest du selbst: Spot plus Points, <Num of="ex.spot" /> + (<Num of="m02.pointsRate" />) = <Num of="m02.fwd" />. Der Grund ist praktisch: Der Spot bewegt sich ständig, die Points ändern sich viel langsamer. So bleibt eine Quote länger gültig.
+Unter Händlern nennt niemand den Forward als ganzen Kurs. Man quotiert die **Forward Points**: den Abstand zum Spot in Pips. Für 3 Monate sind das im Beispiel <Num of="ex.fwdPointsMM" /> Pips. Den Forward rechnest du selbst: Spot plus Points, <Num of="ex.spot" /> + (<Num of="m02.pointsRate" />) = <Num of="m02.fwd" />. Der Grund ist praktisch: Der Spot bewegt sich ständig, die Points ändern sich viel langsamer. So bleibt eine Quote länger gültig. Der Importeur bekommt von seiner Bank am Ende den ganzen Kurs, den Outright.
 
 ### Aufschlag und Abschlag
 
@@ -27,15 +27,15 @@ Der Forward verrechnet beides. Im Beispiel ist die Cost <Num of="m02.cost" /> (C
 
 Der Abstand zum Spot wächst fast linear mit der Laufzeit: 1 Woche <Num of="m02.points1W" />, 1 Monat <Num of="m02.points1M" />, 3 Monate <Num of="ex.fwdPointsMM" />, 6 Monate <Num of="m02.points6M" />, 1 Jahr <Num of="m02.points1Y" /> Pips. Eine Faustregel genügt meist: Points ≈ Spot · Zinsdifferenz · Laufzeit. Für 3 Monate gibt das <Num of="m02.pointsApprox" /> Pips, nahe am exakten Wert.
 
-Aufs Jahr gerechnet beträgt der Abschlag <Num of="m02.premPa" />. Das ist fast genau die Zinsdifferenz CHF minus USD von <Num of="m02.rateDiff" />.
+Aufs Jahr gerechnet beträgt der Abschlag <Num of="m02.discountPa" />. Das ist fast genau der Zinsvorsprung des Dollars von <Num of="m02.usdLead" />.
 
-Und wenn sich ein Zins ändert? Steigt der CHF-Zins auf <Num of="m02.whatIfRd" />, kommt eine Cost von <Num of="m02.whatIfCostPips" /> Pips dazu. Die 3-Monats-Points schrumpfen auf <Num of="m02.whatIfPoints" />, der Forward steigt auf <Num of="m02.whatIfFwd" />. Der Spot hat sich dabei nicht bewegt.
+Und wenn sich ein Zins ändert? Steigt der CHF-Zins auf <Num of="m02.whatIfRd" />, kommt eine Cost von <Num of="m02.whatIfCostPips" /> Pips dazu. Die 3-Monats-Points schrumpfen auf <Num of="m02.whatIfPoints" /> Pips, der Forward steigt auf <Num of="m02.whatIfFwd" />. Der Spot hat sich dabei nicht bewegt.
 
 ### Ein Forward ist keine Prognose
 
 Der 1-Jahres-Forward steht bei <Num of="m02.fwd1Y" />, <Num of="m02.points1YAbs" /> Pips unter dem Spot. Heisst das, der Markt erwartet einen schwächeren Dollar? Nein. Der Forward folgt allein aus Spot und Zinsen. Tausch in der Grafik die beiden Zinsen: Die Points springen ins Plus, obwohl niemand seine Meinung über den Dollar geändert hat.
 
-Wer den Dollar mit dem höheren Zins hält, verdient diesen Zinsvorteil, den **Carry**. Im Forward ist er schon eingepreist. Ob der Kurs in einem Jahr höher oder tiefer steht, weiss niemand. Carry als Abwägung von Kosten und Nutzen ist ein Thema von Modul 09.
+Wer Dollars hält, verdient den höheren Zins. Diesen Zinsvorsprung nennt man **Carry**. Im Forward ist er schon eingepreist: Der Abschlag gibt ihn genau wieder ab. Wer Dollars nur wegen des Zinses hält, gewinnt darum nur, wenn der Dollar bei Fälligkeit über dem Forward steht. Ob er das tut, weiss niemand. Carry als Abwägung von Kosten und Nutzen ist Thema von Modul 09.
 
 <Callout variant="note" title="Contango ist kein FX-Begriff">
 
@@ -65,7 +65,7 @@ Beide Teile sind durch 1 + <i>r</i><sub>USD</sub> · <i>t</i> geteilt. Der Grund
 
 Forward Points haben wie der Spot einen Bid und einen Offer. Die Händler nennen nur die Pips, ohne Vorzeichen. Ist die erste Zahl grösser als die zweite, ziehst du die Points vom Spot ab: Abschlag. Ist sie kleiner, zählst du sie dazu: Aufschlag.
 
-Standardlaufzeiten sind 1W, 1M, 2M, 3M, 6M, 9M und 1Y. Für Daten dazwischen (Broken Dates) interpoliert man zwischen den Nachbarn.
+Standardlaufzeiten sind 1W, 1M, 2M, 3M, 6M, 9M und 1Y. Sie zählen ab dem Spot-Valutatag (T+2, Modul 01): Ein 3M-Forward ist drei Monate nach der Spot-Valuta fällig, nicht drei Monate nach dem Abschluss. Für Daten dazwischen (Broken Dates) interpoliert man zwischen den Nachbarn.
 
 </Desk>
 

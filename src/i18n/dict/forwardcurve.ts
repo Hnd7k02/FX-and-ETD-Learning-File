@@ -36,6 +36,7 @@ export const forwardcurve = defineDict({
     'fc.prem.label': 'Aufschlag p. a.',
     'fc.prem.labelNeg': 'Abschlag p. a.',
     'fc.prem.sub': '≈ Zinsdifferenz CHF − USD = {diff}',
+    'fc.prem.subNeg': '≈ Zinsdifferenz USD − CHF = {diff}',
     'fc.insight.discount':
       'Der USD-Zins ist höher als der CHF-Zins. Wer Dollars hält, verdient mehr Zins, als der Kaufpreis in Franken kostet (Benefit > Cost). Darum liegt der Forward unter dem Spot: Der USD notiert mit Abschlag.',
     'fc.insight.premium':
@@ -90,6 +91,7 @@ export const forwardcurve = defineDict({
     'fc.prem.label': 'Premium p.a.',
     'fc.prem.labelNeg': 'Discount p.a.',
     'fc.prem.sub': '≈ rate differential CHF − USD = {diff}',
+    'fc.prem.subNeg': '≈ rate differential USD − CHF = {diff}',
     'fc.insight.discount':
       'The USD rate is higher than the CHF rate. Holding dollars earns more interest than the purchase price in francs costs (benefit > cost). So the forward sits below spot: the USD trades at a discount.',
     'fc.insight.premium':

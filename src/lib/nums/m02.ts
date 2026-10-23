@@ -169,6 +169,18 @@ export const nums: NumTable = {
     note: 'Annualised forward premium (F/S − 1)·360/90',
   },
   'm02.rateDiff': { value: M.rd - M.rf, kind: 'pct', digits: 1, sign: true, note: 'rd − rf' },
+  'm02.discountPa': {
+    value: Math.abs(p3m.premiumPa),
+    kind: 'pct',
+    digits: 2,
+    note: 'Annualised forward discount, absolute (text: "der Abschlag beträgt …")',
+  },
+  'm02.usdLead': {
+    value: M.rf - M.rd,
+    kind: 'pct',
+    digits: 1,
+    note: 'Rate advantage of the dollar, rf − rd (positive in the example)',
+  },
   'm02.points1W': { value: tenor('1W').points, kind: 'pips' },
   'm02.points1M': { value: tenor('1M').points, kind: 'pips' },
   'm02.points6M': { value: tenor('6M').points, kind: 'pips' },

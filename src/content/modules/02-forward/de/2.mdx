@@ -7,7 +7,7 @@ Woher kommt der Forward von <Num of="m02.fwd" />? Die Bank rät ihn nicht. Sie f
 - **Weg A, der Forward.** Kaufe die Dollars heute auf Termin. In 3 Monaten zahlst du den vereinbarten Kurs.
 - **Weg B, der Geldmarkt.** Leihe heute Franken, kaufe damit sofort Dollars und lege sie bis zum Zahltag an.
 
-Beide Wege sind gleich sicher. Auf keinem spielt der Kurs in 3 Monaten noch eine Rolle. Und beide enden gleich: mit USD 1 Mio. am Zahltag und einem festen Betrag in Franken, den du dafür zahlst. Dann müssen sie auch gleich viel kosten. Sonst würde jeder den billigeren Weg nehmen und den teureren verkaufen. Diese Idee heisst **gedeckte Zinsparität** (Covered Interest Parity).
+Beide Wege sind gleich sicher. Auf keinem spielt der Kurs in 3 Monaten noch eine Rolle. Und beide enden gleich: mit USD 1 Mio. am Zahltag und einem festen Betrag in Franken, den du dafür zahlst. Dann müssen sie auch gleich viel kosten. Sonst würde jeder den billigeren Weg nehmen und den teureren verkaufen (Abschnitt 4). Diese Idee heisst **gedeckte Zinsparität** (Covered Interest Parity). «Gedeckt» heisst: Der Kurs ist auf beiden Wegen schon heute fixiert.
 
 <ParityPathsFigure caption="Links Weg A, rechts Weg B, die Zeit läuft nach unten. Spiel die Schritte ab oder geh sie einzeln durch. Ändere danach die Zinsen und die Laufzeit: Beide Wege kosten immer gleich viel." />
 
@@ -58,7 +58,7 @@ Sei <i>S</i> der Spot in CHF je USD, <i>N</i> der USD-Betrag bei Fälligkeit, <i
 
 **Stetig.** Mit stetigen Zinsen wird aus dem Zinsfaktor 1 + <i>r</i> · <i>t</i> der Faktor e<sup><i>r</i> · <i>T</i></sup>, und der Quotient zweier Exponentialfunktionen ist e<sup>(<i>r</i><sub>d</sub> − <i>r</i><sub>f</sub>) · <i>T</i></sup>.
 
-**Woher die <Num of="ex.fwdDiffPips" /> Pips kommen.** Im Beispiel ist <i>T</i> = <Num of="ex.T" /> in beiden Welten. Der Geldmarkt diskontiert den Dollar mit 1 / <Num of="m02.growthUsd" /> = <Num of="m02.dfMM" />, die stetige Formel mit e<sup>−<i>r</i><sub>f</sub> · <i>T</i></sup> = <Num of="m02.dfCont" />. Der einfache Zins von <Num of="ex.rf" /> über 90 Tage entspricht stetig nur <Num of="m02.rfCont" />. Setzt du diesen Wert ein, liefern beide Formeln denselben Forward.
+**Woher die <Num of="ex.fwdDiffPips" /> Pips kommen.** Im Beispiel ist <i>T</i> = <Num of="ex.T" /> in beiden Welten. Der Geldmarkt diskontiert den Dollar mit 1 / <Num of="m02.growthUsd" /> = <Num of="m02.dfMM" />, die stetige Formel mit e<sup>−<i>r</i><sub>f</sub> · <i>T</i></sup> = <Num of="m02.dfCont" />. Der einfache Zins von <Num of="ex.rf" /> über 90 Tage entspricht stetig nur <Num of="m02.rfCont" />. Setzt du diesen Wert ein, liefern beide Formeln denselben Forward. Den CHF-Zins müsstest du genauso umrechnen; bei <Num of="ex.rd" /> ändert sich nichts.
 
 </Derivation>
 
@@ -66,7 +66,7 @@ Sei <i>S</i> der Spot in CHF je USD, <i>N</i> der USD-Betrag bei Fälligkeit, <i
 
 Am Desk rechnet niemand den Forward aus Leitzinsen. Die Forward Points kommen direkt aus dem Markt für FX Swaps (Modul 03), in dem Banken Währungen auf Zeit tauschen. Die Zinsen darin sind die Sätze, zu denen man eine Währung tatsächlich leihen und anlegen kann.
 
-Darum weicht der Markt-Forward oft leicht von der Formel mit Referenzzinsen ab. Diese Abweichung heisst **Cross-Currency-Basis**. Sie zeigt, wie gefragt eine Währung im Geldmarkt ist. Die Logik der zwei Wege bleibt dieselbe.
+Darum weicht der Markt-Forward oft leicht von der Formel mit Referenzzinsen ab. Diese Abweichung heisst **Cross-Currency Basis**. Sie zeigt, ob es mehr oder weniger kostet, sich eine Währung über FX Swaps zu leihen statt direkt am Geldmarkt. Modul 03 kommt darauf zurück. Die Logik der zwei Wege bleibt dieselbe.
 
 </Desk>
 

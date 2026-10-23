@@ -6,7 +6,7 @@ Unser Importeur muss in 3 Monaten USD 1 Mio. bezahlen. Heute steht USD/CHF bei <
 
 Ein **Forward** löst das Problem. Er ist ein Vertrag, den der Importeur heute mit seiner Bank abschliesst: In 3 Monaten kauft er USD 1 Mio. zu einem Kurs, der schon heute feststeht. Heute fliesst kein Geld. Am Fälligkeitstag liefert die Bank die Dollars, und der Importeur zahlt die vereinbarten Franken. Kurs heute fixieren, Lieferung später.
 
-Forwards sind kein Spezialprodukt. Im <Fact id="m02-bis-month" /> machten Outright Forwards <Fact id="m02-bis-fwd-share" /> des weltweiten Devisenhandels aus, <Fact id="m02-bis-fwd-growth" /> mehr als drei Jahre zuvor (vorläufige Zahlen der BIZ).
+Forwards sind kein Spezialprodukt. Im <Fact id="m02-bis-month" /> machten Outright Forwards <Fact id="m02-bis-fwd-share" /> des weltweiten Devisenhandels aus. Ihr Umsatz lag <Fact id="m02-bis-fwd-growth" /> über dem von drei Jahren zuvor (vorläufige Zahlen der BIZ).
 
 ### Was der Forward kostet
 
@@ -33,7 +33,7 @@ Das Modell ist um den Forward zentriert. Im Mittel kosten die Dollars ohne Absic
 
 - **Er gewinnt Planbarkeit.** Kosten, Verkaufspreise und Marge stehen heute fest. Ein starker Dollar kann ihm nichts mehr anhaben.
 - **Er gibt die Chance ab.** Fällt der Dollar, profitiert er nicht davon.
-- **Er geht eine Pflicht ein.** Der Forward muss erfüllt werden, auch wenn das Geschäft mit dem Lieferanten platzt. Ein Recht ohne Pflicht ist eine Option, das Thema von Modul 04.
+- **Er geht eine Pflicht ein.** Der Forward muss erfüllt werden, auch wenn das Geschäft mit dem Lieferanten platzt. Er kann ihn dann nur zum aktuellen Marktwert auflösen, und der kann gegen ihn sein. Ein Recht ohne Pflicht ist eine Option, das Thema von Modul 04.
 
 <Derivation title="Herleitung: warum der Forward die Kosten fixiert">
 
@@ -41,7 +41,7 @@ Der Forward ist ein eigener Vertrag. Bei Fälligkeit ist er für den Käufer der
 
 <Formula>Wert bei Fälligkeit = <i>N</i> · (<i>S</i><sub>T</sub> − <i>F</i>)</Formula>
 
-Mit <i>N</i> = USD 1 Mio. ist er bei <i>S</i><sub>T</sub> = <Num of="m02.stUp" /> genau <Num of="m02.fwdValueUp" /> wert, bei <i>S</i><sub>T</sub> = <Num of="m02.stDown" /> <Num of="m02.fwdValueDown" />. Die Auszahlung ist eine Gerade mit Steigung 1: Der Forward ist das lineare Grundinstrument, auf das Modul 04 die Optionen zurückführt.
+Mit <i>N</i> = USD 1 Mio. ist er bei <i>S</i><sub>T</sub> = <Num of="m02.stUp" /> genau <Num of="m02.fwdValueUp" /> wert, bei <i>S</i><sub>T</sub> = <Num of="m02.stDown" /> <Num of="m02.fwdValueDown" />. Pro Dollar ist die Auszahlung eine Gerade mit Steigung 1: Der Forward ist das lineare Grundinstrument, auf das Modul 04 die Optionen zurückführt.
 
 Ohne Absicherung zahlt der Importeur <i>N</i> · <i>S</i><sub>T</sub>. Rechnest du den Wert des Forwards dazu, bleibt in jedem Szenario derselbe Betrag:
 
@@ -57,7 +57,7 @@ Der Kurs bei Fälligkeit kürzt sich weg. Darum ist die schwarze Linie im Chart 
 
 Beim Abschluss ist ein fairer Forward für beide Seiten null wert. Darum zahlt heute niemand etwas. Die Bank verdient an der Marge im Kurs.
 
-Weil der Forward später viel wert werden kann, für die eine oder die andere Seite, prüft die Bank vorher die Bonität des Kunden. Sie gibt ihm eine Linie, bis zu der sie Forwards mit ihm abschliesst. Am Desk heisst ein einfacher Forward **Outright Forward** oder kurz Outright.
+Weil der Forward später viel wert werden kann, für die eine oder die andere Seite, prüft die Bank vorher die Bonität des Kunden. Sie gibt ihm eine Kreditlinie, bis zu der sie Forwards mit ihm abschliesst. Am Desk heisst ein einfacher Forward **Outright Forward** oder kurz Outright.
 
 </Desk>
 

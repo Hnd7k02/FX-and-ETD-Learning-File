@@ -7,7 +7,7 @@ Where does the forward of <Num of="m02.fwd" /> come from? The bank does not gues
 - **Route A, the forward.** Buy the dollars today for future delivery. In 3 months you pay the agreed rate.
 - **Route B, the money market.** Borrow francs today, use them to buy dollars straight away, and deposit the dollars until payment day.
 
-Both routes are equally safe. On neither does the rate in 3 months matter any more. And both end the same way: with USD 1m on payment day and a fixed amount of francs paid for it. So they must also cost the same. Otherwise everybody would take the cheaper route and sell the dearer one. This idea is called **covered interest parity**.
+Both routes are equally safe. On neither does the rate in 3 months matter any more. And both end the same way: with USD 1m on payment day and a fixed amount of francs paid for it. So they must also cost the same. Otherwise everybody would take the cheaper route and sell the dearer one (section 4). This idea is called **covered interest parity**. "Covered" means that on both routes the exchange rate is already fixed today.
 
 <ParityPathsFigure caption="Route A on the left, route B on the right, time runs downwards. Play the steps or go through them one by one. Then change the rates and the term: both routes always cost the same." />
 
@@ -58,7 +58,7 @@ Let <i>S</i> be spot in CHF per USD, <i>N</i> the USD amount at maturity, and <i
 
 **Continuous.** With continuous rates the interest factor 1 + <i>r</i> · <i>t</i> becomes e<sup><i>r</i> · <i>T</i></sup>, and the ratio of two exponentials is e<sup>(<i>r</i><sub>d</sub> − <i>r</i><sub>f</sub>) · <i>T</i></sup>.
 
-**Where the <Num of="ex.fwdDiffPips" /> pips come from.** In the example <i>T</i> = <Num of="ex.T" /> in both worlds. The money market discounts the dollar by 1 / <Num of="m02.growthUsd" /> = <Num of="m02.dfMM" />, the continuous formula by e<sup>−<i>r</i><sub>f</sub> · <i>T</i></sup> = <Num of="m02.dfCont" />. A simple rate of <Num of="ex.rf" /> over 90 days corresponds to only <Num of="m02.rfCont" /> continuously. Plug in that value and both formulas give the same forward.
+**Where the <Num of="ex.fwdDiffPips" /> pips come from.** In the example <i>T</i> = <Num of="ex.T" /> in both worlds. The money market discounts the dollar by 1 / <Num of="m02.growthUsd" /> = <Num of="m02.dfMM" />, the continuous formula by e<sup>−<i>r</i><sub>f</sub> · <i>T</i></sup> = <Num of="m02.dfCont" />. A simple rate of <Num of="ex.rf" /> over 90 days corresponds to only <Num of="m02.rfCont" /> continuously. Plug in that value and both formulas give the same forward. The CHF rate would need the same conversion; at <Num of="ex.rd" /> nothing changes.
 
 </Derivation>
 
@@ -66,7 +66,7 @@ Let <i>S</i> be spot in CHF per USD, <i>N</i> the USD amount at maturity, and <i
 
 On the desk nobody works out the forward from policy rates. Forward points come straight from the FX swap market (module 03), where banks exchange currencies for a period. The rates in it are the rates at which a currency can actually be borrowed and deposited.
 
-That is why the market forward often differs slightly from the formula with reference rates. The difference is called the **cross-currency basis**. It shows how much demand there is for a currency in the money market. The logic of the two routes stays the same.
+That is why the market forward often differs slightly from the formula with reference rates. The difference is called the **cross-currency basis**. It shows whether borrowing a currency through FX swaps costs more or less than borrowing it directly in the money market. Module 03 comes back to it. The logic of the two routes stays the same.
 
 </Desk>
 
