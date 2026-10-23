@@ -157,7 +157,8 @@ describe('bands', () => {
     const xs = Array.from({ length: 121 }, (_, i) => 0.74 + (0.12 * i) / 120);
     const bands = shaperBands(xs, effectiveCurve(pos.legs, m, xs));
     expect(bands.map((b) => b.kind)).toEqual(['cost', 'benefit']);
-    expect(bands[0]!.to).toBeCloseTo(pos.putStrike!, 6);
+    // band edges are found on the 10-pip grid: within one grid step
+    expect(Math.abs(bands[0]!.to - pos.putStrike!)).toBeLessThan(0.001);
     expect(bands[1]!.from).toBeCloseTo(0.8, 6);
   });
 

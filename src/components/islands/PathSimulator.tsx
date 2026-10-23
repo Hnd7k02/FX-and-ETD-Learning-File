@@ -120,7 +120,9 @@ function resolveProducts(ids?: string[]): SimKind[] {
 }
 
 function initialScen(p: PathSimulatorProps, kind: SimKind): Scen {
-  const preset: ScenarioSettings = isPreset(p.preset) ? CFG.presets[p.preset] : { name: 'trendDown' };
+  const preset: ScenarioSettings = isPreset(p.preset)
+    ? CFG.presets[p.preset]
+    : { name: 'trendDown' };
   const name: ScenarioName = isScenario(p.scenario) ? p.scenario : preset.name;
   const days = horizonDays(simProduct(kind));
   const d = defaultScenario(name, days);
@@ -153,6 +155,14 @@ function layoutFor(w: number) {
 }
 
 /** Decimals that show a tick step exactly (0.02 → 2, 0.025 → 3), at least 2, at most 4. */
+/** Reads prefers-reduced-motion synchronously (false outside the browser). */
+function prefersReducedMotion(): boolean {
+  return (
+    typeof window !== 'undefined' &&
+    !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+  );
+}
+
 const ratioDigits = (step: number) => {
   for (let d = 2; d < 4; d++)
     if (Math.abs(Math.round(step * 10 ** d) - step * 10 ** d) < 1e-6) return d;
@@ -256,17 +266,25 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
     return () => cancelAnimationFrame(raf);
   }, [playing, inView, sim, speedIx, view, events, rm]);
 
-  // First view: autoplay once (never under reduced motion; then show the full path).
+  // First view: autoplay once (never under reduced motion; then show the full path). The media
+  // query is read directly: the hook's value arrives one render late.
   useEffect(() => {
     if (started || !inView) return;
     setStarted(true);
-    if (rm || props.autoplay === false) {
+    if (prefersReducedMotion() || props.autoplay === false) {
       setTDay(sim.days);
     } else {
       setTDay(0);
       setPlaying(true);
     }
-  }, [inView, rm]);
+  }, [inView]);
+  // Reduced motion switched on while an autoplay runs: stop and show the result.
+  useEffect(() => {
+    if (rm && playing) {
+      setPlaying(false);
+      setTDay(sim.days);
+    }
+  }, [rm]);
 
   const restart = () => {
     setTDay(0);

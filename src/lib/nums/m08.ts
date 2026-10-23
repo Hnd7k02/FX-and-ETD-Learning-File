@@ -341,6 +341,12 @@ export const nums: NumTable = {
   'm08.tarfUpFwd': { value: M.tarfUp.bench, kind: 'money', sign: true },
   'm08.tarfUpDiff': { value: M.tarfUp.diff, kind: 'money', sign: true },
   'm08.shockGap': { value: M.shockGap, kind: 'pct', digits: 0 },
+  'm08.shockGapAbs': {
+    value: Math.abs(M.shockGap),
+    kind: 'pct',
+    digits: 0,
+    note: 'Size of the gap',
+  },
   'm08.shockDay': { value: M.shockDay, kind: 'num', digits: 0 },
   'm08.tarfShockUsd': { value: M.tarfShock.base, kind: 'money', ccy: 'USD' },
   'm08.tarfShockLev': { value: M.tarfShock.leveraged, kind: 'num', digits: 0 },

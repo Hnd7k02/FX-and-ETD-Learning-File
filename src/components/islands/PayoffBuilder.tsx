@@ -9,6 +9,10 @@
  * - initial?: template shown first (default: the first of `templates`).
  * - view?: 'value' (value today + payoff at expiry, default) or 'pnl' (both after premium).
  * - smile?: true values every option leg at the smile vol of its strike (EXAMPLE_SMILE).
+ * - highlightSolved?: true marks the strike solved for zero cost on the axis (module 06).
+ * - volShock?: true adds a slider for a parallel shift of the implied vol (module 06): the value
+ *   today is repriced at the shifted vol, the premium paid stays at entry, and a stat row shows
+ *   the P&L from the vol move. Both default to off, so modules 04 and others are unchanged.
  *
  * Interaction: drag the strike handles on the x axis (pointer events, one handle per distinct
  * strike); each leg also has a strike slider as the accessible twin. Near the zero-cost strike a
@@ -64,6 +68,21 @@ export interface PayoffBuilderProps {
   initial?: string;
   view?: 'value' | 'pnl';
   smile?: boolean;
+  highlightSolved?: boolean;
+  volShock?: boolean;
+}
+
+/** Vol shock slider (volShock prop): parallel shift in vol points, decimal. */
+const SHOCK_RANGE = { min: -0.03, max: 0.03, step: 0.0025 } as const;
+
+/** The market with its implied vol (flat vol or smile ATM) shifted in parallel by `shift`. */
+function shiftedMarket(m: PayoffMarket, shift: number): PayoffMarket {
+  if (shift === 0) return m;
+  return {
+    ...m,
+    vol: m.vol + shift,
+    smile: m.smile ? { ...m.smile, atm: m.smile.atm + shift } : undefined,
+  };
 }
 
 type View = 'value' | 'pnl';
@@ -173,6 +192,7 @@ export default function PayoffBuilder(props: PayoffBuilderProps): JSX.Element {
   const [change, setChange] = useState<Change>('init');
   const [drag, setDrag] = useState<number[] | null>(null);
   const [interacted, setInteracted] = useState(false);
+  const [shock, setShock] = useState(0);
   const dragRef = useRef<{ group: number[]; pointerId: number } | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const box = useRef<HTMLDivElement>(null);
@@ -207,8 +227,22 @@ export default function PayoffBuilder(props: PayoffBuilderProps): JSX.Element {
       payoff.push(toPips(p) - shift);
       value.push(toPips(v) - shiftToday);
     }
-    let lo = Math.min(0, ...payoff, ...value);
-    let hi = Math.max(0, ...payoff, ...value);
+    // With the vol slider the y range also covers the value at both slider ends, so the axis
+    // stays still while the vol is dragged.
+    const extremes: number[] = [];
+    if (props.volShock) {
+      for (const s of [SHOCK_RANGE.min, SHOCK_RANGE.max]) {
+        const ms = shiftedMarket(market, s);
+        const vs = legs.map((l) => legVol(l, ms));
+        for (const x of XS) {
+          let v = 0;
+          legs.forEach((l, j) => (v += legValue(l, ms, x, ms.T, vs[j])));
+          extremes.push(toPips(v) - shiftToday);
+        }
+      }
+    }
+    let lo = Math.min(0, ...payoff, ...value, ...extremes);
+    let hi = Math.max(0, ...payoff, ...value, ...extremes);
     const span = Math.max(hi - lo, MIN_SPAN_PIPS);
     const pad = span * 0.1;
     const step = niceStep(span + 2 * pad, 5);
@@ -226,15 +260,36 @@ export default function PayoffBuilder(props: PayoffBuilderProps): JSX.Element {
       domain: [lo, hi] as [number, number],
       spotPips: view === 'pnl' ? 0 : prem.pips,
     };
-  }, [legs, market, view]);
+  }, [legs, market, view, props.volShock]);
+
+  /* ---------- vol shock: value today repriced at the shifted vol (premium stays at entry) ---------- */
+  const shocked = useMemo(() => {
+    if (shock === 0) return { value: calc.value, spotPips: calc.spotPips, pnl: 0 };
+    const ms = shiftedMarket(market, shock);
+    const vs = legs.map((l) => legVol(l, ms));
+    const toPips = (q: number) => q / N / PIP;
+    const shiftToday = view === 'pnl' ? toPips(calc.prem.quote) : 0;
+    const value = XS.map((x) => {
+      let v = 0;
+      legs.forEach((l, j) => (v += legValue(l, ms, x, ms.T, vs[j])));
+      return toPips(v) - shiftToday;
+    });
+    let now = 0;
+    legs.forEach((l, j) => (now += legValue(l, ms, ms.S, ms.T, vs[j])));
+    return {
+      value,
+      spotPips: toPips(now) - shiftToday,
+      pnl: now - calc.prem.quote,
+    };
+  }, [calc, shock]);
 
   /* ---------- tweens: curves morph, numbers count, instant while dragging ---------- */
   const instant = rm || drag !== null || change === 'slider' || change === 'init';
-  const net = useTween([...calc.payoff, ...calc.value], 300, instant);
+  const net = useTween([...calc.payoff, ...shocked.value], 300, instant);
   const legFlat = useTween(calc.legCurves.flat(), 300, instant);
   const dom = useTween(calc.domain, 300, instant);
   const premTween = useTween(calc.prem.pips, 300, instant);
-  const spotTween = useTween(calc.spotPips, 300, instant);
+  const spotTween = useTween(shocked.spotPips, 300, instant);
 
   /* ---------- live announcement of zero cost ---------- */
   const [live, setLive] = useState('');
@@ -443,8 +498,15 @@ export default function PayoffBuilder(props: PayoffBuilderProps): JSX.Element {
 
   const hasLong = legs.some((l) => l.side === 'long' && l.kind !== 'forward');
   const hasShort = legs.some((l) => l.side === 'short' && l.kind !== 'forward');
+  const baseVol = market.smile ? market.smile.atm : market.vol;
+  const volNow = fmtPct(baseVol + shock, lang, 1);
   const legend: LegendItem[] = [
-    { label: t(view === 'pnl' ? 'pb.lg.pnlToday' : 'pb.lg.value'), color: 'var(--ff-long)' },
+    {
+      label: props.volShock
+        ? t(view === 'pnl' ? 'pb.lg.pnlTodayVol' : 'pb.lg.valueVol', { vol: volNow })
+        : t(view === 'pnl' ? 'pb.lg.pnlToday' : 'pb.lg.value'),
+      color: 'var(--ff-long)',
+    },
     {
       label: t(view === 'pnl' ? 'pb.lg.pnlExpiry' : 'pb.lg.payoff'),
       color: 'var(--ff-payoff)',
@@ -495,6 +557,7 @@ export default function PayoffBuilder(props: PayoffBuilderProps): JSX.Element {
       data-template={templateNow ?? 'custom'}
       data-zero-cost={prem.zeroCost ? 'true' : 'false'}
       data-premium-pips={prem.pips.toFixed(4)}
+      data-vol-shock={props.volShock ? shock.toFixed(4) : undefined}
     >
       <div class="ff-lab-head">
         <div class="pb-head-text">
@@ -729,7 +792,7 @@ export default function PayoffBuilder(props: PayoffBuilderProps): JSX.Element {
                 r={6}
                 style={{ fill: 'var(--ff-long)', stroke: '#fff', strokeWidth: 2.5 }}
               />
-              {prem.zeroCost ? (
+              {prem.zeroCost && shock === 0 ? (
                 <g class="pb-aha" key="aha">
                   <text
                     x={ahaX}
@@ -785,16 +848,56 @@ export default function PayoffBuilder(props: PayoffBuilderProps): JSX.Element {
                 const sides = new Set(gr.legs.map((i) => tagColor(legs[i]!.side, legs[i]!.kind)));
                 const color = sides.size === 1 ? [...sides][0]! : 'var(--ff-forward)';
                 const active = drag !== null && drag.join() === gr.legs.join();
+                const solvedHere =
+                  !!props.highlightSolved &&
+                  solve !== null &&
+                  gr.legs.includes(solve) &&
+                  prem.zeroCost;
                 return (
                   <g
                     key={`h${gr.legs.join('-')}`}
                     class={`pb-handle${active ? ' is-active' : ''}`}
                     data-handle={gr.legs.join('-')}
+                    data-solved={solvedHere ? 'true' : undefined}
                     onPointerDown={onDown(gr.legs)}
                     onPointerMove={onMove}
                     onPointerUp={onUp}
                     onPointerCancel={onUp}
                   >
+                    {solvedHere && (
+                      <g class="pb-solved" key={`solved-${solve}`}>
+                        <rect
+                          x={x - w / 2 - 5}
+                          y={cy - 16}
+                          width={w + 10}
+                          height={32}
+                          rx={16}
+                          style={{
+                            fill: 'var(--ff-good-soft)',
+                            stroke: 'var(--ff-good-text)',
+                            strokeWidth: 1.5,
+                          }}
+                        />
+                        {!active && (
+                          <text
+                            x={clamp(x, L.left + 50, L.width - L.right - 50)}
+                            y={cy - 24}
+                            style={{
+                              fontSize: `${L.font}px`,
+                              fontWeight: 800,
+                              fill: 'var(--ff-good-text-strong)',
+                              textAnchor: 'middle',
+                              paintOrder: 'stroke',
+                              stroke: '#fff',
+                              strokeWidth: 4,
+                              strokeLinejoin: 'round',
+                            }}
+                          >
+                            {t('pb.solved', { k: fmtRate(gr.strike, PAIR) })}
+                          </text>
+                        )}
+                      </g>
+                    )}
                     <rect
                       x={x - 24}
                       y={cy - 22}
@@ -864,6 +967,34 @@ export default function PayoffBuilder(props: PayoffBuilderProps): JSX.Element {
         </div>
 
         <div class="ff-lab-side">
+          {props.volShock && (
+            <div class="panel pb-shock">
+              <Slider
+                id={`pb-${uid}-vol`}
+                label={t('pb.shock')}
+                value={shock}
+                min={SHOCK_RANGE.min}
+                max={SHOCK_RANGE.max}
+                step={SHOCK_RANGE.step}
+                valueText={t('pb.shockValue', {
+                  vol: volNow,
+                  shift: fmtNumber(shock * 100, lang, { digits: 2, sign: true }),
+                })}
+                onInput={(v) => {
+                  setInteracted(true);
+                  setChange('slider');
+                  setShock(Math.abs(v) < 1e-9 ? 0 : v);
+                }}
+              />
+              <p class="pb-shock-note" data-shock-pnl={shocked.pnl.toFixed(2)}>
+                {shock === 0
+                  ? t('pb.shockHint')
+                  : t(shocked.pnl >= 0 ? 'pb.shockGain' : 'pb.shockLoss', {
+                      chf: chf(Math.abs(shocked.pnl)),
+                    })}
+              </p>
+            </div>
+          )}
           <StatTable>
             <StatHero
               label={t('pb.premium')}
@@ -879,7 +1010,13 @@ export default function PayoffBuilder(props: PayoffBuilderProps): JSX.Element {
               })}
               value={deltaRatio}
             />
-            <StatRow symbol="ν" label={t('pb.vega')} sub={t('pb.vegaSub')} value={chf(g.vega)} />
+            <StatRow
+              symbol="ν"
+              label={t('pb.vega')}
+              sub={t('pb.vegaSub')}
+              value={chf(g.vega)}
+              highlight={!!props.volShock}
+            />
             <StatRow symbol="Θ" label={t('pb.theta')} sub={t('pb.thetaSub')} value={chf(g.theta)} />
             <StatRow
               label={t('pb.maxGain')}

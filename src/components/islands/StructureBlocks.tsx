@@ -120,8 +120,14 @@ export default function StructureBlocks(props: StructureBlocksProps): JSX.Elemen
   useEffect(() => {
     if (started || !inView) return;
     setStarted(true);
-    if (story && !rm && props.autoplay !== false && stepNow < last) setPlaying(true);
-  }, [inView, rm]);
+    const reduce =
+      typeof window !== 'undefined' &&
+      !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    if (story && !reduce && props.autoplay !== false && stepNow < last) setPlaying(true);
+  }, [inView]);
+  useEffect(() => {
+    if (rm && playing) setPlaying(false);
+  }, [rm]);
   useEffect(() => {
     if (!playing || !inView) return;
     const id = setTimeout(() => {
@@ -211,7 +217,7 @@ export default function StructureBlocks(props: StructureBlocksProps): JSX.Elemen
     if (stepNow === 1) {
       return t(`sb.text.leveraged.${side}`, {
         k: rate(st.strike),
-        d: pipsTxt(Math.abs(st.strike - F) / PIP),
+        d: pipsTxt(Math.abs(st.strike - F) / PIP, 0),
       });
     }
     const prod = MC_PRODUCTS.products[kind].product as unknown as Record<string, number>;
@@ -316,7 +322,7 @@ export default function StructureBlocks(props: StructureBlocksProps): JSX.Elemen
     const st = stages[i]!;
     const d = (st.strike - F) / PIP;
     if (i === 0) return rate(st.strike);
-    const base = `${rate(st.strike)} · ${t('sb.pipsDiff', { v: pipsTxt(d, 1) })}`;
+    const base = `${rate(st.strike)} · ${t('sb.pipsDiff', { v: fmtPips(d, lang, 0, true) })}`;
     return i === last ? `${base} · ± ${se}` : base;
   };
   const blockLabelPos = (b: BlockLine): [number, number, 'start' | 'end'] => {

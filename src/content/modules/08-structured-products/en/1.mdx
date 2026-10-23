@@ -1,0 +1,69 @@
+import StructureBlocksFigure from '@/components/figures/StructureBlocksFigure.astro';
+
+{/* 08 Structured products · Section 1 · Intuition. Numbers only via <Num />, registry src/lib/nums/m08.ts. */}
+
+The importer has to pay USD 1m in 3 months. With a forward he locks in the rate <Num of="ex.forward" digits={4} /> today. Clean, but not exciting.
+
+Then an offer arrives. Instead of buying everything at once, he buys the dollars spread over half a year: <Num of="m08.accNotional" /> every week, <Num of="m08.accTotal" /> in total. The rate is <Num of="m08.accStrike" />. That is <Num of="m08.accBetter" digits={0} /> pips better than the forward at the average fixing date (<Num of="m08.accFwd" />). There is no premium. Where is the catch?
+
+### Nothing is free
+
+A rate better than the forward has to be paid for. With structured products you do not pay with money but with **sold options**. You take on risks you would not have with the forward. In return the products are ‘zero cost’: at inception they are worth exactly nothing. What you gain in one place, you give back in another.
+
+Two ingredients appear almost every time:
+
+- **Leverage.** If the rate moves against you, you trade twice the amount. Gains grow at single speed, losses at double speed.
+- **Path dependence.** Whether the product keeps running depends on the path of the rate. A knock-out ends everything as soon as the rate reaches a barrier. A target ends everything as soon as enough gain has built up. The final rate alone tells you little.
+
+<StructureBlocksFigure
+  products={['accumulator', 'tarf']}
+  caption="Three steps from the forward to the accumulator. Each building block improves the strike. Drag the fixing to the left: below the strike the product loses twice as fast."
+/>
+
+### Worked example: where the pips come from
+
+The chart builds the accumulator in three steps. Each step sells the provider something, and each one moves the strike:
+
+1. **Forward.** A bought call and a sold put at the same strike make a forward. Zero cost at <Num of="m08.accFwd" />.
+2. **A second sold put.** Its premium pays for a better strike: <Num of="m08.accK2" />, that is <Num of="m08.accK2Pips" digits={0} /> pips better. In return you buy twice the amount below the strike.
+3. **Knock-out at <Num of="m08.accBarrier" />.** If the rate rises that far, everything ends. You give up the best scenarios. The strike falls by another <Num of="m08.accKoPips" digits={0} /> pips to <Num of="m08.accStrike" />.
+
+<Formula variant="accent"><Num of="m08.accFwd" /> − <Num of="m08.accK2Pips" digits={0} /> pips − <Num of="m08.accKoPips" digits={0} /> pips = <b><Num of="m08.accStrike" /></b></Formula>
+
+Step 2 can be calculated with the Garman-Kohlhagen formula. For step 3 there is no simple formula any more, because the knock-out depends on the whole path. Monte Carlo helps here: <Num of="m08.paths" /> simulated paths, with the strike solved so that the present value is zero. The standard error is <Num of="m08.accSe" /> pips. The gap to the forward is therefore real, not simulation noise.
+
+Why the forward at the average fixing date? The <Num of="m08.accFixings" /> fixings fall between week 1 and week 26. On average the importer buys on day <Num of="m08.accAvgDay" />, roughly after 3 months. That is where the fair comparison lies.
+
+<Callout variant="note" title="Simplified, generic examples">
+
+All products in this module are simplified and generic: market variants differ. Fixings, barrier, leverage and target are example values. Strike and coupon are always solved so that the product is worth zero at inception. In practice the quoted rate also contains the provider's margin.
+
+</Callout>
+
+<Derivation title="Derivation: what ‘zero cost’ means">
+
+**1.** The present value of a product is the discounted expected sum of its payments, calculated in the risk-neutral model: on average the rate grows at <i>r</i><sub>d</sub> − <i>r</i><sub>f</sub>, exactly like the forward.
+
+**2.** Without the knock-out, the accumulator is a series of one bought call and two sold puts per fixing. Zero cost means:
+
+<Formula><span>Σ<sub><i>i</i></sub> [ <i>C</i>(<i>K</i>, <i>t</i><sub><i>i</i></sub>) − 2 · <i>P</i>(<i>K</i>, <i>t</i><sub><i>i</i></sub>) ] = 0, <i>t</i><sub><i>i</i></sub> = day<sub><i>i</i></sub> / 365</span></Formula>
+
+The sum falls as <i>K</i> rises. The solution is <i>K</i><sub>2</sub> = <Num of="m08.accK2" />. With only one sold put it would be the forward: a call minus a put at the same strike is a forward (put-call parity).
+
+**3.** With the knock-out, the engine simulates daily rate paths, applies the product's rules to each path and averages the discounted payments. A root finder searches for the strike, always on the same paths.
+
+**4.** The standard error of the strike follows from the standard error of the present value divided by the slope of the present value with respect to the strike: SE(<i>K</i>) = SE(PV) / |∂PV/∂<i>K</i>|.
+
+</Derivation>
+
+<Desk title="Who is on the other side?">
+
+Every option you sell inside the product is bought by the provider. The provider hedges it in the market and earns the margin built into the rate. For you one simple question counts: which options am I selling, and in which scenario do they become expensive? If you cannot answer that question, you should not sign the product.
+
+</Desk>
+
+<Takeaway>
+
+A rate better than the forward always costs something. You pay for it with sold options: with leverage and path risk instead of a premium.
+
+</Takeaway>

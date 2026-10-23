@@ -77,16 +77,15 @@ export function smileGeometry(q: SmileQuotes, F: number, T: number): SmileGeomet
   };
 }
 
-const roundTo = (x: number, step: number) => Number((Math.round(x / step) * step).toFixed(6));
 const clampTo = (x: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, x));
 
-/** Quotes clamped to the slider ranges and rounded to their steps. */
+/** Quotes clamped to the slider ranges (drags may land between slider steps). */
 export function clampQuotes(q: SmileQuotes): SmileQuotes {
   const L = SMILE_LIMITS;
   return {
-    atm: clampTo(roundTo(q.atm, L.atm.step), L.atm.min, L.atm.max),
-    rr25: clampTo(roundTo(q.rr25, L.rr.step), L.rr.min, L.rr.max),
-    bf25: clampTo(roundTo(q.bf25, L.bf.step), L.bf.min, L.bf.max),
+    atm: clampTo(q.atm, L.atm.min, L.atm.max),
+    rr25: clampTo(q.rr25, L.rr.min, L.rr.max),
+    bf25: clampTo(q.bf25, L.bf.min, L.bf.max),
   };
 }
 
@@ -94,16 +93,20 @@ export function clampQuotes(q: SmileQuotes): SmileQuotes {
  * New quotes after dragging one pillar to vol `v`:
  * - ATM: the whole smile moves in parallel (RR and BF unchanged, like the ATM slider);
  * - a wing: only that wing's vol changes, ATM and the other wing stay, so RR and BF follow.
- * RR and BF snap to zero within SNAP_TOL (that is where the aha annotations appear); the result
- * is clamped to the slider ranges.
+ * Near "both wings level" the dragged wing snaps onto the other one (RR = 0); near "wings
+ * average ATM" it snaps so that BF = 0. That is where the aha annotations appear. The result is
+ * clamped to the slider ranges.
  */
 export function dragPillar(q: SmileQuotes, which: Pillar, v: number): SmileQuotes {
   if (which === 'atm') return clampQuotes({ ...q, atm: v });
-  const c = which === 'call25' ? v : vol25Call(q);
-  const p = which === 'put25' ? v : vol25Put(q);
-  const next = quotesFromVols(q.atm, c, p);
-  if (Math.abs(next.rr25) < SNAP_TOL) next.rr25 = 0;
-  if (Math.abs(next.bf25) < SNAP_TOL) next.bf25 = 0;
+  const other = which === 'call25' ? vol25Put(q) : vol25Call(q);
+  let dragged = v;
+  if (Math.abs(dragged - other) < SNAP_TOL) dragged = other;
+  else if (Math.abs(0.5 * (dragged + other) - q.atm) < SNAP_TOL / 2) dragged = 2 * q.atm - other;
+  const next =
+    which === 'call25' ? quotesFromVols(q.atm, dragged, other) : quotesFromVols(q.atm, other, dragged);
+  if (Math.abs(next.rr25) < 1e-12) next.rr25 = 0;
+  if (Math.abs(next.bf25) < 1e-12) next.bf25 = 0;
   return clampQuotes(next);
 }
 
@@ -171,7 +174,8 @@ export function premiumEffect(
 export function volDomain(g: SmileGeometry, atm: number): [number, number] {
   const lo = Math.min(g.minVol, atm - 0.02);
   const hi = Math.max(g.maxVol, atm + 0.03);
-  return [Math.max(0, Math.floor(lo * 100 - 1e-9) / 100), Math.ceil(hi * 100 + 1e-9) / 100];
+  const pts = (x: number) => Number((x * 100).toFixed(6));
+  return [Math.max(0, Math.floor(pts(lo)) / 100), Math.ceil(pts(hi)) / 100];
 }
 
 /** True if two quote sets are equal within half a slider step. */
