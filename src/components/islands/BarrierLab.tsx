@@ -222,12 +222,7 @@ export default function BarrierLab({ lang, initial }: BarrierLabProps): JSX.Elem
       )}
     </g>
   );
-  const yGrid = (
-    L: ReturnType<typeof chartLayout>,
-    y: typeof yV,
-    ticks: number[],
-    fmt: (v: number) => string,
-  ) => (
+  const yGrid = (y: typeof yV, ticks: number[], fmt: (v: number) => string) => (
     <g>
       {ticks.map((v) => (
         <g key={`g${v}`}>
@@ -396,7 +391,7 @@ export default function BarrierLab({ lang, initial }: BarrierLabProps): JSX.Elem
               </clipPath>
             </defs>
             {zone(LV)}
-            {yGrid(LV, yV, vTicks.ticks, (v) => num(v, vTicks.digits))}
+            {yGrid(yV, vTicks.ticks, (v) => num(v, vTicks.digits))}
             {vline(LV, s.strike, 'm7-ref')}
             <text
               x={x(s.strike) + (s.strike < s.barrier ? -6 : 6)}
@@ -488,7 +483,7 @@ export default function BarrierLab({ lang, initial }: BarrierLabProps): JSX.Elem
               </clipPath>
             </defs>
             {zone(LD)}
-            {yGrid(LD, yD, dTicks.ticks, (v) => num(v, dTicks.digits))}
+            {yGrid(yD, dTicks.ticks, (v) => num(v, dTicks.digits))}
             {vline(LD, s.strike, 'm7-ref')}
             <g clip-path={`url(#${clipD})`}>
               <path d={P(curves.vanillaDelta, yD)} class="m7-compare" />

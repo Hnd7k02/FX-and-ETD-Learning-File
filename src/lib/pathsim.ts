@@ -21,7 +21,12 @@
 import { forwardContinuous } from '@/lib/fx/forward';
 import { MC_PRODUCTS, fairProduct } from '@/lib/fx/mc/fair';
 import { GbmPathSource } from '@/lib/fx/mc/gbm';
-import { productPayoff, type Cashflow, type EndReason, type PayoffResult } from '@/lib/fx/mc/payoffs';
+import {
+  productPayoff,
+  type Cashflow,
+  type EndReason,
+  type PayoffResult,
+} from '@/lib/fx/mc/payoffs';
 import {
   DEFAULT_MARKET,
   MC_CONFIG,
@@ -200,12 +205,8 @@ export function paramRange(kind: SimKind): [number, number, number] {
       const step = c.strikeStep;
       // Buyers (accumulator, TARF) get a strike below the forward, sellers above.
       const below = f.value < f.forwardAvg;
-      const lo = below
-        ? f.value - c.strikeBeyondFair
-        : f.forwardAvg - c.strikeBeyondForward;
-      const hi = below
-        ? f.forwardAvg + c.strikeBeyondForward
-        : f.value + c.strikeBeyondFair;
+      const lo = below ? f.value - c.strikeBeyondFair : f.forwardAvg - c.strikeBeyondForward;
+      const hi = below ? f.forwardAvg + c.strikeBeyondForward : f.value + c.strikeBeyondFair;
       return [snap(lo, step), snap(hi, step), step];
     }
   }
@@ -216,7 +217,8 @@ export function paramRange(kind: SimKind): [number, number, number] {
 // ---------------------------------------------------------------------------------------------
 
 /** A horizontal level of a product: strike, barrier, pivot or range bound. */
-export type LevelKey = 'strike' | 'barrier' | 'pivot' | 'lower' | 'upper' | 'lowerStrike' | 'upperStrike';
+export type LevelKey =
+  'strike' | 'barrier' | 'pivot' | 'lower' | 'upper' | 'lowerStrike' | 'upperStrike';
 
 export interface ProductLevel {
   key: LevelKey;
@@ -317,7 +319,13 @@ export function defaultScenario(name: ScenarioName, days: number): Required<Scen
   const base = { name, move: 0, gap: 0, gapDay: 0, seed: s.random.seed };
   if (name === 'random') return base;
   if (name === 'shock') {
-    return { ...base, move: s.shock.move, gap: s.shock.gap, gapDay: shockDay(days), seed: s.shock.seed };
+    return {
+      ...base,
+      move: s.shock.move,
+      gap: s.shock.gap,
+      gapDay: shockDay(days),
+      seed: s.shock.seed,
+    };
   }
   return { ...base, move: s[name].move, seed: s[name].seed };
 }
@@ -344,15 +352,7 @@ export function scenarioFor(
 
 /** What a fixing row shows. 'none' = after the product ended (not traded any more). */
 export type RowKind =
-  | 'buy'
-  | 'buyLev'
-  | 'sell'
-  | 'sellLev'
-  | 'coupon'
-  | 'payment'
-  | 'ko'
-  | 'target'
-  | 'none';
+  'buy' | 'buyLev' | 'sell' | 'sellLev' | 'coupon' | 'payment' | 'ko' | 'target' | 'none';
 
 /** One scheduled fixing of a simulated path (one row of the cash-flow table). */
 export interface FixingRow {
@@ -471,14 +471,16 @@ export function simulate(
     const forward = forwardToDay(day, market);
     const cfs = byFixing.get(i + 1) ?? [];
     const active = i <= endIndex;
-    const { kind: rk, leveraged } = active ? rowKind(cfs, N) : { kind: 'none' as const, leveraged: false };
+    const { kind: rk, leveraged } = active
+      ? rowKind(cfs, N)
+      : { kind: 'none' as const, leveraged: false };
     const pnl = cfs.reduce((s, c) => s + c.pnlQuote, 0);
     const amountBase = cfs.reduce((s, c) => s + c.amountBase, 0);
     const amountQuote = cfs.reduce((s, c) => s + c.amountQuote, 0);
     const rate = cfs.find((c) => c.rate !== null)?.rate ?? null;
     const marker = cfs.find((c) => c.kind === 'ko' || c.kind === 'target');
     if (cfs.length) progress = cfs[cfs.length - 1]!.targetProgress;
-    let bench = 0;
+    let bench: number;
     let needBase = 0;
     if (benchmark === 'forwardBuy') {
       bench = (spot - forward) * N;

@@ -47,6 +47,11 @@ export const M07_CONFIG = {
   },
   /** Rebate example of section 2, in pips per USD (choice). */
   rebatePips: 20,
+  /**
+   * Loss scenario of section 1 (choice): USD/CHF ends 60 pips above the up barrier, so the
+   * up-and-out call is gone and the importer pays the market rate.
+   */
+  lossSpotPips: 60,
   /** Spot "close to the barrier" for the delta example of section 2 (choice: 40 pips below). */
   nearBarrierPips: 40,
   /**

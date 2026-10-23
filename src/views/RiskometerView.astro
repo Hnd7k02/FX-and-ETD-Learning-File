@@ -552,6 +552,10 @@ const footMethod = t('rk.footMethod', {
     border: 1px solid var(--ff-line);
     border-radius: var(--ff-r-box);
   }
+  .rk-table:focus-visible {
+    outline: 2px solid var(--ff-linear);
+    outline-offset: 2px;
+  }
   .rk-table[hidden] {
     display: none;
   }
@@ -783,7 +787,12 @@ const footMethod = t('rk.footMethod', {
     .rk-table .ff-table td {
       padding: 8px 8px;
       font-size: 13px;
+    }
+    .rk-table .ff-table td {
       white-space: nowrap;
+    }
+    .rk-table .ff-table th.num {
+      white-space: normal;
     }
     .rk-table-caption {
       padding: 8px;

@@ -56,6 +56,7 @@ const touchUp = touchProbability({ S, H: Hu, T, vol, rd, rf });
 const touchDown = touchProbability({ S, H: Hd, T, vol, rd, rf });
 /** Risk-neutral P(S_T ≥ H_up) = N(d2) at K = H, the "end above" probability. */
 const endAboveUp = digitalCash(S, Hu, T, vol, rd, rf, 'call') / Math.exp(-rd * T);
+const lossSpot = Number((Hu + C.lossSpotPips * PIP).toFixed(4));
 
 /* ---------- Section 2 ---------- */
 const lab = labNumbers(defaultLabState());
@@ -154,6 +155,13 @@ export const nums: NumTable = {
   'm07.endAboveUp': { value: endAboveUp, kind: 'pct', digits: 1, note: 'P(S_T ≥ 0.8240)' },
   'm07.endAboveUp2': { value: 2 * endAboveUp, kind: 'pct', digits: 1, note: '2 · P(S_T ≥ H)' },
   'm07.touchUp1': { value: touchUp, kind: 'pct', digits: 1 },
+  'm07.lossSpot': { value: lossSpot, kind: 'rate', note: 'Loss scenario: spot at expiry' },
+  'm07.lossChf': {
+    value: (lossSpot - K) * N,
+    kind: 'money',
+    note: 'Extra cost vs the strike on USD 1 Mio. once the call is knocked out',
+  },
+  'm07.uocSavingChf': { value: (vanilla - uoc) * N, kind: 'money', note: 'Premium saved' },
 
   // Section 2: parity, rebate, monitoring, Greeks near the barrier, method of images
   'm07.paritySumPips': { value: pips(uoc + uic), kind: 'pips', digits: 2, note: 'UOC + UIC' },

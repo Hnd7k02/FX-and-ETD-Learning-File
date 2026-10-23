@@ -60,6 +60,7 @@ export const structureblocks = defineDict({
     'sb.b.longDigitalCall': 'Digital-Call gekauft',
     'sb.b.longRangeDigital': 'Range-Digital gekauft',
     'sb.ratio': '{r} × {name}',
+    'sb.pipsDiff': '{v} Pips',
     'sb.ko': 'Knock-out: alles endet',
     'sb.targetLine': 'Target: Summe der Gewinne',
     'sb.fixing': 'Fixing',
@@ -125,6 +126,7 @@ export const structureblocks = defineDict({
     'sb.b.longDigitalCall': 'digital call bought',
     'sb.b.longRangeDigital': 'range digital bought',
     'sb.ratio': '{r} × {name}',
+    'sb.pipsDiff': '{v} pips',
     'sb.ko': 'Knock-out: everything ends',
     'sb.targetLine': 'Target: sum of the gains',
     'sb.fixing': 'Fixing',
@@ -132,7 +134,6 @@ export const structureblocks = defineDict({
     'sb.readoutNoFwd': 'Fixing {s}: {product} {p}.',
     'sb.readoutKo': 'Fixing {s}: knock-out, the {product} ends without payment.',
     'sb.dragHint': 'Drag the fixing along the axis',
-    'sb.aria':
-      'Payoff of one fixing in CHF for {product}, step {step}: strike {k}. At {s}: {p}.',
+    'sb.aria': 'Payoff of one fixing in CHF for {product}, step {step}: strike {k}. At {s}: {p}.',
   },
 });

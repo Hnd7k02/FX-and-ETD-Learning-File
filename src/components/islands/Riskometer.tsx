@@ -274,9 +274,16 @@ export default function Riskometer(p: RiskometerProps): JSX.Element {
               </svg>
               {tableOpen ? t('rk.tableHide') : t('rk.tableShow')}
             </button>
-            <div id="rk-table" class="rk-table ff-scroll-x" hidden={!tableOpen}>
+            <div
+              id="rk-table"
+              class="rk-table ff-scroll-x"
+              role="region"
+              aria-labelledby="rk-table-caption"
+              tabIndex={0}
+              hidden={!tableOpen}
+            >
               <table class="ff-table">
-                <caption class="rk-table-caption">
+                <caption class="rk-table-caption" id="rk-table-caption">
                   {t('rk.tableCaption', { pair, year: sinceYear })}
                 </caption>
                 <thead>

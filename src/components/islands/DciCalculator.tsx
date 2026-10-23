@@ -31,14 +31,7 @@ import { translator, type Lang } from '@/i18n/types';
 import { clamp, linePath, niceTicks, scaleLinear, type Point } from '@/lib/chart';
 import { EXAMPLE, EXAMPLE_LABEL } from '@/lib/fx/example';
 import { fmtMoney, fmtNumber, fmtPct, fmtPips, fmtRate } from '@/lib/format';
-import {
-  DCI_CONFIG,
-  dciCurve,
-  dciOutcome,
-  dciRange,
-  dciView,
-  type DciMonths,
-} from '@/lib/dcicalc';
+import { DCI_CONFIG, dciCurve, dciOutcome, dciRange, dciView, type DciMonths } from '@/lib/dcicalc';
 
 export interface DciCalculatorProps {
   lang: Lang;
@@ -108,9 +101,7 @@ export default function DciCalculator(props: DciCalculatorProps): JSX.Element {
     instant,
   );
   const pts: Point[] =
-    ysTween.length === curve.length
-      ? curve.map((p, i) => [p[0], ysTween[i]!])
-      : curve;
+    ysTween.length === curve.length ? curve.map((p, i) => [p[0], ysTween[i]!]) : curve;
   const domTarget = useMemo<[number, number]>(() => {
     const lo = Math.min(...curve.map((p) => p[1]));
     const hi = Math.max(0, ...curve.map((p) => p[1]));
@@ -188,7 +179,12 @@ export default function DciCalculator(props: DciCalculatorProps): JSX.Element {
   const spotX = xs(EXAMPLE.spot);
   const fwdX = xs(view.forward);
   const clipId = `dci-clip-${uid}`;
-  const halo = { paintOrder: 'stroke', stroke: '#fff', strokeWidth: 4, strokeLinejoin: 'round' } as const;
+  const halo = {
+    paintOrder: 'stroke',
+    stroke: '#fff',
+    strokeWidth: 4,
+    strokeLinejoin: 'round',
+  } as const;
   const legend: LegendItem[] = [
     { label: t('dci.lg.dci'), color: 'var(--ff-long)' },
     { label: t('dci.lg.deposit'), color: 'var(--ff-forward)', kind: 'dashed', width: 2 },
@@ -244,7 +240,12 @@ export default function DciCalculator(props: DciCalculatorProps): JSX.Element {
             >
               <defs>
                 <clipPath id={clipId}>
-                  <rect x={L.left} y={L.top - 4} width={L.width - L.left - L.right} height={plotBottom - L.top + 8} />
+                  <rect
+                    x={L.left}
+                    y={L.top - 4}
+                    width={L.width - L.left - L.right}
+                    height={plotBottom - L.top + 8}
+                  />
                 </clipPath>
               </defs>
               {/* conversion zone */}
@@ -256,7 +257,12 @@ export default function DciCalculator(props: DciCalculatorProps): JSX.Element {
                 class="dci-zone"
               />
               {kx - L.left > 90 && (
-                <text x={L.left + 8} y={L.top + L.font + 4} class="dci-zone-label" style={{ fontSize: fs }}>
+                <text
+                  x={L.left + 8}
+                  y={L.top + L.font + 4}
+                  class="dci-zone-label"
+                  style={{ fontSize: fs }}
+                >
                   {t('dci.zone')}
                 </text>
               )}
@@ -274,7 +280,12 @@ export default function DciCalculator(props: DciCalculatorProps): JSX.Element {
               </text>
               {/* reference lines: spot, forward, strike */}
               <path d={`M${spotX.toFixed(1)},${L.top}V${plotBottom}`} class="dci-guide" />
-              <text x={spotX + 4} y={plotBottom - 6} class="dci-ref-label" style={{ fontSize: fs, ...halo }}>
+              <text
+                x={spotX + 4}
+                y={plotBottom - 6}
+                class="dci-ref-label"
+                style={{ fontSize: fs, ...halo }}
+              >
                 {t('dci.spot')}
               </text>
               <path d={`M${fwdX.toFixed(1)},${L.top}V${plotBottom}`} class="dci-guide" />
@@ -313,10 +324,23 @@ export default function DciCalculator(props: DciCalculatorProps): JSX.Element {
               </text>
               {/* fixing handle */}
               <g class="dci-handle" onPointerDown={onDown} data-handle="fixing">
-                <rect x={fx - 22} y={L.top} width={44} height={plotBottom - L.top} style={{ fill: 'transparent' }} />
+                <rect
+                  x={fx - 22}
+                  y={L.top}
+                  width={44}
+                  height={plotBottom - L.top}
+                  style={{ fill: 'transparent' }}
+                />
                 <path d={`M${fx.toFixed(1)},${L.top}V${plotBottom}`} class="dci-fix-line" />
                 <circle cx={fx} cy={fy} r={7} class={`dci-fix-dot dci-fix-dot--${tone}`} />
-                <rect x={fixLabelX} y={plotBottom + 4} width={fixW} height={20} rx={10} class="dci-fix-pill" />
+                <rect
+                  x={fixLabelX}
+                  y={plotBottom + 4}
+                  width={fixW}
+                  height={20}
+                  rx={10}
+                  class="dci-fix-pill"
+                />
                 <text
                   x={fixLabelX + fixW / 2}
                   y={plotBottom + 14 + L.font * 0.36}

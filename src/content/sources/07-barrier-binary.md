@@ -6,7 +6,7 @@ sources of the Riskometer (`src/content/sources/riskometer.md`):
 - `snb-2011-09-06`: minimum exchange rate of CHF 1.20 per euro since 06.09.2011 (facts
   `m07-floor`, `m07-floor-start`).
 - `snb-2015-01-15`: minimum exchange rate discontinued on 15.01.2015, sight-deposit rate cut to
-  −0.75 % (facts `m07-floor-end`, `m07-snb-rate`).
+  −0.75 % (fact `m07-floor-end`; the rate itself reuses the fact `m05-snb-2015-rate`).
 - `ecb-reference-rates` (`src/content/sources.md`): data source of the EUR/CHF fixings in the
   franc-shock replay; every number of the replay is computed from `data/raw/ecb-eur-reference.csv`.
 

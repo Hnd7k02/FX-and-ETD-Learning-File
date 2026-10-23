@@ -150,7 +150,15 @@ export function fullStage(kind: SimKind): Stage {
       target = { kind: 'coupons', value: p.targetCoupons };
       break;
   }
-  return { kind, step: 'full', notional: p.notional, strike, blocks: productBlocks(p), knockOut, target };
+  return {
+    kind,
+    step: 'full',
+    notional: p.notional,
+    strike,
+    blocks: productBlocks(p),
+    knockOut,
+    target,
+  };
 }
 
 /**
@@ -258,7 +266,12 @@ export function stageLevels(stage: Stage): number[] {
  * Sample points of a stage payoff on [x0, x1]: a regular grid plus both sides of every
  * breakpoint, so kinks and the jumps of digitals and knock-outs stay sharp.
  */
-export function stageSamples(stage: Stage, x0: number, x1: number, n = 120): Array<[number, number]> {
+export function stageSamples(
+  stage: Stage,
+  x0: number,
+  x1: number,
+  n = 120,
+): Array<[number, number]> {
   const xs = new Set<number>();
   for (let i = 0; i <= n; i++) xs.add(x0 + ((x1 - x0) * i) / n);
   const eps = (x1 - x0) * 1e-6;

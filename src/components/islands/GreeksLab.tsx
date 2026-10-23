@@ -58,7 +58,6 @@ export interface GreeksLabProps {
 
 const PAIR = EXAMPLE.pair;
 const TWEEN_MS = 300;
-const CALL_FONT = 12;
 
 interface Gesture {
   panel: PanelId;

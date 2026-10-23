@@ -72,6 +72,7 @@ import {
   sortedByPnl,
   summarizeEnsemble,
   type FixingRow,
+  type LevelKey,
   type SimEvent,
   type SimKind,
   type Simulation,
@@ -146,7 +147,8 @@ function layoutFor(w: number) {
 
 /** Decimals that show a tick step exactly (0.02 → 2, 0.025 → 3), at least 2, at most 4. */
 const ratioDigits = (step: number) => {
-  for (let d = 2; d < 4; d++) if (Math.abs(Math.round(step * 10 ** d) - step * 10 ** d) < 1e-6) return d;
+  for (let d = 2; d < 4; d++)
+    if (Math.abs(Math.round(step * 10 ** d) - step * 10 ** d) < 1e-6) return d;
   return 4;
 };
 
@@ -316,9 +318,9 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
     setScen((s) => ({ ...s, gapFrac: clamp(Math.round(d), 1, days - 1) / days }));
 
   /* ---------- live Monte Carlo value of an adjusted parameter (Web Worker) ---------- */
-  const [pv, setPv] = useState<{ status: 'idle' | 'busy' | 'done' | 'error'; res?: PriceResult }>(
-    { status: 'idle' },
-  );
+  const [pv, setPv] = useState<{ status: 'idle' | 'busy' | 'done' | 'error'; res?: PriceResult }>({
+    status: 'idle',
+  });
   const client = useRef<McClient | null>(null);
   const reqKey = useRef('');
   const alive = useRef(true);
@@ -476,7 +478,9 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
   /* ---------- texts ---------- */
   const productName = t(`ps.p.${kind}`);
   const scenarioName = t(`ps.s.${scen.name}`);
-  const freq = t(product.fixingDays[1]! - product.fixingDays[0]! === 7 ? 'ps.freq.weekly' : 'ps.freq.monthly');
+  const freq = t(
+    product.fixingDays[1]! - product.fixingDays[0]! === 7 ? 'ps.freq.weekly' : 'ps.freq.monthly',
+  );
   const desc = (() => {
     const p = product;
     switch (p.kind) {
@@ -537,16 +541,15 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
     }
   };
   const ev = view === 'path' ? eventAt(events, tDay) : null;
-  const evTone =
-    !ev
-      ? ''
-      : ev.type === 'gap' || ev.type === 'leverage'
-        ? 'warn'
-        : ev.type === 'maturity'
-          ? sim.rows[sim.endIndex]!.cumPnl < 0
-            ? 'bad'
-            : 'good'
-          : 'event';
+  const evTone = !ev
+    ? ''
+    : ev.type === 'gap' || ev.type === 'leverage'
+      ? 'warn'
+      : ev.type === 'maturity'
+        ? sim.rows[sim.endIndex]!.cumPnl < 0
+          ? 'bad'
+          : 'good'
+        : 'event';
   const earlyKey = kind === 'accumulator' || kind === 'decumulator' ? 'ko' : 'target';
   const earlyCount = earlyKey === 'ko' ? ensSum.count.knockout : ensSum.count.target;
   const ensText = !ens.length
@@ -568,7 +571,7 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
     if (sim.reason === 'target') return t('ps.st.endTarget', { i });
     return t('ps.st.endMaturity');
   })();
-  const levelText = (key: string, v: number) => t(`ps.lv.${key}`, { v: rate(v) });
+  const levelText = (key: LevelKey, v: number) => t(`ps.lv.${key}`, { v: rate(v) });
   const levelsAria = levels.map((l) => levelText(l.key, l.value)).join(', ');
   const levCount = sim.rows.filter((r) => r.day <= tDay && r.leveraged).length;
   const pathAria = t('ps.aria.path', {
@@ -584,9 +587,7 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
     lev: levCount,
     status: statusText,
   });
-  const benchLabel = t(
-    isHedge ? 'ps.lg.fwdHedge' : isCoupon ? 'ps.lg.coupons' : 'ps.lg.gains',
-  );
+  const benchLabel = t(isHedge ? 'ps.lg.fwdHedge' : isCoupon ? 'ps.lg.coupons' : 'ps.lg.gains');
   const pnlAria = t('ps.aria.pnl', {
     d: Math.round(tDay),
     p: chf(pState.cumPnl),
@@ -772,7 +773,7 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
   const eventCell = (r: FixingRow): JSX.Element => {
     const n = usd(N);
     const k = r.rate !== null ? rate(r.rate) : '';
-    let text = '';
+    let text: string;
     switch (r.kind) {
       case 'buy':
       case 'buyLev':
@@ -808,7 +809,11 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
   const clipPlot = `ps-plot-${uid}`;
   const clipPnl = `ps-pnlclip-${uid}`;
   const ticks = monthTicks(days);
-  const zoneFill = { gain: 'rgba(37, 99, 235, 0.06)', loss: 'rgba(234, 88, 12, 0.07)', ko: 'rgba(14, 17, 22, 0.045)' };
+  const zoneFill = {
+    gain: 'rgba(37, 99, 235, 0.06)',
+    loss: 'rgba(234, 88, 12, 0.07)',
+    ko: 'rgba(14, 17, 22, 0.045)',
+  };
   const zoneLabel = (z: 'gain' | 'loss' | 'ko') =>
     t(
       z === 'ko'
@@ -921,8 +926,18 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
 
           <div
             class={`ps-banner ps-banner--${view === 'path' ? evTone || 'idle' : ensDone ? 'event' : 'idle'}`}
-            key={view === 'path' ? (ev ? `${ev.type}-${ev.day}` : 'none') : ensDone ? 'ens-done' : 'ens'}
-            data-banner={view === 'path' ? (ev?.type ?? 'none') : ensDone ? 'ensemble-done' : 'ensemble'}
+            key={
+              view === 'path'
+                ? ev
+                  ? `${ev.type}-${ev.day}`
+                  : 'none'
+                : ensDone
+                  ? 'ens-done'
+                  : 'ens'
+            }
+            data-banner={
+              view === 'path' ? (ev?.type ?? 'none') : ensDone ? 'ensemble-done' : 'ensemble'
+            }
             aria-hidden="true"
           >
             {view === 'path'
@@ -942,7 +957,12 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
             >
               <defs>
                 <clipPath id={clipPlot}>
-                  <rect x={L.left} y={L.top - 4} width={L.width - L.left - L.right} height={plotBottom - L.top + 8} />
+                  <rect
+                    x={L.left}
+                    y={L.top - 4}
+                    width={L.width - L.left - L.right}
+                    height={plotBottom - L.top + 8}
+                  />
                 </clipPath>
                 <clipPath id={clipPlayed}>
                   <rect x={0} y={0} width={Math.max(0, xT)} height={L.hPath} />
@@ -1021,8 +1041,7 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
                 const y = ys(l.value);
                 if (y < L.top - 2 || y > plotBottom + 2) return null;
                 const draggable =
-                  canDragLevel &&
-                  (kind === 'pivotTarf' ? l.key !== 'pivot' : l.key === 'strike');
+                  canDragLevel && (kind === 'pivotTarf' ? l.key !== 'pivot' : l.key === 'strike');
                 const label = levelText(l.key, l.value);
                 const w = label.length * (L.font * 0.62) + (draggable ? 26 : 14);
                 const x1 = L.width - L.right - 14;
@@ -1038,7 +1057,13 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
                       data-level-handle={draggable ? l.key : undefined}
                     >
                       {draggable && (
-                        <rect x={x1 - w} y={y - 22} width={w} height={44} style={{ fill: 'transparent' }} />
+                        <rect
+                          x={x1 - w}
+                          y={y - 22}
+                          width={w}
+                          height={44}
+                          style={{ fill: 'transparent' }}
+                        />
                       )}
                       <rect
                         x={x1 - w}
@@ -1051,7 +1076,11 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
                       {draggable && (
                         <path
                           d={`M${x1 - w + 9},${y - 3}h7M${x1 - w + 9},${y + 1}h7`}
-                          style={{ stroke: 'currentColor', strokeWidth: 1.4, strokeLinecap: 'round' }}
+                          style={{
+                            stroke: 'currentColor',
+                            strokeWidth: 1.4,
+                            strokeLinecap: 'round',
+                          }}
                           class="ps-grip"
                         />
                       )}
@@ -1098,10 +1127,26 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
                     const cx = xs(r.day);
                     const cy = ys(r.spot);
                     if (!r.active) {
-                      return <circle key={`f${r.fixing}`} cx={cx} cy={cy} r={3.2} class="ps-fix ps-fix--off" />;
+                      return (
+                        <circle
+                          key={`f${r.fixing}`}
+                          cx={cx}
+                          cy={cy}
+                          r={3.2}
+                          class="ps-fix ps-fix--off"
+                        />
+                      );
                     }
                     if (r.kind === 'ko' || (r.kind === 'target' && !r.pnl)) {
-                      return <circle key={`f${r.fixing}`} cx={cx} cy={cy} r={5} class="ps-fix ps-fix--event" />;
+                      return (
+                        <circle
+                          key={`f${r.fixing}`}
+                          cx={cx}
+                          cy={cy}
+                          r={5}
+                          class="ps-fix ps-fix--event"
+                        />
+                      );
                     }
                     const loss = r.pnl < 0;
                     return (
@@ -1148,12 +1193,14 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
 
                   {/* handles: path end (trend) and shock */}
                   {canDragEnd && (
-                    <g
-                      class="ps-handle"
-                      data-handle="end"
-                      onPointerDown={onDown('end')}
-                    >
-                      <rect x={xs(days) - 22} y={ys(sim.path[days]!) - 22} width={44} height={44} style={{ fill: 'transparent' }} />
+                    <g class="ps-handle" data-handle="end" onPointerDown={onDown('end')}>
+                      <rect
+                        x={xs(days) - 22}
+                        y={ys(sim.path[days]!) - 22}
+                        width={44}
+                        height={44}
+                        style={{ fill: 'transparent' }}
+                      />
                       <circle cx={xs(days)} cy={ys(sim.path[days]!)} r={10} class="ps-handle-dot" />
                       <path
                         d={`M${xs(days) - 3.5},${ys(sim.path[days]!) - 2}l3.5,-3.5l3.5,3.5M${xs(days) - 3.5},${ys(sim.path[days]!) + 2}l3.5,3.5l3.5,-3.5`}
@@ -1163,8 +1210,19 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
                   )}
                   {canDragShock && (
                     <g class="ps-handle" data-handle="shock" onPointerDown={onDown('shock')}>
-                      <rect x={xs(gapDay) - 22} y={ys(sim.path[gapDay]!) - 22} width={44} height={44} style={{ fill: 'transparent' }} />
-                      <circle cx={xs(gapDay)} cy={ys(sim.path[gapDay]!)} r={10} class="ps-handle-dot ps-handle-dot--shock" />
+                      <rect
+                        x={xs(gapDay) - 22}
+                        y={ys(sim.path[gapDay]!) - 22}
+                        width={44}
+                        height={44}
+                        style={{ fill: 'transparent' }}
+                      />
+                      <circle
+                        cx={xs(gapDay)}
+                        cy={ys(sim.path[gapDay]!)}
+                        r={10}
+                        class="ps-handle-dot ps-handle-dot--shock"
+                      />
                       <path
                         d={`M${xs(gapDay) + 1.5},${ys(sim.path[gapDay]!) - 5}l-4,5.5h4l-2,5`}
                         class="ps-handle-icon"
@@ -1197,9 +1255,7 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
 
               {/* playhead */}
               <path d={`M${xT.toFixed(1)},${L.top - 6}V${plotBottom}`} class="ps-playhead" />
-              {view === 'path' && (
-                <circle cx={xT} cy={ys(pState.spot)} r={5} class="ps-head-dot" />
-              )}
+              {view === 'path' && <circle cx={xT} cy={ys(pState.spot)} r={5} class="ps-head-dot" />}
               <text
                 x={clamp(xT, L.left + 24, L.width - L.right - 24)}
                 y={L.top - 9}
@@ -1297,7 +1353,11 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
                   format={kFmt}
                   fontSize={L.font}
                 />
-                <text x={L.left} y={11} style={{ fontSize: fs, fontWeight: 600, fill: 'var(--ff-muted)' }}>
+                <text
+                  x={L.left}
+                  y={11}
+                  style={{ fontSize: fs, fontWeight: 600, fill: 'var(--ff-muted)' }}
+                >
                   {t('ps.yPnl')}
                 </text>
                 {ticks.map((tk) => (
@@ -1348,7 +1408,10 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
                 })}
                 {ensDone && ens.length > 0 && (
                   <g class="ps-mean">
-                    <path d={`M${L.left},${yo(ensSum.meanPnl).toFixed(1)}H${L.width - L.right}`} class="ps-mean-line" />
+                    <path
+                      d={`M${L.left},${yo(ensSum.meanPnl).toFixed(1)}H${L.width - L.right}`}
+                      class="ps-mean-line"
+                    />
                     <text
                       x={L.width - L.right - 4}
                       y={yo(ensSum.meanPnl) - 6}
@@ -1425,7 +1488,10 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
                 <div class="ps-reseed-row">
                   <button type="button" class="ps-btn" onClick={reseed} data-reseed>
                     <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true">
-                      <path d="M3.5 8a4.5 4.5 0 1 0 1.4-3.3M3.5 2.8v2.6h2.6" class="ps-icon-stroke" />
+                      <path
+                        d="M3.5 8a4.5 4.5 0 1 0 1.4-3.3M3.5 2.8v2.6h2.6"
+                        class="ps-icon-stroke"
+                      />
                     </svg>
                     {t('ps.reseed')}
                   </button>
@@ -1458,9 +1524,7 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
                   label={t(buyer ? 'ps.st.bought' : 'ps.st.sold')}
                   sub={t('ps.st.needSub', {
                     need: usd(Math.abs(pState.need)),
-                    ratio: pState.need
-                      ? fmtPct(Math.abs(pState.base / pState.need), lang, 0)
-                      : '–',
+                    ratio: pState.need ? fmtPct(Math.abs(pState.base / pState.need), lang, 0) : '–',
                   })}
                   value={usd(Math.abs(pState.base))}
                   highlight={Math.abs(pState.base) !== Math.abs(pState.need)}
@@ -1664,12 +1728,18 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
                       <td class="num">{r.day}</td>
                       <td class="num">{rate(r.spot)}</td>
                       <td>{eventCell(r)}</td>
-                      <td class="num">{r.amountBase ? fmtNumber(r.amountBase, lang, { sign: true }) : '–'}</td>
-                      <td class="num">{r.amountQuote ? fmtNumber(r.amountQuote, lang, { sign: true }) : '–'}</td>
+                      <td class="num">
+                        {r.amountBase ? fmtNumber(r.amountBase, lang, { sign: true }) : '–'}
+                      </td>
+                      <td class="num">
+                        {r.amountQuote ? fmtNumber(r.amountQuote, lang, { sign: true }) : '–'}
+                      </td>
                       <td class={`num ${r.pnl < 0 ? 'is-neg' : r.pnl > 0 ? 'is-pos' : ''}`}>
                         {r.active ? fmtNumber(r.pnl, lang, { sign: true }) : '–'}
                       </td>
-                      <td class="num">{r.bench ? fmtNumber(r.bench, lang, { sign: true }) : '–'}</td>
+                      <td class="num">
+                        {r.bench ? fmtNumber(r.bench, lang, { sign: true }) : '–'}
+                      </td>
                       <td class="num">{fmtNumber(r.cumPnl, lang, { sign: true })}</td>
                     </tr>
                   ))

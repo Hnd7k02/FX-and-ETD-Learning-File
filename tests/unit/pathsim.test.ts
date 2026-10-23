@@ -35,6 +35,10 @@ import { DEFAULT_MARKET, MC_CONFIG, forwardAt } from '@/lib/fx/mc/products';
 import { productPayoff } from '@/lib/fx/mc/payoffs';
 import { scenarioPath } from '@/lib/fx/mc/scenarios';
 
+/** A numeric field of the simulated product (the union type does not know them all). */
+const num = (sim: { product: object }, field: string): number =>
+  (sim.product as Record<string, number>)[field]!;
+
 const KINDS: SimKind[] = ['accumulator', 'decumulator', 'tarf', 'pivotTarf', 'tpf', 'rtpf'];
 
 describe('pathsim: products and parameters', () => {
@@ -166,7 +170,7 @@ describe('pathsim: one simulated path', () => {
     const ko = sim.rows[sim.endIndex]!;
     expect(ko.event).toBe('ko');
     expect(ko.kind).toBe('ko');
-    expect(ko.spot).toBeGreaterThanOrEqual(sim.product.barrier);
+    expect(ko.spot).toBeGreaterThanOrEqual(num(sim, 'barrier'));
     const end = playState(sim, sim.days);
     expect(end.ended).toBe(true);
     expect(end.base).toBeLessThan(end.need);
@@ -182,7 +186,7 @@ describe('pathsim: one simulated path', () => {
     expect(lev.kind).toBe('buyLev');
     expect(lev.leveraged).toBe(true);
     expect(lev.amountBase).toBe(2 * sim.product.notional);
-    expect(lev.spot).toBeLessThan(sim.product.strike);
+    expect(lev.spot).toBeLessThan(num(sim, 'strike'));
     const ev = simEvents(sim);
     expect(ev[0]!.type).toBe('leverage');
     expect(ev[ev.length - 1]!.type).toBe('maturity');
@@ -195,8 +199,8 @@ describe('pathsim: one simulated path', () => {
     const last = sim.rows[sim.endIndex]!;
     expect(last.event).toBe('target');
     expect(last.kind).toBe('buy');
-    expect(last.cumPnl).toBeCloseTo(sim.product.target * sim.product.notional, 6);
-    expect(last.targetProgress).toBeCloseTo(sim.product.target, 10);
+    expect(last.cumPnl).toBeCloseTo(num(sim, 'target') * sim.product.notional, 6);
+    expect(last.targetProgress).toBeCloseTo(num(sim, 'target'), 10);
   });
 
   it('runs the TARF to maturity when an early shock hits before the target', () => {
@@ -212,8 +216,8 @@ describe('pathsim: one simulated path', () => {
   it('tracks coupons and payments of TPF and RTPF with the gains benchmark', () => {
     const good = simulate('tpf', { name: 'sideways' });
     expect(good.reason).toBe('target');
-    expect(good.rows.filter((r) => r.kind === 'coupon').length).toBe(good.product.targetCoupons);
-    expect(good.rows[good.endIndex]!.targetProgress).toBe(good.product.targetCoupons);
+    expect(good.rows.filter((r) => r.kind === 'coupon').length).toBe(num(good, 'targetCoupons'));
+    expect(good.rows[good.endIndex]!.targetProgress).toBe(num(good, 'targetCoupons'));
     const bad = simulate('rtpf', { name: 'trendUp' });
     expect(bad.reason).toBe('maturity');
     const end = playState(bad, bad.days);

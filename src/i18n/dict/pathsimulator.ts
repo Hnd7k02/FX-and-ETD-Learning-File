@@ -176,7 +176,8 @@ export const pathsimulator = defineDict({
     'ps.ens.worst': 'Schlechtester Pfad',
     'ps.ens.losses': 'Pfade mit Verlust',
     'ps.ens.lossesSub': 'im Schnitt {v}',
-    'ps.ens.fairNote': 'Mit {paths} Pfaden ist der Barwert null: Die vielen kleinen Gewinne bezahlen die wenigen grossen Verluste.',
+    'ps.ens.fairNote':
+      'Mit {paths} Pfaden ist der Barwert null: Die vielen kleinen Gewinne bezahlen die wenigen grossen Verluste.',
     'ps.tbl.title': 'Cashflows',
     'ps.tbl.caption': 'Cashflows bis Tag {d}, aus deiner Sicht: + erhalten, − bezahlt',
     'ps.tbl.fixing': 'Fixing',
@@ -381,7 +382,8 @@ export const pathsimulator = defineDict({
     'ps.ens.worst': 'Worst path',
     'ps.ens.losses': 'Paths with a loss',
     'ps.ens.lossesSub': 'on average {v}',
-    'ps.ens.fairNote': 'With {paths} paths the present value is zero: the many small gains pay for the few large losses.',
+    'ps.ens.fairNote':
+      'With {paths} paths the present value is zero: the many small gains pay for the few large losses.',
     'ps.tbl.title': 'Cash flows',
     'ps.tbl.caption': 'Cash flows until day {d}, from your point of view: + received, − paid',
     'ps.tbl.fixing': 'Fixing',
@@ -411,8 +413,7 @@ export const pathsimulator = defineDict({
     'ps.aria.pnl': 'Cumulative P&L until day {d}: product {p}, {benchLabel} {b}.',
     'ps.aria.ens':
       '{n} random paths for {product}. Until day {d}: {ended} ended. At the end: {early} ended early, {maturity} ran to maturity, mean {mean}, worst path {worst}.',
-    'ps.aria.outcome':
-      'Result of the {n} paths, sorted: best {best}, worst {worst}, mean {mean}.',
+    'ps.aria.outcome': 'Result of the {n} paths, sorted: best {best}, worst {worst}, mean {mean}.',
     'ps.live.event': '{text}',
   },
 });

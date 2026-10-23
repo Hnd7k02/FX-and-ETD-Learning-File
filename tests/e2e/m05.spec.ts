@@ -77,9 +77,7 @@ test.describe('module 05 · Greeks', () => {
     await expect(time.locator('[data-value]')).not.toHaveText(monthValue);
   });
 
-  test('greeks lab (delta-gamma): spot slider and drag move delta and gamma', async ({
-    page,
-  }) => {
+  test('greeks lab (delta-gamma): spot slider and drag move delta and gamma', async ({ page }) => {
     await page.goto('/module/05-greeks/2/');
     const lab = await hydrated(page, '[data-greekslab][data-mode="delta-gamma"]');
     const summary = lab.locator('[data-summary]');
@@ -154,7 +152,9 @@ test.describe('module 05 · Greeks', () => {
       test(`section ${s} has no serious axe violations (${lang})`, async ({ page }) => {
         await page.goto(`${prefix}/module/05-greeks/${s}/`);
         await hydrateAll(page);
-        const results = await new AxeBuilder({ page }).analyze();
+        // @axe-core/playwright ships its own playwright-core types; the page object is the same at runtime
+        const axePage = page as unknown as ConstructorParameters<typeof AxeBuilder>[0]['page'];
+        const results = await new AxeBuilder({ page: axePage }).analyze();
         const bad = results.violations.filter(
           (v) => v.impact === 'serious' || v.impact === 'critical',
         );
