@@ -1,0 +1,78 @@
+import GapReplayFigure from '@/components/figures/GapReplayFigure.astro';
+
+{/* 07 Barrier & Binary · section 4 · Second generation and gap risk. Numbers only via <Num />, facts via <Fact />. */}
+
+You now know the first generation: one barrier, watched throughout the option's life. The second generation changes these building blocks. It moves the time window, sets two barriers or combines barriers with digitals. Market variants differ; here are two typical ones.
+
+### Window barrier: a barrier with an end date
+
+With a window barrier, the barrier applies only during a time window. Take the importer's up-and-out call with strike <Num of="ex.strike" /> and barrier <Num of="m07.barrierUp" />. This time the barrier is only active on days <Num of="m07.windowStart" /> to <Num of="m07.windowEnd" /> and is observed daily. Expiry is after <Num of="m07.windowExpiry" /> days.
+
+The tool has no closed formula for this. The calculation core values the option with <Num of="m07.windowPaths" /> million simulated paths:
+
+| Variant, <Num of="m07.windowExpiry" /> days | Price on USD 1m |
+| --- | --- |
+| Up-and-out, barrier for the whole life | <Num of="m07.uocFull91Chf" /> |
+| Window barrier, days <Num of="m07.windowStart" /> to <Num of="m07.windowEnd" /> | <Num of="m07.windowPvChf" /> (± <Num of="m07.windowSeChf" />) |
+| Vanilla call | <Num of="m07.windowVanillaChf" /> |
+
+The window is a compromise. In <Num of="m07.windowKo" /> of the paths the option is knocked out in the first month. If it survives the window, it is an ordinary call from then on.
+
+**Double barrier.** Two barriers, one above and one below: the option vanishes (double knock-out) or comes to life (double knock-in) as soon as either is touched. Its digital relative is the double no-touch from section 3. The narrower the corridor, the cheaper the option, and the likelier the end.
+
+### Gap risk: the franc shock
+
+Every formula in this module assumes that the rate moves continuously. To cross a barrier it must pass through every rate in between once, and someone can trade there. On <Fact id="m07-floor-end" /> that was not the case. Since <Fact id="m07-floor-start" />, the Swiss National Bank had enforced a minimum exchange rate of <Fact id="m07-floor" /> francs per euro. On that day it discontinued it and lowered the interest rate on sight deposits to <Fact id="m05-snb-2015-rate" />.
+
+The ECB fixing for EUR/CHF was <Num of="m07.gapBefore" /> the day before and <Num of="m07.gapShock" /> on the day: <Num of="m07.gapDayMove" /> from one fixing to the next. In this series there is not a single rate in between.
+
+<GapReplayFigure caption="ECB reference rates for EUR/CHF, day by day. Below the minimum rate sit a stop-loss and four knock-out barriers. On the day the floor was removed, all of them are triggered at the same rate." />
+
+A stop-loss meant to sell EUR at <Num of="m07.gapStop" /> is filled at the next rate available. In the ECB series that is <Num of="m07.gapShock" />, <Num of="m07.gapStopPips" /> pips lower. On <Num of="m07.gapNotionalEur" /> that is <Num of="m07.gapStopChf" /> less than planned. A stop limits the loss only if there is a market at the stop level.
+
+<Callout variant="bad" title="Loss scenario: the reverse knock-out">
+
+An exporter with euro income buys a EUR put with a strike of <Num of="m07.gapPutStrike" />. To save premium, he adds a knock-out below the minimum rate. That is a reverse knock-out (section 2): the barrier is in the money. Whether it sits at <Num of="m07.gapKoHigh" /> or at <Num of="m07.gapKoLow" /> makes no difference. All <Num of="m07.gapKoCount" /> variants are knocked out on the same day at the same rate. With the knock-out, intrinsic value of <Num of="m07.gapPutLostChf" /> disappears, at exactly the moment the protection was meant for.
+
+</Callout>
+
+<Callout variant="warn" title="Risk box">
+
+- A barrier is a condition, not protection. Check which scenarios it cuts away.
+- Reverse knock-outs disappear where the option would be worth the most.
+- Stops and barriers assume a market you can trade in. In a gap, every level is triggered at once, at the next available rate.
+- Read the term sheet: observation period, type of monitoring, reference rate, and who determines the barrier event.
+
+</Callout>
+
+How sharply vol reacted after the shock is shown in the [Riskometer for the franc shock](/en/riskometer/?event=chf-shock-2015&pair=EUR%2FCHF).
+
+<Derivation title="Derivation: how the calculation core values the window barrier">
+
+**1.** Simulate many USD/CHF paths in daily steps (Δ<i>t</i> = 1/365) with the risk-neutral drift <i>r</i><sub>d</sub> − <i>r</i><sub>f</sub>:
+
+<Formula>
+  <span><i>S</i><sub><i>t</i>+Δ<i>t</i></sub> = <i>S</i><sub><i>t</i></sub> · exp((<i>r</i><sub>d</sub> − <i>r</i><sub>f</sub> − ½σ²) Δ<i>t</i> + σ √Δ<i>t</i> · <i>Z</i>), <i>Z</i> ~ <i>N</i>(0, 1)</span>
+</Formula>
+
+**2.** On each path, check the barrier on the window days only. If it is touched, the path pays nothing. Otherwise it pays (<i>S</i><sub><i>T</i></sub> − <i>K</i>)<sup>+</sup> on USD 1m at expiry.
+
+**3.** The price is the average of all payoffs, discounted with <i>e</i><sup>−<i>r</i><sub>d</sub><i>T</i></sup>. The uncertainty shrinks with 1/√<i>n</i>: with <Num of="m07.windowPaths" /> million paths the standard error is <Num of="m07.windowSeChf" />.
+
+**4.** Why no formula? The reflection principle needs a barrier that applies the whole time. If the window ends before expiry, the symmetry breaks. For simple windows there are formulas using the bivariate normal distribution; Monte Carlo is more flexible and can be checked against the closed forms.
+
+</Derivation>
+
+<Desk title="Barriers in practice">
+
+Every term sheet states four things about the barrier: the period, the type of monitoring (continuously in the market or once a day against a fixing), the reference rate and who determines the event. Two contracts with the same number can differ a lot here.
+
+When many barriers sit at the same level, the rate can behave conspicuously there. The reason is in section 2: at the barrier, the hedges of reverse knock-outs flip. In a gap no rule helps. The barrier is crossed before anyone can trade.
+
+</Desk>
+
+<Takeaway>
+
+Barriers and stops are only as good as the market you can trade in. If the rate jumps, every level is triggered at once, at the next available rate.
+
+</Takeaway>

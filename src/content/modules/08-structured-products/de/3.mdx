@@ -1,0 +1,78 @@
+import PathSimulatorFigure from '@/components/figures/PathSimulatorFigure.astro';
+import StructureBlocksFigure from '@/components/figures/StructureBlocksFigure.astro';
+
+{/* 08 Strukturierte Produkte · Abschnitt 3 · TARF und Pivot TARF. Zahlen nur über <Num />, Registry src/lib/nums/m08.ts. */}
+
+Ein TARF (Target Redemption Forward) ist eine Serie von Forwards zu einem besseren Strike, die endet, sobald genug Gewinn angefallen ist. Im Beispiel kauft der Importeur <Num of="m08.tarfFixings" /> Monate lang je <Num of="m08.tarfNotional" />, zusammen <Num of="m08.tarfTotal" />. Der faire Strike ist <Num of="m08.tarfStrike" />, <Num of="m08.tarfBetter" /> Pips unter dem Forward von <Num of="m08.tarfFwd" /> (Standardfehler <Num of="m08.tarfSe" /> Pips).
+
+An jedem Fixing gilt:
+
+- **Fixing über dem Strike:** Du kaufst <Num of="m08.tarfNotional" /> zum Strike. Der Gewinn pro Dollar zählt aufs **Target** von <Num of="m08.tarfTargetPips" /> Pips. Ist es erreicht, endet der TARF. Der letzte Gewinn wird so gekappt, dass die Summe genau das Target ist.
+- **Fixing unter dem Strike:** Du kaufst die doppelte Menge zum Strike. Dieser Verlust zählt **nicht** aufs Target.
+
+In Bausteinen: pro Fixing ein gekaufter Call und zwei verkaufte Puts zum Strike, dazu das Target als Knock-out-Regel. Mehr als <Num of="m08.tarfTargetChf" /> (<Num of="m08.tarfTargetPips" /> Pips auf <Num of="m08.tarfNotional" />) kannst du nicht gewinnen. Verlieren kannst du viel mehr.
+
+<PathSimulatorFigure
+  products={['tarf', 'pivotTarf']}
+  preset="earlyShock"
+  caption="Ein früher Schock, bevor das Target erreicht ist: Der TARF läuft bis zum Ende, mit doppelter Menge. Schalte dann auf «100 Pfade»: Fast alle enden früh mit kleinem Gewinn, wenige laufen durch und tragen die grossen Verluste."
+/>
+
+### Rechenbeispiel: die Asymmetrie
+
+Mit diesen Beispielwerten liegt das erste Fixing fast immer weit über dem Strike. Das Target ist darum schnell erreicht: in <Num of="m08.tarfPTarget" /> der Monte-Carlo-Pfade, im Schnitt nach <Num of="m08.tarfExpFix" /> Fixings. Drei Szenarien im Simulator:
+
+- **Trend auf.** Target nach <Num of="m08.tarfUpEnd" /> Fixings. Der TARF bringt <Num of="m08.tarfUpPnl" />, mehr geht nicht. Der Importeur hat erst <Num of="m08.tarfUpUsd" /> gekauft. Den Rest kauft er am Markt, zu steigenden Kursen. Gegenüber dem Forward-Hedge (<Num of="m08.tarfUpFwd" />) liegt er <Num of="m08.tarfUpDiff" /> zurück.
+- **Schock vor dem Target.** Der Kurs fällt an Tag <Num of="m08.shockDay" /> um <Num of="m08.shockGap" />. Schon das erste Fixing liegt unter dem Strike, das Target kommt nie. Alle <Num of="m08.tarfShockLev" /> Fixings kaufen doppelt, zusammen <Num of="m08.tarfShockUsd" />: doppelt so viel, wie der Importeur braucht. Ergebnis gegen den Markt: <Num of="m08.tarfShockPnl" />.
+- **100 Pfade.** Die Balken unter dem Chart zeigen das Ergebnis jedes Pfads. Fast alle sind kleine Gewinne bis höchstens <Num of="m08.tarfTargetChf" />. Ganz rechts stehen wenige tiefe Verluste. Jeder 20. Pfad verliert mehr als <Num of="m08.tarfQ05" />, der schlechteste von <Num of="m08.paths" /> Pfaden <Num of="m08.tarfWorst" />.
+
+<Callout variant="bad" title="Wann geht es schief: Gute Szenarien enden früh">
+
+Läuft es gut, endet der TARF nach wenigen Fixings mit einem gekappten Gewinn. Läuft es schlecht, gibt es kein Target, das dich erlöst: Das Produkt läuft bis zum letzten Fixing weiter, jedes Mal mit doppelter Menge. Die Verluste sind gehebelt und nicht begrenzt.
+
+</Callout>
+
+### Pivot TARF: zwei Strikes um einen Pivot
+
+Der Pivot TARF wettet darauf, dass der Kurs in einem Band bleibt. Um den Pivot <Num of="m08.pivPivot" /> liegen zwei Strikes: <Num of="m08.pivK1" /> und <Num of="m08.pivK2" />, je <Num of="m08.pivWidth" /> Pips entfernt (Standardfehler <Num of="m08.pivSe" /> Pips). Unter dem Pivot kaufst du zu <Num of="m08.pivK1" />, darüber verkaufst du zu <Num of="m08.pivK2" />. Beides bringt Gewinn, solange das Fixing zwischen den Strikes liegt. Ausserhalb handelst du die doppelte Menge mit Verlust. Das Target ist <Num of="m08.pivTargetPips" /> Pips, also <Num of="m08.pivTargetChf" />.
+
+<StructureBlocksFigure
+  products={['pivotTarf']}
+  caption="Die Bausteine des Pivot TARF: ein Zelt aus Gewinnen zwischen den Strikes, ausserhalb doppelte Verluste."
+/>
+
+Das Muster ist noch extremer als beim TARF. In <Num of="m08.pivPTarget" /> der Pfade ist das Target nach durchschnittlich <Num of="m08.pivExpFix" /> Fixings erreicht. Sogar das 5 %-Quantil ist ein Gewinn: <Num of="m08.pivQ05" />. Der schlechteste Pfad verliert <Num of="m08.pivWorst" />. Im Simulator mit dem Schock: <Num of="m08.pivShockPnl" />.
+
+<Callout variant="warn" title="Risiko-Box: TARF und Pivot TARF">
+
+- **Maximalverlust:** nicht begrenzt. Im Extremfall laufen alle <Num of="m08.tarfFixings" /> Fixings mit doppelter Menge, bei beliebig ungünstigem Kurs. Monte Carlo: schlechtester Pfad TARF <Num of="m08.tarfWorst" />, Pivot TARF <Num of="m08.pivWorst" />.
+- **Hebel:** 2 auf der Verlustseite. Gewinne sind durch das Target gekappt (<Num of="m08.tarfTargetChf" /> bzw. <Num of="m08.pivTargetChf" />).
+- **Pfadabhängigkeit:** Ob das Target kommt, entscheiden die ersten Fixings. Ein Schock davor trifft voll, ein Schock danach gar nicht.
+
+</Callout>
+
+<Derivation title="Herleitung: was das Target mit dem Strike macht">
+
+**1.** Ohne Target ist der TARF eine Serie aus einem Call und zwei Puts je Fixing. Wie beim Accumulator liefert Garman-Kohlhagen den fairen Strike: <Num of="m08.tarfK2" />.
+
+**2.** Das Target nimmt dir die besten Szenarien weg: Gewinne über <Num of="m08.tarfTargetPips" /> Pips bekommst du nie. Dein gekaufter Call ist dadurch weniger wert. Damit der Barwert null bleibt, muss der Strike sinken: auf <Num of="m08.tarfStrike" /> (Monte Carlo).
+
+**3.** Ein Überschlag zeigt, wie schief die Verteilung ist. Der Barwert ist null, und mit dem CHF-Zins von <Num of="ex.rd" /> wird nicht abgezinst. Bringen <Num of="m08.tarfPTarget" /> der Pfade je rund <Num of="m08.tarfTargetChf" />, müssen die übrigen <Num of="m08.tarfPMaturity" /> im Mittel verlieren:
+
+<Formula variant="accent"><Num of="m08.tarfPTarget" /> · <Num of="m08.tarfTargetChf" /> + <Num of="m08.tarfPMaturity" /> · <i>L</i> = 0 ⇒ <i>L</i> ≈ <b><Num of="m08.tarfImpliedLoss" /></b></Formula>
+
+Das ist ein Überschlag: Einige Target-Pfade hatten vorher ein Verlust-Fixing. Die Grössenordnung stimmt trotzdem. Viele kleine Gewinne bezahlen wenige grosse Verluste.
+
+</Derivation>
+
+<Desk title="Ein Franken-Schock ist kein Gedankenexperiment">
+
+Am <Fact id="m08-floor-end" /> hob die Schweizerische Nationalbank den Mindestkurs von <Fact id="m08-floor" /> Franken pro Euro auf, mit sofortiger Wirkung. Was das am Devisenmarkt auslöste, zeigt das [Riskometer](/riskometer/). Für Produkte mit doppelter Menge ist so ein Tag der Ernstfall: Über ein Gap springt der Kurs hinweg, kein Stop-Loss greift zum geplanten Kurs, und ein Target, das noch nicht erreicht ist, rettet niemanden.
+
+</Desk>
+
+<Takeaway>
+
+Ein Target begrenzt den Gewinn, nicht den Verlust. Gute Szenarien enden früh, schlechte laufen bis zum Schluss, mit doppelter Menge.
+
+</Takeaway>

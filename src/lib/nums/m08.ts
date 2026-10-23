@@ -291,6 +291,12 @@ export const nums: NumTable = {
   'm08.accSideFwd': { value: M.accSide.bench, kind: 'money', sign: true },
   'm08.accSideDiff': { value: M.accSide.diff, kind: 'money', sign: true },
   'm08.accDownMove': { value: M.accDownMove, kind: 'pct', digits: 0, note: 'Preset strongDown' },
+  'm08.accDownFirstLev': {
+    value: M.accDown.firstLeveraged,
+    kind: 'num',
+    digits: 0,
+    note: 'First leveraged fixing, preset strongDown',
+  },
   'm08.accDownUsd': { value: M.accDown.base, kind: 'money', ccy: 'USD' },
   'm08.accDownLev': {
     value: M.accDown.leveraged,
@@ -415,6 +421,17 @@ export const nums: NumTable = {
   'm08.dciDistance': { value: M.dciDistance, kind: 'pct', digits: 0 },
   'm08.dciForward': { value: M.dciForward, kind: 'rate' },
   'm08.dciStrikeVsFwd': { value: M.dciStrikeVsFwdPips, kind: 'pips' },
+  'm08.dciStrikeVsFwdAbs': {
+    value: Math.abs(M.dciStrikeVsFwdPips),
+    kind: 'pips',
+    note: 'Distance strike to forward',
+  },
+  'm08.dciFixBelow': {
+    value: DCI_CONFIG.initialFixingBelowStrike,
+    kind: 'pct',
+    digits: 0,
+    note: 'Fixing below the strike in the example outcome',
+  },
   'm08.dciPremium': { value: M.dciPremium, kind: 'money' },
   'm08.dciYield': { value: M.dciYield, kind: 'pct', digits: 2 },
   'm08.dciMm': { value: M.dciMm, kind: 'pct', digits: 2 },

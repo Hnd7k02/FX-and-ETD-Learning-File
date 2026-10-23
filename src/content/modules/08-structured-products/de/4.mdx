@@ -1,0 +1,85 @@
+import PathSimulatorFigure from '@/components/figures/PathSimulatorFigure.astro';
+import StructureBlocksFigure from '@/components/figures/StructureBlocksFigure.astro';
+import DciCalculatorFigure from '@/components/figures/DciCalculatorFigure.astro';
+
+{/* 08 Strukturierte Produkte · Abschnitt 4 · TPF, RTPF und Dual Currency. Zahlen nur über <Num />, Registry src/lib/nums/m08.ts. */}
+
+Bisher ging es um einen besseren Kurs. TPF und RTPF tauschen den Kurs gegen einen **Coupon**: einen festen Betrag pro Fixing, solange der Kurs mitspielt. Gekauft oder verkauft wird dabei nichts. Es fliessen nur Coupons und Ausgleichszahlungen in CHF.
+
+- **TPF (direktional):** Liegt das Fixing auf oder über dem Strike <Num of="m08.tpfStrike" /> (Spot <Num of="m08.tpfStrikeVsSpot" />), erhältst du <Num of="m08.tpfCoupon" /> Pips auf <Num of="m08.tpfNotional" />, also <Num of="m08.tpfCouponChf" />. Darunter zahlst du die doppelte Differenz zum Strike. Nach <Num of="m08.tpfTargetCoupons" /> Coupons ist Schluss.
+- **RTPF (Range):** Der Coupon von <Num of="m08.rtpfCoupon" /> Pips (<Num of="m08.rtpfCouponChf" />) fliesst, solange das Fixing zwischen <Num of="m08.rtpfLower" /> und <Num of="m08.rtpfUpper" /> liegt. Ausserhalb zahlst du die doppelte Distanz zur Range.
+
+In Bausteinen: Der TPF ist ein gekaufter Digital-Call, der den Coupon zahlt, bezahlt mit zwei verkauften Puts zum Strike. Der RTPF ist ein gekauftes Range-Digital, bezahlt mit zwei verkauften Puts an der unteren und zwei verkauften Calls an der oberen Grenze.
+
+<StructureBlocksFigure
+  products={['tpf', 'rtpf']}
+  caption="Ein Fixing des TPF und des RTPF: oben ein flacher Coupon, unten gehebelte Verluste ohne Boden."
+/>
+
+### Warum der Coupon so gross aussieht
+
+<Num of="m08.tpfCouponChf" /> pro Fixing, bis zu <Num of="m08.tpfMaxChf" /> insgesamt: Das wirkt grosszügig. Der Grund liegt im Forward. Der Strike ist relativ zum Spot gesetzt, <Num of="m08.tpfStrikeVsSpot" />. Der Forward fällt aber mit der Zinsdifferenz: bis zum letzten Fixing um <Num of="m08.tpfFwdDrop" /> Pips auf <Num of="m08.tpfFwdEnd" />. Ab etwa Monat <Num of="m08.tpfCrossMonth" /> liegt er unter dem Strike. Für die späten Fixings «erwartet» der Markt also einen Kurs unter dem Strike. Die verkauften Puts sind viel wert, und ihre Prämie bezahlt den Coupon. Ein Forward ist keine Prognose, aber er ist der Preis.
+
+<PathSimulatorFigure
+  products={['tpf', 'rtpf']}
+  scenario="sideways"
+  caption="Seitwärts sammelt der TPF seine Coupons und endet früh. Wechsle zu Trend ab oder zieh das Pfadende nach unten: Die Zahlungen übersteigen die Coupons schnell."
+/>
+
+### Rechenbeispiel: Coupons gegen Zahlungen
+
+- **Seitwärts:** <Num of="m08.tpfTargetCoupons" /> Coupons, dann endet der TPF. Ergebnis <Num of="m08.tpfSidePnl" />, das Maximum.
+- **Trend ab <Num of="m08.accDownMove" />:** nur <Num of="m08.tpfDownCoupons" /> Coupons (<Num of="m08.tpfDownReceived" />), danach Zahlungen bis zum Ende. Ergebnis <Num of="m08.tpfDownPnl" />.
+- **RTPF bei Trend auf:** <Num of="m08.rtpfUpCoupons" /> Coupons (<Num of="m08.rtpfUpReceived" />), dann bricht der Kurs aus der Range aus. Ergebnis <Num of="m08.rtpfUpPnl" />.
+
+<Callout variant="warn" title="Risiko-Box: TPF und RTPF">
+
+- **Maximalverlust:** nicht begrenzt. Der Gewinn ist auf <Num of="m08.tpfMaxChf" /> (TPF) bzw. <Num of="m08.rtpfMaxChf" /> (RTPF) begrenzt, der Verlust wächst mit jedem Pip doppelt. Monte Carlo: Jeder 20. Pfad verliert mehr als <Num of="m08.tpfQ05" /> (TPF) bzw. <Num of="m08.rtpfQ05" /> (RTPF), der schlechteste <Num of="m08.tpfWorst" /> bzw. <Num of="m08.rtpfWorst" />.
+- **Hebel:** 2 auf jede Distanz zum Strike oder zur Range.
+- **Pfadabhängigkeit:** Das Target endet nach <Num of="m08.tpfTargetCoupons" /> Coupons, beim TPF in <Num of="m08.tpfPTarget" /> der Pfade, beim RTPF in <Num of="m08.rtpfPTarget" />. Alle anderen laufen bis zum Schluss.
+
+</Callout>
+
+### Dual Currency: Festgeld mit verkaufter Option
+
+Eine Dual-Currency-Anlage ist kein Hedge, sondern eine Geldanlage für 1 bis 3 Monate. Du legst <Num of="m08.dciCapital" /> für <Num of="m08.dciDays" /> Tage an und verkaufst dazu einen USD Put / CHF Call mit Strike <Num of="m08.dciStrike" /> (<Num of="m08.dciDistance" /> unter dem Spot). Die Prämie von <Num of="m08.dciPremium" /> erhältst du als Zusatzzins. Das ergibt <Num of="m08.dciYield" /> p.a., der Geldmarkt bringt im Beispiel <Num of="m08.dciMm" />.
+
+Bei Verfall entscheidet ein einziges Fixing. Liegt es auf oder über dem Strike, erhältst du dein Kapital plus <Num of="m08.dciInterest" /> Zins. Liegt es darunter, wird das Kapital zum Strike in <Num of="m08.dciUsd" /> umgetauscht, plus Zins. Genau dann ist der Dollar weniger wert als zum Strike: Das ist das **Konversionsrisiko**.
+
+<DciCalculatorFigure caption="Zieh den Kurs bei Verfall: Unter dem Strike tauschst du, unter dem Break-even fährst du schlechter als mit Festgeld. Verkürz den Abstand zum Spot: mehr Zins, mehr Umtausch." />
+
+Im Beispiel liegt der Break-even bei <Num of="m08.dciBreakEven" />. Bei einem Fixing von <Num of="m08.dciFixing" /> sind die Dollars plus Zins <Num of="m08.dciOutValue" /> wert, <Num of="m08.dciOutDiff" /> gegenüber dem Festgeld. Der Strike liegt nur <Num of="m08.dciStrikeVsFwdAbs" /> Pips unter dem Forward von <Num of="m08.dciForward" />. Im Modell wird in <Num of="m08.dciPConv" /> der Fälle umgetauscht. Das ist keine Prognose, sondern der Preis des Risikos.
+
+<Callout variant="bad" title="Wann geht es schief: Dual Currency">
+
+Fällt der Dollar stark, erhältst du Dollars zum Strike, die am Markt viel weniger wert sind. Der Zusatzzins ist dann klein gegen den Verlust. Das Kapital ist nicht in CHF gesichert: Es ist nur so lange CHF, wie der Kurs über dem Strike bleibt.
+
+</Callout>
+
+<Derivation title="Herleitung: fairer Coupon und Dual-Currency-Zins">
+
+**1.** Ohne Target ist der TPF-Coupon <i>c</i> fair, wenn die Digitals so viel wert sind wie die verkauften Puts. <i>D</i> ist der Preis eines Digital-Calls, der 1 CHF zahlt:
+
+<Formula><span><i>c</i> · Σ<sub><i>i</i></sub> <i>D</i>(<i>K</i>, <i>t</i><sub><i>i</i></sub>) = 2 · Σ<sub><i>i</i></sub> <i>P</i>(<i>K</i>, <i>t</i><sub><i>i</i></sub>)</span></Formula>
+
+Das ergibt <Num of="m08.tpfCouponNoTarget" /> Pips (RTPF: <Num of="m08.rtpfCouponNoTarget" /> Pips). Das Target streicht die Coupons der guten Szenarien. Damit der Barwert null bleibt, steigt der Coupon auf <Num of="m08.tpfCoupon" /> Pips (RTPF <Num of="m08.rtpfCoupon" />), Standardfehler <Num of="m08.tpfSe" /> bzw. <Num of="m08.rtpfSe" /> Pips.
+
+**2.** Dual Currency: Die Option rechnet mit <i>T</i> = Tage/365, der Zins mit der Geldmarkt-Konvention Act/360, τ = Tage/360. Der Zins p.a. ist Geldmarktzins plus annualisierte Prämie:
+
+<Formula><span>Zins p.a. = Geldmarktzins + Prämie · <i>e</i><sup><i>r</i><sub>d</sub><i>T</i></sup> / (Kapital · τ)</span></Formula>
+
+**3.** Break-even: Umgetauscht hast du Kapital/<i>K</i> Dollar plus den Zins <i>I</i>. Gleich viel wie das Festgeld ist das bei <i>S</i><sub>be</sub> = <i>K</i> · (1 − <i>I</i>/Kapital), wenn der Geldmarkt wie hier nichts bringt: <Num of="m08.dciStrike" /> · (1 − <Num of="m08.dciInterest" /> / <Num of="m08.dciCapital" />) = <Num of="m08.dciBreakEven" />.
+
+</Derivation>
+
+<Desk title="Coupon-Produkte richtig lesen">
+
+Drei Zahlen gehören auf jedes Termsheet: der maximale Gewinn (Coupon mal Target), der Verlust pro Pip auf der falschen Seite (zweimal das Nominal) und der Abstand des Strikes zum Forward, nicht zum Spot. Bei Dual Currency kommt eine vierte dazu: Wie gross ist der Verlust bei einem Umtausch, wenn der Kurs <Num of="m08.dciFixBelow" /> unter dem Strike steht? Im Beispiel <Num of="m08.dciOutDiff" />, bei einer Laufzeit von 3 Monaten mehr Zins (<Num of="m08.dci3Yield" /> p.a.), aber auch mehr Zeit für den Dollar, zu fallen.
+
+</Desk>
+
+<Takeaway>
+
+Ein Coupon ist die Prämie für verkaufte Optionen: Er ist begrenzt, der Verlust nicht. Bei Dual Currency bezahlst du den Mehrzins mit dem Risiko, in der schwächeren Währung zu landen.
+
+</Takeaway>
