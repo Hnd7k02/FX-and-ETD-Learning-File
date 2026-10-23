@@ -23,9 +23,7 @@
  * (limit, stop) have no fixed profile: they only become a spot trade when the level trades.
  */
 import { EXAMPLE, EXAMPLE_FORWARD } from '@/lib/fx/example';
-import { gkPrice } from '@/lib/fx/vanilla';
-import { fairProduct } from '@/lib/fx/mc/fair';
-import { MC_PRODUCTS } from '@/lib/fx/mc/fair';
+import { MC_PRODUCTS, fairProduct } from '@/lib/fx/mc/fair';
 import { M09_CONFIG, PIP } from '@/lib/m09/config';
 import { hedgeSetup, hedgeRate, type HedgeSetup } from '@/lib/m09/hedge';
 import { carryView, yieldPnlPerUsd, type CarryView } from '@/lib/m09/carry';
@@ -399,7 +397,8 @@ export function productCells(): Map<ProductId, Cell[]> {
     for (const id of MATRIX.hedge[v]) add(id, { need: 'hedge', view: v });
     for (const id of MATRIX.yield[v]) add(id, { need: 'yield', view: v });
   }
-  for (const v of ALPHA_VIEW_IDS) for (const id of MATRIX.alpha[v]) add(id, { need: 'alpha', view: v });
+  for (const v of ALPHA_VIEW_IDS)
+    for (const id of MATRIX.alpha[v]) add(id, { need: 'alpha', view: v });
   return out;
 }
 
@@ -643,7 +642,7 @@ export function clippedBelow(
   p: MatrixParams,
   clip: number = M09_CONFIG.matrix.clipPips,
 ): boolean {
-  return xs.some((x) => ((productResult(id, x, p) ?? 0) / PIP) < -clip);
+  return xs.some((x) => (productResult(id, x, p) ?? 0) / PIP < -clip);
 }
 
 /** S_T snapped to the 5-pip grid and clamped to the matrix range. */
@@ -681,8 +680,20 @@ export function cellSpreadAt(
   return { best: best.id, worst: worst.id, bestPips: best.r / PIP, worstPips: worst.r / PIP };
 }
 
-/** Premium of the ATMF USD call per USD (for the quiz: the call card's key number). */
-export function callPremium(): number {
-  const { spot, rd, rf, vol, T } = EXAMPLE;
-  return gkPrice(spot, hedgeSetup().call.strike, T, vol, rd, rf, 'call');
+/**
+ * Groups the products of a cell whose profiles coincide on the grid (forward and spot plus
+ * deposit, dual currency and discount certificate): one curve, one combined label. Products
+ * without a profile (orders) are left out. Order follows the cell.
+ */
+export function profileGroups(cell: Cell, xs: readonly number[], p: MatrixParams): ProductId[][] {
+  const groups: Array<{ ids: ProductId[]; ys: number[] }> = [];
+  for (const id of cellProducts(cell)) {
+    const ys = xs.map((x) => productResult(id, x, p));
+    if (ys.some((y) => y === null)) continue;
+    const vals = ys as number[];
+    const g = groups.find((gr) => gr.ys.every((y, i) => Math.abs(y - vals[i]!) < 1e-9));
+    if (g) g.ids.push(id);
+    else groups.push({ ids: [id], ys: vals });
+  }
+  return groups.map((g) => g.ids);
 }

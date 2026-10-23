@@ -33,13 +33,7 @@ const H = M09_CONFIG.hedge;
 export type HedgeId = 'unhedged' | 'forward' | 'call' | 'collar' | 'leveraged';
 
 /** Strategies in legend order (simple → structured). */
-export const HEDGE_IDS: readonly HedgeId[] = [
-  'unhedged',
-  'forward',
-  'call',
-  'collar',
-  'leveraged',
-];
+export const HEDGE_IDS: readonly HedgeId[] = ['unhedged', 'forward', 'call', 'collar', 'leveraged'];
 
 export function isHedgeId(x: unknown): x is HedgeId {
   return typeof x === 'string' && (HEDGE_IDS as readonly string[]).includes(x);
@@ -178,12 +172,7 @@ export function initialHedgeFixing(m: PayoffMarket = M09_MARKET): number {
 /* ---------- events: levels where a strategy changes character ---------- */
 
 export type HedgeEventId =
-  | 'forward'
-  | 'callStrike'
-  | 'collarCap'
-  | 'collarFloor'
-  | 'levStrike'
-  | 'levWorse';
+  'forward' | 'callStrike' | 'collarCap' | 'collarFloor' | 'levStrike' | 'levWorse';
 
 export interface HedgeEvent {
   id: HedgeEventId;

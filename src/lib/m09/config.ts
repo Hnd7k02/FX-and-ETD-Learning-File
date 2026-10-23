@@ -99,13 +99,14 @@ export const M09_CONFIG = {
   },
 
   /**
-   * ProductMatrix (sections 1 and 3): chart range of S_T relative to spot, samples per curve
-   * and the y range in pips per USD (curves beyond it are clipped and marked "nicht begrenzt").
+   * ProductMatrix (sections 1 and 3): chart range of S_T relative to spot (±10 %, wide enough
+   * to show the leveraged losses below the TARF and pivot strikes), samples per curve and the
+   * y range in pips per USD (curves beyond it are clipped and marked "nicht begrenzt").
    */
   matrix: {
-    xRange: [-0.0625, 0.0625] as const,
-    samples: 120,
-    clipPips: 900,
+    xRange: [-0.1, 0.1] as const,
+    samples: 160,
+    clipPips: 1000,
     fixingStep: 0.0005,
     /** S_T shown first: the importer's fear, a dollar 3 % stronger. Choice. */
     initialMove: 0.03,
