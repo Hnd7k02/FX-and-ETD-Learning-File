@@ -1,0 +1,72 @@
+import G10ProfilesFigure from '@/components/figures/G10ProfilesFigure.astro';
+
+{/* 01 Spot · Section 4 · G10 profiles, roles, carry. Facts via <Fact />, April 2025 from the ECB reference rates (m01.apr25…). */}
+
+Why does USD/CHF move at all? Behind every currency stand a central bank, an economy and investors with expectations. If US interest rates rise, dollar investments become more attractive. If the world slides into a crisis, investors look for safe havens. If the oil price rises, Norway earns more.
+
+The market groups ten large, freely traded currencies as the **G10**: USD, EUR, JPY, GBP, CHF, AUD, NZD, CAD, NOK and SEK. The dollar is the hub. In <Fact id="m01-bis-month" /> it was on one side of <Fact id="m01-bis-usd-share" /> of all FX trades. The franc was the world's <Fact id="m01-bis-chf-rank" /> currency, even though Switzerland is a small country.
+
+<G10ProfilesFigure caption="Filter by role, pick a scenario and tap a currency. The arrows show typical tendencies, not forecasts." />
+
+### Four roles
+
+- **Major reserve currency:** USD and EUR. Central banks around the world hold them as reserves; much trade and lending runs through them.
+- **Safe haven:** USD, JPY and CHF. In a crisis, money flows to countries with stable institutions and deep, liquid markets. These currencies then often appreciate.
+- **Commodity currency:** AUD, NZD, CAD and NOK. Their countries export a lot of commodities. When those prices rise, the currency tends to appreciate.
+- **Funding currency:** JPY and CHF. They have had very low interest rates for long periods. Investors borrow them to finance higher-yielding investments.
+
+Sterling and the Swedish krona have no special role. Their rates mainly follow interest rates, growth and politics.
+
+### Carry: the franc as a funding currency
+
+In the example the franc pays <Num of="ex.rd" /> interest and the dollar <Num of="ex.rf" />. That invites a **carry trade**. An investor borrows <Num of="m01.costToday" />, changes it into USD 1m at the spot rate of <Num of="ex.spot" /> and invests the dollars in the money market for <Num of="ex.mmDays" /> days. Afterwards he has <Num of="m01.carryUsdEnd" />, so <Num of="m01.carryInterestUsd" /> of interest. He has to repay <Num of="m01.carryChfDebt" />.
+
+- **USD/CHF stays at <Num of="ex.spot" />.** He changes the dollars back and earns <Num of="m01.carryPnlFlat" />.
+- **USD/CHF falls to <Num of="m01.stDown" />.** He gets too few francs back and loses <Num of="m01.carryPnlDown" />. The interest advantage is gone, and a great deal more.
+
+The break-even rate is <Num of="m01.carryBreakEven" />. That is exactly the forward from module 02. If the investor hedges the dollars with a forward, no profit is left: the forward already prices in the interest rate differential. The carry trade only earns money if the rate falls by less than the forward implies.
+
+<Callout variant="bad" title="When carry goes wrong">
+
+Carry trades often run smoothly for a long time and then turn quickly. In a crisis many investors want out at the same time. They buy back the borrowed francs and yen, the funding currencies appreciate, and the loss on the exchange rate wipes out many months of interest.
+
+</Callout>
+
+### Roles can flip
+
+After the US tariff announcements of <Fact id="m01-tariff-date" /> markets were very turbulent. Yet the dollar lost value. According to the ECB reference rates, USD/CHF fell from <Num of="m01.apr25UsdChfStart" /> to <Num of="m01.apr25UsdChfLow" /> by the low of the month, a move of <Num of="m01.apr25UsdChfPct" />. Over the same period EUR/USD rose from <Num of="m01.apr25EurUsdStart" /> to <Num of="m01.apr25EurUsdHigh" />. The franc played its part; the dollar did not behave like a safe haven in this phase. Roles are tendencies, not laws.
+
+<Derivation title="Derivation: profit and break-even of a carry trade">
+
+An investor borrows <i>N</i> · <i>S</i> francs at the rate <i>r</i><sub>CHF</sub>, uses them to buy <i>N</i> dollars and invests these at the rate <i>r</i><sub>USD</sub>. With the money-market convention Act/360 and <i>t</i> = days / 360, at the end:
+
+<Formula>
+  <span>Dollars: <i>N</i> · (1 + <i>r</i><sub>USD</sub> · <i>t</i>)</span>
+  <span>Debt in francs: <i>N</i> · <i>S</i> · (1 + <i>r</i><sub>CHF</sub> · <i>t</i>)</span>
+</Formula>
+
+If he changes the dollars back at the rate <i>S</i><sub>T</sub> that applies then, his result in francs is
+
+<Formula><i>P</i>(<i>S</i><sub>T</sub>) = <i>N</i> · (1 + <i>r</i><sub>USD</sub> · <i>t</i>) · <i>S</i><sub>T</sub> − <i>N</i> · <i>S</i> · (1 + <i>r</i><sub>CHF</sub> · <i>t</i>)</Formula>
+
+Break-even, <i>P</i> = 0, is reached at
+
+<Formula variant="accent"><i>S</i><sup>*</sup> = <i>S</i> · (1 + <i>r</i><sub>CHF</sub> · <i>t</i>) / (1 + <i>r</i><sub>USD</sub> · <i>t</i>) = <Num of="m01.carryBreakEven" /></Formula>
+
+This is the forward formula with the quote currency on top and the base currency below. The carry trade is therefore a bet that the rate ends above the forward.
+
+</Derivation>
+
+<Desk title="Reading currencies in groups">
+
+On the desk you rarely think in a single pair. If equities fall while the franc and the yen rise together, it is a risk-off day. If AUD, NZD and NOK rise with commodity prices, the mood is good. The rates calendar shows when each central bank decides: risk events are to be expected on those days.
+
+For Swiss companies EUR/CHF is often just as important as USD/CHF, because a large part of Swiss trade is with the euro area.
+
+</Desk>
+
+<Takeaway>
+
+Every currency has a character: its central bank, its economy, its role. Safe haven, commodity or funding currency describe tendencies, not laws.
+
+</Takeaway>

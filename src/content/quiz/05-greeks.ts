@@ -51,16 +51,6 @@ const check1: QuizQuestion = {
   options: [
     {
       label: {
-        de: 'Delta wächst unterwegs mit dem Kurs, und diese Krümmung (Gamma) fehlt',
-        en: 'Delta grows with the rate along the way, and that curvature (gamma) is missing',
-      },
-      explain: {
-        de: `Delta ist die Steigung von heute. Steigt der Kurs, wird die Preiskurve steiler, weil Gamma positiv ist. Mit dem Term ½ · Γ · (ΔS)² kommt die Schätzung auf ${spotUpDG.de}, fast genau der exakte Wert.`,
-        en: `Delta is today's slope. As the rate rises, the price curve gets steeper because gamma is positive. With the term ½ · Γ · (ΔS)² the estimate reaches ${spotUpDG.en}, almost exactly the true value.`,
-      },
-    },
-    {
-      label: {
         de: 'Weil gleichzeitig Zeit vergeht (Theta)',
         en: 'Because time passes at the same time (theta)',
       },
@@ -79,8 +69,18 @@ const check1: QuizQuestion = {
         en: 'Volatility stays the same in this scenario; only spot moves. The gap comes from the curvature of the price curve: gamma.',
       },
     },
+    {
+      label: {
+        de: 'Weil Delta mit dem Kurs wächst: Die Krümmung (Gamma) fehlt',
+        en: 'Because delta grows with the rate: the curvature (gamma) is missing',
+      },
+      explain: {
+        de: `Delta ist die Steigung von heute. Steigt der Kurs, wird die Preiskurve steiler, weil Gamma positiv ist. Mit dem Term ½ · Γ · (ΔS)² kommt die Schätzung auf ${spotUpDG.de}, fast genau der exakte Wert.`,
+        en: `Delta is today's slope. As the rate rises, the price curve gets steeper because gamma is positive. With the term ½ · Γ · (ΔS)² the estimate reaches ${spotUpDG.en}, almost exactly the true value.`,
+      },
+    },
   ],
-  correct: 0,
+  correct: 2,
 };
 
 const check2: QuizQuestion = {

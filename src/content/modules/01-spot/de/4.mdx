@@ -1,0 +1,72 @@
+import G10ProfilesFigure from '@/components/figures/G10ProfilesFigure.astro';
+
+{/* 01 Spot · Abschnitt 4 · G10-Steckbriefe, Rollen, Carry. Fakten über <Fact />, April 2025 aus den EZB-Referenzkursen (m01.apr25…). */}
+
+Warum bewegt sich USD/CHF überhaupt? Hinter jeder Währung stehen eine Zentralbank, eine Volkswirtschaft und Anleger mit Erwartungen. Steigen in den USA die Zinsen, werden Dollar-Anlagen attraktiver. Gerät die Welt in eine Krise, suchen Anleger sichere Häfen. Steigt der Ölpreis, verdient Norwegen mehr.
+
+Am Markt fasst man zehn grosse, frei handelbare Währungen als **G10** zusammen: USD, EUR, JPY, GBP, CHF, AUD, NZD, CAD, NOK und SEK. Der Dollar ist die Drehscheibe. Im <Fact id="m01-bis-month" /> stand er auf einer Seite von <Fact id="m01-bis-usd-share" /> aller Devisengeschäfte. Der Franken war die <Fact id="m01-bis-chf-rank" /> Währung der Welt, obwohl die Schweiz ein kleines Land ist.
+
+<G10ProfilesFigure caption="Filtere nach Rolle, wähle ein Szenario und tippe eine Währung an. Die Pfeile zeigen typische Tendenzen, keine Prognosen." />
+
+### Vier Rollen
+
+- **Grosse Reservewährung:** USD und EUR. Zentralbanken weltweit halten sie als Reserve, viel Handel und viele Kredite laufen über sie.
+- **Safe Haven:** USD, JPY und CHF. In Krisen fliesst Geld in Länder mit stabilen Institutionen und tiefen, liquiden Märkten. Diese Währungen werten dann oft auf.
+- **Rohstoffwährung:** AUD, NZD, CAD und NOK. Ihre Länder exportieren viele Rohstoffe. Steigen deren Preise, wertet die Währung tendenziell auf.
+- **Funding-Währung:** JPY und CHF. Sie hatten über lange Zeit sehr tiefe Zinsen. Anleger leihen sie sich, um höher verzinste Anlagen zu finanzieren.
+
+Pfund und Schwedische Krone haben keine Sonderrolle. Ihre Kurse folgen vor allem Zinsen, Konjunktur und Politik.
+
+### Carry: der Franken als Funding-Währung
+
+Im Beispiel zahlt der Franken <Num of="ex.rd" /> Zins, der Dollar <Num of="ex.rf" />. Das lädt zu einem **Carry Trade** ein. Ein Anleger leiht sich <Num of="m01.costToday" />, tauscht sie zum Spot von <Num of="ex.spot" /> in USD 1 Mio. und legt die Dollars für <Num of="ex.mmDays" /> Tage am Geldmarkt an. Danach hat er <Num of="m01.carryUsdEnd" />, also <Num of="m01.carryInterestUsd" /> Zins. Zurückzahlen muss er <Num of="m01.carryChfDebt" />.
+
+- **USD/CHF bleibt bei <Num of="ex.spot" />.** Er tauscht die Dollars zurück und verdient <Num of="m01.carryPnlFlat" />.
+- **USD/CHF fällt auf <Num of="m01.stDown" />.** Er erhält zu wenig Franken und verliert <Num of="m01.carryPnlDown" />. Der Zinsvorteil ist weg, und noch viel mehr.
+
+Die Gewinnschwelle liegt bei <Num of="m01.carryBreakEven" />. Das ist genau der Forward aus Modul 02. Sichert der Anleger die Dollars mit einem Forward ab, bleibt kein Gewinn übrig: Der Forward preist die Zinsdifferenz schon ein. Der Carry Trade verdient nur, wenn der Kurs weniger fällt, als der Forward es vorsieht.
+
+<Callout variant="bad" title="Wann Carry schiefgeht">
+
+Carry Trades laufen oft lange gut und kippen dann schnell. In einer Krise wollen viele Anleger gleichzeitig aussteigen. Sie kaufen die geliehenen Franken und Yen zurück, die Funding-Währungen werten auf, und der Verlust aus dem Kurs frisst die Zinsen vieler Monate.
+
+</Callout>
+
+### Rollen können kippen
+
+Nach den US-Zollankündigungen vom <Fact id="m01-tariff-date" /> waren die Märkte sehr unruhig. Trotzdem verlor der Dollar an Wert. Laut EZB-Referenzkursen fiel USD/CHF bis zum Tief des Monats von <Num of="m01.apr25UsdChfStart" /> auf <Num of="m01.apr25UsdChfLow" />, also um <Num of="m01.apr25UsdChfPct" />. EUR/USD stieg im gleichen Zeitraum von <Num of="m01.apr25EurUsdStart" /> auf <Num of="m01.apr25EurUsdHigh" />. Der Franken spielte seine Rolle, der Dollar verhielt sich in dieser Phase nicht wie ein Safe Haven. Rollen sind Tendenzen, keine Gesetze.
+
+<Derivation title="Herleitung: Gewinn und Gewinnschwelle eines Carry Trades">
+
+Ein Anleger leiht <i>N</i> · <i>S</i> Franken zum Zins <i>r</i><sub>CHF</sub>, kauft damit <i>N</i> Dollar und legt sie zum Zins <i>r</i><sub>USD</sub> an. Mit der Geldmarkt-Konvention Act/360 und <i>t</i> = Tage / 360 gilt am Ende:
+
+<Formula>
+  <span>Dollar: <i>N</i> · (1 + <i>r</i><sub>USD</sub> · <i>t</i>)</span>
+  <span>Schuld in Franken: <i>N</i> · <i>S</i> · (1 + <i>r</i><sub>CHF</sub> · <i>t</i>)</span>
+</Formula>
+
+Tauscht er die Dollars zum dann gültigen Kurs <i>S</i><sub>T</sub> zurück, ist sein Ergebnis in Franken
+
+<Formula><i>G</i>(<i>S</i><sub>T</sub>) = <i>N</i> · (1 + <i>r</i><sub>USD</sub> · <i>t</i>) · <i>S</i><sub>T</sub> − <i>N</i> · <i>S</i> · (1 + <i>r</i><sub>CHF</sub> · <i>t</i>)</Formula>
+
+Die Gewinnschwelle <i>G</i> = 0 liegt bei
+
+<Formula variant="accent"><i>S</i><sup>*</sup> = <i>S</i> · (1 + <i>r</i><sub>CHF</sub> · <i>t</i>) / (1 + <i>r</i><sub>USD</sub> · <i>t</i>) = <Num of="m01.carryBreakEven" /></Formula>
+
+Das ist die Formel des Forwards mit der Quote-Währung oben und der Base-Währung unten. Der Carry Trade ist also eine Wette darauf, dass der Kurs über dem Forward endet.
+
+</Derivation>
+
+<Desk title="Währungen in Gruppen lesen">
+
+Am Desk denkt man selten in einem einzelnen Paar. Fällt der Aktienmarkt und steigen Franken und Yen gleichzeitig, ist das ein Risk-off-Tag. Steigen AUD, NZD und NOK mit den Rohstoffpreisen, ist die Stimmung gut. Der Zinskalender zeigt, wann welche Zentralbank entscheidet: An diesen Tagen ist mit Risk Events zu rechnen.
+
+Für Schweizer Firmen ist EUR/CHF oft genauso wichtig wie USD/CHF, denn ein grosser Teil des Schweizer Handels läuft mit dem Euroraum.
+
+</Desk>
+
+<Takeaway>
+
+Jede Währung hat einen Charakter: ihre Zentralbank, ihre Wirtschaft, ihre Rolle. Safe Haven, Rohstoff- oder Funding-Währung beschreiben Tendenzen, keine Gesetze.
+
+</Takeaway>
