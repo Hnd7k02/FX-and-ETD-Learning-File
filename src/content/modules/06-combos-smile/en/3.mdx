@@ -27,12 +27,12 @@ The butterfly buys calls at <Num of="m06.flyLow" /> and <Num of="m06.flyHigh" />
 
 The importer's seagull (calls at <Num of="m06.sgK1" /> and <Num of="m06.sgK2" />, put at <Num of="m06.sgPut" />) costs nothing. But it is short vega: <Num of="m06.sgVegaChf" /> per point. If vol rises by <Num of="m06.shockPts" /> points, the structure loses <Num of="m06.sgShockChf" /> in value today. The hedge still works at expiry. Until then, though, the daily valuation shows a loss.
 
-| Structure | Premium in pips | Vega per point | Vol +<Num of="m06.shockPts" /> points |
-| --- | --- | --- | --- |
-| Straddle | <Num of="m06.straddlePips" /> | <Num of="m06.straddleVegaChf" /> | <Num of="m06.straddleShockChf" /> |
-| Strangle | <Num of="m06.strPips" /> | <Num of="m06.strVegaChf" /> | <Num of="m06.strShockChf" /> |
-| Butterfly | <Num of="m06.flyPips" /> | <Num of="m06.flyVegaChf" /> | <Num of="m06.flyShockChf" /> |
-| Seagull | Zero cost | <Num of="m06.sgVegaChf" /> | <Num of="m06.sgShockChf" /> |
+| Structure | Vega per point | Vol +<Num of="m06.shockPts" /> points |
+| --- | --- | --- |
+| Straddle | <Num of="m06.straddleVegaChf" /> | <Num of="m06.straddleShockChf" /> |
+| Strangle | <Num of="m06.strVegaChf" /> | <Num of="m06.strShockChf" /> |
+| Butterfly | <Num of="m06.flyVegaChf" /> | <Num of="m06.flyShockChf" /> |
+| Seagull | <Num of="m06.sgVegaChf" /> | <Num of="m06.sgShockChf" /> |
 
 <Callout variant="warn" title="When the seagull hurts">
 

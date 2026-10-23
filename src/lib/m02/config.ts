@@ -33,6 +33,7 @@ export const M02_CONFIG = {
     days: EXAMPLE.mmDays,
     T: EXAMPLE.T,
     notional: EXAMPLE.notional,
+    months: EXAMPLE.months,
     basisQuote: basisOf(EXAMPLE.quote),
     basisBase: basisOf(EXAMPLE.base),
   },

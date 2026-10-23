@@ -1,0 +1,21 @@
+---
+/**
+ * HedgeOutcome as an MDX figure (module 02, section 1): <HedgeOutcomeFigure caption="…" />.
+ * Reads the page language and hydrates the island when it scrolls into view.
+ */
+import Figure from '@/components/content/Figure.astro';
+import HedgeOutcome from '@/components/islands/HedgeOutcome';
+import { pageLang } from '@/components/content/lang';
+import M02Styles from './M02Styles.astro';
+
+interface Props {
+  caption?: string;
+}
+const { caption } = Astro.props;
+const lang = pageLang(Astro.currentLocale);
+---
+
+<M02Styles />
+<Figure caption={caption}>
+  <HedgeOutcome client:visible lang={lang} />
+</Figure>

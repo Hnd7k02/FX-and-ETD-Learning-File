@@ -27,12 +27,12 @@ Der Butterfly kauft Calls bei <Num of="m06.flyLow" /> und <Num of="m06.flyHigh" 
 
 Der Seagull des Importeurs (Calls <Num of="m06.sgK1" /> und <Num of="m06.sgK2" />, Put <Num of="m06.sgPut" />) kostet nichts. Er ist aber short Vega: <Num of="m06.sgVegaChf" /> je Punkt. Steigt die Vola um <Num of="m06.shockPts" /> Punkte, verliert die Struktur heute <Num of="m06.sgShockChf" /> an Wert. Die Absicherung bei Verfall funktioniert trotzdem. Bis dahin zeigt die tägliche Bewertung aber einen Verlust.
 
-| Struktur | Prämie in Pips | Vega je Punkt | Vola +<Num of="m06.shockPts" /> Punkte |
-| --- | --- | --- | --- |
-| Straddle | <Num of="m06.straddlePips" /> | <Num of="m06.straddleVegaChf" /> | <Num of="m06.straddleShockChf" /> |
-| Strangle | <Num of="m06.strPips" /> | <Num of="m06.strVegaChf" /> | <Num of="m06.strShockChf" /> |
-| Butterfly | <Num of="m06.flyPips" /> | <Num of="m06.flyVegaChf" /> | <Num of="m06.flyShockChf" /> |
-| Seagull | Zero Cost | <Num of="m06.sgVegaChf" /> | <Num of="m06.sgShockChf" /> |
+| Struktur | Vega je Punkt | Vola +<Num of="m06.shockPts" /> Punkte |
+| --- | --- | --- |
+| Straddle | <Num of="m06.straddleVegaChf" /> | <Num of="m06.straddleShockChf" /> |
+| Strangle | <Num of="m06.strVegaChf" /> | <Num of="m06.strShockChf" /> |
+| Butterfly | <Num of="m06.flyVegaChf" /> | <Num of="m06.flyShockChf" /> |
+| Seagull | <Num of="m06.sgVegaChf" /> | <Num of="m06.sgShockChf" /> |
 
 <Callout variant="warn" title="Wann der Seagull schmerzt">
 

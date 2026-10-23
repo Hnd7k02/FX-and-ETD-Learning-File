@@ -34,6 +34,7 @@ export const orderdemo = defineDict({
     dayN: 'Tag {n}',
     rowSlip: 'gegenüber dem Order-Kurs',
     rowVsMarket: 'gegenüber Market am Tag 1',
+    pipsValue: '{pips} Pips',
     'note.market':
       'Sofort ausgeführt zum aktuellen Ask, {rate}. Die Ausführung ist sicher, den Kurs nimmst du, wie er ist.',
     'note.limitFilled':
@@ -82,6 +83,7 @@ export const orderdemo = defineDict({
     dayN: 'day {n}',
     rowSlip: 'versus the order rate',
     rowVsMarket: 'versus market on day 1',
+    pipsValue: '{pips} pips',
     'note.market':
       'Filled at once at the current ask, {rate}. Execution is certain; you take the rate as it is.',
     'note.limitFilled':

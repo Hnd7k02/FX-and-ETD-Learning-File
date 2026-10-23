@@ -1,0 +1,161 @@
+---
+/** Triangular arbitrage calculator (module 01, section 3) for MDX. Props: caption. */
+import TriangularArbitrage from '@/components/islands/TriangularArbitrage';
+import Figure from '@/components/content/Figure.astro';
+import { pageLang } from '@/components/content/lang';
+
+interface Props {
+  caption?: string;
+}
+const { caption } = Astro.props;
+const lang = pageLang(Astro.currentLocale);
+---
+
+<Figure caption={caption}>
+  <TriangularArbitrage client:visible lang={lang} />
+</Figure>
+
+<style is:global>
+  .tri {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+  }
+  .tri .ff-lab-head {
+    margin-bottom: 0;
+  }
+  .tri-head-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+  .tri-chip {
+    background: var(--ff-linear-soft);
+    color: var(--ff-linear-text);
+    font-weight: 800;
+  }
+  .tri p {
+    margin: 0;
+  }
+  .tri-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    font-family: var(--ff-font-ui);
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .tri-flow {
+    stroke-dasharray: 7 7;
+    animation: tri-flow 900ms linear infinite;
+  }
+  @keyframes tri-flow {
+    from {
+      stroke-dashoffset: 28;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  .tri-amounts {
+    animation: tri-rise 300ms ease-out both;
+  }
+  @keyframes tri-rise {
+    from {
+      transform: translateY(4px);
+    }
+    to {
+      transform: none;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .tri-flow,
+    .tri-amounts {
+      animation: none !important;
+    }
+  }
+  .tri-ruler-title {
+    margin-top: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ff-ink-2);
+  }
+  .tri-direct {
+    cursor: grab;
+    touch-action: none;
+  }
+  .tri-direct.is-active {
+    cursor: grabbing;
+  }
+  .tri-surface {
+    cursor: ew-resize;
+    touch-action: pan-y;
+  }
+  .tri .tri-hint {
+    font-size: 12px;
+    color: var(--ff-muted);
+  }
+  .tri-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+  }
+  .tri-row .segmented > button {
+    min-height: 44px;
+  }
+  .tri-legs {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px 16px;
+    border: 1px solid var(--ff-line);
+    border-radius: var(--ff-r-box);
+  }
+  .tri-legs-title {
+    font-size: 13px;
+    font-weight: 800;
+  }
+  .tri-legs ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .tri-legs li {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    animation: tri-rise 300ms ease-out both;
+  }
+  .tri-leg-head {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ff-ink);
+  }
+  .tri-leg-flow {
+    font-size: 12px;
+    color: var(--ff-ink-2);
+  }
+  .tri .tri-nolegs {
+    font-size: 13px;
+    color: var(--ff-muted);
+  }
+  .tri .tri-note {
+    padding: 14px 16px;
+    border-radius: var(--ff-r-box);
+    background: var(--ff-surface-2);
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--ff-ink-2);
+  }
+  .tri .tri-note.is-arb {
+    background: var(--ff-good-soft);
+    color: var(--ff-good-text-strong);
+  }
+</style>
