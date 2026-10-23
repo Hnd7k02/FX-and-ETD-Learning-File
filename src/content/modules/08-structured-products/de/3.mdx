@@ -22,7 +22,7 @@ In Bausteinen: pro Fixing ein gekaufter Call und zwei verkaufte Puts zum Strike,
 
 Mit diesen Beispielwerten liegt das erste Fixing fast immer weit über dem Strike. Das Target ist darum schnell erreicht: in <Num of="m08.tarfPTarget" /> der Monte-Carlo-Pfade, im Schnitt nach <Num of="m08.tarfExpFix" /> Fixings. Drei Szenarien im Simulator:
 
-- **Trend auf.** Target nach <Num of="m08.tarfUpEnd" /> Fixings. Der TARF bringt <Num of="m08.tarfUpPnl" />, mehr geht nicht. Der Importeur hat erst <Num of="m08.tarfUpUsd" /> gekauft. Den Rest kauft er am Markt, zu steigenden Kursen. Gegenüber dem Forward-Hedge (<Num of="m08.tarfUpFwd" />) liegt er <Num of="m08.tarfUpDiff" /> zurück.
+- **Trend auf.** Target nach <Num of="m08.tarfUpEnd" /> Fixings. Der TARF bringt <Num of="m08.tarfUpPnl" />, mehr geht nicht. Der Importeur hat erst <Num of="m08.tarfUpUsd" /> gekauft. Den Rest kauft er am Markt, zu steigenden Kursen. Der Forward-Hedge brachte <Num of="m08.tarfUpFwd" />, die Differenz ist <Num of="m08.tarfUpDiff" />.
 - **Schock vor dem Target.** Der Kurs fällt an Tag <Num of="m08.shockDay" /> um <Num of="m08.shockGapAbs" />. Schon das erste Fixing liegt unter dem Strike, das Target kommt nie. Alle <Num of="m08.tarfShockLev" /> Fixings kaufen doppelt, zusammen <Num of="m08.tarfShockUsd" />: doppelt so viel, wie der Importeur braucht. Ergebnis gegen den Markt: <Num of="m08.tarfShockPnl" />.
 - **100 Pfade.** Die Balken unter dem Chart zeigen das Ergebnis jedes Pfads. Fast alle sind kleine Gewinne bis höchstens <Num of="m08.tarfTargetChf" />. Ganz rechts stehen wenige tiefe Verluste. Jeder 20. Pfad verliert mehr als <Num of="m08.tarfQ05" />, der schlechteste von <Num of="m08.paths" /> Pfaden <Num of="m08.tarfWorst" />.
 

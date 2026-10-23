@@ -22,7 +22,7 @@ In building blocks: per fixing, one bought USD call on <Num of="m08.accNotional"
 
 The simulator compares the product with a forward hedge. The hedge buys <Num of="m08.accNotional" /> on every scheduled fixing at that day's forward. Both are measured against the market rate. The difference shows how much cheaper (+) or dearer (−) the accumulator made the dollars than the forward did.
 
-- **Trend up.** The dollar rises and reaches the barrier at fixing <Num of="m08.accUpKo" />: knock-out. The importer has bought only <Num of="m08.accUpUsd" />. He has to buy the rest in the market, at higher rates. Accumulator <Num of="m08.accUpPnl" />, forward <Num of="m08.accUpFwd" />: the accumulator is <Num of="m08.accUpDiff" /> behind.
+- **Trend up.** The dollar rises and reaches the barrier at fixing <Num of="m08.accUpKo" />: knock-out. The importer has bought only <Num of="m08.accUpUsd" />. He has to buy the rest in the market, at higher rates. Accumulator <Num of="m08.accUpPnl" />, forward <Num of="m08.accUpFwd" />, difference <Num of="m08.accUpDiff" />.
 - **Sideways.** No knock-out, no fixing below the strike. Every fixing buys the normal amount at the better rate. Accumulator <Num of="m08.accSidePnl" />, forward <Num of="m08.accSideFwd" />: <Num of="m08.accSideDiff" /> for the accumulator.
 - **Trend down.** See the box below.
 

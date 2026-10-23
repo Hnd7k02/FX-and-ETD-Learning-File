@@ -63,7 +63,7 @@ const PILLARS: Pillar[] = ['put25', 'atm', 'call25'];
 function layoutFor(w: number) {
   const width = Math.max(280, Math.round(w));
   const compact = width < 560;
-  const height = compact ? 300 : Math.round(clamp(width * 0.6, 320, 410));
+  const height = compact ? 330 : Math.round(clamp(width * 0.6, 320, 410));
   return {
     width,
     height,
@@ -210,7 +210,9 @@ export default function SmileBuilder(props: SmileBuilderProps): JSX.Element {
     const d = DELTA_TICKS.find((x) => Math.abs(x.delta - v) < 1e-9);
     return d ? t(`sb.tick.${d.key}`) : '';
   };
-  const pillarLabel = (k: Pillar) => `${t(`sb.pillar.${k}`)} ${pct(geom.pillars[k].vol)}`;
+  const SHORT: Record<Pillar, 'p25' | 'atm' | 'c25'> = { put25: 'p25', atm: 'atm', call25: 'c25' };
+  const pillarLabel = (k: Pillar) =>
+    `${L.compact ? t(`sb.tick.${SHORT[k]}`) : t(`sb.pillar.${k}`)} ${pct(geom.pillars[k].vol)}`;
 
   /* label placement: BF label first, then each pillar label on its clearest side */
   const charW = L.font * 0.58;

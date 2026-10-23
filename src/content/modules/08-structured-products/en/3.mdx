@@ -22,7 +22,7 @@ In building blocks: per fixing, a bought call and two sold puts at the strike, p
 
 With these example values the first fixing is almost always far above the strike. The target is therefore reached quickly: in <Num of="m08.tarfPTarget" /> of the Monte Carlo paths, on average after <Num of="m08.tarfExpFix" /> fixings. Three scenarios in the simulator:
 
-- **Trend up.** Target after <Num of="m08.tarfUpEnd" /> fixings. The TARF brings <Num of="m08.tarfUpPnl" />, and that is the maximum. The importer has bought only <Num of="m08.tarfUpUsd" />. He buys the rest in the market, at rising rates. Against the forward hedge (<Num of="m08.tarfUpFwd" />) he is <Num of="m08.tarfUpDiff" /> behind.
+- **Trend up.** Target after <Num of="m08.tarfUpEnd" /> fixings. The TARF brings <Num of="m08.tarfUpPnl" />, and that is the maximum. The importer has bought only <Num of="m08.tarfUpUsd" />. He buys the rest in the market, at rising rates. The forward hedge brought <Num of="m08.tarfUpFwd" />; the difference is <Num of="m08.tarfUpDiff" />.
 - **Shock before the target.** The rate falls by <Num of="m08.shockGapAbs" /> on day <Num of="m08.shockDay" />. The very first fixing is below the strike and the target never comes. All <Num of="m08.tarfShockLev" /> fixings buy double, <Num of="m08.tarfShockUsd" /> in total: twice what the importer needs. Result against the market: <Num of="m08.tarfShockPnl" />.
 - **100 paths.** The bars below the chart show the result of each path. Almost all are small gains of at most <Num of="m08.tarfTargetChf" />. On the far right stand a few deep losses. One path in 20 loses more than <Num of="m08.tarfQ05" />, the worst of <Num of="m08.paths" /> paths <Num of="m08.tarfWorst" />.
 

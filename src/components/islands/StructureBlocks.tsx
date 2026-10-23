@@ -172,10 +172,10 @@ export default function StructureBlocks(props: StructureBlocksProps): JSX.Elemen
   const plotBottom = L.height - L.axis;
   const ys = scaleLinear(domain, [plotBottom, L.top]);
   const yTicks = niceTicks(domain[0], domain[1], L.compact ? 4 : 6).filter(
-    (v) => v >= domain[0] && v <= domain[1],
+    (v) => v >= domain[0] && domain[1] >= v,
   );
   const xTicks = niceTicks(X_RANGE[0], X_RANGE[1], L.compact ? 4 : 6).filter(
-    (v) => v > X_RANGE[0] && v < X_RANGE[1],
+    (v) => v > X_RANGE[0] && X_RANGE[1] > v,
   );
 
   /* ---------- formatting ---------- */
@@ -258,7 +258,7 @@ export default function StructureBlocks(props: StructureBlocksProps): JSX.Elemen
   const clipId = `sb-clip-${uid}`;
 
   const prodAt = stagePayoff(stage, fixing);
-  const inKo = !!stage.knockOut && fixing >= stage.knockOut.from && fixing <= stage.knockOut.to;
+  const inKo = !!stage.knockOut && fixing >= stage.knockOut.from && stage.knockOut.to >= fixing;
   const readout = inKo
     ? t('sb.readoutKo', { s: rate(fixing), product: productName })
     : story

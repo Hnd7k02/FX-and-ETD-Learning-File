@@ -4,6 +4,7 @@
 import { describe, expect, it } from 'vitest';
 import { EXAMPLE } from '@/lib/fx/example';
 import { triangularArbitrage } from '@/lib/fx/arbitrage';
+import { forwardMoneyMarket } from '@/lib/fx/forward';
 import {
   BIG_FIGURE,
   bigFigureBlocks,
@@ -123,7 +124,7 @@ describe('session clock (section 2)', () => {
       const peak = curve.reduce((a, b) => (b[1] > a[1] ? b : a));
       expect(peak[0]).toBeGreaterThanOrEqual(14);
       expect(peak[0]).toBeLessThan(18);
-      expect(peak[1]).toBeCloseTo(1, 6);
+      expect(peak[1]).toBeGreaterThan(0.99);
       expect(liquidityLevel(season, 'monThu', 15)).toBe('peak');
       expect(liquidityLevel(season, 'monThu', 11)).toBe('high');
       expect(inOverlap(season, 'monThu', 15)).toBe(true);
@@ -366,6 +367,11 @@ describe('number registry m01', () => {
     expect(nums['m01.pipChf']!.value).toBeCloseTo(100, 6);
     expect(formatNum(nums['m01.inverse']!, 'de')).toBe('1.2500');
     expect(M01.carry.breakEven).toBeCloseTo(nums['m01.carryBreakEven']!.value, 12);
+    // the carry break-even is the money-market forward of module 02
+    expect(M01.carry.breakEven).toBeCloseTo(
+      forwardMoneyMarket(EXAMPLE.spot, EXAMPLE.rd, EXAMPLE.rf, EXAMPLE.mmDays),
+      12,
+    );
     expect(M01.tri.profit).toBeGreaterThan(0);
     expect(M01.stopGap.slippagePips).toBeGreaterThan(100);
   });

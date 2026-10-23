@@ -247,7 +247,7 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
       }
       const cur = tRef.current;
       let next = cur + (dt * speed * sim.days) / (CFG.playSeconds * 1000);
-      const hit = evDays.find((d) => d > cur + 1e-9 && d <= next && d < sim.days);
+      const hit = evDays.find((d) => d > cur + 1e-9 && next >= d && sim.days > d);
       if (hit !== undefined) {
         next = hit;
         holdUntil = now + (rm ? 0 : CFG.eventHoldMs);
@@ -425,7 +425,7 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
   const dom = useTween(domTarget, 300, instant);
   const ys = scaleLinear([dom[0]!, dom[1]!], [plotBottom, L.top]);
   const yStep = niceTicks(dom[0]!, dom[1]!, L.compact ? 4 : 5);
-  const yTicks = yStep.filter((v) => v >= dom[0]! && v <= dom[1]!);
+  const yTicks = yStep.filter((v) => v >= dom[0]! && dom[1]! >= v);
   const yDigits = ratioDigits(yTicks.length > 1 ? yTicks[1]! - yTicks[0]! : 0.01);
   const xT = xs(Math.min(tDay, days));
 
@@ -468,7 +468,7 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
   const pnlDom = useTween(pnlDomTarget, 300, rm || drag !== null);
   const yp = scaleLinear([pnlDom[0]!, pnlDom[1]!], [pnlBottom, pnlTop]);
   const pnlTicks = niceTicks(pnlDom[0]!, pnlDom[1]!, L.compact ? 3 : 4).filter(
-    (v) => v >= pnlDom[0]! && v <= pnlDom[1]!,
+    (v) => v >= pnlDom[0]! && pnlDom[1]! >= v,
   );
   const stepD = (pts: Array<[number, number]>) => linePath(pts.map(([d, v]) => [xs(d), yp(v)]));
   const prodD = stepD(pnlSteps(sim, 'product'));
@@ -488,9 +488,9 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
   }, [ens, ensSum]);
   const yo = scaleLinear(outDom, [pnlBottom, pnlTop]);
   const outTicks = niceTicks(outDom[0], outDom[1], L.compact ? 3 : 4).filter(
-    (v) => v >= outDom[0] && v <= outDom[1],
+    (v) => v >= outDom[0] && outDom[1] >= v,
   );
-  const ended = ens.filter((p) => p.reason !== 'maturity' && p.endDay <= tDay + 1e-9).length;
+  const ended = ens.filter((p) => p.reason !== 'maturity' && tDay + 1e-9 >= p.endDay).length;
   const ensDone = tDay >= days - 1e-9;
 
   /* ---------- tweened numbers ---------- */
@@ -598,7 +598,7 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
   })();
   const levelText = (key: LevelKey, v: number) => t(`ps.lv.${key}`, { v: rate(v) });
   const levelsAria = levels.map((l) => levelText(l.key, l.value)).join(', ');
-  const levCount = sim.rows.filter((r) => r.day <= tDay && r.leveraged).length;
+  const levCount = sim.rows.filter((r) => tDay + 1e-9 >= r.day && r.leveraged).length;
   const pathAria = t('ps.aria.path', {
     pair: PAIR,
     scenario: scenarioName,
@@ -789,7 +789,7 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
   })();
 
   /* ---------- table ---------- */
-  const tableRows = sim.rows.filter((r) => r.day <= tDay + 1e-9);
+  const tableRows = sim.rows.filter((r) => tDay + 1e-9 >= r.day);
   const tableBox = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const el = tableBox.current;

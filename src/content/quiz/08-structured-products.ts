@@ -114,8 +114,8 @@ const check2: QuizQuestion = {
         en: `He has bought only ${accUpUsd.en} and has to buy the rest in the market at higher rates`,
       },
       explain: {
-        de: `Richtig. Der Knock-out kommt genau dann, wenn der Dollar steigt. Gegenüber dem Forward-Hedge liegt er ${accUpDiff.de} zurück.`,
-        en: `Correct. The knock-out comes exactly when the dollar rises. Against the forward hedge he is ${accUpDiff.en} behind.`,
+        de: `Richtig. Der Knock-out kommt genau dann, wenn der Dollar steigt. Differenz zum Forward-Hedge: ${accUpDiff.de}.`,
+        en: `Correct. The knock-out comes exactly when the dollar rises. Difference to the forward hedge: ${accUpDiff.en}.`,
       },
     },
     {

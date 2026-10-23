@@ -69,9 +69,7 @@ test.describe('module 08 · structured products', () => {
     });
   }
 
-  test('building blocks: steps move the strike, the fixing moves the readout', async ({
-    page,
-  }) => {
+  test('building blocks: steps move the strike, the fixing moves the readout', async ({ page }) => {
     await page.goto(`${BASE}/1/`);
     const sb = await hydrated(page, '[data-sb]');
     await sb.locator('[data-step-btn="1"]').click();
@@ -166,9 +164,7 @@ test.describe('module 08 · structured products', () => {
     await expect(dci.locator('[data-outcome]')).toHaveAttribute('data-outcome', 'good');
     const y1 = Number(await dci.getAttribute('data-yield'));
     await setRange(dci, 'Strike unter Spot', 0.025);
-    await expect
-      .poll(async () => Number(await dci.getAttribute('data-yield')))
-      .toBeLessThan(y1);
+    await expect.poll(async () => Number(await dci.getAttribute('data-yield'))).toBeLessThan(y1);
     await dci.getByRole('button', { name: '3 Monate' }).click();
     await expect.poll(async () => Number(await dci.getAttribute('data-yield'))).not.toBe(y1);
   });

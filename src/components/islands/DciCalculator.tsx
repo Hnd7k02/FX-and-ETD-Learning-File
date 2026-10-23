@@ -121,7 +121,7 @@ export default function DciCalculator(props: DciCalculatorProps): JSX.Element {
   const plotBottom = L.height - L.axis;
   const ys = scaleLinear([dom[0]!, dom[1]!], [plotBottom, L.top]);
   const yTicks = niceTicks(dom[0]!, dom[1]!, L.compact ? 4 : 5).filter(
-    (v) => v >= dom[0]! && v <= dom[1]!,
+    (v) => v >= dom[0]! && dom[1]! >= v,
   );
   const xTicks = niceTicks(x0, x1, L.compact ? 4 : 6).filter((v) => v > x0 && v < x1);
   const kTw = useTween(K, 300, instant);
