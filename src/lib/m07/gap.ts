@@ -105,11 +105,15 @@ export function gapSummary(series: readonly Point[], cfg = M07_CONFIG.gap): GapS
   };
 }
 
-/** Riskometer deep link for the event (path from src/i18n/routes riskometerPath). */
+/**
+ * Riskometer deep link for the event (path from src/i18n/routes riskometerPath). The pair goes in
+ * its canonical code without the slash ("EUR/CHF" → "EURCHF"), as the Riskometer writes it.
+ */
 export function riskometerLink(
   base: string,
   event: string = M07_CONFIG.gap.riskometerEvent,
   pair: string = M07_CONFIG.gap.pair,
 ): string {
-  return `${base}?event=${encodeURIComponent(event)}&pair=${encodeURIComponent(pair)}`;
+  const code = pair.replace('/', '');
+  return `${base}?event=${encodeURIComponent(event)}&pair=${encodeURIComponent(code)}`;
 }

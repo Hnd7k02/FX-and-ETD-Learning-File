@@ -4,11 +4,11 @@ import StructureBlocksFigure from '@/components/figures/StructureBlocksFigure.as
 
 The importer has to pay USD 1m in 3 months. With a forward he locks in the rate <Num of="ex.forward" digits={4} /> today. Clean, but not exciting.
 
-Then an offer arrives. Instead of buying everything at once, he buys the dollars spread over half a year: <Num of="m08.accNotional" /> every week, <Num of="m08.accTotal" /> in total. The rate is <Num of="m08.accStrike" />. That is <Num of="m08.accBetter" digits={0} /> pips better than the forward at the average fixing date (<Num of="m08.accFwd" />). There is no premium. Where is the catch?
+Then an offer arrives: an accumulator. Instead of buying everything at once, he buys the dollars spread over half a year: <Num of="m08.accNotional" /> every week, <Num of="m08.accTotal" /> in total. The rate is <Num of="m08.accStrike" />. That is <Num of="m08.accBetter" /> pips better than the forward at the average fixing date (<Num of="m08.accFwd" />). There is no premium. Where is the catch?
 
 ### Nothing is free
 
-A rate better than the forward has to be paid for. With structured products you do not pay with money but with **sold options**. You take on risks you would not have with the forward. In return the products are ‘zero cost’: at inception they are worth exactly nothing. What you gain in one place, you give back in another.
+A rate better than the forward has to be paid for. With structured products you do not pay with money but with **sold options**. You take on risks you would not have with the forward. In return the products are ‘zero cost’: at inception they are worth exactly nothing in the model. What you gain in one place, you give back in another.
 
 Two ingredients appear almost every time:
 
@@ -17,22 +17,22 @@ Two ingredients appear almost every time:
 
 <StructureBlocksFigure
   products={['accumulator', 'tarf']}
-  caption="Three steps from the forward to the accumulator. Each building block improves the strike. Drag the fixing to the left: below the strike the product loses twice as fast."
+  caption="Three steps from the forward to the accumulator. Each building block improves the strike. Drag the fixing to the left: below the strike the product loses twice as fast as the forward."
 />
 
 ### Worked example: where the pips come from
 
 The chart builds the accumulator in three steps. Each step sells the provider something, and each one moves the strike:
 
-1. **Forward.** A bought call and a sold put at the same strike make a forward. Zero cost at <Num of="m08.accFwd" />.
+1. **Forward.** A bought call and a sold put at the same strike make a forward: put-call parity from [module 04](/en/module/04-vanilla-options/4/). Zero cost at <Num of="m08.accFwd" />.
 2. **A second sold put.** Its premium pays for a better strike: <Num of="m08.accK2" />, that is <Num of="m08.accK2Pips" digits={0} /> pips better. In return you buy twice the amount below the strike.
-3. **Knock-out at <Num of="m08.accBarrier" />.** If the rate rises that far, everything ends. You give up the best scenarios. The strike falls by another <Num of="m08.accKoPips" digits={0} /> pips to <Num of="m08.accStrike" />.
+3. **Knock-out at <Num of="m08.accBarrier" />.** If the rate rises that far, everything ends, just like a barrier option from [module 07](/en/module/07-barrier-binary/2/). You give up the best scenarios. The strike falls by another <Num of="m08.accKoPips" digits={0} /> pips to <Num of="m08.accStrike" />.
 
 <Formula variant="accent"><Num of="m08.accFwd" /> − <Num of="m08.accK2Pips" digits={0} /> pips − <Num of="m08.accKoPips" digits={0} /> pips = <b><Num of="m08.accStrike" /></b></Formula>
 
 Step 2 can be calculated with the Garman-Kohlhagen formula. For step 3 there is no simple formula any more, because the knock-out depends on the whole path. Monte Carlo helps here: <Num of="m08.paths" /> simulated paths, with the strike solved so that the present value is zero. The standard error is <Num of="m08.accSe" /> pips. The gap to the forward is therefore real, not simulation noise.
 
-Why the forward at the average fixing date? The <Num of="m08.accFixings" /> fixings fall between week 1 and week 26. On average the importer buys on day <Num of="m08.accAvgDay" />, roughly after 3 months. That is where the fair comparison lies.
+Why the forward at the average fixing date? The <Num of="m08.accFixings" /> fixings fall between week 1 and week <Num of="m08.accFixings" />. On average the importer buys on day <Num of="m08.accAvgDay" />, roughly after 3 months. That is where the fair comparison lies. The schedule still does not match his single invoice exactly: some dollars arrive before the payment date, some after it. Gaps like these are shifted with an FX swap ([module 03](/en/module/03-fx-swap/1/)).
 
 <Callout variant="note" title="Simplified, generic examples">
 
@@ -48,7 +48,7 @@ All products in this module are simplified and generic: market variants differ. 
 
 <Formula><span>Σ<sub><i>i</i></sub> [ <i>C</i>(<i>K</i>, <i>t</i><sub><i>i</i></sub>) − 2 · <i>P</i>(<i>K</i>, <i>t</i><sub><i>i</i></sub>) ] = 0, <i>t</i><sub><i>i</i></sub> = day<sub><i>i</i></sub> / 365</span></Formula>
 
-The sum falls as <i>K</i> rises. The solution is <i>K</i><sub>2</sub> = <Num of="m08.accK2" />. With only one sold put it would be the forward: a call minus a put at the same strike is a forward (put-call parity).
+The sum falls as <i>K</i> rises. The solution is <i>K</i><sub>2</sub> = <Num of="m08.accK2" />. With only one sold put it would be the forward: a call minus a put at the same strike is a forward (put-call parity). Strictly, it is the average of the forwards of all fixings, because the CHF rate of <Num of="ex.rd" /> discounts nothing. It lies practically on the forward at the average fixing date.
 
 **3.** With the knock-out, the engine simulates daily rate paths, applies the product's rules to each path and averages the discounted payments. A root finder searches for the strike, always on the same paths.
 

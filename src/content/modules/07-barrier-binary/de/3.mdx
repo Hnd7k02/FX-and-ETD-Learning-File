@@ -17,19 +17,21 @@ Alle Beispiele zahlen <Num of="m07.payout" /> und laufen drei Monate. Die Wette 
 
 Der Digital Call kostet <Num of="m07.digitalChf" />. Das ist kein Zufall: Die risikoneutrale Wahrscheinlichkeit, über dem Strike zu enden, ist <i>N</i>(<i>d</i><sub>2</sub>) = <Num of="m07.digitalProb" />. Der Preis ist Auszahlung mal Wahrscheinlichkeit, abgezinst mit dem CHF-Zins. Bei einem CHF-Zins von <Num of="ex.rd" digits={0} /> fällt die Abzinsung weg.
 
+Warum nicht genau 50 %? Der Strike liegt am Forward, und der Forward ist der Durchschnitt aller möglichen Kurse bei Verfall. Nach oben kann der Kurs weiter ausschlagen als nach unten. Darum liegt die Mitte der Verteilung leicht unter dem Durchschnitt, und USD/CHF endet etwas öfter unter dem Forward als darüber.
+
 Dasselbe gilt für Touch-Produkte. Der One-Touch auf <Num of="m07.barrierUp" /> kostet <Num of="m07.otChf" />, der No-Touch <Num of="m07.ntChf" />. Zusammen ergeben sie <Num of="m07.otNtSumChf" />: Auf jedem Pfad zahlt genau einer von beiden. Kennst du den einen Preis, kennst du den anderen.
 
 Eine Faustregel vom Desk: Ein One-Touch kostet etwa doppelt so viel wie ein Digital mit Strike an der Barriere. Das ist das Spiegelungsprinzip aus Abschnitt 1. Im Beispiel ist es das <Num of="m07.otVsDigitalH" />-Fache, weil der Forward unter dem Spot liegt.
 
-<TouchLabFigure caption="Wähl ein Produkt und zieh an den orangen Griffen. Oben siehst du, welche Pfade zahlen; unten liegt der Preis (blau) fast auf der Wahrscheinlichkeit (gestrichelt). Beim Digital wird der Call Spread mit kleiner Breite zur Stufe." />
+<TouchLabFigure caption="Wähl ein Produkt und zieh an den orangen Griffen. Oben siehst du, welche Pfade zahlen. Unten liegt die Wahrscheinlichkeit (schwarz gestrichelt) genau auf dem Preis (blau), solange der CHF-Zins null ist. Beim Digital wird der Call Spread mit kleiner Breite zur Stufe." />
 
 ### Bei Berührung oder bei Verfall?
 
-Ein One-Touch kann sofort bei der Berührung zahlen oder erst bei Verfall. Im Interbankenhandel ist die Zahlung bei Verfall üblich. Mit einem CHF-Zins von null ist beides gleich viel wert. Bei einem CHF-Zins von <Num of="m07.rdExample" /> kostet der One-Touch mit Zahlung bei Berührung <Num of="m07.otHitRdChf" />, mit Zahlung bei Verfall <Num of="m07.otExpRdChf" />. Früheres Geld ist mehr wert.
+Ein One-Touch kann sofort bei der Berührung zahlen oder erst bei Verfall. Im Interbankenhandel ist die Zahlung bei Verfall üblich. Mit einem CHF-Zins von null ist beides gleich viel wert. Bei einem CHF-Zins von <Num of="m07.rdExample" /> kostet der One-Touch mit Zahlung bei Berührung <Num of="m07.otHitRdChf" />, mit Zahlung bei Verfall <Num of="m07.otExpRdChf" />. Früheres Geld ist mehr wert. Beide kosten mehr als bei 0 %: Der höhere CHF-Zins hebt den Forward an, die Barriere oben wird eher berührt.
 
 ### Double No-Touch: eine Wette auf Ruhe
 
-Der Double No-Touch zahlt, wenn USD/CHF drei Monate lang im Korridor <Num of="m07.dntWidth" /> um den Spot bleibt. Er kostet <Num of="m07.dntChf" />. Wer ihn kauft, setzt auf einen ruhigen Markt. Darum hängt er stark an der Vola: Steigt sie von <Num of="ex.vol" /> auf <Num of="m07.volUp" />, fällt der Preis auf <Num of="m07.dntVolUpChf" />. Sinkt sie auf <Num of="m07.volDown" />, steigt er auf <Num of="m07.dntVolDownChf" />. Der Käufer ist short Vega.
+Der Double No-Touch zahlt, wenn USD/CHF drei Monate lang im Korridor ±<Num of="m07.dntWidth" /> um den Spot bleibt, also zwischen <Num of="m07.dntLower" /> und <Num of="m07.dntUpper" />. Er kostet <Num of="m07.dntChf" />. Wer ihn kauft, setzt auf einen ruhigen Markt. Darum hängt er stark an der Vola: Steigt sie von <Num of="ex.vol" /> auf <Num of="m07.volUp" />, fällt der Preis auf <Num of="m07.dntVolUpChf" />. Sinkt sie auf <Num of="m07.volDown" />, steigt er auf <Num of="m07.dntVolDownChf" />. Der Käufer ist short Vega.
 
 <Derivation title="Herleitung: das Digital als Grenzwert eines Call Spreads">
 
@@ -51,9 +53,9 @@ Der Double No-Touch zahlt, wenn USD/CHF drei Monate lang im Korridor <Num of="m0
 
 <Desk title="Digitals am Desk: der enge Call Spread">
 
-Kurz vor Verfall und nahe am Strike ist ein Digital kaum zu hedgen. Ein Pip entscheidet über alles oder nichts, Delta wird riesig. Darum bewerten und hedgen Händler Digitals als engen Call Spread. Die Breite wählen sie bewusst etwas zu ihren Gunsten: ein Sicherheitspolster, das der Kunde im Preis mitbezahlt.
+Kurz vor Verfall und nahe am Strike ist ein Digital kaum zu hedgen. Ein Pip entscheidet über alles oder nichts, Delta wird riesig. Darum bewerten und hedgen Händler ein verkauftes Digital als engen Call Spread knapp unter dem Strike: gekauft bei <i>K</i> − ε, verkauft bei <i>K</i>. Er zahlt in jedem Szenario mindestens so viel wie das Digital. Dieses Polster kostet etwas mehr als das Digital, und der Kunde bezahlt es im Preis mit.
 
-Für Touch-Produkte gilt dasselbe an der Barriere. Auch die Beobachtung ist ein Thema: Der Monte-Carlo-Check im Labor beobachtet den Double No-Touch einmal täglich. Dann ist er mehr wert (<Num of="m07.dntMcChf" />) als bei stetiger Beobachtung, weil zwischen zwei Fixings keine Berührung zählt.
+Für Touch-Produkte gilt dasselbe an der Barriere. Auch die Beobachtung zählt: Der numerische Check im Labor bewertet den Double No-Touch mit Monte Carlo und täglichen Fixings. Dann ist er mehr wert (<Num of="m07.dntMcChf" />) als bei stetiger Beobachtung, weil zwischen zwei Fixings keine Berührung zählt.
 
 </Desk>
 

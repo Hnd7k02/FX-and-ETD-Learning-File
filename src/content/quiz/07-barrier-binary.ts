@@ -59,18 +59,18 @@ const check1: QuizQuestion = {
           en: 'The barrier is hardly ever touched, so it costs little',
         },
         explain: {
-          de: `Umgekehrt: Die Barriere wird mit rund ${pct(M07.touchUp, 0).de} berührt. Wäre sie fast nie berührt, wäre der Knock-out fast so teuer wie der Vanilla.`,
-          en: `The opposite: the barrier is touched with about ${pct(M07.touchUp, 0).en} probability. If it were hardly ever touched, the knock-out would cost almost as much as the vanilla.`,
+          de: `Nein. Die Barriere wird mit einer Wahrscheinlichkeit von rund ${pct(M07.touchUp, 0).de} berührt. Die untere Barriere ${Hd} wird sogar öfter berührt (${pct(M07.touchDown, 0).de}), und doch ist der Down-and-out Call nur ${pct(1 - M07.doc / M07.vanilla, 0).de} billiger. Es zählt, welche Szenarien wegfallen, nicht nur wie viele.`,
+          en: `No. The barrier is touched with a probability of about ${pct(M07.touchUp, 0).en}. The lower barrier ${Hd} is touched even more often (${pct(M07.touchDown, 0).en}), yet the down-and-out call is only ${pct(1 - M07.doc / M07.vanilla, 0).en} cheaper. What matters is which scenarios are lost, not just how many.`,
         },
       },
       {
         label: {
-          de: 'Die Barriere senkt den Strike des Calls',
-          en: 'The barrier lowers the strike of the call',
+          de: 'Er verschwindet, wenn der Dollar fällt, also wenn der Importeur keinen Schutz braucht',
+          en: 'It disappears when the dollar falls, so when the importer needs no protection',
         },
         explain: {
-          de: `Der Strike bleibt ${K}. Die Barriere ist eine Bedingung, die den Call auslöscht; sie verändert den Strike nicht.`,
-          en: `The strike stays at ${K}. The barrier is a condition that extinguishes the call; it does not change the strike.`,
+          de: `Das beschreibt den Down-and-out Call mit Barriere ${Hd}. Er ist nur ${pct(1 - M07.doc / M07.vanilla, 0).de} billiger. Der Up-and-out Call verschwindet, wenn der Dollar steigt.`,
+          en: `That describes the down-and-out call with barrier ${Hd}. It is only ${pct(1 - M07.doc / M07.vanilla, 0).en} cheaper. The up-and-out call disappears when the dollar rises.`,
         },
       },
     ],
@@ -176,8 +176,8 @@ const shock = fmtRate(g.shock, 'EUR/CHF');
 const check4: QuizQuestion = {
   id: 'm07-c4',
   prompt: {
-    de: `Ein Stop-Loss sollte EUR bei ${stop} verkaufen. Ausgeführt wurde er erst zu ${shock}. Warum?`,
-    en: `A stop-loss was meant to sell EUR at ${stop}. It was only filled at ${shock}. Why?`,
+    de: `Ein Stop-Loss soll EUR bei ${stop} verkaufen. Im Replay mit den EZB-Fixings wird er erst zu ${shock} ausgeführt. Warum so tief?`,
+    en: `A stop-loss is meant to sell EUR at ${stop}. In the replay with the ECB fixings it is only filled at ${shock}. Why so low?`,
   },
   ...place(
     [
@@ -197,8 +197,8 @@ const check4: QuizQuestion = {
           en: 'Stops are always filled on the next day',
         },
         explain: {
-          de: 'Ein Stop arbeitet laufend. Das Problem war nicht die Zeit, sondern dass es zwischen den Kursen keinen Markt gab.',
-          en: 'A stop works continuously. The problem was not timing but that there was no market between the rates.',
+          de: 'Ein Stop arbeitet laufend, nicht nur einmal pro Tag. Entscheidend ist, ob es am Stop-Niveau einen Kurs gibt. Springt der Kurs, gibt es dort keinen.',
+          en: 'A stop works continuously, not just once a day. What matters is whether there is a price at the stop level. If the rate jumps, there is none.',
         },
       },
       {
@@ -207,8 +207,8 @@ const check4: QuizQuestion = {
           en: 'The stop was set too close to the minimum rate',
         },
         explain: {
-          de: 'Auch ein tieferer Stop hätte nichts genützt: Alle Niveaus bis zum Fixing nach dem Schock wurden zum selben Kurs ausgelöst.',
-          en: 'A lower stop would not have helped either: every level down to the fixing after the shock was triggered at the same rate.',
+          de: 'Auch ein tieferer Stop hätte nichts genützt: Alle Niveaus bis hinunter zum Fixing nach dem Schock werden zum selben Kurs ausgelöst.',
+          en: 'A lower stop would not have helped either: every level down to the fixing after the shock is triggered at the same rate.',
         },
       },
     ],

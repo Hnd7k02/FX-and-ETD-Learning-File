@@ -439,7 +439,7 @@ describe('m07 gap replay (figure d)', () => {
   });
 
   it('links to the Riskometer event', () => {
-    expect(riskometerLink('/riskometer/')).toBe('/riskometer/?event=chf-shock-2015&pair=EUR%2FCHF');
+    expect(riskometerLink('/riskometer/')).toBe('/riskometer/?event=chf-shock-2015&pair=EURCHF');
   });
 });
 

@@ -15,7 +15,7 @@ In Bausteinen: pro Fixing ein gekaufter USD Call über <Num of="m08.accNotional"
 <PathSimulatorFigure
   products={['accumulator', 'decumulator']}
   scenario="trendUp"
-  caption="Der Accumulator im Zeitraffer. Jeder Punkt ist ein Fixing: blau mit Gewinn, orange mit Verlust. Zieh das Pfadende nach unten, schalte auf Seitwärts oder verschieb den Strike: Der Barwert rechnet live mit."
+  caption="Der Accumulator im Zeitraffer. Jeder Punkt ist ein Fixing: blau mit Gewinn, orange mit Verlust. Schalte auf Seitwärts oder Trend ab, zieh das Pfadende oder verschieb den Strike: Der Barwert rechnet live mit."
 />
 
 ### Rechenbeispiel: drei Märkte, drei Ergebnisse
@@ -28,7 +28,7 @@ Der Simulator vergleicht das Produkt mit einem Forward-Hedge. Dieser kauft an je
 
 <Callout variant="bad" title="Wann geht es schief: Der Dollar fällt stark">
 
-Zieh das Pfadende auf <Num of="m08.accDownMove" />. Ab Fixing <Num of="m08.accDownFirstLev" /> liegt der Kurs unter dem Strike. <Num of="m08.accDownLev" /> Fixings kaufen die doppelte Menge, zusammen <Num of="m08.accDownUsd" />. Das ist viel mehr, als der Importeur braucht, gekauft über dem Marktkurs. Accumulator <Num of="m08.accDownPnl" />, Forward <Num of="m08.accDownFwd" />: <Num of="m08.accDownDiff" />. Ab einem Fixing unter <Num of="m08.accBreakLev" /> verliert jedes doppelte Fixing mehr als der Forward.
+Schalte auf «Trend ab» und zieh das Pfadende auf <Num of="m08.accDownMove" />. Ab Fixing <Num of="m08.accDownFirstLev" /> liegt der Kurs unter dem Strike. <Num of="m08.accDownLev" /> Fixings kaufen die doppelte Menge, zusammen <Num of="m08.accDownUsd" />. Das ist viel mehr, als der Importeur braucht, gekauft über dem Marktkurs. Accumulator <Num of="m08.accDownPnl" />, Forward <Num of="m08.accDownFwd" />: <Num of="m08.accDownDiff" />. Ab einem Fixing unter <Num of="m08.accBreakLev" /> verliert jedes doppelte Fixing mehr als der Forward.
 
 </Callout>
 
@@ -36,13 +36,15 @@ Der Accumulator ist also nicht einfach ein besserer Forward. Er schlägt den For
 
 ### Der Decumulator: das Spiegelbild
 
-Ein Exporteur, der Dollars verkaufen muss, bekommt das Spiegelbild. Er verkauft zum Strike <Num of="m08.decStrike" />, <Num of="m08.decBetter" /> Pips über dem Forward. Liegt das Fixing über dem Strike, verkauft er die doppelte Menge. Fällt der Kurs auf die Barriere <Num of="m08.decBarrier" />, endet alles. Bausteine: ein gekaufter USD Put und zwei verkaufte USD Calls, mit Knock-out. Mit den Beispielwerten endet der Decumulator in <Num of="m08.decPKo" /> der Pfade durch Knock-out.
+Ein Exporteur, der Dollars verkaufen muss, bekommt das Spiegelbild. Er verkauft zum Strike <Num of="m08.decStrike" />, <Num of="m08.decBetter" /> Pips über dem Forward (Standardfehler <Num of="m08.decSe" /> Pips). Liegt das Fixing über dem Strike, verkauft er die doppelte Menge. Fällt der Kurs auf die Barriere <Num of="m08.decBarrier" />, endet alles. Bausteine: ein gekaufter USD Put und zwei verkaufte USD Calls, mit Knock-out.
+
+Warum mehr Pips als beim Accumulator? Wieder wegen des Forwards. Beide Barrieren liegen <Num of="m08.barrierDist" /> vom Spot entfernt, aber der Forward liegt unter dem Spot. Vom Forward aus ist die Barriere des Decumulators nur <Num of="m08.decFwdToBarrier" /> Pips weit weg, die des Accumulators <Num of="m08.accFwdToBarrier" /> Pips. Der Knock-out kommt darum öfter: in <Num of="m08.decPKo" /> statt <Num of="m08.accPKo" /> der Pfade. Jeder Knock-out nimmt dem Exporteur gute Szenarien weg, und dafür bekommt er einen besseren Strike. Schief geht es beim Decumulator, wenn der Dollar stark steigt: Dann verkauft er die doppelte Menge zum Strike, unter dem Marktkurs.
 
 <Callout variant="warn" title="Risiko-Box: Accumulator und Decumulator">
 
-- **Maximalverlust:** Das Produkt setzt keine Grenze. Im Extremfall kaufst du alle <Num of="m08.accFixings" /> Fixings doppelt, also <Num of="m08.accTotalMax" />, egal wie tief der Kurs fällt. Monte Carlo: Jeder 20. Pfad verliert mehr als <Num of="m08.accQ05" />, der schlechteste von <Num of="m08.paths" /> Pfaden <Num of="m08.accWorst" />.
+- **Maximalverlust:** Das Produkt setzt keine Grenze. Im Extremfall kaufst du alle <Num of="m08.accFixings" /> Fixings doppelt, also <Num of="m08.accTotalMax" />, egal wie tief der Kurs fällt. Monte Carlo: Jeder 20. Pfad endet bei <Num of="m08.accQ05" /> oder schlechter, der schlechteste von <Num of="m08.paths" /> Pfaden bei <Num of="m08.accWorst" />.
 - **Hebel:** 2. Unter dem Strike (Decumulator: über dem Strike) handelst du die doppelte Menge.
-- **Pfadabhängigkeit:** Der Knock-out beendet die Absicherung genau dann, wenn der Dollar steigt, also im Szenario, vor dem sich der Importeur fürchtet. Das passiert in <Num of="m08.accPKo" /> der Pfade, im Schnitt nach <Num of="m08.accExpFix" /> Fixings.
+- **Pfadabhängigkeit:** Der Knock-out beendet die Absicherung genau dann, wenn der Dollar steigt, also im Szenario, vor dem sich der Importeur fürchtet. Das passiert in <Num of="m08.accPKo" /> der Pfade, im Schnitt schon nach <Num of="m08.accKoFix" /> von <Num of="m08.accFixings" /> Fixings.
 
 </Callout>
 
@@ -56,7 +58,7 @@ Ein Exporteur, der Dollars verkaufen muss, bekommt das Spiegelbild. Er verkauft 
 
 <Formula variant="accent">Δ<sub><i>i</i></sub> = (<i>S</i><sub><i>i</i></sub> − <i>K</i>) · <i>q</i><sub><i>i</i></sub> − (<i>S</i><sub><i>i</i></sub> − <i>F</i><sub><i>i</i></sub>) · <i>N</i></Formula>
 
-**4.** Ein doppeltes Fixing gibt Δ = [2 · (<i>S</i> − <i>K</i>) − (<i>S</i> − <i>F</i>)] · <i>N</i> = (<i>S</i> − 2<i>K</i> + <i>F</i>) · <i>N</i>. Das ist negativ, sobald <i>S</i> unter 2<i>K</i> − <i>F</i> = <Num of="m08.accBreakLev" /> fällt.
+**4.** Ein doppeltes Fixing gibt Δ = [2 · (<i>S</i> − <i>K</i>) − (<i>S</i> − <i>F</i>)] · <i>N</i> = (<i>S</i> − 2<i>K</i> + <i>F</i>) · <i>N</i>. Das ist negativ, sobald <i>S</i> unter 2<i>K</i> − <i>F</i> fällt. Mit dem Forward am durchschnittlichen Fixing-Tag sind das <Num of="m08.accBreakLev" />.
 
 **5.** Nach dem Knock-out ist <i>q</i><sub><i>i</i></sub> = 0. Dann bleibt Δ = −(<i>S</i><sub><i>i</i></sub> − <i>F</i><sub><i>i</i></sub>) · <i>N</i>: Bei steigendem Dollar entgeht dir genau der Gewinn, den der Forward gemacht hätte.
 
@@ -64,7 +66,7 @@ Ein Exporteur, der Dollars verkaufen muss, bekommt das Spiegelbild. Er verkauft 
 
 <Desk title="Drei Fragen vor dem Abschluss">
 
-Wie viel kaufe ich maximal, und brauche ich diese Menge überhaupt? Was passiert mit meiner Absicherung nach einem Knock-out? Ab welchem Kurs ist ein doppeltes Fixing schlechter als der Forward? Wer diese drei Zahlen kennt, versteht den Accumulator. Wer nur den besseren Strike kennt, nicht.
+Wie viel kaufe ich maximal, und brauche ich diese Menge überhaupt? Was passiert mit meiner Absicherung nach einem Knock-out? Ab welchem Kurs ist ein doppeltes Fixing schlechter als der Forward? Wer diese drei Antworten kennt, versteht den Accumulator. Wer nur den besseren Strike kennt, nicht.
 
 </Desk>
 

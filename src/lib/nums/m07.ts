@@ -28,6 +28,8 @@ const K = C.strike;
 const Hu = C.barriers.up;
 const Hd = C.barriers.down;
 const pips = (x: number) => x / PIP;
+/** Difference of two CHF amounts as shown (rounded to whole CHF), so text sums add up. */
+const shownDiff = (a: number, b: number) => Math.round(a) - Math.round(b);
 const call = (
   kind: 'up-and-out' | 'up-and-in' | 'down-and-out' | 'down-and-in',
   H: number,
@@ -173,14 +175,25 @@ export const nums: NumTable = {
     kind: 'money',
     note: 'Extra cost vs the strike on USD 1 Mio. once the call is knocked out',
   },
-  'm07.uocSavingChf': { value: (vanilla - uoc) * N, kind: 'money', note: 'Premium saved' },
+  'm07.uocSavingChf': {
+    value: shownDiff(vanilla * N, uoc * N),
+    kind: 'money',
+    note: 'Premium saved, vanilla − UOC as shown',
+  },
+  'm07.lossNetChf': {
+    value: shownDiff((lossSpot - K) * N, shownDiff(vanilla * N, uoc * N)),
+    kind: 'money',
+    note: 'Loss scenario: worse off than with the vanilla call = extra cost − premium saved',
+  },
 
   // Section 2: parity, rebate, monitoring, Greeks near the barrier, method of images
   'm07.paritySumPips': { value: pips(uoc + uic), kind: 'pips', digits: 1, note: 'UOC + UIC' },
   'm07.vanillaPips2': { value: pips(vanilla), kind: 'pips', digits: 2 },
   'm07.rebatePips': { value: C.rebatePips, kind: 'pips', digits: 0 },
-  'm07.uocRebatePips': { value: pips(uocRebate), kind: 'pips', digits: 1 },
-  'm07.rebateValuePips': { value: pips(uocRebate - uoc), kind: 'pips', digits: 1 },
+  // Rebate sentence with 2 decimals so that 17.23 + 7.62 = 24.85 adds up on screen.
+  'm07.uocPips2': { value: pips(uoc), kind: 'pips', digits: 2 },
+  'm07.uocRebatePips': { value: pips(uocRebate), kind: 'pips', digits: 2 },
+  'm07.rebateValuePips': { value: pips(uocRebate - uoc), kind: 'pips', digits: 2 },
   'm07.bgkFactor': { value: bgk, kind: 'num', digits: 5, note: 'e^(0.5826·σ·√(1/365))' },
   'm07.bgkBarrier': { value: hDaily, kind: 'rate', note: 'Continuous equivalent of daily 0.8240' },
   'm07.bgkShiftPips': { value: pips(hDaily - Hu), kind: 'pips', digits: 0 },
@@ -195,11 +208,18 @@ export const nums: NumTable = {
   'm07.uocNearShortPips': { value: pips(labNearShort.price), kind: 'pips', digits: 1 },
   'm07.uocDeltaNearShort': { value: labNearShort.delta, kind: 'num', digits: 2, sign: true },
   'm07.uocGammaNearShort': { value: labNearShort.gamma, kind: 'num', digits: 0, sign: true },
+  'm07.uocDeltaNearShortUsd': {
+    value: -labNearShort.delta * N,
+    kind: 'money',
+    ccy: 'USD',
+    note: 'Short USD equivalent of the UOC delta at 0.8200, 2 weeks, on USD 1 Mio.',
+  },
   'm07.vanillaGammaNearShort': { value: labNearShort.vanillaGamma, kind: 'num', digits: 0 },
   'm07.mirrorSpot': { value: mirror.mirrorSpot, kind: 'rate', note: 'H²/S for H 0.7760' },
   'm07.mirrorMu': { value: mirror.mu, kind: 'num', digits: 2 },
   'm07.mirrorWeight': { value: mirror.weight, kind: 'num', digits: 3 },
-  'm07.mirrorCallPips': { value: pips(mirror.mirrorCall), kind: 'pips', digits: 1 },
+  // 2 decimals: 8.57 · 1.439 = 12.33 must match the mirror term (8.6 · 1.439 would give 12.4).
+  'm07.mirrorCallPips': { value: pips(mirror.mirrorCall), kind: 'pips', digits: 2 },
   'm07.mirrorPips': { value: pips(mirror.mirror), kind: 'pips', digits: 1 },
 
   // Section 3: digital, touch, double no-touch (payout CHF 100’000)
@@ -208,7 +228,7 @@ export const nums: NumTable = {
   'm07.digitalProb': { value: digital / dfd, kind: 'pct', digits: 1, note: 'N(d2) at K' },
   'm07.spreadPips': { value: C.touch.spreadExamplePips, kind: 'pips', digits: 0 },
   'm07.spreadChf': { value: spread * P, kind: 'money' },
-  'm07.spreadDiffChf': { value: (spread - digital) * P, kind: 'money', digits: 2, sign: true },
+  'm07.spreadDiffChf': { value: (spread - digital) * P, kind: 'money', digits: 2 },
   'm07.otChf': { value: ot * P, kind: 'money', note: 'One-touch 0.8240, paid at expiry' },
   'm07.ntChf': { value: nt * P, kind: 'money' },
   'm07.otNtSumChf': { value: (ot + nt) * P, kind: 'money', note: '= payout · e^(−rd T)' },
@@ -249,6 +269,16 @@ export const nums: NumTable = {
   'm07.windowKo': { value: w.stats.pKnockOut, kind: 'pct', digits: 1 },
   'm07.windowPaths': { value: w.paths / 1e6, kind: 'num', digits: 0, note: 'Paths in millions' },
   'm07.uocFull91Chf': { value: uocFull91 * N, kind: 'money', note: 'UOC 91 days, daily (BGK)' },
+  'm07.windowSavingChf': {
+    value: shownDiff(w.compare?.vanilla ?? Number.NaN, w.pv),
+    kind: 'money',
+    note: 'Window barrier cheaper than the vanilla (as shown)',
+  },
+  'm07.windowExtraChf': {
+    value: shownDiff(w.pv, uocFull91 * N),
+    kind: 'money',
+    note: 'Window barrier dearer than the full-life barrier (as shown)',
+  },
   'm07.gapBefore': { value: gap.before, kind: 'rate', note: 'ECB EUR/CHF fixing the day before' },
   'm07.gapShock': { value: gap.shock, kind: 'rate', note: 'ECB EUR/CHF fixing on 15.01.2015' },
   'm07.gapDayMove': { value: gap.dayMove, kind: 'pct', digits: 1 },

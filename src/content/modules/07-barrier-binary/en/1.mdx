@@ -2,7 +2,7 @@ import BarrierPathsFigure from '@/components/figures/BarrierPathsFigure.astro';
 
 {/* 07 Barrier & Binary · section 1 · Intuition. Numbers only via <Num />, registry src/lib/nums/ex.ts and m07.ts. */}
 
-The importer knows his hedge: a USD call with a strike of <Num of="ex.strike" /> on <Num of="ex.notional" />. It costs <Num of="ex.callChf" />. That is more than he wants to pay. He asks for something cheaper and gets a proposal: the same call, but with a **barrier**.
+The importer knows his hedge from module 04: a USD call struck at the forward, <Num of="ex.strike" />, on <Num of="ex.notional" />. It costs <Num of="ex.callChf" />. That is more than he wants to pay. He asks for something cheaper and gets a proposal: the same call, but with a **barrier**.
 
 A barrier is a rate level that is watched throughout the life of the option. If USD/CHF touches it, something final happens:
 
@@ -27,7 +27,7 @@ Why the difference? The lower barrier is actually touched more often than the up
 
 <Callout variant="bad" title="Loss scenario">
 
-The importer picks the up-and-out call and saves <Num of="m07.uocSavingChf" /> in premium. After a month USD/CHF rises above <Num of="m07.barrierUp" />: the call is gone, even if the rate comes back later. At expiry USD/CHF stands at <Num of="m07.lossSpot" />. The importer pays <Num of="m07.lossChf" /> more for his dollars than at the strike. The saving is a fraction of that.
+The importer picks the up-and-out call and saves <Num of="m07.uocSavingChf" /> in premium. After a month USD/CHF rises above <Num of="m07.barrierUp" />: the call is gone, even if the rate comes back later. At expiry USD/CHF stands at <Num of="m07.lossSpot" />. The importer pays <Num of="m07.lossChf" /> more for his dollars than at the strike. The premium he saved covers only part of that: all in, he is <Num of="m07.lossNetChf" /> worse off than with the plain call.
 
 </Callout>
 
@@ -47,7 +47,7 @@ The importer picks the up-and-out call and saves <Num of="m07.uocSavingChf" /> i
 
 The first term is P(<i>S</i><sub><i>T</i></sub> ≥ <i>H</i>); the second counts the paths that touch and end below. Without drift the two are equal.
 
-**4.** In the example: <Num of="m07.endAboveUp" /> + <Num of="m07.touchMirrorTerm" /> = <Num of="m07.touchUp1" />. Twice the first term would be only <Num of="m07.endAboveUp2" />. The negative drift (the forward is below spot) lowers the chance of ending above more than the chance of brushing the barrier on the way.
+**4.** In the example: <Num of="m07.endAboveUp" /> + <Num of="m07.touchMirrorTerm" /> = <Num of="m07.touchUp1" />. Twice the first term would be only <Num of="m07.endAboveUp2" />. The negative drift (the forward is below spot) pulls the paths down over time. To end above, the rate has to beat the drift of the whole life of the option. For a touch, an early swing is enough, before the drift has done much. That is why the ratio is above 2 here.
 
 </Derivation>
 

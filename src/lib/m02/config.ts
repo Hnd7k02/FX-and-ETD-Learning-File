@@ -110,6 +110,16 @@ export const M02_CONFIG = {
     rateStep: 0.0005,
     /** What-if of the text: CHF rate raised to this level, USD rate unchanged (choice). */
     whatIfRd: 0.015,
+    /**
+     * Preset buttons of the figure (choice): the example, both rates equal (at the example's USD
+     * rate) and the two rates swapped, so the points change sign without anyone changing a view
+     * on the dollar ("a forward is not a forecast").
+     */
+    presets: [
+      { id: 'example', rd: EXAMPLE.rd, rf: EXAMPLE.rf },
+      { id: 'equal', rd: EXAMPLE.rf, rf: EXAMPLE.rf },
+      { id: 'swapped', rd: EXAMPLE.rf, rf: EXAMPLE.rd },
+    ] as const,
   },
 
   /** (d) CashCarryCalculator, section 4. */

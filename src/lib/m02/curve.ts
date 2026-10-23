@@ -101,3 +101,23 @@ export function visibleLabels(xs: readonly number[], minGap: number): number[] {
   }
   return keep;
 }
+
+/** Id of the preset whose rates match (within half a slider step), or null. */
+export function matchPreset(
+  rd: number,
+  rf: number,
+  presets: readonly { id: string; rd: number; rf: number }[] = M02_CONFIG.curve.presets,
+  tol: number = M02_CONFIG.curve.rateStep / 2,
+): string | null {
+  const p = presets.find((x) => Math.abs(x.rd - rd) < tol && Math.abs(x.rf - rf) < tol);
+  return p ? p.id : null;
+}
+
+/** Index of the tenor closest to `days` (for click/drag selection on the chart). */
+export function nearestTenor(days: number, tenors: readonly Tenor[] = M02_CONFIG.curve.tenors): number {
+  let best = 0;
+  tenors.forEach((t, i) => {
+    if (Math.abs(t.days - days) < Math.abs(tenors[best]!.days - days)) best = i;
+  });
+  return best;
+}

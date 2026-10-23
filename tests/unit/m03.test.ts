@@ -12,7 +12,7 @@ import {
   snapSpot,
   tourAt,
 } from '@/lib/m03/roll';
-import { fitCentre, textWidth } from '@/lib/m03/text';
+import { fitCentre, stepTicks, textWidth } from '@/lib/m03/text';
 import {
   EXAMPLE_MARKET as M,
   pathAt,
@@ -270,5 +270,11 @@ describe('text helpers', () => {
     expect(fitCentre(98, 20, 0, 100)).toBe(90);
     expect(fitCentre(50, 20, 0, 100)).toBe(50);
     expect(fitCentre(50, 200, 0, 100)).toBe(50);
+  });
+
+  it('places ticks at multiples of a step', () => {
+    expect(stepTicks(0.73, 0.87, 0.02)).toEqual([0.74, 0.76, 0.78, 0.8, 0.82, 0.84, 0.86]);
+    expect(stepTicks(0.76, 0.8, 0.02)).toEqual([0.76, 0.78, 0.8]);
+    expect(stepTicks(1, 0.5, 0.1)).toEqual([]);
   });
 });

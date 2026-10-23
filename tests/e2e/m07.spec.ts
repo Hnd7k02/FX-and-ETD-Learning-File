@@ -153,7 +153,7 @@ test('GapReplay: the shock triggers every order at once and links to the Riskome
   await expect(fig.locator('tr[data-hit="true"]')).toHaveCount(5);
   await expect(fig.locator('[data-riskometer]')).toHaveAttribute(
     'href',
-    '/riskometer/?event=chf-shock-2015&pair=EUR%2FCHF',
+    '/riskometer/?event=chf-shock-2015&pair=EURCHF',
   );
 });
 

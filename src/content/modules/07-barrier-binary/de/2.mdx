@@ -9,6 +9,8 @@ Drei Fragen bestimmen jede einfache Barrier-Option. Call oder Put? Liegt die Bar
 | **Call** | Up-and-out, Up-and-in. Barriere im Geld: **reverse** | Down-and-out, Down-and-in. Barriere aus dem Geld: **regulär** |
 | **Put** | Up-and-out, Up-and-in. Barriere aus dem Geld: **regulär** | Down-and-out, Down-and-in. Barriere im Geld: **reverse** |
 
+Die Tabelle gilt für einen Strike nahe am Spot, wie beim Importeur. Die Regel dahinter: Liegt die Barriere dort, wo die Option im Geld ist, heisst sie reverse. Sonst ist sie regulär.
+
 ### Die In-Out-Parität
 
 Kauf einen Knock-out und einen Knock-in mit gleichem Strike, gleicher Barriere und gleicher Laufzeit. Auf jedem Pfad lebt dann genau eine der beiden Optionen. Berührt der Kurs die Barriere, stirbt der Knock-out und der Knock-in erwacht. Berührt er sie nie, lebt der Knock-out weiter und der Knock-in entsteht nie. Zusammen hast du also immer den Vanilla.
@@ -17,7 +19,7 @@ Kauf einen Knock-out und einen Knock-in mit gleichem Strike, gleicher Barriere u
 
 Im Beispiel mit Barriere <Num of="m07.barrierUp" />: Up-and-out Call <Num of="m07.uocPips" /> Pips plus Up-and-in Call <Num of="m07.uicPips" /> Pips ergibt <Num of="m07.paritySumPips" /> Pips, genau den Preis des Vanilla Calls. Kennst du zwei der drei Preise, kennst du den dritten.
 
-<BarrierLabFigure caption="Wähl Typ, Richtung und Art. Zieh den Spot (schwarzer Punkt) an die Barriere und verkürze die Laufzeit: Beim Reverse Knock-out kippt Delta ins Negative. Unten siehst du die In-Out-Parität als zwei gleich lange Balken." />
+<BarrierLabFigure caption="Wähl Typ, Richtung und Art. Zieh den Spot (schwarzer Punkt) an die Barriere und verkürze die Laufzeit: Beim Reverse Knock-out wird Delta stark negativ. Unten siehst du die In-Out-Parität als zwei gleich lange Balken." />
 
 ### Reverse Knock-out: billig, aber nervös
 
@@ -27,13 +29,13 @@ Beim Up-and-out Call mit Barriere <Num of="m07.barrierUp" /> liegt die Barriere 
 
 - Bei Spot <Num of="ex.spot" /> ist Delta <Num of="m07.uocDelta" />, der Vanilla hat <Num of="ex.delta" />. Die Option reagiert kaum auf den Kurs.
 - Bei Spot <Num of="m07.nearSpot" />, kurz vor der Barriere, ist Delta <Num of="m07.uocDeltaNear" />. Der Vanilla hat dort <Num of="m07.vanillaDeltaNear" />. Steigt der Dollar, verliert die Option.
-- Mit nur <Num of="m07.shortWeeks" /> Wochen Restlaufzeit ist der Call bei <Num of="m07.nearSpot" /> noch <Num of="m07.uocNearShortPips" /> Pips wert. Delta ist <Num of="m07.uocDeltaNearShort" />, Gamma <Num of="m07.uocGammaNearShort" />. Der Vanilla hat dort ein Gamma von <Num of="m07.vanillaGammaNearShort" />.
+- Mit nur <Num of="m07.shortWeeks" /> Wochen Restlaufzeit ist der Call bei <Num of="m07.nearSpot" /> mehr wert: <Num of="m07.uocNearShortPips" /> statt <Num of="m07.uocNearPips" /> Pips, denn bis Verfall bleibt wenig Zeit für eine Berührung. Dafür ist Delta <Num of="m07.uocDeltaNearShort" /> und Gamma <Num of="m07.uocGammaNearShort" />, beim Vanilla nur <Num of="m07.vanillaGammaNearShort" />. Auf <Num of="ex.notional" /> verhält sich der Call damit wie eine Short-Position von <Num of="m07.uocDeltaNearShortUsd" />. Der Importeur wollte long Dollar sein.
 
 Für den Absicherer heisst das: Nahe der Barriere schwankt das Delta heftig, und an der Barriere springt es auf null. Ein Reverse Knock-out lässt sich dort kaum sauber hedgen.
 
 ### Rebate: ein Trostpreis
 
-Manche Knock-outs zahlen bei der Berührung eine feste Entschädigung, das Rebate. Ein Rebate von <Num of="m07.rebatePips" /> Pips hebt den Preis des Up-and-out Calls von <Num of="m07.uocPips" /> auf <Num of="m07.uocRebatePips" /> Pips. Das Rebate ist nur <Num of="m07.rebateValuePips" /> Pips wert, weil es nur fällig wird, wenn die Barriere tatsächlich berührt wird. Bei Knock-ins zahlt das Rebate bei Verfall, falls die Option nie entstanden ist.
+Manche Knock-outs zahlen bei der Berührung eine feste Entschädigung, das Rebate. Ein Rebate von <Num of="m07.rebatePips" /> Pips hebt den Preis des Up-and-out Calls von <Num of="m07.uocPips2" /> auf <Num of="m07.uocRebatePips" /> Pips. Das Rebate ist nur <Num of="m07.rebateValuePips" /> Pips wert, weil es nur fällig wird, wenn die Barriere tatsächlich berührt wird. Das geschieht mit <Num of="m07.touchUp" /> Wahrscheinlichkeit (Abschnitt 1). Bei Knock-ins zahlt das Rebate bei Verfall, falls die Option nie entstanden ist.
 
 <Derivation title="Herleitung: die Spiegel-Methode">
 
@@ -55,7 +57,7 @@ Manche Knock-outs zahlen bei der Berührung eine feste Entschädigung, das Rebat
 
 <Desk title="Stetig oder täglich beobachtet">
 
-Die Formeln gehen von stetiger Beobachtung aus: Jede Sekunde zählt. Viele Verträge prüfen die Barriere aber nur einmal pro Tag gegen ein Fixing. Dann wird sie seltener berührt, und ein Knock-out ist mehr wert.
+Die Formeln gehen von stetiger Beobachtung aus: Jede Sekunde zählt. Manche Verträge, vor allem in strukturierten Produkten, prüfen die Barriere aber nur einmal pro Tag gegen ein Fixing. Dann wird sie seltener berührt, und ein Knock-out ist mehr wert.
 
 Broadie, Glasserman und Kou haben gezeigt: Eine täglich beobachtete Barriere wirkt fast wie eine stetige, die ein Stück weiter vom Spot weg liegt.
 

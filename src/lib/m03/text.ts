@@ -18,3 +18,13 @@ export function fitCentre(x: number, width: number, lo: number, hi: number): num
   if (hi - lo <= width) return (lo + hi) / 2;
   return Math.min(hi - half, Math.max(lo + half, x));
 }
+
+/** Ticks at multiples of `step` inside [lo, hi] (rounded to avoid float noise). */
+export function stepTicks(lo: number, hi: number, step: number): number[] {
+  const out: number[] = [];
+  const decimals = Math.max(0, Math.ceil(-Math.log10(step)) + 2);
+  for (let v = Math.ceil(lo / step - 1e-9) * step; v <= hi + step * 1e-9; v += step) {
+    out.push(Number(v.toFixed(decimals)));
+  }
+  return out;
+}

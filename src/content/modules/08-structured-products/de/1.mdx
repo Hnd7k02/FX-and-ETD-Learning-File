@@ -4,11 +4,11 @@ import StructureBlocksFigure from '@/components/figures/StructureBlocksFigure.as
 
 Der Importeur muss in 3 Monaten USD 1 Mio. bezahlen. Mit einem Forward legt er heute den Kurs <Num of="ex.forward" digits={4} /> fest. Das ist sauber, aber nicht spannend.
 
-Dann kommt ein Angebot. Statt alles auf einmal kauft er die Dollars über ein halbes Jahr verteilt: jede Woche <Num of="m08.accNotional" />, zusammen <Num of="m08.accTotal" />. Der Kurs ist <Num of="m08.accStrike" />. Das sind <Num of="m08.accBetter" digits={0} /> Pips besser als der Forward am durchschnittlichen Fixing-Tag (<Num of="m08.accFwd" />). Eine Prämie gibt es nicht. Wo ist der Haken?
+Dann kommt ein Angebot, ein Accumulator. Statt alles auf einmal kauft er die Dollars über ein halbes Jahr verteilt: jede Woche <Num of="m08.accNotional" />, zusammen <Num of="m08.accTotal" />. Der Kurs ist <Num of="m08.accStrike" />. Das sind <Num of="m08.accBetter" /> Pips besser als der Forward am durchschnittlichen Fixing-Tag (<Num of="m08.accFwd" />). Eine Prämie gibt es nicht. Wo ist der Haken?
 
 ### Nichts ist gratis
 
-Ein besserer Kurs als der Forward muss bezahlt werden. Bei strukturierten Produkten bezahlst du ihn nicht mit Geld, sondern mit **verkauften Optionen**. Du übernimmst Risiken, die du mit dem Forward nicht hättest. Dafür sind die Produkte «zero cost»: Beim Abschluss sind sie genau null wert. Was du bekommst, gibst du an anderer Stelle wieder her.
+Ein besserer Kurs als der Forward muss bezahlt werden. Bei strukturierten Produkten bezahlst du ihn nicht mit Geld, sondern mit **verkauften Optionen**. Du übernimmst Risiken, die du mit dem Forward nicht hättest. Dafür sind die Produkte «zero cost»: Beim Abschluss sind sie im Modell genau null wert. Was du bekommst, gibst du an anderer Stelle wieder her.
 
 Zwei Zutaten kommen fast immer vor:
 
@@ -17,22 +17,22 @@ Zwei Zutaten kommen fast immer vor:
 
 <StructureBlocksFigure
   products={['accumulator', 'tarf']}
-  caption="Drei Schritte vom Forward zum Accumulator. Jeder Baustein verbessert den Strike. Zieh das Fixing nach links: Unter dem Strike verliert das Produkt doppelt so schnell."
+  caption="Drei Schritte vom Forward zum Accumulator. Jeder Baustein verbessert den Strike. Zieh das Fixing nach links: Unter dem Strike verliert das Produkt doppelt so schnell wie der Forward."
 />
 
 ### Rechenbeispiel: woher die Pips kommen
 
 Die Grafik baut den Accumulator in drei Schritten. Jeder Schritt verkauft dem Anbieter etwas, und jeder verschiebt den Strike:
 
-1. **Forward.** Ein gekaufter Call und ein verkaufter Put zum selben Strike ergeben einen Forward. Kosten null bei <Num of="m08.accFwd" />.
+1. **Forward.** Ein gekaufter Call und ein verkaufter Put zum selben Strike ergeben einen Forward: die Put-Call-Parität aus [Modul 04](/module/04-vanilla-options/4/). Kosten null bei <Num of="m08.accFwd" />.
 2. **Zweiter verkaufter Put.** Seine Prämie bezahlt einen besseren Strike: <Num of="m08.accK2" />, also <Num of="m08.accK2Pips" digits={0} /> Pips besser. Dafür kaufst du unter dem Strike die doppelte Menge.
-3. **Knock-out bei <Num of="m08.accBarrier" />.** Steigt der Kurs so weit, endet alles. Du verzichtest auf die besten Szenarien. Der Strike sinkt um weitere <Num of="m08.accKoPips" digits={0} /> Pips auf <Num of="m08.accStrike" />.
+3. **Knock-out bei <Num of="m08.accBarrier" />.** Steigt der Kurs so weit, endet alles, wie bei einer Barrier-Option aus [Modul 07](/module/07-barrier-binary/2/). Du verzichtest auf die besten Szenarien. Der Strike sinkt um weitere <Num of="m08.accKoPips" digits={0} /> Pips auf <Num of="m08.accStrike" />.
 
 <Formula variant="accent"><Num of="m08.accFwd" /> − <Num of="m08.accK2Pips" digits={0} /> Pips − <Num of="m08.accKoPips" digits={0} /> Pips = <b><Num of="m08.accStrike" /></b></Formula>
 
 Schritt 2 lässt sich mit der Formel von Garman-Kohlhagen rechnen. Für Schritt 3 gibt es keine einfache Formel mehr, weil der Knock-out vom ganzen Pfad abhängt. Hier hilft Monte Carlo: <Num of="m08.paths" /> simulierte Pfade, der Strike so gelöst, dass der Barwert null ist. Der Standardfehler beträgt <Num of="m08.accSe" /> Pips. Der Abstand zum Forward ist also echt und kein Rauschen der Simulation.
 
-Warum der Forward am durchschnittlichen Fixing-Tag? Die <Num of="m08.accFixings" /> Fixings liegen zwischen Woche 1 und Woche 26. Im Mittel kauft der Importeur an Tag <Num of="m08.accAvgDay" />, also etwa nach 3 Monaten. Dort steht der faire Vergleich.
+Warum der Forward am durchschnittlichen Fixing-Tag? Die <Num of="m08.accFixings" /> Fixings liegen zwischen Woche 1 und Woche <Num of="m08.accFixings" />. Im Mittel kauft der Importeur an Tag <Num of="m08.accAvgDay" />, also nach etwa 3 Monaten. Dort steht der faire Vergleich. Zu seiner einen Rechnung passt der Zeitplan trotzdem nicht genau: Ein Teil der Dollars kommt vor dem Zahltag, ein Teil danach. Solche Lücken verschiebt man mit einem FX Swap ([Modul 03](/module/03-fx-swap/1/)).
 
 <Callout variant="note" title="Vereinfachte, generische Beispiele">
 
@@ -48,7 +48,7 @@ Alle Produkte in diesem Modul sind vereinfacht und generisch: Marktvarianten unt
 
 <Formula><span>Σ<sub><i>i</i></sub> [ <i>C</i>(<i>K</i>, <i>t</i><sub><i>i</i></sub>) − 2 · <i>P</i>(<i>K</i>, <i>t</i><sub><i>i</i></sub>) ] = 0, <i>t</i><sub><i>i</i></sub> = Tag<sub><i>i</i></sub> / 365</span></Formula>
 
-Die Summe fällt mit <i>K</i>. Die Lösung ist <i>K</i><sub>2</sub> = <Num of="m08.accK2" />. Mit nur einem verkauften Put wäre sie der Forward: Call minus Put zum selben Strike ist ein Forward (Put-Call-Parität).
+Die Summe fällt, wenn <i>K</i> steigt. Die Lösung ist <i>K</i><sub>2</sub> = <Num of="m08.accK2" />. Mit nur einem verkauften Put wäre sie der Forward: Call minus Put zum selben Strike ist ein Forward (Put-Call-Parität). Genauer ist es der Mittelwert der Forwards aller Fixings, weil der CHF-Zins von <Num of="ex.rd" /> nichts abzinst. Er liegt praktisch auf dem Forward am durchschnittlichen Fixing-Tag.
 
 **3.** Mit Knock-out simuliert der Rechner tägliche Kurspfade, wendet auf jeden Pfad die Regeln des Produkts an und mittelt die abgezinsten Zahlungen. Den Strike sucht ein Nullstellenverfahren, immer auf denselben Pfaden.
 

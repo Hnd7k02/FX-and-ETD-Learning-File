@@ -2,7 +2,7 @@ import BarrierPathsFigure from '@/components/figures/BarrierPathsFigure.astro';
 
 {/* 07 Barrier & Binary · Abschnitt 1 · Intuition. Zahlen nur über <Num />, Registry src/lib/nums/ex.ts und m07.ts. */}
 
-Der Importeur kennt seinen Schutz: einen USD Call mit Strike <Num of="ex.strike" /> über <Num of="ex.notional" />. Er kostet <Num of="ex.callChf" />. Das ist ihm zu viel. Er fragt nach einer günstigeren Variante und bekommt einen Vorschlag: denselben Call, aber mit einer **Barriere**.
+Der Importeur kennt seinen Schutz aus Modul 04: einen USD Call mit Strike am Forward, <Num of="ex.strike" />, über <Num of="ex.notional" />. Er kostet <Num of="ex.callChf" />. Das ist ihm zu viel. Er fragt nach einer günstigeren Variante und bekommt einen Vorschlag: denselben Call, aber mit einer **Barriere**.
 
 Eine Barriere ist ein Kursniveau, das während der ganzen Laufzeit beobachtet wird. Berührt USD/CHF dieses Niveau, passiert etwas Endgültiges:
 
@@ -27,7 +27,7 @@ Warum dieser Unterschied? Unten wird die Barriere sogar öfter berührt als oben
 
 <Callout variant="bad" title="Verlustszenario">
 
-Der Importeur wählt den Up-and-out Call und spart <Num of="m07.uocSavingChf" /> Prämie. Nach einem Monat steigt USD/CHF über <Num of="m07.barrierUp" />: Der Call ist weg, auch wenn der Kurs später zurückkommt. Bei Verfall steht USD/CHF auf <Num of="m07.lossSpot" />. Der Importeur zahlt für seine Dollar <Num of="m07.lossChf" /> mehr als zum Strike. Der gesparte Betrag ist ein Bruchteil davon.
+Der Importeur wählt den Up-and-out Call und spart <Num of="m07.uocSavingChf" /> Prämie. Nach einem Monat steigt USD/CHF über <Num of="m07.barrierUp" />: Der Call ist weg, auch wenn der Kurs später zurückkommt. Bei Verfall steht USD/CHF auf <Num of="m07.lossSpot" />. Der Importeur zahlt für seine Dollar <Num of="m07.lossChf" /> mehr als zum Strike. Die gesparte Prämie deckt nur einen Teil davon: Unter dem Strich steht er <Num of="m07.lossNetChf" /> schlechter da als mit dem normalen Call.
 
 </Callout>
 
@@ -47,7 +47,7 @@ Der Importeur wählt den Up-and-out Call und spart <Num of="m07.uocSavingChf" />
 
 Der erste Term ist P(<i>S</i><sub><i>T</i></sub> ≥ <i>H</i>), der zweite zählt die Pfade, die berühren und unten enden. Ohne Drift sind beide gleich.
 
-**4.** Im Beispiel: <Num of="m07.endAboveUp" /> + <Num of="m07.touchMirrorTerm" /> = <Num of="m07.touchUp1" />. Das Doppelte des ersten Terms wären nur <Num of="m07.endAboveUp2" />. Die negative Drift (der Forward liegt unter dem Spot) senkt die Chance, oben zu enden, stärker als die Chance, die Barriere unterwegs zu streifen.
+**4.** Im Beispiel: <Num of="m07.endAboveUp" /> + <Num of="m07.touchMirrorTerm" /> = <Num of="m07.touchUp1" />. Das Doppelte des ersten Terms wären nur <Num of="m07.endAboveUp2" />. Die negative Drift (der Forward liegt unter dem Spot) zieht die Pfade mit der Zeit nach unten. Wer oben enden will, muss gegen die Drift der ganzen Laufzeit ankommen. Für eine Berührung reicht ein früher Ausschlag, bevor die Drift viel bewirkt hat. Darum ist das Verhältnis hier grösser als 2.
 
 </Derivation>
 

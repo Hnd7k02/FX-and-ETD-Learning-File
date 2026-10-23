@@ -717,8 +717,8 @@
   .m3-flow.is-out {
     color: var(--ff-exotics-text);
   }
-  /* HedgeRoll: cash-flow timeline */
-  .m3-timeline {
+  /* HedgeRoll: cash-flow timeline (selectors beat the .prose list styles) */
+  .m3 .m3-timeline {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 8px;
@@ -726,20 +726,23 @@
     padding: 0;
     list-style: none;
   }
-  .m3 .m3-timeline > li {
-    margin: 0;
-  }
-  .m3-tl-card {
+  .m3 .m3-tl-card {
     display: flex;
     flex-direction: column;
     gap: 6px;
+    margin: 0;
     padding: 12px 14px;
     border: 1px solid var(--ff-line);
     border-radius: var(--ff-r-box);
     font-size: 13px;
+    line-height: 1.5;
+    color: var(--ff-ink);
     min-width: 0;
   }
-  .m3-tl-card.is-total {
+  .m3 .m3-tl-card::marker {
+    content: none;
+  }
+  .m3 .m3-tl-card.is-total {
     background: var(--ff-surface-2);
     border-color: transparent;
   }
@@ -750,12 +753,13 @@
   }
   .m3-tl-row {
     display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 0;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 8px;
     padding-top: 6px;
     border-top: 1px solid var(--ff-row);
   }
   .m3-tl-row > span:first-child {
+    grid-column: 1 / -1;
     font-weight: 700;
     color: var(--ff-ink-2);
   }
@@ -780,7 +784,7 @@
     }
   }
   @media (max-width: 640px) {
-    .m3-timeline {
+    .m3 .m3-timeline {
       grid-template-columns: minmax(0, 1fr);
     }
     .m3-legs {

@@ -472,9 +472,11 @@ export default function ParityPaths({ lang }: ParityPathsProps): JSX.Element {
               {/* equal signs between the lanes */}
               {resultOn &&
                 [C.B4.y + C.B4.h / 2, C.B5.y + C.B5.h / 2].map((y, i) => (
-                  <g key={i} class="pp-eq" transform={`translate(${L.spine} ${y})`}>
-                    <circle r={L.compact ? 12 : 15} />
-                    <path d="M-5,-3H5M-5,3H5" />
+                  <g key={i} transform={`translate(${L.spine} ${y})`}>
+                    <g class="pp-eq">
+                      <circle r={L.compact ? 12 : 15} />
+                      <path d="M-5,-3H5M-5,3H5" />
+                    </g>
                   </g>
                 ))}
 

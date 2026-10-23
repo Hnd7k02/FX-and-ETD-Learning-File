@@ -280,6 +280,12 @@ export const nums: NumTable = {
     note: 'Forward − fair strike, whole pips like the 4-decimal rates it compares',
   },
   'm08.accBarrier': { value: M.accBarrier, kind: 'rate' },
+  'm08.barrierDist': {
+    value: Math.abs(M.accBarrier / E.spot - 1),
+    kind: 'pct',
+    digits: 0,
+    note: 'Distance of both barriers from spot (§8.7: spot ± 3 %)',
+  },
   'm08.accFixings': { value: M.accFixings, kind: 'num', digits: 0 },
   'm08.accNotional': { value: M.accNotional, kind: 'money', ccy: 'USD' },
   'm08.accTotal': {

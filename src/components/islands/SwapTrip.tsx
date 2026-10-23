@@ -20,17 +20,11 @@ import {
 } from '@/components/ui/hooks';
 import { swaptrip as dict } from '@/i18n/dict/swaptrip';
 import { translator, type Lang } from '@/i18n/types';
-import { clamp, linePath, niceTicks, scaleLinear, type Point } from '@/lib/chart';
+import { clamp, linePath, scaleLinear, type Point } from '@/lib/chart';
 import { fmtMillions, fmtMoney, fmtNumber, fmtPct, fmtPips, fmtRate } from '@/lib/format';
 import { M03_CONFIG, PIP } from '@/lib/m03/config';
-import { textWidth } from '@/lib/m03/text';
-import {
-  EXAMPLE_MARKET as MK,
-  pathAt,
-  roundTripChf,
-  spotPath,
-  tripSwap,
-} from '@/lib/m03/trip';
+import { stepTicks, textWidth } from '@/lib/m03/text';
+import { EXAMPLE_MARKET as MK, pathAt, roundTripChf, spotPath, tripSwap } from '@/lib/m03/trip';
 import { usePlayback } from './m03-shared';
 
 export interface SwapTripProps {
@@ -105,7 +99,8 @@ export default function SwapTrip({ lang }: SwapTripProps): JSX.Element {
   const done = play.done && play.started;
   const aha = done;
 
-  const yTicks = niceTicks(y0, y1, L.compact ? 4 : 5).filter((v) => v > y0 && v < y1);
+  const yStep = y1 - y0 > 0.09 ? 0.04 : 0.02;
+  const yTicks = stepTicks(y0, y1, yStep).filter((v) => v > y0 && v < y1);
   const xTicks = [0, 10, 20, 30].filter((d) => d <= T.days);
 
   // open-result bracket at the head (orange), label left or right of it
