@@ -40,14 +40,16 @@ export const SMILE_GRID: readonly number[] = Array.from(
 );
 
 /** Delta ticks of the chart with their pillar names: 10Δ put … 10Δ call. */
-export const DELTA_TICKS: ReadonlyArray<{ delta: number; key: 'p10' | 'p25' | 'atm' | 'c25' | 'c10' }> =
-  [
-    { delta: 0.9, key: 'p10' },
-    { delta: 0.75, key: 'p25' },
-    { delta: 0.5, key: 'atm' },
-    { delta: 0.25, key: 'c25' },
-    { delta: 0.1, key: 'c10' },
-  ];
+export const DELTA_TICKS: ReadonlyArray<{
+  delta: number;
+  key: 'p10' | 'p25' | 'atm' | 'c25' | 'c10';
+}> = [
+  { delta: 0.9, key: 'p10' },
+  { delta: 0.75, key: 'p25' },
+  { delta: 0.5, key: 'atm' },
+  { delta: 0.25, key: 'c25' },
+  { delta: 0.1, key: 'c10' },
+];
 
 export type Pillar = 'put25' | 'atm' | 'call25';
 
@@ -104,7 +106,9 @@ export function dragPillar(q: SmileQuotes, which: Pillar, v: number): SmileQuote
   if (Math.abs(dragged - other) < SNAP_TOL) dragged = other;
   else if (Math.abs(0.5 * (dragged + other) - q.atm) < SNAP_TOL / 2) dragged = 2 * q.atm - other;
   const next =
-    which === 'call25' ? quotesFromVols(q.atm, dragged, other) : quotesFromVols(q.atm, other, dragged);
+    which === 'call25'
+      ? quotesFromVols(q.atm, dragged, other)
+      : quotesFromVols(q.atm, other, dragged);
   if (Math.abs(next.rr25) < 1e-12) next.rr25 = 0;
   if (Math.abs(next.bf25) < 1e-12) next.bf25 = 0;
   return clampQuotes(next);
@@ -168,14 +172,20 @@ export function premiumEffect(
 }
 
 /**
- * y domain of the chart (decimal vols): covers the curve and at least [ATM − 2, ATM + 3] vol
- * points, rounded out to whole vol points.
+ * y domain of the chart (decimal vols): the base range (e.g. the example's ATM − 2 to + 3 vol
+ * points), widened in whole vol points only when the curve leaves it. So the axis stays still
+ * for small changes and the curve visibly moves.
  */
-export function volDomain(g: SmileGeometry, atm: number): [number, number] {
-  const lo = Math.min(g.minVol, atm - 0.02);
-  const hi = Math.max(g.maxVol, atm + 0.03);
+export function volDomain(g: SmileGeometry, base: readonly [number, number]): [number, number] {
   const pts = (x: number) => Number((x * 100).toFixed(6));
+  const lo = Math.min(g.minVol, base[0]);
+  const hi = Math.max(g.maxVol, base[1]);
   return [Math.max(0, Math.floor(pts(lo)) / 100), Math.ceil(pts(hi)) / 100];
+}
+
+/** Base y range around an ATM vol: ATM − 2 to ATM + 3 vol points. */
+export function baseVolRange(atm: number): [number, number] {
+  return [atm - 0.02, atm + 0.03];
 }
 
 /** True if two quote sets are equal within half a slider step. */
@@ -189,7 +199,9 @@ export function sameQuotes(a: SmileQuotes, b: SmileQuotes): boolean {
 }
 
 /** Preset quotes of the builder: the example, the same smile symmetric, and flat. */
-export function smilePresets(example: SmileQuotes): Record<'example' | 'symmetric' | 'flat', SmileQuotes> {
+export function smilePresets(
+  example: SmileQuotes,
+): Record<'example' | 'symmetric' | 'flat', SmileQuotes> {
   return {
     example: { ...example },
     symmetric: { ...example, rr25: 0 },

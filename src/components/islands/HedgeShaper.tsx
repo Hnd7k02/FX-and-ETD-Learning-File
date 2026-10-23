@@ -111,7 +111,12 @@ const lineStyle = (color: string, width: number, dash?: string) => ({
   strokeLinejoin: 'round' as const,
 });
 
-const halo = { paintOrder: 'stroke' as const, stroke: '#fff', strokeWidth: 4, strokeLinejoin: 'round' as const };
+const halo = {
+  paintOrder: 'stroke' as const,
+  stroke: '#fff',
+  strokeWidth: 4,
+  strokeLinejoin: 'round' as const,
+};
 
 export default function HedgeShaper({ lang }: HedgeShaperProps): JSX.Element {
   const t = translator(dict, lang);
@@ -235,7 +240,13 @@ export default function HedgeShaper({ lang }: HedgeShaperProps): JSX.Element {
   const fwdY = sy(EXAMPLE_FORWARD);
 
   return (
-    <div class="hs" data-hs data-structure={id} data-zero-cost={f.zeroCost ? 'true' : 'false'} data-st={st.toFixed(4)}>
+    <div
+      class="hs"
+      data-hs
+      data-structure={id}
+      data-zero-cost={f.zeroCost ? 'true' : 'false'}
+      data-st={st.toFixed(4)}
+    >
       <div class="ff-lab-head">
         <div class="hs-head-text">
           <div class="ff-lab-title">{t('hs.title')}</div>
@@ -279,7 +290,12 @@ export default function HedgeShaper({ lang }: HedgeShaperProps): JSX.Element {
             >
               <defs>
                 <clipPath id={clipId}>
-                  <rect x={L.left} y={L.top} width={L.width - L.left - L.right} height={L.plotBottom - L.top} />
+                  <rect
+                    x={L.left}
+                    y={L.top}
+                    width={L.width - L.left - L.right}
+                    height={L.plotBottom - L.top}
+                  />
                 </clipPath>
               </defs>
               <GridY
@@ -291,7 +307,11 @@ export default function HedgeShaper({ lang }: HedgeShaperProps): JSX.Element {
                 fontSize={L.font}
                 axisAt={null}
               />
-              <text x={L.left} y={L.top - 14} style={{ fontSize: fs, fontWeight: 600, fill: 'var(--ff-muted)' }}>
+              <text
+                x={L.left}
+                y={L.top - 14}
+                style={{ fontSize: fs, fontWeight: 600, fill: 'var(--ff-muted)' }}
+              >
                 {t('hs.y')}
               </text>
 
@@ -321,7 +341,11 @@ export default function HedgeShaper({ lang }: HedgeShaperProps): JSX.Element {
               </g>
 
               {/* forward label at the left end, above the line */}
-              <text x={L.left + 6} y={fwdY - 7} style={{ fontSize: fs, fontWeight: 600, fill: 'var(--ff-ink-2)', ...halo }}>
+              <text
+                x={L.left + 6}
+                y={fwdY - 7}
+                style={{ fontSize: fs, fontWeight: 600, fill: 'var(--ff-ink-2)', ...halo }}
+              >
                 {t('hs.lg.forward')} {rate(EXAMPLE_FORWARD)}
               </text>
 
@@ -331,7 +355,13 @@ export default function HedgeShaper({ lang }: HedgeShaperProps): JSX.Element {
                 class="hs-note"
                 x={capLabelX}
                 y={sy(f.capRate) - 10}
-                style={{ fontSize: fs, fontWeight: 800, fill: 'var(--ff-long)', textAnchor: 'middle', ...halo }}
+                style={{
+                  fontSize: fs,
+                  fontWeight: 800,
+                  fill: 'var(--ff-long)',
+                  textAnchor: 'middle',
+                  ...halo,
+                }}
               >
                 {t('hs.cap', { r: rate(f.capRate) })}
               </text>
@@ -341,7 +371,13 @@ export default function HedgeShaper({ lang }: HedgeShaperProps): JSX.Element {
                   class="hs-note"
                   x={sx(f.protectionEndsAt) - 8}
                   y={sy(f.capRate) + L.font + 10}
-                  style={{ fontSize: fs, fontWeight: 700, fill: 'var(--ff-ink-2)', textAnchor: 'end', ...halo }}
+                  style={{
+                    fontSize: fs,
+                    fontWeight: 700,
+                    fill: 'var(--ff-ink-2)',
+                    textAnchor: 'end',
+                    ...halo,
+                  }}
                 >
                   {t('hs.ends')}
                 </text>
@@ -352,7 +388,13 @@ export default function HedgeShaper({ lang }: HedgeShaperProps): JSX.Element {
                   class="hs-note"
                   x={floorLabelX}
                   y={sy(f.floorRate) - 10}
-                  style={{ fontSize: fs, fontWeight: 800, fill: 'var(--ff-long)', textAnchor: 'middle', ...halo }}
+                  style={{
+                    fontSize: fs,
+                    fontWeight: 800,
+                    fill: 'var(--ff-long)',
+                    textAnchor: 'middle',
+                    ...halo,
+                  }}
                 >
                   {t('hs.floor', { r: rate(f.floorRate) })}
                 </text>
@@ -364,20 +406,43 @@ export default function HedgeShaper({ lang }: HedgeShaperProps): JSX.Element {
                   data-aha
                   x={L.left + 8}
                   y={L.top + L.font + 4}
-                  style={{ fontSize: `${L.font + 1}px`, fontWeight: 800, fill: 'var(--ff-good-text-strong)', ...halo }}
+                  style={{
+                    fontSize: `${L.font + 1}px`,
+                    fontWeight: 800,
+                    fill: 'var(--ff-good-text-strong)',
+                    ...halo,
+                  }}
                 >
                   {t('hs.aha')}
                 </text>
               )}
 
               {/* marker at the rate at expiry */}
-              <path d={`M${x.toFixed(1)},${L.top}V${L.rail}`} style={{ fill: 'none', stroke: 'var(--ff-ink)', strokeWidth: 1.5 }} />
-              <circle cx={x} cy={sy(st)} r={5} style={{ fill: COLORS.unhedged, stroke: '#fff', strokeWidth: 2.5 }} />
-              <circle cx={x} cy={sy(dots[0]!)} r={6.5} style={{ fill: COLORS.structure, stroke: '#fff', strokeWidth: 2.5 }} />
+              <path
+                d={`M${x.toFixed(1)},${L.top}V${L.rail}`}
+                style={{ fill: 'none', stroke: 'var(--ff-ink)', strokeWidth: 1.5 }}
+              />
+              <circle
+                cx={x}
+                cy={sy(st)}
+                r={5}
+                style={{ fill: COLORS.unhedged, stroke: '#fff', strokeWidth: 2.5 }}
+              />
+              <circle
+                cx={x}
+                cy={sy(dots[0]!)}
+                r={6.5}
+                style={{ fill: COLORS.structure, stroke: '#fff', strokeWidth: 2.5 }}
+              />
 
               <path
                 d={`M${L.left},${L.rail}H${L.width - L.right}`}
-                style={{ fill: 'none', stroke: 'var(--ff-line)', strokeWidth: 4, strokeLinecap: 'round' }}
+                style={{
+                  fill: 'none',
+                  stroke: 'var(--ff-line)',
+                  strokeWidth: 4,
+                  strokeLinecap: 'round',
+                }}
               />
               <g
                 class={`hs-handle${dragging ? ' is-active' : ''}`}
@@ -387,8 +452,21 @@ export default function HedgeShaper({ lang }: HedgeShaperProps): JSX.Element {
                 onPointerUp={onUp}
                 onPointerCancel={onUp}
               >
-                <rect x={x - 28} y={L.rail - 22} width={56} height={44} style={{ fill: 'transparent' }} />
-                <rect x={x - 34} y={L.rail - 11} width={68} height={22} rx={11} style={{ fill: 'var(--ff-ink)', stroke: '#fff', strokeWidth: 2 }} />
+                <rect
+                  x={x - 28}
+                  y={L.rail - 22}
+                  width={56}
+                  height={44}
+                  style={{ fill: 'transparent' }}
+                />
+                <rect
+                  x={x - 34}
+                  y={L.rail - 11}
+                  width={68}
+                  height={22}
+                  rx={11}
+                  style={{ fill: 'var(--ff-ink)', stroke: '#fff', strokeWidth: 2 }}
+                />
                 <text
                   x={x}
                   y={L.rail + 4}
@@ -404,7 +482,13 @@ export default function HedgeShaper({ lang }: HedgeShaperProps): JSX.Element {
                   {rate(st)}
                 </text>
               </g>
-              <AxisX x={sx} ticks={ticks} y={L.height - 6} format={(v) => fmtRate(v, PAIR, 2)} fontSize={L.font} />
+              <AxisX
+                x={sx}
+                ticks={ticks}
+                y={L.height - 6}
+                format={(v) => fmtRate(v, PAIR, 2)}
+                fontSize={L.font}
+              />
             </svg>
           </div>
           <p class="hs-hint">{t('hs.drag')}</p>
@@ -448,7 +532,9 @@ export default function HedgeShaper({ lang }: HedgeShaperProps): JSX.Element {
               <span class="hs-block-tag" aria-hidden="true" />
               <span class="hs-block-text">
                 <span class="hs-block-name">
-                  {pos.putStrike === null ? t('hs.sellPut') : t('hs.sellPutK', { k: rate(pos.putStrike) })}
+                  {pos.putStrike === null
+                    ? t('hs.sellPut')
+                    : t('hs.sellPutK', { k: rate(pos.putStrike) })}
                 </span>
                 <span class="hs-block-sub">{t('hs.sellPutSub')}</span>
               </span>
@@ -463,8 +549,12 @@ export default function HedgeShaper({ lang }: HedgeShaperProps): JSX.Element {
           <StatTable>
             <StatHero
               label={t('hs.premium')}
-              value={t('hs.pips', { v: fmtPips(f.zeroCost && Math.abs(premTween) < 0.05 ? 0 : premTween, lang) })}
-              sub={f.zeroCost ? t('hs.zero') : t('hs.pay', { chf: chf(Math.abs(premTween) * PIP * N) })}
+              value={t('hs.pips', {
+                v: fmtPips(f.zeroCost && Math.abs(premTween) < 0.05 ? 0 : premTween, lang),
+              })}
+              sub={
+                f.zeroCost ? t('hs.zero') : t('hs.pay', { chf: chf(Math.abs(premTween) * PIP * N) })
+              }
             />
             <StatRow label={t('hs.capRow')} sub={capSub} value={rate(f.capRate)} />
             <StatRow

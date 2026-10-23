@@ -207,7 +207,7 @@ export default function TouchLab({ lang, mc, initialMode }: TouchLabProps): JSX.
   const PT = (pts: Point[]) => pts.map(([a, b]): Point => [xDays(a), yTop(b)]);
 
   const pathsView = (
-    <g>
+    <g clip-path="url(#tl-clip-top)">
       <path d={areaPath(PT(cone.o2), PT(cone.u2))} class="tl-cone2" />
       <path d={areaPath(PT(cone.o1), PT(cone.u1))} class="tl-cone1" />
       {paths.map((p, i) => {
@@ -531,6 +531,11 @@ export default function TouchLab({ lang, mc, initialMode }: TouchLabProps): JSX.
             data-chart="top"
             {...dragTop.handlers}
           >
+            <defs>
+              <clipPath id="tl-clip-top">
+                <rect x={x0} y={LT.top} width={x1 - x0} height={LT.height - LT.bottom - LT.top} />
+              </clipPath>
+            </defs>
             {topTicksY.map((v) => (
               <g key={`ty${v}`}>
                 <path

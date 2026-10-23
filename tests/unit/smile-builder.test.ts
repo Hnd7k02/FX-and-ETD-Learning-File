@@ -15,6 +15,7 @@ import {
   smilePresets,
   smileShape,
   volDomain,
+  baseVolRange,
 } from '@/lib/smile-builder';
 
 describe('grid and geometry', () => {
@@ -52,12 +53,12 @@ describe('grid and geometry', () => {
 
   it('domain covers the curve and at least ATM −2 / +3 vol points', () => {
     const g = smileGeometry(Q, F, E.T);
-    const [lo, hi] = volDomain(g, Q.atm);
+    const [lo, hi] = volDomain(g, baseVolRange(Q.atm));
     expect(lo).toBeCloseTo(0.06, 12);
     expect(hi).toBeCloseTo(0.11, 12);
     const steep = { atm: 0.04, rr25: -0.03, bf25: 0.015 };
     const gs = smileGeometry(steep, F, E.T);
-    const [lo2, hi2] = volDomain(gs, steep.atm);
+    const [lo2, hi2] = volDomain(gs, baseVolRange(Q.atm));
     expect(lo2).toBeLessThanOrEqual(gs.minVol);
     expect(hi2).toBeGreaterThanOrEqual(gs.maxVol);
     expect(lo2).toBeGreaterThanOrEqual(0);

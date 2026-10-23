@@ -77,8 +77,7 @@ export const hedgeshaper = defineDict({
     'hs.sellPutSub': 'sold: strike solved for zero cost',
     'hs.add': 'Add',
     'hs.on': 'On',
-    'hs.desc.call':
-      'Just the call: from {k} your rate is capped. You always pay the premium.',
+    'hs.desc.call': 'Just the call: from {k} your rate is capped. You always pay the premium.',
     'hs.desc.call-spread':
       'The sold call makes the protection cheaper. Above {k2} you pay the market rate again, just with a fixed discount.',
     'hs.desc.collar':

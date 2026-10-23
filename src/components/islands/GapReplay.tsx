@@ -43,6 +43,8 @@ export interface GapReplayProps {
   floor: number;
   floorText: string;
   floorSince: string;
+  /** Date the minimum rate was discontinued (sourced fact). */
+  floorEnd: string;
   /** Time of the ECB concertation (sourced fact), shown in the note. */
   ecbTime: string;
   /** Riskometer deep link for the event. */
@@ -271,7 +273,7 @@ export default function GapReplay(p: GapReplayProps): JSX.Element {
                   class={`m7-label${triggered ? ' gr-gone-label' : ''}`}
                 >
                   {triggered
-                    ? t('gr.floorEnded', { v: p.floorText, since: p.floorSince, date: shockDate })
+                    ? t('gr.floorEnded', { v: p.floorText, since: p.floorSince, date: p.floorEnd })
                     : t('gr.floor', { v: p.floorText, since: p.floorSince })}
                 </text>
               </>

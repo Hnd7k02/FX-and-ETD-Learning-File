@@ -255,35 +255,42 @@ export default function BarrierPaths({ lang }: BarrierPathsProps): JSX.Element {
             <text x={x1 - 4} y={y(M07_CONFIG.strike) - 6} class="m7-ref-label" text-anchor="end">
               {t('bp.label.strike', { v: rate(M07_CONFIG.strike) })}
             </text>
-            {/* paths */}
-            {paths.map((p, i) => {
-              const h = hits[i] ?? null;
-              const hitNow = reached(h, day);
-              const before = poly(p, 0, hitNow ? h! : day);
-              const after = hitNow ? poly(p, h!, day) : '';
-              const preCls = io === 'out' ? 'm7-path-alive' : 'm7-path-wait';
-              const postCls = io === 'out' ? 'm7-path-dead' : 'm7-path-alive';
-              const [hx, hy] = hitNow ? pt(p, h!) : [0, 0];
-              const [ex, ey] = pt(p, day);
-              const aliveEnd = io === 'out' ? !hitNow : hitNow;
-              return (
-                <g key={`p${seed}-${i}`} data-path={i} data-hit={h ?? ''}>
-                  <path d={before} class={preCls} />
-                  {after && <path d={after} class={postCls} />}
-                  {aliveEnd && day > 0 && <circle cx={ex} cy={ey} r={3} class="m7-path-head" />}
-                  {hitNow && (
-                    <circle
-                      key={`hit${seed}-${i}-${barrier}`}
-                      cx={hx}
-                      cy={hy}
-                      r={5.5}
-                      class="m7-hit m7-pop"
-                      style={{ transformOrigin: `${hx}px ${hy}px` }}
-                    />
-                  )}
-                </g>
-              );
-            })}
+            {/* paths, clipped to the plot */}
+            <defs>
+              <clipPath id="bp-clip">
+                <rect x={x0} y={L.top} width={x1 - x0} height={L.height - L.bottom - L.top} />
+              </clipPath>
+            </defs>
+            <g clip-path="url(#bp-clip)">
+              {paths.map((p, i) => {
+                const h = hits[i] ?? null;
+                const hitNow = reached(h, day);
+                const before = poly(p, 0, hitNow ? h! : day);
+                const after = hitNow ? poly(p, h!, day) : '';
+                const preCls = io === 'out' ? 'm7-path-alive' : 'm7-path-wait';
+                const postCls = io === 'out' ? 'm7-path-dead' : 'm7-path-alive';
+                const [hx, hy] = hitNow ? pt(p, h!) : [0, 0];
+                const [ex, ey] = pt(p, day);
+                const aliveEnd = io === 'out' ? !hitNow : hitNow;
+                return (
+                  <g key={`p${seed}-${i}`} data-path={i} data-hit={h ?? ''}>
+                    <path d={before} class={preCls} />
+                    {after && <path d={after} class={postCls} />}
+                    {aliveEnd && day > 0 && <circle cx={ex} cy={ey} r={3} class="m7-path-head" />}
+                    {hitNow && (
+                      <circle
+                        key={`hit${seed}-${i}-${barrier}`}
+                        cx={hx}
+                        cy={hy}
+                        r={5.5}
+                        class="m7-hit m7-pop"
+                        style={{ transformOrigin: `${hx}px ${hy}px` }}
+                      />
+                    )}
+                  </g>
+                );
+              })}
+            </g>
             <text
               x={x0 + 8}
               y={dir === 'up' ? L.top + 15 : L.height - L.bottom - 8}
