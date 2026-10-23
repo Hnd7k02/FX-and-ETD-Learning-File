@@ -340,6 +340,17 @@ describe('content lint', () => {
     }
   });
 
+  it('central banks as sources and model authors stay allowed (D-50)', () => {
+    for (const name of ['EZB', 'ECB', 'SNB', 'BIZ', 'BIS', 'Garman', 'Kohlhagen', 'Reiner']) {
+      expect(
+        FORBIDDEN_NAMES.some((f) => f.includes(name) || name.includes(f)),
+        name,
+      ).toBe(false);
+    }
+    const sources = readFileSync(join(ROOT, 'src/content/sources.md'), 'utf8');
+    for (const publisher of ['(EZB)', '(SNB)', '(BIZ)']) expect(sources).toContain(publisher);
+  });
+
   it.each(textFiles.map((f) => [relative(ROOT, f), f]))(
     '%s avoids "garantiert" and "risikolos" outside allowed contexts',
     (_r, f) => {

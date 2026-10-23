@@ -407,7 +407,7 @@ Format: `D-xx · date · origin`, then question, decision, reasoning. Origin is 
 
 **Decision:**
 
-- 07.4: the franc-shock replay is «ein hypothetisches Szenario mit täglichen EZB-Referenzkursen» everywhere (caption, title, aha, status, note, quiz). ECB reference rates are published for information and are not tradable prices (source `ecb-reference-rates-method`, its "Belegt" line extended; no new fact because the statement carries no value). A stop-loss is filled at the next tradable price (where depended on minute and liquidity; the replay simplifies to the next fixing); a knock-out is not a trade, the option simply expires; with daily observation against a fixing all four barriers go with the same fixing, with continuous observation the first price beyond the barrier counts under the term sheet. The table columns read «Typ» and «Fixing» (a knock-out is not an order); the chart's aha title is shortened to «Hypothetisches Szenario» because annotation titles do not wrap.
+- 07.4: the franc-shock replay is «ein hypothetisches Szenario mit täglichen EZB-Referenzkursen» everywhere (caption, title, aha, status, note, quiz). ECB reference rates are published for information and are not tradable prices (source `ecb-reference-rates-method`, its "Belegt" line extended; no new fact because the statement carries no value). A stop-loss is filled at the next tradable price (where depended on minute and liquidity; the replay simplifies to the next fixing); a knock-out is not a trade, the option is extinguished under the assumed terms (wording of supplement point 17); with daily observation against a fixing all four barriers go with the same fixing, with continuous observation the first price beyond the barrier counts under the term sheet. The table columns read «Typ» and «Fixing» (a knock-out is not an order); the chart's aha title is shortened to «Hypothetisches Szenario» because annotation titles do not wrap.
 - 03.1: a spot deal settles T+2, so the firm pays the supplier on the spot value date, not "today"; a shorter near leg (value today or tomorrow) exists at a slightly different rate. 03.3: the roll swap is dealt two business days before the old maturity, so its near leg has the old forward's value date; «Spot beim Abschluss des Rolls» replaces «Spot am Roll-Datum» in text, caption, slider and quiz. T+2 and "two business days" are market conventions written as text.
 - Barrier lab maturity in days: see D-42.
 - Supplement of 23.10.2026 (point 17): the replay is nowhere an executable historical transaction, also not in tooltips, ARIA texts or the quiz (m07-c4): every fill is an assumption, stop, put and barriers are «angenommene Beispiele, keine historischen Geschäfte», a knock-out «erlischt nach den angenommenen Bedingungen» (daily observation against the ECB fixing). The replay has no rebates; texts say so, a rebate would be a separate row, and a unit test fails when a rebate appears in its config. The glossary knock-out entry follows: extinguished under the terms of the deal, a rebate paid separately, in-out parity only without a rebate.
@@ -428,3 +428,16 @@ Format: `D-xx · date · origin`, then question, decision, reasoning. Origin is 
 - Tests: delta and chance as two separate values at the four strikes (unrounded with tolerance and as shown in DE and EN); a wording guard keeps «Delta ist die Chance» and «einer von vier Fällen» out of every text, quiz, dictionary and the glossary.
 
 **Reasoning:** Delta and the chance coincide only roughly and for different reasons; a learner who prices with delta as a probability makes systematic mistakes, especially for puts.
+
+## D-50 · 2026-10-23 · Supplement 23.10.2026
+
+**Namen: was verboten bleibt, was erlaubt ist**
+
+**Question:** The rule "no names of banks, companies or people" was read strictly enough to put the sources (ECB, SNB, BIS) and the model names (Garman-Kohlhagen, Reiner-Rubinstein) in doubt.
+**Decision:** (supplement point 24)
+
+- Forbidden stay: commercial banks, companies, clients, real persons as examples, and product brands. The content lint (`FORBIDDEN_NAMES` in `tests/unit/content-lint.test.ts`) enforces it on every text, quiz, dictionary and the glossary.
+- Allowed: central banks and authorities as sources (EZB/ECB, SNB, BIZ/BIS) and model and author names (Garman-Kohlhagen, Reiner-Rubinstein, Black-76, Broadie-Glasserman-Kou). A lint test checks that these names are not on the forbidden list and that the sources keep their publishers.
+- No source is removed; `src/content/sources.md` keeps every entry.
+
+**Reasoning:** The rule protects against advertising and against any link to a real firm or person; a source has to name its publisher, and a model is known by its authors' names.

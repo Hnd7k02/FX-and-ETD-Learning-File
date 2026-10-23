@@ -2,20 +2,20 @@
 
 Working branch: `claude/forward-first-v5` (Version 5, from `claude/forward-first-v1` at 1f0f4ff). Mode: phases without stops (D-16), uncertain choices kept easy to change (D-22).
 
-| Phase | Content                                                                         | Status                                                                  |
-| ----- | ------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| 0     | Setup: scaffold, tooling, tokens, layout shell, i18n routing, CI, memory files  | done                                                                    |
-| 1     | Calculation core without Monte Carlo                                            | done, independently verified (`docs/reference/xcheck/`)                 |
-| 2     | Design system, home page, Wow moment, module template                           | done                                                                    |
-| 3     | Module 05 vertical slice (Greeks lab, content, quiz, progress)                  | done, reviewed                                                          |
-| 4     | Riskometer: pipeline, method, events, page, mini gauge                          | done                                                                    |
-| 5     | Modules 01–04 incl. session clock, calculators, payoff builder                  | done, reviewed                                                          |
-| 6     | Monte Carlo engine, products, modules 06–09, path simulator, matrix             | done, reviewed                                                          |
-| 7     | English complete, glossary, about and methodology                               | written alongside each module; English review open (after Dario's go)   |
-| 7b    | Offline file `forward-first.html` (D-13, D-40)                                  | done; Version 4 tested by Dario on work PC and iPad                     |
-| 7c    | Version 5 after review and device test of 23.10.2026 (D-41 to D-48)             | done; waiting for Dario's test of Version 5 (iPad and work PC, by mail) |
-| 8     | Polish: transitions, micro-interactions, 390 px and iPad, visual comparison     | open                                                                    |
-| 9     | Verification and release: tests, E2E in Chromium and WebKit, fact check, README | open                                                                    |
+| Phase | Content                                                                                          | Status                                                                  |
+| ----- | ------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------- |
+| 0     | Setup: scaffold, tooling, tokens, layout shell, i18n routing, CI, memory files                   | done                                                                    |
+| 1     | Calculation core without Monte Carlo                                                             | done, independently verified (`docs/reference/xcheck/`)                 |
+| 2     | Design system, home page, Wow moment, module template                                            | done                                                                    |
+| 3     | Module 05 vertical slice (Greeks lab, content, quiz, progress)                                   | done, reviewed                                                          |
+| 4     | Riskometer: pipeline, method, events, page, mini gauge                                           | done                                                                    |
+| 5     | Modules 01–04 incl. session clock, calculators, payoff builder                                   | done, reviewed                                                          |
+| 6     | Monte Carlo engine, products, modules 06–09, path simulator, matrix                              | done, reviewed                                                          |
+| 7     | English complete, glossary, about and methodology                                                | written alongside each module; English review open (after Dario's go)   |
+| 7b    | Offline file `forward-first.html` (D-13, D-40)                                                   | done; Version 4 tested by Dario on work PC and iPad                     |
+| 7c    | Version 5 after review and device test of 23.10.2026, with the binding supplement (D-41 to D-50) | done; waiting for Dario's test of Version 5 (iPad and work PC, by mail) |
+| 8     | Polish: transitions, micro-interactions, 390 px and iPad, visual comparison                      | open                                                                    |
+| 9     | Verification and release: tests, E2E in Chromium and WebKit, fact check, README                  | open                                                                    |
 
 ## Stop point (Dario, 23.10.2026)
 
@@ -27,10 +27,17 @@ Version 5 is in PR against `main` and must not be merged: Dario tests `release/f
 - **B · Dragging (D-42):** tween rule in `useTween`, dots on their lines, parity bar without transition, barrier lab maturity in days; frame-by-frame tests.
 - **C · Content (D-43 to D-48):** max-loss classes, forward conventions, risk reversal vs zero-cost collar, ECB fixings as non-tradable reference rates, value dates of spot and roll, risk-neutral probabilities, spot vs forward moneyness and intrinsic value. DE and EN together; every new number via `<Num>` with a tested check value.
 
+## Supplement to Version 5 (binding, 23.10.2026)
+
+- **A · Transport (D-41):** the rule holds for every byte; CSS escapes only `\d7` (×) and `\B7` (·); esbuild with `unicode-escapes` off; the scanner rewrites only `\n \r \t \v \f`, `\xHH` and `\\` before n/r/t and stops the build on anything else (script index, position, context); acorn + regexpp prove the meaning unchanged; every check runs on the bytes read back from disk; `__FF_READY__` next to `__FF_OFFLINE__`; location only «lokal»/«Netzlaufwerk»; version only in `scripts/lib/version.ts`; both release files byte-identical; browser check of special characters.
+- **B · Animation (D-42):** nothing moves two frames after the last input: slider-aware tween rule in a layout effect, CSS animations of a figure end while a slider or handle moves and in quick click series; every slider of 37 pages tested with mouse and held arrow key on the rendered geometry; touch over CDP in Chromium for a chart handle; single toggle, preset and reset still animate; barrier lab parity against `labNumbers` (shown KO + KI = vanilla).
+- **C · Content (D-43 to D-49):** delta is not a probability (N(d2), new core function), risk-neutral measure vs model assumptions, forward gap as convention, risk reversal unrounded with the delta convention, typed max loss, ECB replay never a historical trade, value dates with both holiday calendars, forward moneyness as the tool's convention. Tests: removed keys gone, every internal link and anchor valid, no check values in components, texts or dictionaries.
+- **D · Names (D-50):** commercial banks, firms, clients, real persons and product brands stay forbidden; central banks as sources and model authors are allowed.
+
 ## Current state
 
-- **Output:** one offline file `release/forward-first.html` (copy `forward-first-v5.html`), 1.65 MB (CSS 475 KB, JS 753 KB, packed pages 454 KB), plain ASCII. 99 pages, 19 route aliases, 38 islands, both languages. CSP `default-src 'none'`, no network request (tested).
-- **Tests:** `npm run check` green (Vitest 2’229 tests, coverage ≥ 90 % in `src/lib`). Offline file: 44 tests green locally in Chromium 1440 (2 touch tests run in the WebKit iPad projects); WebKit iPad runs in CI. Web build component tests: 460 green.
+- **Output:** one offline file `release/forward-first.html` (byte-identical copy `forward-first-v5.html`), 1.66 MB (CSS 475 KB, JS 757 KB, packed pages 467 KB), plain ASCII. 99 pages, 19 route aliases, 38 islands, both languages. CSP `default-src 'none'`, no network request (tested).
+- **Tests:** `npm run check` green (Vitest about 2’600 tests, coverage ≥ 90 % in `src/lib`). Offline file: 96 tests in Chromium 1440 (2 touch tests run only in the WebKit iPad projects); WebKit iPad runs in CI. Web build component tests: 460 green.
 - **Calculation core:** forward, swap, roll, arbitrage, Garman-Kohlhagen, Black-76, implied vol, delta strikes, six Greeks, smile, digitals, 8 barriers, touch, double no-touch; all §6 reference values within tolerance; cross-checked against independent formulas (max diff 1.8e-13).
 - **Monte Carlo:** 8 products, fair strikes/coupons with standard errors in `src/data/fx/mc-products.json`, independently re-implemented and reproduced; interactive pricing in chunks on the main thread.
 - **Riskometer data:** ECB until 14.09.2026; EUR/CHF 3.9 % (Normal, percentile 45). Manual update via Actions → Release.
@@ -60,3 +67,6 @@ Version 5 is in PR against `main` and must not be merged: Dario tests `release/f
 15. **Module 01 probabilities (D-46):** the rise/fall probabilities are now risk-neutral (with drift): 7 % instead of 11 % for a rise to 0.84, 15 % instead of 10 % for a fall to 0.76. OK?
 16. **Probabilities without their own note:** chart legends («Wahrscheinlichkeit») and the path simulator's ensemble counts («93 von 100») carry no note of their own; the stat rows next to them do. Enough?
 17. **Barrier lab maturity (D-42):** the slider now runs in days (start 91.25 days = 3 months, shown as «3 Monate (91 Tage)»). OK on the iPad?
+18. **Not tested by automation (supplement point 9):** native range sliders by touch (Playwright cannot drive them); touch frame by frame in WebKit (the iPad projects test the handle behaviour only); the English pages are not swept slider by slider (same islands as German). Your device test covers these.
+19. **Delta vs chance in the quiz:** module 04 keeps its fixed quiz shape, so there is no own question on «delta is not a probability» (the text, a table, the explorer and the glossary cover it). Add one by replacing check m04-c3?
+20. **About page model texts:** «Garman-Kohlhagen» and «Monte Carlo» on the About page do not list the model assumptions (constant vol, lognormal, no jumps); the glossary entry «Risikoneutral» does. Add them there too?
