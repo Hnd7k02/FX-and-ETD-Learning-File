@@ -6,6 +6,8 @@ import {
   dciRange,
   dciValueAt,
   dciView,
+  defaultFixing,
+  snapFixing,
   tenorDays,
 } from '@/lib/dcicalc';
 import { MC_PRODUCTS } from '@/lib/fx/mc/fair';
@@ -78,5 +80,16 @@ describe('DCI calculator', () => {
     expect(c.dci.some(([x]) => x === v.product.strike)).toBe(true);
     const outside = dciCurve(v, 0.9, 0.95, 4);
     expect(outside.dci).toHaveLength(5);
+  });
+
+  it('snaps fixings to the slider grid inside the chart range', () => {
+    const [x0, x1] = dciRange();
+    expect(snapFixing(0.77617)).toBeCloseTo(0.776, 10);
+    expect(snapFixing(0.1)).toBe(x0);
+    expect(snapFixing(9)).toBe(x1);
+    const v = dciView(100_000, 1, 0.01);
+    const f = defaultFixing(v);
+    expect(f).toBeLessThan(v.product.strike);
+    expect(dciOutcome(v, f).vsDepositQuote).toBeLessThan(0);
   });
 });

@@ -231,3 +231,19 @@ Format: `D-xx · date · origin`, then question, decision, reasoning. Origin is 
 **Decision:** `<Num>`/`<Fact>` render with `set:text` (formatting could otherwise add spaces around values); `.formula` is a block with `width: fit-content` where plain child `<span>`s are lines and inline elements stay inline; Vitest's persistent module cache is off because the registries use `import.meta.glob` and new files would stay invisible.
 
 **Reasoning:** Bugs reported by the template agent; fixed centrally so no module has to work around them.
+
+## D-35 · 2026-10-23 · Claude
+
+**Question:** Deviations of the Riskometer page from the prototype?
+
+**Decision:** All four pairs active; H1 follows the pair (Franken / Euro / Yen). Event markers sit on the highest weekly value between the anchor week and the daily-peak week (otherwise the 2015 dot would sit at the foot of the cliff, because the 15.01. return leaves the 21-day window the day after the daily peak). Under 640 px the event buttons become a chip row below the chart (44 px hit areas would overlap on the chart). Year tags lift a row when they collide. The chart fills the card height with 12 px labels. Deep links `?pair=EURUSD&event=gfc-2008` are read on load and written after an interaction. Default events and all timings in `RISKOMETER_UI` (`src/lib/riskometer-ui.ts`).
+
+**Reasoning:** Fidelity where the prototype works, deviations where real data or touch targets require it.
+
+## D-36 · 2026-10-23 · Claude
+
+**Question:** `@axe-core/playwright` pulled a second, newer `playwright-core`, which broke `astro check` on the e2e specs.
+
+**Decision:** `overrides: { "playwright-core": "1.56.1" }` in `package.json`, matching `@playwright/test` (D-14).
+
+**Reasoning:** One Playwright version in the tree, types agree, no casts in the specs.

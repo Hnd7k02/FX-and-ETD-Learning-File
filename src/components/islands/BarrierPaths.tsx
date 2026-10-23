@@ -110,7 +110,7 @@ export default function BarrierPaths({ lang }: BarrierPathsProps): JSX.Element {
     return s;
   };
 
-  const touchedNow = hits.filter((h) => h !== null && h <= day).length;
+  const touchedNow = hits.filter((h) => reached(h, day)).length;
   const firstHit = hits.reduce<{ i: number; d: number } | null>((best, h, i) => {
     if (h === null || h > day) return best;
     return !best || h < best.d ? { i, d: h } : best;
@@ -257,7 +257,7 @@ export default function BarrierPaths({ lang }: BarrierPathsProps): JSX.Element {
             {/* paths */}
             {paths.map((p, i) => {
               const h = hits[i] ?? null;
-              const hitNow = h !== null && h <= day;
+              const hitNow = reached(h, day);
               const before = poly(p, 0, hitNow ? h! : day);
               const after = hitNow ? poly(p, h!, day) : '';
               const preCls = io === 'out' ? 'm7-path-alive' : 'm7-path-wait';

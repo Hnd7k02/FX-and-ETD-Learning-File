@@ -39,7 +39,7 @@ import {
   touchNumbers,
   type TouchState,
 } from '@/lib/m07/touchlab';
-import { annotationBox, useSliderDrag, useSvgDrag, type DragTarget } from './m07-shared';
+import { annotationBox, inRange, useSliderDrag, useSvgDrag, type DragTarget } from './m07-shared';
 
 /** Monte Carlo check of the DNT (src/data/fx/mc-products.json), passed by the wrapper. */
 export interface DntCheck {
@@ -129,7 +129,7 @@ export default function TouchLab({ lang, mc, initialMode }: TouchLabProps): JSX.
         {
           key: 'strike',
           distance: (vx, vy) =>
-            vy >= LT.top - 14 && vy <= LT.height - LT.bottom
+            inRange(vy, LT.top - 14, LT.height - LT.bottom)
               ? Math.abs(vx - xLevel(s.strike))
               : Infinity,
           move: (vx) => moveLevel('strike', xLevel.invert(vx)),

@@ -113,6 +113,19 @@ export function dciValueAt(view: DciView, ST: number): number {
   return dciOutcome(view, ST).valueQuote;
 }
 
+/** A fixing at maturity snapped to the slider grid and clamped to the chart range. */
+export function snapFixing(x: number, market: Market = DEFAULT_MARKET): number {
+  const [lo, hi] = dciRange(market);
+  const step = DCI_CONFIG.fixingStep;
+  const snapped = Number((Math.round(x / step) * step).toFixed(6));
+  return Math.min(hi, Math.max(lo, snapped));
+}
+
+/** The fixing the outcome card starts with: below the strike (DCI_CONFIG), snapped. */
+export function defaultFixing(view: DciView, market: Market = DEFAULT_MARKET): number {
+  return snapFixing(view.product.strike * (1 - DCI_CONFIG.initialFixingBelowStrike), market);
+}
+
 /** Chart range [lo, hi] of S_T for the view's market. */
 export function dciRange(market: Market = DEFAULT_MARKET): [number, number] {
   return [market.spot * (1 + DCI_CONFIG.xRange[0]), market.spot * (1 + DCI_CONFIG.xRange[1])];

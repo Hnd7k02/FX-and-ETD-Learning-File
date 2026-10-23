@@ -262,3 +262,13 @@ export function annotationBox(
   const longest = Math.max(title.length * 7.2, ...lines.map((l) => l.length * perChar));
   return { lines, w: Math.min(maxWidth, Math.ceil(longest) + 22), h: 27 + lines.length * 17 };
 }
+
+/** lo ≤ v ≤ hi (a named helper keeps comparison operators out of the JSX text scan). */
+export function inRange(v: number, lo: number, hi: number): boolean {
+  return v >= lo && v <= hi;
+}
+
+/** True if a hit day exists and has been reached by the playback day. */
+export function reached(hit: number | null, day: number): boolean {
+  return hit !== null && hit <= day;
+}

@@ -31,7 +31,16 @@ import { translator, type Lang } from '@/i18n/types';
 import { clamp, linePath, niceTicks, scaleLinear, type Point } from '@/lib/chart';
 import { EXAMPLE, EXAMPLE_LABEL } from '@/lib/fx/example';
 import { fmtMoney, fmtNumber, fmtPct, fmtPips, fmtRate } from '@/lib/format';
-import { DCI_CONFIG, dciCurve, dciOutcome, dciRange, dciView, type DciMonths } from '@/lib/dcicalc';
+import {
+  DCI_CONFIG,
+  dciCurve,
+  dciOutcome,
+  dciRange,
+  dciView,
+  defaultFixing,
+  snapFixing,
+  type DciMonths,
+} from '@/lib/dcicalc';
 
 export interface DciCalculatorProps {
   lang: Lang;
@@ -77,10 +86,9 @@ export default function DciCalculator(props: DciCalculatorProps): JSX.Element {
   const view = useMemo(() => dciView(capital, months, distance), [capital, months, distance]);
   const K = view.product.strike;
   const [x0, x1] = dciRange();
-  const snapFix = (x: number) =>
-    clamp(Number((Math.round(x / C.fixingStep) * C.fixingStep).toFixed(6)), x0, x1);
+  const snapFix = (x: number) => snapFixing(x);
   const [fixing, setFixing] = useState(() =>
-    snapFix(props.fixing ?? K * (1 - C.initialFixingBelowStrike)),
+    props.fixing !== undefined ? snapFixing(props.fixing) : defaultFixing(view),
   );
   const [drag, setDrag] = useState(false);
   const [sliding, setSliding] = useState(false);

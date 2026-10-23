@@ -32,7 +32,7 @@ import {
   mirrorBarrier,
   type LabState,
 } from '@/lib/m07/barrierlab';
-import { annotationBox, useSliderDrag, useSvgDrag, type DragTarget } from './m07-shared';
+import { annotationBox, inRange, useSliderDrag, useSvgDrag, type DragTarget } from './m07-shared';
 
 export interface BarrierLabProps {
   lang: Lang;
@@ -45,7 +45,7 @@ const C = M07_CONFIG.lab;
 const R = C.ranges;
 const M = M07_CONFIG.market;
 
-const pctDigits = (v: number) => (Math.abs(v * 100 - Math.round(v * 100)) < 1e-9 ? 0 : 1);
+const pctDigits = (v: number) => (Number.isInteger(Math.round(v * 1e6) / 1e4) ? 0 : 1);
 
 export default function BarrierLab({ lang, initial }: BarrierLabProps): JSX.Element {
   const t = translator(dict, lang);
@@ -129,7 +129,7 @@ export default function BarrierLab({ lang, initial }: BarrierLabProps): JSX.Elem
       {
         key: 'barrier',
         distance: (vx, vy) =>
-          vy >= L.top - 12 && vy <= L.height - L.bottom
+          inRange(vy, L.top - 12, L.height - L.bottom)
             ? Math.abs(vx - xs(s.barrier)) + 4
             : Infinity,
         move: (vx) => {

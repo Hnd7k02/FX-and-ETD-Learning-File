@@ -14,7 +14,7 @@ import { MC_PRODUCTS, fairProduct } from '@/lib/fx/mc/fair';
 import { MC_CONFIG, PIP } from '@/lib/fx/mc/products';
 import { gkPrice } from '@/lib/fx/vanilla';
 import { digitalCash } from '@/lib/fx/exotics/digital';
-import { DCI_CONFIG, dciOutcome, dciView } from '@/lib/dcicalc';
+import { DCI_CONFIG, dciOutcome, dciView, defaultFixing } from '@/lib/dcicalc';
 import {
   PATHSIM_CONFIG,
   forwardToDay,
@@ -102,7 +102,7 @@ const tpfForwardEnd = forwardToDay(tpfLastDay);
 const tpfCrossDay = (Math.log(E.spot / tpf.strike) / (E.rf - E.rd)) * year;
 
 const dci = dciView(DCI_CONFIG.capital.initial, 1, DCI_CONFIG.distance.initial);
-const dciFixing = dci.product.strike * (1 - DCI_CONFIG.initialFixingBelowStrike);
+const dciFixing = defaultFixing(dci);
 const dciOut = dciOutcome(dci, dciFixing);
 const dci3 = dciView(DCI_CONFIG.capital.initial, 3, DCI_CONFIG.distance.initial);
 

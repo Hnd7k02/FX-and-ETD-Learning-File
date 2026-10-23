@@ -33,7 +33,7 @@ import {
 } from '@/lib/format';
 import { M07_CONFIG, chartLayout } from '@/lib/m07/config';
 import { gapSummary, type FixingPoint } from '@/lib/m07/gap';
-import { annotationBox, usePlayback } from './m07-shared';
+import { annotationBox, inRange, usePlayback } from './m07-shared';
 
 export interface GapReplayProps {
   lang: Lang;
@@ -94,7 +94,7 @@ export default function GapReplay(p: GapReplayProps): JSX.Element {
     else after.push(pt);
   }
   const tip: Point = [x(pos), y(valueAt(pos))];
-  if (shock >= 0 && pos > shock - 1 && pos < shock) {
+  if (shock > 0 && inRange(pos, shock - 1, shock) && pos !== shock - 1 && pos !== shock) {
     gapSeg.push([x(shock - 1), y(series[shock - 1]!.value)], tip);
   } else if (shock >= 0 && pos >= shock) {
     gapSeg.push([x(shock - 1), y(series[shock - 1]!.value)], [x(shock), y(series[shock]!.value)]);
