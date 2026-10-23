@@ -12,6 +12,7 @@
  */
 import type { JSX } from 'preact';
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
+import { tweenProgress } from '@/lib/anim';
 import { AxisX, GridY } from '@/components/ui/Chart';
 import type { Lang } from '@/i18n/types';
 import { easeInOutCubic, linePath, nearestIndex, type Point } from '@/lib/chart';
@@ -106,7 +107,7 @@ function useSeriesMorph(target: number[], yMaxTarget: number, instant: boolean):
     }
     const t0 = performance.now();
     const step = (now: number) => {
-      const k = Math.min(1, (now - t0) / RISKOMETER_UI.morphMs);
+      const k = tweenProgress(now, t0, RISKOMETER_UI.morphMs);
       const e = easeInOutCubic(k);
       setState(
         k >= 1

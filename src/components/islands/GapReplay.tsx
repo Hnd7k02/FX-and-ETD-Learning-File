@@ -68,7 +68,7 @@ export default function GapReplay(p: GapReplayProps): JSX.Element {
   const L = chartLayout(width, width < 480 ? 0.85 : 0.52, 280);
 
   const pos = play.pos;
-  const idx = Math.min(last, Math.floor(pos + 1e-9));
+  const idx = Math.max(0, Math.min(last, Math.floor(pos + 1e-9)));
   const shock = sum.shockIndex;
   const triggered = shock >= 0 && pos >= shock;
   const cur = series[idx]!;
@@ -80,7 +80,7 @@ export default function GapReplay(p: GapReplayProps): JSX.Element {
   const x = scaleLinear([0, last], [x0, x1]);
   const y = scaleLinear(G.yDomain, [L.height - L.bottom, L.top]);
   const valueAt = (q: number) => {
-    const i = Math.min(last, Math.floor(q));
+    const i = Math.max(0, Math.min(last, Math.floor(q)));
     const f = q - i;
     return i < last && f > 0
       ? series[i]!.value + (series[i + 1]!.value - series[i]!.value) * f

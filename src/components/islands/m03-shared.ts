@@ -6,6 +6,7 @@
  */
 import type { RefObject } from 'preact';
 import { useEffect, useRef, useState } from 'preact/hooks';
+import { frameDelta } from '@/lib/anim';
 
 /** Playback state; `pos` runs from 0 to `total` (days, fractions …). */
 export interface Playback {
@@ -67,9 +68,9 @@ export function usePlayback(
     let raf = 0;
     let last = performance.now();
     const step = (now: number) => {
-      const dt = Math.min(64, now - last);
+      const dt = frameDelta(now, last, 64);
       last = now;
-      const next = Math.min(total, posRef.current + dt / unitMs);
+      const next = Math.min(total, Math.max(0, posRef.current + dt / unitMs));
       setPos(next);
       if (next >= total) {
         setPlaying(false);

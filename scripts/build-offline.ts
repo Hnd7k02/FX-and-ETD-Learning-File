@@ -185,7 +185,8 @@ async function bundleJs(islandNames: string[]): Promise<string> {
     bundle: true,
     write: false,
     format: 'iife',
-    minify: true,
+    // FF_DEBUG=1 keeps names and line breaks for readable stack traces while debugging.
+    minify: process.env.FF_DEBUG !== '1',
     legalComments: 'none',
     charset: 'utf8',
     target: ['chrome100', 'edge100', 'safari15'],

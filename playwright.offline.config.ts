@@ -1,8 +1,12 @@
 /**
  * End-to-end tests of the single offline file release/forward-first.html (DECISIONS D-13).
  *
- * The file is opened over file:// with the network blocked; any request that leaves the file
- * fails the test (tests/offline/fixtures.ts). Run `npm run build` first.
+ * The file is opened over file:// with the network blocked: every browser goes through a proxy
+ * that does not exist (127.0.0.1:9), so no http(s) request can leave the machine, and Chromium
+ * additionally runs in offline mode. Any request that leaves the file fails the test
+ * (tests/offline/fixtures.ts). Run `npm run build` first.
+ * No offline emulation or request interception for WebKit: with both enabled, WebKit in CI
+ * failed to load the file itself ("WebKit encountered an internal error").
  *
  * Projects: Chromium 1440 × 900 (work PC, Chrome/Edge) and WebKit as iPad in portrait
  * (820 × 1180) and landscape (1180 × 820). Locally without WebKit:
@@ -23,7 +27,7 @@ export default defineConfig({
   reporter: process.env.CI ? [['github'], ['list']] : 'list',
   use: {
     trace: 'retain-on-failure',
-    offline: true,
+    proxy: { server: 'http://127.0.0.1:9' },
   },
   projects: [
     {
@@ -31,6 +35,7 @@ export default defineConfig({
       use: {
         ...devices['Desktop Chrome'],
         viewport: { width: 1440, height: 900 },
+        offline: true,
         launchOptions: executablePath ? { executablePath } : undefined,
       },
     },

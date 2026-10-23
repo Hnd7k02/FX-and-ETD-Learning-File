@@ -8,6 +8,7 @@
  */
 import type { JSX } from 'preact';
 import { useEffect, useRef, useState } from 'preact/hooks';
+import { tweenProgress } from '@/lib/anim';
 import { LEVEL_COLORS, type LevelIndex } from '@/i18n/dict/levels';
 import { easeInOutCubic } from '@/lib/chart';
 import { FULL_GAUGE, gaugeSegments, needleAngle, needleBasePath } from '@/lib/gauge';
@@ -31,7 +32,7 @@ export function useNeedleAngle(target: number, reduced: boolean): number {
     }
     const t0 = performance.now();
     const step = (now: number) => {
-      const k = Math.min(1, (now - t0) / RISKOMETER_UI.needleMoveMs);
+      const k = tweenProgress(now, t0, RISKOMETER_UI.needleMoveMs);
       setAngle(k >= 1 ? target : from + (target - from) * easeInOutCubic(k));
       raf.current = k < 1 ? requestAnimationFrame(step) : null;
     };

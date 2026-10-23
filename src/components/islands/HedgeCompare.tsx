@@ -11,6 +11,7 @@
  */
 import type { JSX } from 'preact';
 import { useEffect, useId, useMemo, useRef, useState } from 'preact/hooks';
+import { tweenProgress } from '@/lib/anim';
 import { AxisX, GridY } from '@/components/ui/Chart';
 import { Slider } from '@/components/ui/Slider';
 import {
@@ -182,7 +183,7 @@ export default function HedgeCompare(props: HedgeCompareProps): JSX.Element {
     let raf = 0;
     const t0 = performance.now();
     const step = (now: number) => {
-      const k = Math.min(1, (now - t0) / H.tour.ms);
+      const k = tweenProgress(now, t0, H.tour.ms);
       setSt(tourPosition(k, w));
       if (k < 1) raf = requestAnimationFrame(step);
       else setPlaying(false);

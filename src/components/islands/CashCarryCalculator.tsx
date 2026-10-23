@@ -9,6 +9,7 @@
  */
 import type { JSX } from 'preact';
 import { useEffect, useId, useRef, useState } from 'preact/hooks';
+import { tweenProgress } from '@/lib/anim';
 import { Slider } from '@/components/ui/Slider';
 import { StatHero, StatRow, StatTable } from '@/components/ui/Stat';
 import {
@@ -120,7 +121,7 @@ export default function CashCarryCalculator({ lang }: CashCarryCalculatorProps):
     if (!reacting || typeof requestAnimationFrame === 'undefined') return;
     let raf = 0;
     const step = (now: number) => {
-      const k = (now - reacting.t0) / A.reactionMs;
+      const k = tweenProgress(now, reacting.t0, A.reactionMs);
       const v = reactionAt(reacting.from, FAIR, k);
       setMarketRaw(v);
       setDraft(fmtRate(v, PAIR, FD));

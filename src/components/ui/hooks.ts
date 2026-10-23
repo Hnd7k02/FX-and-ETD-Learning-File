@@ -2,6 +2,7 @@
  * Shared Preact hooks for islands: reduced motion, element width, in-view and tweening.
  */
 import { useEffect, useRef, useState } from 'preact/hooks';
+import { tweenProgress } from '@/lib/anim';
 import type { RefObject } from 'preact';
 import { easeInOutCubic } from '@/lib/chart';
 
@@ -75,7 +76,7 @@ export function useTween<T extends number | number[]>(
     from.current = current.current;
     const t0 = performance.now();
     const step = (now: number) => {
-      const k = Math.min(1, (now - t0) / duration);
+      const k = tweenProgress(now, t0, duration);
       const e = easeInOutCubic(k);
       const a = from.current;
       let next: T;

@@ -12,6 +12,7 @@
  */
 import type { JSX } from 'preact';
 import { useEffect, useId, useMemo, useRef, useState } from 'preact/hooks';
+import { frameDelta } from '@/lib/anim';
 import { Segmented } from '@/components/ui/Segmented';
 import { Slider } from '@/components/ui/Slider';
 import {
@@ -154,7 +155,7 @@ export default function SessionClock({ lang }: SessionClockProps): JSX.Element {
     let raf = 0;
     let last = performance.now();
     const step = (t: number) => {
-      const dt = Math.min(0.1, (t - last) / 1000);
+      const dt = frameDelta(t, last, 100) / 1000;
       last = t;
       if (advance((dt * 24) / CLOCK_UI.playSeconds)) raf = requestAnimationFrame(step);
     };

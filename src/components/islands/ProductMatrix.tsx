@@ -12,6 +12,7 @@
  */
 import type { JSX } from 'preact';
 import { useEffect, useId, useMemo, useRef, useState } from 'preact/hooks';
+import { tweenProgress } from '@/lib/anim';
 import { AxisX, GridY } from '@/components/ui/Chart';
 import { Legend } from '@/components/ui/Legend';
 import { Slider } from '@/components/ui/Slider';
@@ -190,7 +191,7 @@ export default function ProductMatrix(props: ProductMatrixProps): JSX.Element {
     let raf = 0;
     const t0 = performance.now();
     const step = (now: number) => {
-      const k = Math.min(1, (now - t0) / TOUR.ms);
+      const k = tweenProgress(now, t0, TOUR.ms);
       setSt(snapMatrixFixing(tourPosition(k, tour)));
       if (k < 1) raf = requestAnimationFrame(step);
       else setPlaying(false);

@@ -28,6 +28,7 @@
  */
 import type { JSX } from 'preact';
 import { useEffect, useId, useMemo, useRef, useState } from 'preact/hooks';
+import { frameDelta } from '@/lib/anim';
 import { GridY } from '@/components/ui/Chart';
 import { Legend, type LegendItem } from '@/components/ui/Legend';
 import { Segmented } from '@/components/ui/Segmented';
@@ -240,7 +241,7 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
     const evDays = view === 'path' ? events.map((e) => e.day) : [];
     const speed = CFG.speeds[speedIx] ?? 1;
     const step = (now: number) => {
-      const dt = Math.min(80, now - last);
+      const dt = frameDelta(now, last, 80);
       last = now;
       if (now < holdUntil) {
         raf = requestAnimationFrame(step);

@@ -2,7 +2,8 @@
  * Shared setup for the offline file tests.
  *
  * - `open(route)` loads release/forward-first.html over file:// with a hash route.
- * - Every request that is not file:, data: or blob: is aborted and fails the test.
+ * - Every request that is not file:, data: or blob: fails the test. The network itself is blocked
+ *   by the config (dead proxy, Chromium offline mode); no interception, which breaks file:// in WebKit.
  * - Console errors and uncaught page errors (incl. CSP violations) fail the test.
  * - `routes()` lists every page packed into the file (read from its data block).
  */
@@ -27,15 +28,9 @@ export const test = base.extend<{
   open: (route?: string) => Promise<void>;
 }>({
   guard: [
-    async ({ page, context }, use) => {
+    async ({ page }, use) => {
       if (!existsSync(FILE)) throw new Error(`${FILE} missing: run npm run build first`);
       const guard: Guard = { requests: [], errors: [] };
-      await context.route('**/*', (route) => {
-        const url = route.request().url();
-        if (LOCAL.test(url)) return route.continue();
-        guard.requests.push(url);
-        return route.abort('blockedbyclient');
-      });
       page.on('request', (req) => {
         if (!LOCAL.test(req.url()) && !guard.requests.includes(req.url())) {
           guard.requests.push(req.url());

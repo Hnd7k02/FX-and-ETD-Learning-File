@@ -5,6 +5,7 @@
  */
 import type { RefObject } from 'preact';
 import { useEffect, useRef, useState } from 'preact/hooks';
+import { frameDelta } from '@/lib/anim';
 
 /** Playback state of a day-by-day animation. `pos` is fractional (0 … total). */
 export interface Playback {
@@ -57,9 +58,9 @@ export function usePlayback(
     let raf = 0;
     let last = performance.now();
     const step = (now: number) => {
-      const dt = now - last;
+      const dt = frameDelta(now, last, 64);
       last = now;
-      const next = Math.min(total, posRef.current + dt / msPerStep);
+      const next = Math.min(total, Math.max(0, posRef.current + dt / msPerStep));
       setPos(next);
       if (next >= total) {
         setPlaying(false);
