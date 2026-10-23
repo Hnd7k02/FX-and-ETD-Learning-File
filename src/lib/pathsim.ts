@@ -99,6 +99,13 @@ export const PATHSIM_CONFIG = {
     coupon: { min: 0, maxFactor: 2, step: 0.0005 },
     width: { min: 0.01, max: 0.08, step: 0.0005 },
   },
+  /**
+   * Quote step of the fair TPF / RTPF coupon in CHF per USD: 0.1 pip = CHF 1 per fixing on
+   * USD 100’000. The simulator and the module texts use the quoted coupon, so "coupon × number
+   * of coupons" adds up exactly on screen (CHF 7’754 × 6 = CHF 46’524). The rounding moves the
+   * coupon by at most 0.05 pip, far inside its Monte Carlo standard error (about 1 pip). Choice.
+   */
+  couponQuoteStep: 0.00001,
 } as const;
 
 // ---------------------------------------------------------------------------------------------
@@ -160,9 +167,38 @@ export function paramOverrides<K extends SimKind>(kind: K, value: number): Produ
   return { strike: value } as ProductOverrides<K>;
 }
 
-/** The fair product of the running example, optionally with an adjusted solved parameter. */
+/** A coupon rounded to the quote step (PATHSIM_CONFIG.couponQuoteStep). */
+export function quoteCoupon(coupon: number): number {
+  const step = PATHSIM_CONFIG.couponQuoteStep;
+  return Number((Math.round(coupon / step) * step).toFixed(8));
+}
+
+/**
+ * The fair product of the running example, optionally with an adjusted solved parameter.
+ * Coupon products carry the quoted fair coupon (PATHSIM_CONFIG.couponQuoteStep).
+ */
 export function simProduct<K extends SimKind>(kind: K, param?: number): ProductOf<K> {
-  return param === undefined ? fairProduct(kind) : fairProduct(kind, paramOverrides(kind, param));
+  if (param !== undefined) return fairProduct(kind, paramOverrides(kind, param));
+  const k: SimKind = kind;
+  if (k === 'tpf' || k === 'rtpf') {
+    const coupon = quoteCoupon(fairProduct(k).coupon);
+    return fairProduct(kind, { coupon } as ProductOverrides<K>);
+  }
+  return fairProduct(kind);
+}
+
+/**
+ * Mean number of fixings of the paths that ended EARLY (knock-out or target), from the mean
+ * over all paths: the other paths run all n fixings, so
+ * E[all] = p(maturity) · n + p(early) · E[early]. Null when no path ends early.
+ */
+export function earlyEndFixings(
+  expectedFixings: number,
+  pMaturity: number,
+  pEarly: number,
+  n: number,
+): number | null {
+  return pEarly > 0 ? (expectedFixings - pMaturity * n) / pEarly : null;
 }
 
 /** Fair value of the solved parameter from mc-products.json, with its MC facts. */
@@ -732,8 +768,10 @@ export function simulateEnsemble(
 export interface EnsembleSummary {
   n: number;
   count: Record<EndReason, number>;
-  /** Mean number of fixings until the product ended. */
+  /** Mean number of fixings until the product ended (all paths). */
   meanFixings: number;
+  /** Mean number of fixings of the paths that ended early (target / knock-out), null if none. */
+  meanFixingsEarly: number | null;
   meanPnl: number;
   stdErr: number;
   worst: number;
@@ -756,6 +794,7 @@ export function summarizeEnsemble(paths: readonly EnsemblePath[]): EnsembleSumma
   let best = Number.NEGATIVE_INFINITY;
   let early = 0;
   let earlyN = 0;
+  let earlyFix = 0;
   let mat = 0;
   let lossSum = 0;
   let lossN = 0;
@@ -770,6 +809,7 @@ export function summarizeEnsemble(paths: readonly EnsemblePath[]): EnsembleSumma
     else {
       early += p.pnl;
       earlyN++;
+      earlyFix += p.endIndex + 1;
     }
     if (p.pnl < 0) {
       lossSum += p.pnl;
@@ -782,6 +822,7 @@ export function summarizeEnsemble(paths: readonly EnsemblePath[]): EnsembleSumma
     n,
     count,
     meanFixings: n ? fix / n : 0,
+    meanFixingsEarly: earlyN ? earlyFix / earlyN : null,
     meanPnl: mean,
     stdErr: n > 1 ? Math.sqrt(Math.max(0, variance) / n) : 0,
     worst: n ? worst : 0,

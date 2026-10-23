@@ -75,7 +75,17 @@ export const nums: NumTable = {
     sign: true,
     note: 'Open round trip result at the up scenario',
   },
+  'm03.tripUpGain': {
+    value: Math.abs(roundTripChf(MK, T.scenarioUp)),
+    kind: 'money',
+    note: 'Open round trip gain at the up scenario (amount)',
+  },
   'm03.tripDown': { value: T.scenarioDown, kind: 'rate', note: 'Scenario: spot in one month' },
+  'm03.tripDownLoss': {
+    value: Math.abs(roundTripChf(MK, T.scenarioDown)),
+    kind: 'money',
+    note: 'Open round trip loss at the down scenario (amount)',
+  },
   'm03.tripDownChf': {
     value: roundTripChf(MK, T.scenarioDown),
     kind: 'money',
@@ -119,8 +129,7 @@ export const nums: NumTable = {
   'm03.rollSettleUp': {
     value: up.settlement,
     kind: 'money',
-    sign: true,
-    note: 'Cash settlement at the roll date (up): importer receives',
+    note: 'Cash settlement at the roll date (up): importer receives (positive)',
   },
   'm03.rollAllInUp': { value: up.allIn, kind: 'rate', digits: RD, note: 'All-in rate (up)' },
   'm03.rollTotalUp': { value: up.totalChf, kind: 'money', note: 'CHF in total (up)' },

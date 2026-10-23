@@ -85,11 +85,16 @@ export function blockValue(b: BlockLine, S: number): number {
   return b.sign * b.ratio * v;
 }
 
-/** Payoff of one fixing at S (CHF on N): sum of the blocks, 0 inside the knock-out region. */
+/**
+ * Payoff of one fixing at S (CHF on N): sum of the blocks, 0 inside the knock-out region.
+ * A target in pips caps the gain of the fixing (one fixing can never earn more than the whole
+ * target: the last gain is capped so that the sum is exactly the target); losses stay uncapped.
+ */
 export function stagePayoff(stage: Stage, S: number): number {
   if (stage.knockOut && S >= stage.knockOut.from && S <= stage.knockOut.to) return 0;
   let sum = 0;
   for (const b of stage.blocks) sum += blockValue(b, S);
+  if (stage.target?.kind === 'pips') sum = Math.min(sum, stage.target.value);
   return sum * stage.notional;
 }
 
@@ -258,6 +263,20 @@ export function stageLevels(stage: Stage): number[] {
   if (stage.knockOut) {
     if (Number.isFinite(stage.knockOut.from)) out.add(stage.knockOut.from);
     if (Number.isFinite(stage.knockOut.to)) out.add(stage.knockOut.to);
+  }
+  // Kinks where the gain reaches a target in pips (the payoff is linear between block levels).
+  if (stage.target?.kind === 'pips' && out.size) {
+    const cap = stage.target.value;
+    const raw = (S: number) => stage.blocks.reduce((s, b) => s + blockValue(b, S), 0) - cap;
+    const lv = [...out].sort((x, y) => x - y);
+    const xs = [lv[0]! - 1, ...lv, lv[lv.length - 1]! + 1];
+    for (let i = 1; i < xs.length; i++) {
+      const a = xs[i - 1]!;
+      const b = xs[i]!;
+      const fa = raw(a);
+      const fb = raw(b);
+      if (fa * fb < 0) out.add(a + ((b - a) * fa) / (fa - fb));
+    }
   }
   return [...out].sort((x, y) => x - y);
 }

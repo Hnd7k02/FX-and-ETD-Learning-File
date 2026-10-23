@@ -173,3 +173,149 @@ export function prevTarget(pos: number, tl: Timeline = timeline()): number {
   if (frac > 0) return startOf(index, tl);
   return startOf(Math.max(0, index - 1), tl);
 }
+
+/** Display state of one step at a playback position. */
+export interface StepView {
+  state: 'todo' | 'active' | 'done';
+  /** Counting progress of the step's amount, 0 … 1 (eased, complete after 60 % of the step). */
+  k: number;
+}
+
+export interface ParityFrame {
+  /** Index of the active step and its progress. */
+  index: number;
+  frac: number;
+  /** Days passed (0 before the 'time' step, `days` after it). */
+  day: number;
+  /** Route B balances at `day`: USD deposit and CHF loan. */
+  usd: number;
+  chf: number;
+  steps: Record<ParityStepId, StepView>;
+}
+
+/** Ease-out for counting numbers (fast start, calm landing). */
+function easeOut(k: number): number {
+  return 1 - (1 - k) ** 3;
+}
+
+/**
+ * Everything the figure shows at playback time `pos` (ms): step states, counting progress,
+ * the day counter and the balances of route B. Pure, so the animation is testable.
+ */
+export function parityFrame(
+  pos: number,
+  p: ParityInput,
+  r: ParityResult = parity(p),
+  tl: Timeline = timeline(),
+): ParityFrame {
+  const { index, frac } = stepAt(pos, tl);
+  const steps = {} as Record<ParityStepId, StepView>;
+  PARITY_STEPS.forEach((id, i) => {
+    const state = stepState(i, index, frac);
+    const k = state === 'done' ? 1 : state === 'todo' ? 0 : easeOut(Math.min(1, frac / 0.6));
+    steps[id] = { state, k };
+  });
+  const timeIdx = PARITY_STEPS.indexOf('time');
+  const dayFrac = index > timeIdx ? 1 : index < timeIdx ? 0 : frac;
+  const day = p.days * dayFrac;
+  const b = balancesAt(day, p, r);
+  return { index, frac, day, usd: b.usd, chf: b.chf, steps };
+}
+
+/** A rectangle in viewBox units. */
+export interface Box {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+/** Cards of the two lanes: A1/A2 route A (forward), B1…B5 route B (money market). */
+export type ParityCard = 'A1' | 'A2' | 'B1' | 'B2' | 'B3' | 'B4' | 'B5';
+
+export interface ParityLayout {
+  width: number;
+  height: number;
+  compact: boolean;
+  /** Font sizes of labels and amounts (≥ 11 px). */
+  font: number;
+  mono: number;
+  /** Centre line between the lanes. */
+  spine: number;
+  laneA: { x: number; w: number };
+  laneB: { x: number; w: number };
+  /** Y of the lane titles and subtitles. */
+  titleY: number;
+  subY: number;
+  /** Y of the band dividers (chip centres): today, the term, maturity. */
+  todayY: number;
+  termY: number;
+  maturityY: number;
+  /** Rows of the balances in the term band (lane B) and the middle of the band. */
+  balanceY: [number, number];
+  termMid: number;
+  cards: Record<ParityCard, Box>;
+  result: Box;
+}
+
+/**
+ * Geometry of the two vertical swim lanes (route A left, route B right, time flowing down) for
+ * an SVG `width` px wide (1:1 with CSS pixels, so fonts stay ≥ 11 px). Compact under 520 px.
+ */
+export function parityLayout(width: number): ParityLayout {
+  const W = Math.max(300, Math.round(width));
+  const compact = W < 520;
+  const font = compact ? 11 : 12;
+  const mono = compact ? 11.5 : 13;
+  const gutter = compact ? 40 : 64;
+  const spine = W / 2;
+  const laneW = (W - gutter) / 2;
+  const laneA = { x: 0, w: laneW };
+  const laneB = { x: W - laneW, w: laneW };
+  const head = compact ? 40 : 44;
+  const h = compact ? 62 : 54;
+  const g = 14;
+  const todayY = head + 12;
+  const c0 = todayY + 22;
+  const row = (i: number) => c0 + i * (h + g);
+  const termY = row(3) - g + 22;
+  const balanceY: [number, number] = [termY + 26, termY + 26 + (compact ? 30 : 28)];
+  const maturityY = balanceY[1] + (compact ? 34 : 32);
+  const m0 = maturityY + 22;
+  const mrow = (i: number) => m0 + i * (h + g);
+  const box = (lane: { x: number; w: number }, y: number, hh = h): Box => ({
+    x: lane.x,
+    y,
+    w: lane.w,
+    h: hh,
+  });
+  const resultY = mrow(2) - g + 18;
+  const resultH = compact ? 92 : 74;
+  return {
+    width: W,
+    height: resultY + resultH + 2,
+    compact,
+    font,
+    mono,
+    spine,
+    laneA,
+    laneB,
+    titleY: compact ? 14 : 16,
+    subY: compact ? 30 : 34,
+    todayY,
+    termY,
+    maturityY,
+    balanceY,
+    termMid: (termY + maturityY) / 2,
+    cards: {
+      A1: box(laneA, row(0)),
+      B1: box(laneB, row(0)),
+      B2: box(laneB, row(1)),
+      B3: box(laneB, row(2)),
+      B4: box(laneB, mrow(0)),
+      B5: box(laneB, mrow(1)),
+      A2: box(laneA, mrow(0), 2 * h + g),
+    },
+    result: { x: 0, y: resultY, w: W, h: resultH },
+  };
+}

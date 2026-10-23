@@ -1,0 +1,69 @@
+import SwapLegsFigure from '@/components/figures/SwapLegsFigure.astro';
+
+Now let us take a closer look. An FX swap always consists of two deals for the same notional, but in opposite directions:
+
+- The **near leg** is the earlier deal, usually at spot for value T+2.
+- The **far leg** is the later deal, at the forward rate for the end date.
+
+The direction is named after the near leg in the base currency. **Buy/sell USD** means: you buy USD in the near leg and sell them in the far leg. That is what the company in section 1 did. **Sell/buy USD** is the mirror image: you hand over USD and get them back later.
+
+<SwapLegsFigure caption="Top: the cash flows from your point of view; arrows pointing up are money you receive, arrows pointing down money you pay. Bottom: the forward curve. Drag the far point to another tenor or change the rates and watch the swap points." />
+
+### The price is the swap points
+
+A swap has two rates. But only their **difference** is traded: the **swap points**, far rate minus near rate, in pips. Whether the spot is a few pips higher or lower hardly matters. Both legs move together.
+
+Where does the difference come from? The far rate is the fair forward from module 02. So the swap points are exactly the **forward points**. They reflect the interest differential between CHF and USD over the term. If the USD rate is higher, the far rate lies below spot: a discount. If the CHF rate is higher, a premium.
+
+### Worked example: buy/sell USD 1m for 3 months
+
+- **Near leg:** you buy USD 1m at <Num of="ex.spot" /> and pay <Num of="m03.nearChf" />.
+- **Far leg:** after <Num of="ex.mmDays" /> days you sell USD 1m at <Num of="ex.forwardMM" /> and receive <Num of="m03.farChf" />.
+- **Swap points:** <Num of="ex.fwdPointsMM" /> pips, the same as the forward points in module 02.
+- **Net:** the dollars cancel out. In francs, <Num of="m03.netChf" /> remains.
+
+The <Num of="m03.costChf" /> are once again the USD interest: <Num of="m03.usdInterest" /> for <Num of="ex.mmDays" /> days, converted at the far rate.
+
+With **sell/buy USD** every arrow flips. You hand over the higher-yielding currency and are compensated for it: net <Num of="m03.mirrorNetChf" />. The swap points stay the same; only the direction changes.
+
+The longer the tenor, the larger the swap points. Over one week they are <Num of="m03.points1w" /> pips, over one year <Num of="m03.points1y" /> pips. That is almost proportional to time, because the interest differential keeps running every day.
+
+<Derivation title="Derivation: swap points from the interest differential">
+
+With simple money-market rates and the same day count in both currencies, the far rate is
+
+<Formula>
+  <i>F</i> = <i>S</i> · (1 + <i>r</i><sub>CHF</sub> · <i>t</i>) / (1 + <i>r</i><sub>USD</sub> · <i>t</i>)
+</Formula>
+
+Subtract <i>S</i> and put everything over one denominator:
+
+<Formula variant="accent">
+  <i>F</i> − <i>S</i> = <i>S</i> · (<i>r</i><sub>CHF</sub> − <i>r</i><sub>USD</sub>) · <i>t</i> / (1 + <i>r</i><sub>USD</sub> · <i>t</i>)
+</Formula>
+
+The sign depends only on the interest differential. For short tenors the denominator is almost 1. Then the rule of thumb is
+
+<Formula>
+  <i>F</i> − <i>S</i> ≈ <i>S</i> · (<i>r</i><sub>CHF</sub> − <i>r</i><sub>USD</sub>) · <i>t</i>
+</Formula>
+
+In the example: spot <Num of="ex.spot" />, interest differential <Num of="m03.diff" />, <i>t</i> = <Num of="ex.mmDays" />/360. The rule of thumb gives <Num of="m03.approxPoints" /> pips; exactly, it is <Num of="ex.fwdPointsMM" /> pips. The denominator makes the difference.
+
+Conversely, from spot, swap points and the USD rate you can back out the CHF rate. That is why swap points are also called the implied interest differential: whoever does a swap borrows one currency and lends the other.
+
+</Derivation>
+
+<Desk title="How swaps are traded">
+
+On the desk, swaps are quoted in points, with a bid and an ask for the swap points. The spot for the near leg is only fixed as a reference rate. An outright forward is then simply a spot deal plus a swap.
+
+A swap dealer therefore has hardly any FX risk, but interest rate risk: if CHF or USD rates change, the swap points change. Very short swaps have their own names: overnight (today against tomorrow), tom/next (tomorrow against spot) and spot/next (spot against the day after).
+
+</Desk>
+
+<Takeaway>
+
+An FX swap is two deals in opposite directions for the same amount. Its price is the swap points, and they equal the forward points: the interest differential over the term.
+
+</Takeaway>

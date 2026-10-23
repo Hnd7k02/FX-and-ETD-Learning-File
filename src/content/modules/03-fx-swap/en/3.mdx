@@ -1,0 +1,65 @@
+import HedgeRollFigure from '@/components/figures/HedgeRollFigure.astro';
+
+Back to our importer. In module 02 he dealt a forward: in 3 months he buys USD 1m at <Num of="m03.oldFwd" />. Now he hears that the goods will arrive late. The supplier only wants paying <Num of="m03.slipDays" /> days after the original date.
+
+But the forward matures on the old date. If the importer lets it run, he receives the dollars a month too early. The solution is an FX swap that **rolls** the hedge, that is, extends it:
+
+- **Near leg:** on the old maturity date he sells the USD 1m at the current spot. That offsets the dollars from the forward.
+- **Far leg:** at the same time he buys USD 1m for the new date, at the new forward rate.
+
+From his point of view this is a sell/buy USD. The dollars now arrive exactly when he has to pay.
+
+<HedgeRollFigure caption="Drag the spot on the roll date. Blue is the new far rate, black your all-in rate. The gap between them is the settlement on the roll date. Use ‘Play spot scenarios’ to see what swings and what stays." />
+
+### The settlement on the roll date
+
+Two things happen on the old maturity date. The forward delivers USD 1m against <Num of="m03.oldFwdChf" />. At the same time the importer sells the dollars at spot in the near leg. The dollars cancel out. What remains is a payment in francs: the difference between spot and the old forward.
+
+**Case 1: the dollar has risen,** spot is at <Num of="m03.rollUp" />. In the near leg the importer receives <Num of="m03.rollNearChfUp" />; for the forward he pays <Num of="m03.oldFwdChf" />. Net, he gets <Num of="m03.rollSettleUp" />. In the far leg he buys the dollars back at <Num of="m03.rollFarUp" />, that is for <Num of="m03.rollFarChfUp" />. The swap points over <Num of="m03.slipDays" /> days are <Num of="m03.rollPointsUp" /> pips.
+
+All in all he pays <Num of="m03.rollTotalUp" />. That corresponds to an **all-in rate** of <Num of="m03.rollAllInUp" />: old forward plus swap points.
+
+**Case 2: the dollar has fallen,** spot is at <Num of="m03.rollDown" />. Now the importer has to **pay** <Num of="m03.rollSettleDownAbs" /> on the roll date. In return he buys the dollars more cheaply in the far leg, at <Num of="m03.rollFarDown" />. His all-in rate: <Num of="m03.rollAllInDown" />.
+
+The two all-in rates are only <Num of="m03.rollAllInGap" /> pips apart. The hedge holds wherever the spot is. What swings is the payment on the roll date. His rate even ends up slightly better than the old forward: because the dollar pays more interest, every later date trades lower. The swap points are negative.
+
+<Callout variant="warn" title="Plan for the cash">
+
+A roll can cost money before the goods are paid for. In case 2, <Num of="m03.rollSettleDownAbs" /> flows out on the roll date. The loss is not new: the hedge was out of the money because the dollar fell. What is new is that it now falls due in cash.
+
+</Callout>
+
+<Derivation title="Derivation: the all-in rate after the roll">
+
+Let <i>F</i><sub>old</sub> be the old forward, <i>S</i><sub>1</sub> the spot on the roll date and <i>F</i><sub>2</sub> the new far rate. The payments in francs per USD:
+
+<Formula>
+  <span>roll date: −<i>F</i><sub>old</sub> + <i>S</i><sub>1</sub> (forward and near leg)</span>
+  <span>new date: −<i>F</i><sub>2</sub> (far leg)</span>
+</Formula>
+
+The dollars cancel on the roll date and arrive on the new date. In total the importer pays per USD:
+
+<Formula variant="accent">
+  <i>F</i><sub>old</sub> − <i>S</i><sub>1</sub> + <i>F</i><sub>2</sub> = <i>F</i><sub>old</sub> + (<i>F</i><sub>2</sub> − <i>S</i><sub>1</sub>) = old forward + swap points
+</Formula>
+
+The swap points <i>F</i><sub>2</sub> − <i>S</i><sub>1</sub> = <i>S</i><sub>1</sub> · (<i>r</i><sub>CHF</sub> − <i>r</i><sub>USD</sub>) · <i>t</i> / (1 + <i>r</i><sub>USD</sub> · <i>t</i>) are proportional to the spot. So the all-in rate moves a little with it, but only by fractions of a pip per big figure.
+
+One simplification is built in: the settlement falls due a month before the payment to the supplier. Its interest over that month is not included here. With a CHF rate of <Num of="ex.rd" /> it is zero anyway.
+
+</Derivation>
+
+<Desk title="Rolling at the historical rate">
+
+Some clients want to avoid the settlement. Then the near leg is dealt not at spot but at the old forward rate. No money flows on the roll date. The difference, plus interest, moves into the new far rate.
+
+That spares liquidity, but it pushes a gain or loss into the future. This is why the variant is delicate and often only available with restrictions. If the payment comes earlier rather than later, you roll the other way: buy USD earlier and sell them back for the old date.
+
+</Desk>
+
+<Takeaway>
+
+An FX swap extends a hedge: the near leg closes the old forward at spot, the far leg opens the new one. The all-in rate is old forward plus swap points; in between, a settlement falls due that costs or brings cash.
+
+</Takeaway>

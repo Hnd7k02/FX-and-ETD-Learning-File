@@ -1,0 +1,65 @@
+import HedgeRollFigure from '@/components/figures/HedgeRollFigure.astro';
+
+Zurück zu unserem Importeur. In Modul 02 hat er einen Forward abgeschlossen: Er kauft in 3 Monaten USD 1 Mio. zu <Num of="m03.oldFwd" />. Jetzt kommt die Nachricht, dass die Ware später eintrifft. Der Lieferant will sein Geld erst <Num of="m03.slipDays" /> Tage nach dem ursprünglichen Termin.
+
+Der Forward wird aber am alten Datum fällig. Lässt der Importeur ihn laufen, bekommt er die Dollar einen Monat zu früh. Die Lösung ist ein FX Swap, der den Hedge **rollt**, also verlängert:
+
+- **Near Leg:** Am alten Fälligkeitstag verkauft er die USD 1 Mio. zum aktuellen Spot. Das gleicht die Dollar aus dem Forward aus.
+- **Far Leg:** Gleichzeitig kauft er USD 1 Mio. für das neue Datum, zum neuen Forward-Kurs.
+
+Aus seiner Sicht ist das ein Sell/Buy USD. Die Dollar kommen nun genau dann, wenn er zahlen muss.
+
+<HedgeRollFigure caption="Zieh den Spot am Roll-Datum. Blau ist der neue Far-Kurs, schwarz dein All-in-Kurs. Der Abstand dazwischen ist der Ausgleich am Roll-Datum. Mit «Spot-Szenarien abspielen» siehst du, was schwankt und was bleibt." />
+
+### Der Ausgleich am Roll-Datum
+
+Am alten Fälligkeitstag passiert zweierlei. Der Forward liefert USD 1 Mio. gegen <Num of="m03.oldFwdChf" />. Gleichzeitig verkauft der Importeur die Dollar im Near Leg zum Spot. Die Dollar heben sich auf. Übrig bleibt eine Zahlung in Franken: die Differenz zwischen Spot und altem Forward.
+
+**Fall 1: Der Dollar ist gestiegen,** der Spot steht bei <Num of="m03.rollUp" />. Im Near Leg erhält der Importeur <Num of="m03.rollNearChfUp" />, für den Forward zahlt er <Num of="m03.oldFwdChf" />. Netto bekommt er <Num of="m03.rollSettleUp" />. Im Far Leg kauft er die Dollar zu <Num of="m03.rollFarUp" /> zurück, also für <Num of="m03.rollFarChfUp" />. Die Swap Points über <Num of="m03.slipDays" /> Tage betragen <Num of="m03.rollPointsUp" /> Pips.
+
+Unter dem Strich zahlt er <Num of="m03.rollTotalUp" />. Das entspricht einem **All-in-Kurs** von <Num of="m03.rollAllInUp" />: alter Forward plus Swap Points.
+
+**Fall 2: Der Dollar ist gefallen,** der Spot steht bei <Num of="m03.rollDown" />. Jetzt muss der Importeur am Roll-Datum <Num of="m03.rollSettleDownAbs" /> **bezahlen**. Dafür kauft er die Dollar im Far Leg günstiger, zu <Num of="m03.rollFarDown" />. Sein All-in-Kurs: <Num of="m03.rollAllInDown" />.
+
+Die beiden All-in-Kurse liegen nur <Num of="m03.rollAllInGap" /> Pips auseinander. Der Hedge hält, egal wo der Spot steht. Was schwankt, ist die Zahlung am Roll-Datum. Sein Kurs wird sogar etwas besser als der alte Forward: Weil der Dollar höher verzinst ist, liegt jeder spätere Termin tiefer. Die Swap Points sind negativ.
+
+<Callout variant="warn" title="Liquidität einplanen">
+
+Ein Roll kann Geld kosten, bevor die Ware bezahlt ist. Im Fall 2 fliessen am Roll-Datum <Num of="m03.rollSettleDownAbs" /> ab. Der Verlust ist nicht neu: Der Hedge war aus dem Geld, weil der Dollar gefallen ist. Neu ist nur, dass er jetzt bar fällig wird.
+
+</Callout>
+
+<Derivation title="Herleitung: All-in-Kurs nach dem Roll">
+
+Sei <i>F</i><sub>alt</sub> der alte Forward, <i>S</i><sub>1</sub> der Spot am Roll-Datum und <i>F</i><sub>2</sub> der neue Far-Kurs. Die Zahlungen in Franken pro USD:
+
+<Formula>
+  <span>Roll-Datum: −<i>F</i><sub>alt</sub> + <i>S</i><sub>1</sub> (Forward und Near Leg)</span>
+  <span>neues Datum: −<i>F</i><sub>2</sub> (Far Leg)</span>
+</Formula>
+
+Die Dollar heben sich am Roll-Datum auf, am neuen Datum kommen sie an. Zusammen zahlt der Importeur pro USD:
+
+<Formula variant="accent">
+  <i>F</i><sub>alt</sub> − <i>S</i><sub>1</sub> + <i>F</i><sub>2</sub> = <i>F</i><sub>alt</sub> + (<i>F</i><sub>2</sub> − <i>S</i><sub>1</sub>) = alter Forward + Swap Points
+</Formula>
+
+Die Swap Points <i>F</i><sub>2</sub> − <i>S</i><sub>1</sub> = <i>S</i><sub>1</sub> · (<i>r</i><sub>CHF</sub> − <i>r</i><sub>USD</sub>) · <i>t</i> / (1 + <i>r</i><sub>USD</sub> · <i>t</i>) sind proportional zum Spot. Darum bewegt sich der All-in-Kurs ein wenig mit, aber nur um Bruchteile eines Pips je Big Figure.
+
+Eine Vereinfachung steckt drin: Der Ausgleich fällt einen Monat früher an als die Zahlung an den Lieferanten. Sein Zins über diesen Monat ist hier nicht eingerechnet. Beim CHF-Zins von <Num of="ex.rd" /> ist er ohnehin null.
+
+</Derivation>
+
+<Desk title="Rollen zum historischen Kurs">
+
+Manche Kunden möchten den Ausgleich vermeiden. Dann setzt man das Near Leg nicht zum Spot, sondern zum alten Forward-Kurs. Am Roll-Datum fliesst kein Geld. Die Differenz wandert samt Zins in den neuen Far-Kurs.
+
+Das schont die Liquidität, verschiebt aber einen Gewinn oder Verlust in die Zukunft. Darum ist diese Variante heikel und oft nur eingeschränkt möglich. Kommt die Zahlung früher statt später, rollt man in die Gegenrichtung: USD früher kaufen, zum alten Termin zurückverkaufen.
+
+</Desk>
+
+<Takeaway>
+
+Ein FX Swap verlängert einen Hedge: Das Near Leg schliesst den alten Forward zum Spot, das Far Leg eröffnet den neuen. Der All-in-Kurs ist alter Forward plus Swap Points; dazwischen fällt ein Ausgleich an, der Liquidität kostet oder bringt.
+
+</Takeaway>

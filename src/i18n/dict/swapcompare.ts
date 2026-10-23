@@ -108,6 +108,6 @@ export const swapcompare = defineDict({
       'Cash flows over {tenor}. FX swap: exchange at {near}, re-exchange at {far}, no interest payments. Cross-currency swap: exchange and re-exchange at {near}, {n} interest payments of {usd} and {chf}.',
     'sc.live': '{tenor}: FX swap re-exchange at {far}; cross-currency swap {n} interest payments.',
     'sc.hint':
-      'Choose "Interest": in the FX swap the differential sits in the rate, in the cross-currency swap it flows as interest.',
+      'Choose ‘Interest’: in the FX swap the differential sits in the rate, in the cross-currency swap it flows as interest.',
   },
 });

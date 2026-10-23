@@ -1,0 +1,65 @@
+import SwapTripFigure from '@/components/figures/SwapTripFigure.astro';
+
+Our importer has to pay USD 1m in 3 months. With the forward from module 02 he has locked in his rate. Now for a related question: what do you do if you do not need a currency for good, but only **for a while**?
+
+Picture a Swiss company. It has francs in its account. Today it has to pay a supplier USD 1m. In one month a customer in the US will transfer exactly that amount back to it. So the company needs the dollars for one month only.
+
+### Three ways to a month in dollars
+
+- **Spot there, spot back.** It buys USD against CHF today and sells the customer's dollars again in a month. It does not know the rate for the way back today. That is open FX risk.
+- **Borrow dollars.** It takes out a USD loan and repays it with the customer's money. That needs a credit line, and its francs sit idle in the meantime.
+- **FX swap.** It buys USD 1m at spot today and, in the same deal, sells them forward for one month. Both rates are fixed today.
+
+The third way is an **FX swap**: two FX deals in opposite directions for the same amount. The earlier one is the **near leg**, the later one the **far leg**. The company exchanges its francs for dollars for a while and gets them back afterwards.
+
+<SwapTripFigure caption="The spot runs for a month along a model path. Without the swap (orange) the result moves with the rate. With the swap (black) it has been fixed since day 0. Use ‘New rate path’ to play through a different month." />
+
+### What the swap costs
+
+In the near leg the company pays <Num of="m03.nearChf" /> and receives USD 1m at the spot rate of <Num of="ex.spot" />. In the far leg, after <Num of="m03.tripDays" /> days, it hands the dollars back at <Num of="m03.tripFar" /> and receives <Num of="m03.tripFarChf" />.
+
+So it gets back <Num of="m03.tripCostChf" /> less than it paid. That is not an FX loss. It is the price of a month in dollars. The reason is the interest differential: dollars earn <Num of="ex.rf" />, francs <Num of="ex.rd" />. Whoever holds the higher-yielding currency pays the difference through the far-leg rate.
+
+Check it: USD 1m at <Num of="ex.rf" /> for <Num of="m03.tripDays" /> days gives <Num of="m03.tripUsdInterest" /> of interest. Converted at the far rate, that is exactly <Num of="m03.tripCostChf" />. So the swap costs the same as a dollar loan secured by the francs.
+
+And the FX risk? If the dollar rose to <Num of="m03.tripUp" /> during the month, ‘spot there, spot back’ would have made <Num of="m03.tripUpGain" />. If it fell to <Num of="m03.tripDown" />, it would have lost <Num of="m03.tripDownLoss" />. With the swap it stays at <Num of="m03.tripCostChf" /> either way.
+
+<Derivation title="Derivation: why the swap is a secured loan">
+
+A swap on <i>N</i> USD with near rate <i>S</i> and far rate <i>F</i> has these cash flows from the company's point of view:
+
+<Formula>
+  <span>today: +<i>N</i> USD and −<i>N</i> · <i>S</i> CHF</span>
+  <span>after the term <i>t</i>: −<i>N</i> USD and +<i>N</i> · <i>F</i> CHF</span>
+</Formula>
+
+So for the period <i>t</i> the company holds dollars instead of francs. The far rate is fair if no other safe route is cheaper. That is interest rate parity from module 02, with simple money-market rates:
+
+<Formula variant="accent">
+  <i>F</i> = <i>S</i> · (1 + <i>r</i><sub>CHF</sub> · <i>t</i>) / (1 + <i>r</i><sub>USD</sub> · <i>t</i>)
+</Formula>
+
+It follows how many fewer CHF come back:
+
+<Formula>
+  <span><i>N</i> · (<i>S</i> − <i>F</i>) = <i>N</i> · <i>S</i> · (<i>r</i><sub>USD</sub> − <i>r</i><sub>CHF</sub>) · <i>t</i> / (1 + <i>r</i><sub>USD</sub> · <i>t</i>)</span>
+  <span>with <i>r</i><sub>CHF</sub> = 0: = <i>N</i> · <i>r</i><sub>USD</sub> · <i>t</i> · <i>F</i></span>
+</Formula>
+
+That is the USD interest on <i>N</i>, converted at the far rate. The swap is therefore a USD loan secured by CHF; the interest sits in the rate. Because both rates are fixed today, the company carries no FX risk on the notional.
+
+</Derivation>
+
+<Desk title="Who needs FX swaps">
+
+Banks use FX swaps every day to manage their liquidity in foreign currencies. If they are short of dollars and long of francs, they swap for a night or a week.
+
+Companies use swaps when payments move in time. Investors holding securities in a foreign currency often hedge the FX risk with forwards and extend the hedge regularly with a swap. Section 3 shows how that works.
+
+</Desk>
+
+<Takeaway>
+
+An FX swap exchanges currencies for a while: there today, back later, both rates fixed. It costs the interest differential, not FX risk.
+
+</Takeaway>

@@ -21,7 +21,10 @@ import type { SimKind } from '@/lib/pathsim';
 
 const KINDS: SimKind[] = ['accumulator', 'decumulator', 'tarf', 'pivotTarf', 'tpf', 'rtpf'];
 
-/** Per-fixing payoff written out from §8.7 (without target / knock-out end). */
+/**
+ * Per-fixing payoff written out from §8.7 (without the end of the product). A target in pips
+ * caps the gain of one fixing at the target (TARF, pivot TARF).
+ */
 function reference(kind: SimKind, S: number): number {
   const p = fairProduct(kind) as never as Record<string, number>;
   const N = p.notional!;
@@ -31,12 +34,12 @@ function reference(kind: SimKind, S: number): number {
     case 'decumulator':
       return S <= p.barrier! ? 0 : (S <= p.strike! ? 1 : 2) * (p.strike! - S) * N;
     case 'tarf':
-      return (S >= p.strike! ? 1 : 2) * (S - p.strike!) * N;
+      return Math.min((S >= p.strike! ? 1 : 2) * (S - p.strike!), p.target!) * N;
     case 'pivotTarf': {
-      const { lowerStrike: k1, upperStrike: k2, pivot: P } = p as Record<string, number>;
+      const { lowerStrike: k1, upperStrike: k2, pivot: P, target: T } = p as Record<string, number>;
       if (S <= k1!) return 2 * (S - k1!) * N;
-      if (S <= P!) return (S - k1!) * N;
-      if (S < k2!) return (k2! - S) * N;
+      if (S <= P!) return Math.min(S - k1!, T!) * N;
+      if (S < k2!) return Math.min(k2! - S, T!) * N;
       return 2 * (k2! - S) * N;
     }
     case 'tpf':
@@ -172,5 +175,23 @@ describe('structures: the three-step story', () => {
     const xs = pts.map((p) => p[0]);
     expect(xs).toEqual([...xs].sort((a, b) => a - b));
     expect(pts.some(([x, y]) => x > acc.knockOut!.from && y === 0)).toBe(true);
+  });
+
+  it('caps the gain of one fixing at the target and samples the kink exactly', () => {
+    const tarf = fullStage('tarf');
+    const p = fairProduct('tarf');
+    const kink = p.strike + p.target;
+    expect(stageLevels(tarf).some((x) => Math.abs(x - kink) < 1e-12)).toBe(true);
+    expect(stagePayoff(tarf, 0.9)).toBeCloseTo(p.target * p.notional, 6);
+    expect(stagePayoff(tarf, 0.7)).toBeCloseTo(2 * (0.7 - p.strike) * p.notional, 6);
+    const piv = fullStage('pivotTarf');
+    const q = fairProduct('pivotTarf');
+    expect(stagePayoff(piv, q.pivot)).toBeCloseTo(q.target * q.notional, 6);
+    const lv = stageLevels(piv);
+    expect(lv.some((x) => Math.abs(x - (q.lowerStrike + q.target)) < 1e-12)).toBe(true);
+    expect(lv.some((x) => Math.abs(x - (q.upperStrike - q.target)) < 1e-12)).toBe(true);
+    // the leveraged stage of the story has no target: no cap
+    const [, lev] = storyStages('tarf');
+    expect(stagePayoff(lev!, 0.9)).toBeCloseTo((0.9 - lev!.strike) * lev!.notional, 6);
   });
 });
