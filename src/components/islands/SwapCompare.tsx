@@ -161,7 +161,6 @@ export default function SwapCompare({ lang, tenor: tenorProp }: SwapCompareProps
           { len: Math.max(0, L.LN - len), kind: 'ghost' },
         ];
       }
-      const len = segs.reduce((a, s) => a + (s.kind === 'ghost' ? 0 : s.len), 0);
       // the label sits beyond the ghost too, so the missing part stays visible
       const reach = segs.reduce((a, s) => a + s.len, 0);
       const isEnd = g.day === 0 || g.day === tenor.days;

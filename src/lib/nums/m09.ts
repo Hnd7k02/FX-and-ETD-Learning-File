@@ -18,13 +18,7 @@ import { MC_PRODUCTS } from '@/lib/fx/mc/fair';
 import { MC_CONFIG } from '@/lib/fx/mc/products';
 import { M09_CONFIG, PIP } from '@/lib/m09/config';
 import { hedgeCosts, hedgeSetup } from '@/lib/m09/hedge';
-import {
-  CARRY_DEFAULTS,
-  carryView,
-  cushionPips,
-  probLoss,
-  yieldPnl,
-} from '@/lib/m09/carry';
+import { CARRY_DEFAULTS, carryView, cushionPips, probLoss, yieldPnl } from '@/lib/m09/carry';
 import { matrixParams, productResult } from '@/lib/matrix';
 import type { NumTable } from './types';
 
@@ -193,7 +187,7 @@ export const nums: NumTable = {
   'm09.s1Down': { value: M.s1Down, kind: 'rate' },
   'm09.s1FwdUp': { value: M.s1FwdUpPips, kind: 'pips', digits: 0, sign: true },
   'm09.s1FwdUpChf': {
-    value: (M.s1FwdUpPips * PIP) * N,
+    value: M.s1FwdUpPips * PIP * N,
     kind: 'money',
     sign: true,
     note: 'Forward result on USD 1 Mio. at +3 %',

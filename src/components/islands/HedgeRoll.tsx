@@ -27,7 +27,7 @@ import { clamp, scaleLinear } from '@/lib/chart';
 import { fmtMillions, fmtMoney, fmtNumber, fmtPct, fmtPips, fmtRate } from '@/lib/format';
 import { M03_CONFIG, tenorById } from '@/lib/m03/config';
 import { allInRange, rollView, snapSpot, tourAt } from '@/lib/m03/roll';
-import { innerTicks, nudgeY, textWidth, type Box } from '@/lib/m03/text';
+import { fitCentre, innerTicks, nudgeY, textWidth, type Box } from '@/lib/m03/text';
 import { EXAMPLE_MARKET as MK } from '@/lib/m03/trip';
 import { useDragX, usePlayback, useSliderDrag } from './m03-shared';
 
@@ -108,6 +108,8 @@ export default function HedgeRoll({ lang }: HedgeRollProps): JSX.Element {
   const a = lineAt(R.spotRange[0]);
   const b = lineAt(R.spotRange[1]);
   const x = sx(spot);
+  // the handle pill stays fully inside the figure at the ends of the rail
+  const pillX = clamp(x, 36, L.width - 36);
   const yFar = sy(v.farRate);
   const yAll = sy(v.allIn);
   const yOld = sy(OLD);
@@ -157,7 +159,14 @@ export default function HedgeRoll({ lang }: HedgeRollProps): JSX.Element {
   const oldLabel = t('hr.oldLabel', { rate: r5(OLD) });
   const crossLabel = t('hr.cross');
   const clW = textWidth(crossLabel, L.font) + 8;
-  const clLeft = xCross + 14 + clW > L.right;
+  // crossing label: right of the point, else left, else centred a little higher (phones)
+  const clSide = xCross + 14 + clW <= L.right ? 'right' : xCross - 14 - clW >= 2 ? 'left' : 'above';
+  const clX =
+    clSide === 'right'
+      ? xCross + 14
+      : clSide === 'left'
+        ? xCross - 14
+        : fitCentre(xCross, clW, 2, L.width - 2);
   // gap label: beside the gap, nudged away from the lines if it would hit another label
   const awLabel = textWidth(allInLabel, L.font) + 8;
   // all-in label below the line at the right end, or at the left end while the spot is there
@@ -170,15 +179,18 @@ export default function HedgeRoll({ lang }: HedgeRollProps): JSX.Element {
     y0: baseline - font,
     y1: baseline + 4,
   });
+  // old-forward label above the line at the left end, or at the right end while the spot is there
+  const olW = textWidth(oldLabel, L.font) + 8;
+  const oldAtRight = x < L.left + 6 + olW + 12;
+  const xOldLabel = oldAtRight ? L.right - 4 - olW : L.left + 6;
   const obstacles: Box[] = [
-    textBox(L.left + 6, textWidth(oldLabel, L.font) + 8, yOld - 7, L.font),
+    textBox(xOldLabel, olW, yOld - 7, L.font),
     textBox(xAllInLabel, awLabel, yAllInLabel, L.font),
   ];
   const gapX0 = glLeft ? x - 12 - glW : x + 12;
   const gapBase = (yFar + yAll) / 2 + L.font * 0.35;
   const gapY = clamp(
-    gapBase +
-      nudgeY(textBox(gapX0, glW, gapBase, L.font + 1), obstacles, side === 'pay' ? 1 : -1),
+    gapBase + nudgeY(textBox(gapX0, glW, gapBase, L.font + 1), obstacles, side === 'pay' ? 1 : -1),
     L.top + L.font,
     L.plotBottom - 4,
   );
@@ -257,9 +269,16 @@ export default function HedgeRoll({ lang }: HedgeRollProps): JSX.Element {
               </text>
               {/* old forward */}
               <path d={`M${L.left},${yOld.toFixed(1)}H${L.right}`} class="m3-ref" />
-              <text x={L.left + 6} y={yOld - 7} class="m3-ref-label" style={{ fontSize: fs }}>
-                {oldLabel}
-              </text>
+              {!(nearCross && clSide === 'above') && (
+                <text
+                  x={oldAtRight ? L.right - 4 : xOldLabel}
+                  y={yOld - 7}
+                  class="m3-ref-label"
+                  style={{ fontSize: fs, textAnchor: oldAtRight ? 'end' : 'start' }}
+                >
+                  {oldLabel}
+                </text>
+              )}
               {/* lines */}
               <path
                 d={`M${L.left},${sy(a.farRate).toFixed(1)}L${L.right},${sy(b.farRate).toFixed(1)}`}
@@ -288,10 +307,13 @@ export default function HedgeRoll({ lang }: HedgeRollProps): JSX.Element {
               />
               {nearCross && (
                 <text
-                  x={clLeft ? xCross - 14 : xCross + 14}
-                  y={yCross - 14}
+                  x={clX}
+                  y={yCross - (clSide === 'above' ? 24 : 14)}
                   class="m3-event-label"
-                  style={{ fontSize: fs, textAnchor: clLeft ? 'end' : 'start' }}
+                  style={{
+                    fontSize: fs,
+                    textAnchor: clSide === 'right' ? 'start' : clSide === 'left' ? 'end' : 'middle',
+                  }}
                 >
                   {crossLabel}
                 </text>
@@ -336,14 +358,14 @@ export default function HedgeRoll({ lang }: HedgeRollProps): JSX.Element {
                   class="m3-hit"
                 />
                 <rect
-                  x={x - 34}
+                  x={pillX - 34}
                   y={L.rail - 11}
                   width={68}
                   height={22}
                   rx={11}
                   class="m3-handle-pill"
                 />
-                <text x={x} y={L.rail + 4} class="m3-handle-text">
+                <text x={pillX} y={L.rail + 4} class="m3-handle-text">
                   {r4(spot)}
                 </text>
               </g>

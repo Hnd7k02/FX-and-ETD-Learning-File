@@ -385,7 +385,7 @@ export default function CarryCushion(props: CarryCushionProps): JSX.Element {
                 x1={L.width - L.right}
                 format={(val) =>
                   L.compact
-                    ? fmtNumber(val / 1000, lang, { sign: val > 0 }) + 'k'
+                    ? t('cc.k', { v: fmtNumber(val / 1000, lang, { sign: val > 0 }) })
                     : fmtNumber(val, lang, { sign: val > 0 })
                 }
                 fontSize={L.font}

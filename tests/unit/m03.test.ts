@@ -12,14 +12,7 @@ import {
   snapSpot,
   tourAt,
 } from '@/lib/m03/roll';
-import {
-  fitCentre,
-  innerTicks,
-  nudgeY,
-  overlaps,
-  stepTicks,
-  textWidth,
-} from '@/lib/m03/text';
+import { fitCentre, innerTicks, nudgeY, overlaps, stepTicks, textWidth } from '@/lib/m03/text';
 import { EXAMPLE_MARKET as M, pathAt, roundTripChf, spotPath, tripSwap } from '@/lib/m03/trip';
 import { M03 } from '@/lib/nums/m03';
 
