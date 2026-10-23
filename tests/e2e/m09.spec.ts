@@ -79,6 +79,9 @@ test.describe('module 09 · hedge, alpha, yield', () => {
     await expect(pm).toHaveAttribute('data-view', 'sideways');
     await expect(pm.locator('[data-card="structured"]')).toBeVisible();
     await expect(pm.locator('[data-card="structured"] [data-chip="leverage"]')).toContainText('2×');
+    // two grey comparison curves stay tellable apart: the second one is dashed
+    await expect(pm.locator('.pm-curve-dash')).toHaveCount(1);
+    await expect(pm.locator('svg.pm-svg')).not.toHaveAttribute('aria-label', /Pips Pips/);
 
     // highlight another curve from its card
     await pm.locator('[data-show="structured"]').click();

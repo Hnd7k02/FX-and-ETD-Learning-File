@@ -46,7 +46,7 @@ export const paritypaths = defineDict({
     'pp.idle': 'Drück auf Abspielen: Beide Wege laufen Schritt für Schritt nebeneinander.',
     'pp.aha.title': 'Zwei sichere Wege, ein Preis',
     'pp.aha.text':
-      'Beide Wege liefern USD {notional} und kosten {chf}. Wäre der Forward billiger oder teurer, könntest du ohne Risiko Geld verdienen (Arbitrage, Abschnitt 4).',
+      'Beide Wege liefern USD {notional} und kosten {chf}. Wäre der Forward billiger oder teurer, könntest du ohne Kursrisiko Geld verdienen (Arbitrage, Abschnitt 4).',
     'pp.counter': 'Schritt {i} von {n}',
     'pp.play': 'Abspielen',
     'pp.pause': 'Pause',
@@ -116,7 +116,7 @@ export const paritypaths = defineDict({
     'pp.idle': 'Press play: both routes run step by step, side by side.',
     'pp.aha.title': 'Two safe routes, one price',
     'pp.aha.text':
-      'Both routes deliver USD {notional} and cost {chf}. If the forward were cheaper or dearer, you could make money without risk (arbitrage, section 4).',
+      'Both routes deliver USD {notional} and cost {chf}. If the forward were cheaper or dearer, you could make money without exchange-rate risk (arbitrage, section 4).',
     'pp.counter': 'Step {i} of {n}',
     'pp.play': 'Play',
     'pp.pause': 'Pause',
