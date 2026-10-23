@@ -37,6 +37,9 @@ Intro text that is not an entry.
 ## no-fields
 `;
 
+/** ISBN-13 with hyphens, e.g. 978-0-13-216494-8. */
+const ISBN13 = /^97[89](-[0-9]+){3}-[0-9]$/;
+
 describe('parseSources', () => {
   const entries = parseSources(SAMPLE, 'sample.md');
 
@@ -130,11 +133,41 @@ describe('the real source files', () => {
     expect(all.some((e) => e.id === 'ecb-reference-rates')).toBe(true);
   });
 
-  it.each(all.map((e) => [e.id, e] as const))('%s has a title and an https URL', (_id, e) => {
-    expect(e.title.trim()).not.toBe('');
-    expect(e.title).not.toBe(e.id);
-    expect(e.url, `${e.id} has no URL`).toMatch(/^https:\/\//);
-    expect(urlHost(e.url)).not.toBe('');
+  it.each(all.map((e) => [e.id, e] as const))(
+    '%s has a title and an https URL (a book: an ISBN instead)',
+    (_id, e) => {
+      expect(e.title.trim()).not.toBe('');
+      expect(e.title).not.toBe(e.id);
+      if (e.extra['ISBN'] !== undefined) {
+        // a book: no link to a copy, the ISBN identifies it (Version 6)
+        expect(e.extra['ISBN']).toMatch(ISBN13);
+        expect(e.url).toBeUndefined();
+        return;
+      }
+      expect(e.url, `${e.id} has no URL`).toMatch(/^https:\/\//);
+      expect(urlHost(e.url)).not.toBe('');
+    },
+  );
+
+  it('the textbooks and articles of Version 6 are listed', () => {
+    const ids = new Set(all.map((e) => e.id));
+    for (const id of ['hull-2012', 'bis-2016-cip', 'jensen-1968', 'jewitt-2015']) {
+      expect(ids.has(id), id).toBe(true);
+    }
+    const hull = all.find((e) => e.id === 'hull-2012')!;
+    expect(hull.extra['ISBN']).toBe('978-0-13-216494-8');
+    for (const chapter of [
+      'Determination of Forward and Futures Prices',
+      'The Greek Letters',
+      'Exotic Options',
+    ]) {
+      expect(hull.supports).toContain(chapter);
+    }
+    expect(all.find((e) => e.id === 'jewitt-2015')!.extra['ISBN']).toBe('978-1-118-96745-4');
+    // books carry an ISBN and no link at all (no links to copies of books)
+    for (const id of ['hull-2012', 'jewitt-2015']) {
+      expect(all.find((e) => e.id === id)!.url, id).toBeUndefined();
+    }
   });
 });
 
@@ -147,7 +180,8 @@ describe('sources.md (single source list)', () => {
     expect(new Set(ids).size).toBe(ids.length);
     for (const e of entries) {
       expect(e.title.length, e.id).toBeGreaterThan(0);
-      expect(e.url ?? '', e.id).toMatch(/^https:\/\//);
+      if (e.extra['ISBN'] !== undefined) expect(e.extra['ISBN'], e.id).toMatch(ISBN13);
+      else expect(e.url ?? '', e.id).toMatch(/^https:\/\//);
     }
   });
 });

@@ -2,7 +2,8 @@
 
 Every market event, institutional fact and statistic used in Forward First is listed here.
 Each entry has an id (the `## id` heading) that `<Fact>` registries and event data refer to.
-Format per entry: title, publisher, date, URL, what it supports.
+Format per entry: title, publisher, date, URL, what it supports. A book has an ISBN instead of a
+URL (no links to copies of books; statements are paraphrased, never copied).
 
 <!-- Allgemein -->
 
@@ -13,6 +14,40 @@ Format per entry: title, publisher, date, URL, what it supports.
 - Datum: laufend, werktags um ca. 16:00 MEZ / daily around 16:00 CET
 - URL: https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html
 - Belegt: Datenquelle des Riskometers (EUR/CHF, EUR/USD direkt; USD/CHF und USD/JPY als Kreuzkurse); Referenzkurse dienen nur Informationszwecken.
+
+<!-- Lehrbuch und Fachliteratur / textbooks and literature (Version 6, Review 2) -->
+
+## hull-2012
+
+- Titel: Options, Futures, and Other Derivatives, 8. Auflage / 8th edition
+- Herausgeber: John C. Hull; Pearson
+- Datum: 2012
+- ISBN: 978-0-13-216494-8
+- Belegt: Lehrbuchwissen, sinngemäss wiedergegeben (kein Buchtext übernommen). Kapitel «Determination of Forward and Futures Prices»: gedeckte Zinsparität bei Währungen, der Forward folgt aus Spot und den beiden Zinsen (Modul 02.3). Kapitel «The Greek Letters»: Delta eines Forward-Kontrakts e^(−r_f·T); Greeks für ein Asset mit Rendite q, bei Währungen q = r_f (Modul 05.2, 05.3); die Lage des Gamma- und des Vega-Maximums ist aus diesen Formeln hergeleitet. Kapitel «Exotic Options»: Barrier-Optionen und In-Out-Parität (Modul 07.4); Volatility und Variance Swaps (Modul 05.1, 05.3).
+
+## bis-2016-cip
+
+- Titel: Covered interest parity lost: understanding the cross-currency basis
+- Herausgeber: Claudio Borio, Robert N. McCauley, Patrick McGuire, Vladyslav Sushko; BIS Quarterly Review, Bank für Internationalen Zahlungsausgleich (BIZ) / Bank for International Settlements (BIS)
+- Datum: September 2016
+- URL: https://www.bis.org/publ/qtrpdf/r_qt1609e.htm
+- Belegt: Am Markt weicht der Terminkurs seit der Finanzkrise 2008 dauerhaft von der gedeckten Zinsparität ab; diese Abweichung ist die Cross-Currency Basis. Darum sagt Modul 02.3: Der Forward folgt aus Spot und Zinsen, am Markt kommt die Basis dazu.
+
+## jensen-1968
+
+- Titel: The Performance of Mutual Funds in the Period 1945–1964
+- Herausgeber: Michael C. Jensen; Journal of Finance, Vol. 23, Nr. 2, S. 389–416
+- Datum: 1968
+- URL: https://papers.ssrn.com/abstract=244153
+- Belegt: Alpha als risikobereinigter Mehrertrag gegenüber einem Vergleichsmassstab (Jensens Alpha). Modul 09.3 und Glossar «Alpha».
+
+## jewitt-2015
+
+- Titel: FX Derivatives Trader School
+- Herausgeber: Giles Jewitt; Wiley
+- Datum: 2015
+- ISBN: 978-1-118-96745-4
+- Belegt: Weiterführende Literatur zur Praxis am FX-Options-Desk (Konventionen, Strukturen wie TARFs); kein Beleg für eine einzelne Aussage im Tool.
 
 <!-- Riskometer -->
 

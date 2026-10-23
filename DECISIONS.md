@@ -439,5 +439,6 @@ Format: `D-xx · date · origin`, then question, decision, reasoning. Origin is 
 - Forbidden stay: commercial banks, companies, clients, real persons as examples, and product brands. The content lint (`FORBIDDEN_NAMES` in `tests/unit/content-lint.test.ts`) enforces it on every text, quiz, dictionary and the glossary.
 - Allowed: central banks and authorities as sources (EZB/ECB, SNB, BIZ/BIS) and model and author names (Garman-Kohlhagen, Reiner-Rubinstein, Black-76, Broadie-Glasserman-Kou). A lint test checks that these names are not on the forbidden list and that the sources keep their publishers.
 - No source is removed; `src/content/sources.md` keeps every entry.
+- Version 6 (Review 2, 23.10.2026): in source entries, publishers and authors are allowed (e.g. a textbook's author and publisher, the authors of a BIS article). A book is listed with its ISBN instead of a URL; no links to copies of books, statements are paraphrased, never copied.
 
 **Reasoning:** The rule protects against advertising and against any link to a real firm or person; a source has to name its publisher, and a model is known by its authors' names.

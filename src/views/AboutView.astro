@@ -827,6 +827,12 @@ const sid = (i: number) => toc[i]!.id;
                         <dd>{date}</dd>
                       </div>
                     )}
+                    {s.extra['ISBN'] && (
+                      <div>
+                        <dt>{t('about.sources.isbn')}</dt>
+                        <dd class="mono">{s.extra['ISBN']}</dd>
+                      </div>
+                    )}
                     {s.supports && (
                       <div class="ab-source-supports">
                         <dt>{t('about.sources.supports')}</dt>
