@@ -1,5 +1,73 @@
 import PayoffBuilderFigure from '@/components/figures/PayoffBuilderFigure.astro';
 
-Stub.
+{/* 06 Kombos & Vola-Smile · Abschnitt 3 · Straddle, Strangle, Butterfly, Seagull. Zahlen nur über <Num />, Registry src/lib/nums/m06.ts. */}
 
-<PayoffBuilderFigure templates={['straddle', 'strangle', 'butterfly', 'seagull']} initial="straddle" view="pnl" volShock caption="Test" />
+Bisher ging es um die Richtung: Steigt der Dollar oder fällt er? Jetzt geht es ums Ausmass. Wie stark bewegt sich USD/CHF bis Verfall, egal wohin? Wer darauf eine Meinung hat, handelt nicht den Kurs, sondern die **Vola**.
+
+Stell dir eine Händlerin vor, die eine wichtige Zinsentscheidung erwartet. Sie weiss nicht, in welche Richtung der Franken springt. Sie rechnet nur damit, dass er springt. Mit einem einzelnen Call oder Put kann sie das nicht ausdrücken, mit einer Kombination schon:
+
+- **Straddle:** Long Call und Long Put mit demselben Strike, meist ATM. Er gewinnt, wenn sich der Kurs stark bewegt, in jede Richtung.
+- **Strangle:** Long Put und Long Call aus dem Geld, zum Beispiel die 25Δ-Strikes. Billiger als der Straddle, braucht aber eine grössere Bewegung.
+- **Butterfly:** Long Call tief, zwei Short Calls in der Mitte, Long Call hoch. Er gewinnt, wenn der Kurs ruhig nahe der Mitte endet. Das ist die Gegenwette.
+- **Seagull:** die Struktur des Importeurs aus Abschnitt 1, ein Call-Spread finanziert mit einem Short Put. Sie ist für die Absicherung gebaut, hat aber auch eine Sicht auf die Vola, ob er will oder nicht.
+
+<PayoffBuilderFigure templates={['straddle', 'strangle', 'butterfly', 'seagull']} initial="straddle" view="pnl" volShock caption="G&V nach Prämie: Die Kreise markieren die Break-evens bei Verfall. Schieb die implizite Vola: Die blaue G&V von heute bewegt sich, obwohl der Spot stillsteht. Vergleiche Vega in der Tabelle." />
+
+### Straddle und Strangle: long Vola
+
+Der Straddle hat beide Beine auf dem ATM-Strike <Num of="m06.dns" />, dem Strike des delta-neutralen Straddles. Er kostet <Num of="m06.straddlePips" /> Pips, also <Num of="m06.straddleChf" />. Gewinn gibt es erst ausserhalb der beiden Break-evens <Num of="m06.straddleBeLo" /> und <Num of="m06.straddleBeHi" />. USD/CHF muss sich bis Verfall also um mehr als <Num of="m06.straddleMovePct" /> bewegen.
+
+Vega ist <Num of="m06.straddleVegaChf" /> je Vola-Punkt, doppelt so viel wie bei einer Option allein. Steigt die implizite Vola um <Num of="m06.shockPts" /> Punkte auf <Num of="m06.shockVol" />, gewinnt der Straddle heute <Num of="m06.straddleShockChf" />, ohne dass sich der Spot bewegt. Dafür kostet ihn jeder ruhige Tag Zeitwert: Theta <Num of="m06.straddleThetaChf" /> pro Tag.
+
+Der Strangle mit <Num of="m06.put25K" /> und <Num of="m06.call25K" /> kostet nur <Num of="m06.strPips" /> Pips. Seine Break-evens liegen weiter aussen, bei <Num of="m06.strBeLo" /> und <Num of="m06.strBeHi" />. Vega ist mit <Num of="m06.strVegaChf" /> trotzdem hoch: Ein Strangle ist eine günstige Wette auf mehr Vola.
+
+### Butterfly und Seagull: short Vola
+
+Der Butterfly kauft Calls bei <Num of="m06.flyLow" /> und <Num of="m06.flyHigh" /> und verkauft zwei Calls bei <Num of="m06.flyMid" />. Er kostet <Num of="m06.flyPips" /> Pips. Endet USD/CHF genau bei <Num of="m06.flyMid" />, verdient er <Num of="m06.flyMaxGainChf" />. Gewinn gibt es zwischen <Num of="m06.flyBeLo" /> und <Num of="m06.flyBeHi" />. Vega ist negativ, <Num of="m06.flyVegaChf" />, und Theta positiv, <Num of="m06.flyThetaChf" /> pro Tag: Ruhe und Zeit arbeiten für ihn.
+
+Der Seagull des Importeurs (Calls <Num of="m06.sgK1" /> und <Num of="m06.sgK2" />, Put <Num of="m06.sgPut" />) kostet nichts. Er ist aber short Vega: <Num of="m06.sgVegaChf" /> je Punkt. Steigt die Vola um <Num of="m06.shockPts" /> Punkte, verliert die Struktur heute <Num of="m06.sgShockChf" /> an Wert. Die Absicherung bei Verfall funktioniert trotzdem. Bis dahin zeigt die tägliche Bewertung aber einen Verlust.
+
+| Struktur | Prämie in Pips | Vega je Punkt | Vola +<Num of="m06.shockPts" /> Punkte |
+| --- | --- | --- | --- |
+| Straddle | <Num of="m06.straddlePips" /> | <Num of="m06.straddleVegaChf" /> | <Num of="m06.straddleShockChf" /> |
+| Strangle | <Num of="m06.strPips" /> | <Num of="m06.strVegaChf" /> | <Num of="m06.strShockChf" /> |
+| Butterfly | <Num of="m06.flyPips" /> | <Num of="m06.flyVegaChf" /> | <Num of="m06.flyShockChf" /> |
+| Seagull | Zero Cost | <Num of="m06.sgVegaChf" /> | <Num of="m06.sgShockChf" /> |
+
+<Callout variant="warn" title="Wann der Seagull schmerzt">
+
+Steigt USD/CHF bei Verfall über <Num of="m06.sgK2" />, endet der Schutz: Der Importeur zahlt den Marktkurs minus <Num of="m06.shSeagullDiscPips" /> Pips. Fällt der Kurs unter <Num of="m06.sgPut" />, muss er trotzdem zu <Num of="m06.sgPut" /> kaufen. Und vor Verfall verliert die Struktur an Wert, wenn der Markt nervös wird.
+
+</Callout>
+
+<Derivation title="Herleitung: Was ein Straddle kostet und warum">
+
+**1.** Am Forward kosten Call und Put gleich viel (Put-Call-Parität mit <i>K</i> = <i>F</i>). Mit Black-76 gilt dort <i>d</i><sub>1</sub> = σ√<i>T</i>/2 und <i>d</i><sub>2</sub> = −σ√<i>T</i>/2:
+
+<Formula><span><i>C</i> = <i>P</i> = <i>DF</i><sub>d</sub> · <i>F</i> · [<i>N</i>(σ√<i>T</i>/2) − <i>N</i>(−σ√<i>T</i>/2)]</span></Formula>
+
+**2.** Für kleine σ√<i>T</i> ist die Klammer etwa σ√<i>T</i> · φ(0) = σ√<i>T</i> / √(2π). Der Straddle hat zwei Beine:
+
+<Formula variant="accent"><span>Straddle ≈ √(2/π) · σ√<i>T</i> · <i>F</i> · <i>DF</i><sub>d</sub></span></Formula>
+
+**3.** Im Beispiel: <Num of="m06.sqrt2pi" /> · <Num of="m06.sigmaSqrtT" /> · <Num of="ex.forward" digits={4} /> ergibt <Num of="m06.straddleApproxPips" /> Pips. Exakt sind es <Num of="m06.straddlePips" /> Pips.
+
+**4.** Was bedeutet das? Ist <i>F</i><sub>T</sub> normalverteilt um <i>F</i> mit Standardabweichung σ√<i>T</i> · <i>F</i>, ist die erwartete absolute Bewegung genau √(2/π) · σ√<i>T</i> · <i>F</i>. Der Straddle kostet also ungefähr die Bewegung, die der Markt erwartet. Kaufen lohnt sich, wenn du mit grösseren Ausschlägen rechnest, als die implizite Vola einpreist.
+
+**5.** Vega ist die Ableitung nach σ: Beim Straddle zählt jedes Bein, also doppelt. Beim Butterfly heben sich die Beine fast auf, die zwei verkauften Calls in der Mitte haben das grösste Vega. Darum ist er short Vega.
+
+</Derivation>
+
+<Desk title="Vola handeln statt Richtung">
+
+Am Desk wird ein Straddle meist delta-gehedgt gehandelt. Dann bleibt die reine Wette auf die Vola: Der Käufer verdient, wenn der Kurs stärker schwankt, als die implizite Vola sagt. Er verliert jeden ruhigen Tag Theta. Das ist das Duell Gamma gegen Theta aus [Modul 05](/module/05-greeks/4/).
+
+Der Butterfly hat noch eine zweite Bedeutung: Als Quote zeigt er, wie viel teurer Optionen weit aus dem Geld sind als ATM-Optionen. Das führt direkt zum Vola-Smile.
+
+</Desk>
+
+<Takeaway>
+
+Straddle und Strangle kaufen Bewegung: Sie sind long Vega und zahlen Zeitwert, bis sich der Kurs bewegt. Butterfly und Seagull verkaufen Bewegung: Sie sind short Vega und verlieren an Wert, wenn der Markt nervös wird.
+
+</Takeaway>
