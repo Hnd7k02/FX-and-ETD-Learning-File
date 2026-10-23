@@ -148,7 +148,7 @@ describe('legs (section 2)', () => {
 
   it('snaps rate slider values to the grid and the range', () => {
     expect(snapRate(0.0351)).toBe(0.035);
-    expect(snapRate(0.10)).toBe(0.06);
+    expect(snapRate(0.1)).toBe(0.06);
     expect(snapRate(-0.01)).toBe(0);
   });
 });

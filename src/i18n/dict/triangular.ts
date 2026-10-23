@@ -75,7 +75,8 @@ export const triangular = defineDict({
     'side.buy': 'buy',
     leg: '{n}. {pair}: {side} {base} at {rate}',
     legFlow: '{pay} → {receive}',
-    noLegs: 'No round trip pays as long as the direct quote lies inside the band of the cross rate.',
+    noLegs:
+      'No round trip pays as long as the direct quote lies inside the band of the cross rate.',
     'note.none':
       'The rates fit together. The direct EUR/CHF quote lies inside the band of the cross rate: every round trip costs you the spread.',
     'note.sellDirectBuyCross':

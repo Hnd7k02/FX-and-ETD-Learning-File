@@ -161,9 +161,11 @@ export default function HedgeRoll({ lang }: HedgeRollProps): JSX.Element {
   const crossLabel = t('hr.cross');
   const clW = textWidth(crossLabel, L.font) + 8;
   const clLeft = xCross + 14 + clW > L.right;
-  const chipKey = side === 'receive' ? 'hr.chip.receive' : side === 'pay' ? 'hr.chip.pay' : 'hr.chip.zero';
+  const chipKey =
+    side === 'receive' ? 'hr.chip.receive' : side === 'pay' ? 'hr.chip.pay' : 'hr.chip.zero';
   const chipClass = side === 'receive' ? 'is-good' : side === 'pay' ? 'is-warn' : '';
-  const noteKey = side === 'receive' ? 'hr.note.receive' : side === 'pay' ? 'hr.note.pay' : 'hr.note.zero';
+  const noteKey =
+    side === 'receive' ? 'hr.note.receive' : side === 'pay' ? 'hr.note.pay' : 'hr.note.zero';
   const settleSubKey =
     side === 'receive'
       ? 'hr.row.settleSub.receive'
@@ -257,7 +259,12 @@ export default function HedgeRoll({ lang }: HedgeRollProps): JSX.Element {
                 {allInLabel}
               </text>
               {/* crossing: spot = old forward */}
-              <circle cx={xCross} cy={yCross} r={nearCross ? 10 : 6} class={`m3-cross${nearCross ? ' is-lit' : ''}`} />
+              <circle
+                cx={xCross}
+                cy={yCross}
+                r={nearCross ? 10 : 6}
+                class={`m3-cross${nearCross ? ' is-lit' : ''}`}
+              />
               {nearCross && (
                 <text
                   x={clLeft ? xCross - 14 : xCross + 14}
@@ -295,9 +302,26 @@ export default function HedgeRoll({ lang }: HedgeRollProps): JSX.Element {
               <circle cx={x} cy={yAll} r={6} class="m3-dot" />
               {/* rail with the draggable spot */}
               <path d={`M${L.left},${L.rail}H${L.right}`} class="m3-rail" />
-              <g class={`m3-handle${drag.dragging ? ' is-active' : ''}`} data-handle {...drag.handlers}>
-                <rect x={L.left - 10} y={L.rail - 22} width={L.right - L.left + 20} height={44} class="m3-hit" />
-                <rect x={x - 34} y={L.rail - 11} width={68} height={22} rx={11} class="m3-handle-pill" />
+              <g
+                class={`m3-handle${drag.dragging ? ' is-active' : ''}`}
+                data-handle
+                {...drag.handlers}
+              >
+                <rect
+                  x={L.left - 10}
+                  y={L.rail - 22}
+                  width={L.right - L.left + 20}
+                  height={44}
+                  class="m3-hit"
+                />
+                <rect
+                  x={x - 34}
+                  y={L.rail - 11}
+                  width={68}
+                  height={22}
+                  rx={11}
+                  class="m3-handle-pill"
+                />
                 <text x={x} y={L.rail + 4} class="m3-handle-text">
                   {r4(spot)}
                 </text>
@@ -360,7 +384,9 @@ export default function HedgeRoll({ lang }: HedgeRollProps): JSX.Element {
             </li>
             <li class="m3-tl-card is-total">
               <span class="m3-tl-head">{t('hr.tl.total')}</span>
-              <span class="m3-tl-big mono">{t('hr.tl.totalText', { chf: chf(v.totalChf), notional })}</span>
+              <span class="m3-tl-big mono">
+                {t('hr.tl.totalText', { chf: chf(v.totalChf), notional })}
+              </span>
               <span class="m3-tl-sub">
                 {t('hr.tl.totalRate', { rate: r5(v.allIn), old: r5(OLD), pips: pipsTxt })}
               </span>
@@ -423,10 +449,19 @@ export default function HedgeRoll({ lang }: HedgeRollProps): JSX.Element {
             </div>
           </div>
           <StatTable>
-            <StatRow label={t('hr.row.points')} sub={t('hr.row.pointsSub', { days: slip.days })} value={pipsTxt} />
+            <StatRow
+              label={t('hr.row.points')}
+              sub={t('hr.row.pointsSub', { days: slip.days })}
+              value={pipsTxt}
+            />
             <StatRow label={t('hr.row.far')} sub={t('hr.row.farSub')} value={r5(v.farRate)} />
             <StatRow label={t('hr.row.settle')} sub={t(settleSubKey)} value={settleTxt} />
-            <StatRow label={t('hr.row.allIn')} sub={t('hr.row.allInSub')} value={r5(v.allIn)} highlight />
+            <StatRow
+              label={t('hr.row.allIn')}
+              sub={t('hr.row.allInSub')}
+              value={r5(v.allIn)}
+              highlight
+            />
           </StatTable>
           <p class={`m3-note ${chipClass}`} data-note>
             {t(noteKey, { chf: absTxt })}

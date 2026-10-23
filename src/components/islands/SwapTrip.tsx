@@ -29,7 +29,6 @@ import {
   pathAt,
   roundTripChf,
   spotPath,
-  swapLineAt,
   tripSwap,
 } from '@/lib/m03/trip';
 import { usePlayback } from './m03-shared';

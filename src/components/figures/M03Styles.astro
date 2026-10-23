@@ -1,0 +1,778 @@
+---
+/**
+ * Shared styles of the module 03 figures (SwapTrip, SwapLegs, HedgeRoll, SwapCompare). Every
+ * figure wrapper renders this component; Astro includes the styles once per page.
+ * Colour semantics: receive / long / new far rate blue, pay / short / open result orange,
+ * forward, swap and all-in rate black, reference lines grey dashed, settlement received green.
+ * Animations are transform-only and switched off under prefers-reduced-motion.
+ */
+---
+
+<style is:global>
+  .m3 {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+    color: var(--ff-ink);
+  }
+  .m3 .ff-lab-head {
+    margin-bottom: 0;
+  }
+  .m3 .ff-lab-main {
+    gap: 10px;
+  }
+  .m3 p {
+    margin: 0;
+  }
+  .m3-titles {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+  /* The Legend is a <ul>; keep the .prose list styles away from it. */
+  .m3 .ff-legend,
+  .m3 .m3-key-list {
+    flex-direction: row;
+    padding-left: 0;
+    gap: 6px 18px;
+  }
+  .m3 .ff-legend li,
+  .m3 .m3-key-list li {
+    font-size: 13px;
+    line-height: 1.4;
+    color: var(--ff-ink-2);
+  }
+  .m3-key-list {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0;
+    list-style: none;
+  }
+  .m3-key-list li {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin: 0;
+  }
+  .m3-key {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--ff-ink-2);
+  }
+  .m3-key-sw {
+    display: inline-block;
+    width: 3px;
+    height: 14px;
+    border-radius: 2px;
+    background: var(--ff-long);
+  }
+  .m3-key-sw.is-out {
+    background: var(--ff-short);
+    margin-left: 6px;
+  }
+  .m3-key-list .m3-key-sw.is-out {
+    margin-left: 0;
+  }
+  .m3-key-sw.is-coupon {
+    width: 2px;
+    height: 10px;
+    background: var(--ff-ink-2);
+  }
+  .m3-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: var(--ff-r-pill);
+    background: var(--ff-chip);
+    color: var(--ff-ink);
+    font-size: 13px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    transition:
+      background-color 300ms ease,
+      color 300ms ease;
+  }
+  .m3-chip.is-good {
+    background: var(--ff-good-soft);
+    color: var(--ff-good-text-strong);
+  }
+  .m3-chip.is-warn {
+    background: var(--ff-warn-soft);
+    color: var(--ff-warn-text);
+  }
+  .m3-chip.is-blue {
+    background: var(--ff-linear-soft);
+    color: var(--ff-linear-text);
+  }
+  .m3-chip.is-dark {
+    background: var(--ff-ink);
+    color: #fff;
+  }
+  .m3-chart-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 4px 12px;
+    font-size: 14px;
+  }
+  .m3-chart-head b {
+    font-weight: 800;
+  }
+  .m3-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    font-family: var(--ff-font-ui);
+    touch-action: pan-y;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .m3-axis {
+    fill: none;
+    stroke: var(--ff-axis);
+    stroke-width: 1.25;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .m3-axis-title {
+    font-weight: 600;
+    fill: var(--ff-muted);
+  }
+  .m3-ref {
+    fill: none;
+    stroke: var(--ff-ref);
+    stroke-width: 1;
+    stroke-dasharray: 4 5;
+  }
+  .m3-ref-label,
+  .m3-leg-label,
+  .m3-line-label,
+  .m3-bracket-label,
+  .m3-open-label,
+  .m3-gap-label,
+  .m3-event-label {
+    font-weight: 700;
+    fill: var(--ff-ink-2);
+    paint-order: stroke;
+    stroke: #fff;
+    stroke-width: 4px;
+    stroke-linejoin: round;
+    font-variant-numeric: tabular-nums;
+  }
+  .m3-leg-label,
+  .m3-line-label {
+    fill: var(--ff-ink);
+  }
+  .m3-bracket-label {
+    fill: var(--ff-linear-text);
+  }
+  .m3-open-label {
+    fill: var(--ff-exotics-text);
+  }
+  .m3-event-label {
+    fill: var(--ff-ink);
+    animation: m3-rise 320ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+  .m3-line {
+    fill: none;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .m3-line.is-thin {
+    stroke-width: 2.5;
+  }
+  .m3-curve {
+    fill: none;
+    stroke: var(--ff-forward);
+    stroke-width: 1.5;
+    stroke-dasharray: 3 5;
+    opacity: 0.45;
+  }
+  .m3-path {
+    fill: none;
+    stroke: var(--ff-long);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .m3-bracket {
+    fill: none;
+    stroke: var(--ff-short);
+    stroke-width: 3;
+    stroke-linecap: round;
+  }
+  .m3-bracket.is-accent {
+    stroke: var(--ff-linear);
+  }
+  .m3-gap {
+    fill: none;
+    stroke-width: 4;
+    stroke-linecap: round;
+  }
+  .m3-guide {
+    fill: none;
+    stroke: var(--ff-axis);
+    stroke-width: 1;
+    stroke-dasharray: 2 4;
+  }
+  .m3-head {
+    fill: var(--ff-long);
+    stroke: #fff;
+    stroke-width: 2.5;
+  }
+  .m3-dot {
+    fill: var(--ff-forward);
+    stroke: #fff;
+    stroke-width: 2.5;
+    transition: r 300ms ease;
+  }
+  .m3-dot.is-lit {
+    stroke: var(--ff-linear-soft);
+    stroke-width: 6;
+  }
+  .m3-cross {
+    fill: #fff;
+    stroke: var(--ff-ink-2);
+    stroke-width: 2;
+    transition:
+      r 300ms ease,
+      stroke 300ms ease;
+  }
+  .m3-cross.is-lit {
+    stroke: var(--ff-ink);
+    stroke-width: 3;
+  }
+  .m3-tick-dot {
+    fill: var(--ff-ink-2);
+  }
+  .m3-station {
+    fill: none;
+    stroke: var(--ff-grid);
+    stroke-width: 1;
+  }
+  .m3-arrow {
+    fill: none;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .m3-flow-label {
+    font-weight: 700;
+    text-anchor: middle;
+    font-family: var(--ff-font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+  .m3-flow-label.is-in {
+    fill: var(--ff-linear-text);
+  }
+  .m3-flow-label.is-out {
+    fill: var(--ff-exotics-text);
+  }
+  .m3-days {
+    font-weight: 600;
+    fill: var(--ff-muted);
+    text-anchor: middle;
+  }
+  .m3-cap {
+    font-weight: 800;
+    fill: var(--ff-ink);
+    text-anchor: middle;
+  }
+  .m3-cap-sub {
+    fill: var(--ff-muted);
+    text-anchor: middle;
+    font-variant-numeric: tabular-nums;
+  }
+  .m3-tenor {
+    fill: var(--ff-muted);
+    text-anchor: middle;
+    font-weight: 600;
+  }
+  .m3-tenor.is-on {
+    fill: var(--ff-ink);
+    font-weight: 800;
+  }
+  .m3-rail {
+    fill: none;
+    stroke: var(--ff-line);
+    stroke-width: 4;
+    stroke-linecap: round;
+  }
+  .m3-hit {
+    fill: transparent;
+  }
+  .m3-handle {
+    cursor: grab;
+    touch-action: none;
+  }
+  .m3-handle.is-active {
+    cursor: grabbing;
+  }
+  .m3-handle-pill,
+  .m3-handle-dot {
+    fill: var(--ff-ink);
+    stroke: #fff;
+    stroke-width: 2;
+  }
+  .m3-handle-dot {
+    stroke-width: 3;
+  }
+  .m3-handle-text {
+    font-size: 11px;
+    font-weight: 700;
+    fill: #fff;
+    text-anchor: middle;
+    font-family: var(--ff-font-mono);
+    pointer-events: none;
+  }
+  .m3-zero-dot {
+    fill: var(--ff-ref);
+  }
+  .m3-seg {
+    fill: none;
+    stroke-linecap: round;
+    transition: opacity 300ms ease;
+  }
+  .m3-seg.is-notional {
+    stroke-width: 3;
+  }
+  .m3-seg.is-coupon {
+    stroke-width: 2;
+  }
+  .m3-seg.is-ghost {
+    stroke-width: 2;
+    stroke-dasharray: 3 3;
+  }
+  .m3-seg.is-in,
+  .m3-seg-head.is-in {
+    stroke: var(--ff-long);
+  }
+  .m3-seg.is-out,
+  .m3-seg-head.is-out {
+    stroke: var(--ff-short);
+  }
+  .m3-seg.is-ghost.is-in {
+    stroke: var(--ff-linear);
+    opacity: 0.6;
+  }
+  .m3-seg-head {
+    fill: none;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: opacity 300ms ease;
+  }
+  .sc.is-focus-notional .m3-seg.is-coupon,
+  .sc.is-focus-notional .m3-seg.is-ghost,
+  .sc.is-focus-interest .m3-seg.is-notional,
+  .sc.is-focus-interest .m3-seg-head,
+  .sc.is-focus-rate .m3-seg,
+  .sc.is-focus-rate .m3-seg-head {
+    opacity: 0.22;
+  }
+  .sc.is-focus-interest .m3-seg.is-ghost {
+    opacity: 1;
+    stroke-width: 3;
+  }
+  .m3-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 24px;
+  }
+  .m3-seg-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .m3 .segmented > button {
+    min-height: var(--ff-touch);
+  }
+  .m3-cmp {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .m3-cmp-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 12px 14px 4px;
+    border: 1px solid var(--ff-line);
+    border-radius: var(--ff-r-box);
+  }
+  .m3-cmp-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 8px;
+    font-size: 14px;
+  }
+  .m3-cmp-head b {
+    font-weight: 800;
+    margin-right: 4px;
+  }
+  .m3-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: var(--ff-r-pill);
+    background: var(--ff-chip);
+    color: var(--ff-ink-2);
+    font-size: 12px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    transition:
+      background-color 300ms ease,
+      color 300ms ease;
+  }
+  .m3-pill.is-warn {
+    background: var(--ff-warn-soft);
+    color: var(--ff-warn-text);
+  }
+  .sc.is-focus-rate .m3-pill.is-rate,
+  .sc.is-focus-interest .m3-pill.is-interest {
+    background: var(--ff-ink);
+    color: #fff;
+  }
+  .m3-check {
+    align-items: flex-start;
+  }
+  .m3-check > div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+  .m3-check b {
+    font-weight: 800;
+  }
+  .m3-check-icon {
+    flex: 0 0 20px;
+    margin-top: 2px;
+  }
+  .m3-check-icon circle {
+    fill: var(--ff-good-text);
+  }
+  .m3-check-icon path {
+    fill: none;
+    stroke: #fff;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .m3-table-wrap {
+    border: 1px solid var(--ff-line);
+    border-radius: var(--ff-r-box);
+  }
+  .m3-table-wrap:focus-visible {
+    outline: 2px solid var(--ff-ink);
+    outline-offset: 2px;
+  }
+  .m3 .m3-table {
+    margin: 0;
+    font-size: 13px;
+  }
+  .m3 .m3-table th,
+  .m3 .m3-table td {
+    vertical-align: top;
+  }
+  .m3 .m3-table tbody th {
+    font-weight: 700;
+    text-align: left;
+  }
+  .m3-cell-main {
+    display: block;
+    font-weight: 700;
+  }
+  .m3-cell-sub {
+    display: block;
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--ff-muted);
+  }
+  .m3 .m3-table td.is-in {
+    color: var(--ff-linear-text);
+  }
+  .m3 .m3-table td.is-out {
+    color: var(--ff-exotics-text);
+  }
+  .m3 .m3-table tr.is-net th,
+  .m3 .m3-table tr.is-net td {
+    background: var(--ff-surface-2);
+  }
+  .m3 .m3-cmp-table tr {
+    transition: background-color 300ms ease;
+  }
+  .m3 .m3-cmp-table tr.is-focus th,
+  .m3 .m3-cmp-table tr.is-focus td {
+    background: var(--ff-linear-soft);
+  }
+  .m3-hint {
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--ff-muted);
+  }
+  .m3 .m3-hint {
+    font-size: 12px;
+  }
+  .m3-sw {
+    display: inline-block;
+    width: 18px;
+    height: 0;
+    border-top: 3px solid;
+    vertical-align: middle;
+  }
+  .m3-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .m3-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: var(--ff-touch);
+    padding: 0 16px;
+    border-radius: var(--ff-r-pill);
+    border: 1px solid var(--ff-line-strong);
+    background: var(--ff-surface);
+    color: var(--ff-ink);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition:
+      background-color 150ms ease,
+      transform 150ms ease;
+  }
+  .m3-btn:hover {
+    background: var(--ff-chip);
+  }
+  .m3-btn:active {
+    transform: translateY(1px);
+  }
+  .m3-btn-dark {
+    border-color: var(--ff-ink);
+    background: var(--ff-ink);
+    color: #fff;
+  }
+  .m3-btn-dark:hover {
+    background: #262b33;
+  }
+  .m3-icon-stroke {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .m3-icon-fill {
+    fill: currentColor;
+  }
+  .m3-insight {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-height: 66px;
+    justify-content: center;
+    padding: 12px 16px;
+    border-radius: var(--ff-r-box);
+    background: var(--ff-surface-2);
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--ff-ink-2);
+    font-variant-numeric: tabular-nums;
+  }
+  .m3-insight b {
+    font-weight: 800;
+    color: var(--ff-ink);
+  }
+  .m3-insight.is-aha {
+    background: var(--ff-ink);
+    color: var(--ff-on-dark-body);
+    animation: m3-rise 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+  .m3-insight.is-aha b {
+    color: #fff;
+  }
+  .m3-eq {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .m3-eq .math {
+    font-size: 17px;
+    line-height: 1.5;
+  }
+  .m3-eq-sub {
+    font-size: 12px;
+  }
+  .m3-insight.is-aha .m3-eq {
+    margin-top: 6px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.16);
+  }
+  .m3-note {
+    padding: 14px 16px;
+    border-radius: var(--ff-r-box);
+    background: var(--ff-surface-2);
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--ff-ink-2);
+    transition:
+      background-color 300ms ease,
+      color 300ms ease;
+  }
+  .m3 .m3-note {
+    font-size: 14px;
+    line-height: 1.55;
+  }
+  .m3-note.is-good {
+    background: var(--ff-good-soft);
+    color: var(--ff-good-text-strong);
+  }
+  .m3-note.is-warn {
+    background: var(--ff-warn-soft);
+    color: var(--ff-warn-text);
+  }
+  /* SwapTrip: the two legs as cards */
+  .m3-legs {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    gap: 8px;
+  }
+  .m3-leg {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 10px 14px;
+    border: 1px solid var(--ff-line);
+    border-radius: var(--ff-r-box);
+    font-size: 13px;
+    min-width: 0;
+  }
+  .m3-leg-head {
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--ff-muted);
+  }
+  .m3-leg-rate {
+    font-weight: 700;
+  }
+  .m3-leg-arrow {
+    color: var(--ff-ref);
+  }
+  .m3-flow {
+    font-weight: 600;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+  .m3-flow.is-in {
+    color: var(--ff-linear-text);
+  }
+  .m3-flow.is-out {
+    color: var(--ff-exotics-text);
+  }
+  /* HedgeRoll: cash-flow timeline */
+  .m3-timeline {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .m3 .m3-timeline > li {
+    margin: 0;
+  }
+  .m3-tl-card {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px 14px;
+    border: 1px solid var(--ff-line);
+    border-radius: var(--ff-r-box);
+    font-size: 13px;
+    min-width: 0;
+  }
+  .m3-tl-card.is-total {
+    background: var(--ff-surface-2);
+    border-color: transparent;
+  }
+  .m3-tl-head {
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--ff-muted);
+  }
+  .m3-tl-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    padding-top: 6px;
+    border-top: 1px solid var(--ff-row);
+  }
+  .m3-tl-row > span:first-child {
+    font-weight: 700;
+    color: var(--ff-ink-2);
+  }
+  .m3-tl-row.is-net > span:first-child {
+    color: var(--ff-ink);
+  }
+  .m3-tl-big {
+    font-size: 16px;
+    font-weight: 700;
+  }
+  .m3-tl-sub {
+    font-size: 12px;
+    line-height: 1.45;
+    color: var(--ff-muted);
+  }
+  @keyframes m3-rise {
+    from {
+      transform: translateY(8px);
+    }
+    to {
+      transform: none;
+    }
+  }
+  @media (max-width: 640px) {
+    .m3-timeline {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .m3-legs {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .m3-leg-arrow {
+      display: none;
+    }
+    .m3 .m3-table th,
+    .m3 .m3-table td {
+      padding: 7px 8px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .m3-insight.is-aha,
+    .m3-event-label {
+      animation: none;
+    }
+    .m3-dot,
+    .m3-cross,
+    .m3-seg,
+    .m3-seg-head {
+      transition: none;
+    }
+  }
+</style>

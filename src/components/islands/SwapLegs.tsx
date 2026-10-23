@@ -17,7 +17,7 @@ import { StatRow, StatTable } from '@/components/ui/Stat';
 import { useElementWidth, usePrefersReducedMotion, useTween } from '@/components/ui/hooks';
 import { swaplegs as dict } from '@/i18n/dict/swaplegs';
 import { translator, type Lang } from '@/i18n/types';
-import { clamp, linePath, niceTicks, scaleLinear, type Point } from '@/lib/chart';
+import { linePath, niceTicks, scaleLinear, type Point } from '@/lib/chart';
 import type { SwapSide } from '@/lib/fx/swap';
 import { forwardMoneyMarket } from '@/lib/fx/forward';
 import { fmtMillions, fmtMoney, fmtNumber, fmtPct, fmtPips, fmtRate } from '@/lib/format';
