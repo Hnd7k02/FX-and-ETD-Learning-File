@@ -27,7 +27,7 @@ import {
   type OrderType,
   type PathScenario,
 } from '@/lib/m01/orders';
-import { snap, useSvgDrag } from './m01-shared';
+import { inside, snap, useSvgDrag } from './m01-shared';
 
 export interface OrderDemoProps {
   lang: Lang;
@@ -104,7 +104,7 @@ export default function OrderDemo({ lang }: OrderDemoProps): JSX.Element {
   const vsMarket = (fill.price - market.price) * N;
   const fs = `${L.font}px`;
   const yTicks = niceTicks(Y_DOMAIN[0], Y_DOMAIN[1], L.compact ? 4 : 5).filter(
-    (v) => v >= Y_DOMAIN[0] && v <= Y_DOMAIN[1],
+    (v) => inside(v, Y_DOMAIN[0], Y_DOMAIN[1]),
   );
   const dayNames = t('days').split(',');
 

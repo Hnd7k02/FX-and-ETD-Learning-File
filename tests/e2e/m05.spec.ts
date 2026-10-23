@@ -65,6 +65,11 @@ test.describe('module 05 · Greeks', () => {
   test('five levers: flipping a lever flips its bar', async ({ page }) => {
     await page.goto('/module/05-greeks/1/');
     const levers = await hydrated(page, '[data-levers]');
+    // one CHF axis for all levers: every bar track has the same width
+    const widths = await levers
+      .locator('.glv-track')
+      .evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().width)));
+    expect(new Set(widths).size).toBe(1);
     const rf = levers.locator('[data-lever="rf"]');
     await expect(rf).toHaveAttribute('data-sign', 'down');
     const before = (await rf.locator('[data-value]').textContent()) ?? '';
@@ -83,6 +88,7 @@ test.describe('module 05 · Greeks', () => {
     const summary = lab.locator('[data-summary]');
     const start = (await summary.textContent()) ?? '';
     await expect(lab.locator('[data-aha]')).toHaveAttribute('data-aha', 'gammaPeak');
+    await expect(lab.locator('[data-payoff-key]')).toBeVisible();
 
     const spot = lab.locator('#gl-delta-gamma-spot');
     await spot.focus();

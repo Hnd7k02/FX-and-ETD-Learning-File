@@ -2,7 +2,7 @@ import MoneynessExplorerFigure from '@/components/figures/MoneynessExplorerFigur
 
 Der Importeur kann den Strike frei wählen. Ein höherer Strike schützt erst ab einem höheren Kurs, ist dafür billiger. Ein tieferer Strike schützt schon früher und kostet mehr. Wie weit ein Strike «im Geld» liegt, nennt man **Moneyness**.
 
-Gemessen wird gegen den **Forward**, nicht gegen den Spot. Die Option wird erst in 3 Monaten ausgeübt, und der faire Kurs für diesen Tag ist der Forward. Ein Beispiel: Ein USD Call mit Strike <Num of="m04.kMid" /> liegt <Num of="m04.kMidSpotPips" /> Pips unter dem Spot und wirkt im Geld. Gegen den Forward von <Num of="ex.forward" digits={4} /> liegt er aber <Num of="m04.kMidOtmPips" /> Pips darüber. Er ist aus dem Geld.
+Gemessen wird gegen den **Forward**, nicht gegen den Spot. Die Option wird erst in 3 Monaten ausgeübt, und der faire Kurs für diesen Tag ist der Forward. Ein Beispiel: Ein USD Call mit Strike <Num of="m04.kMid" /> liegt <Num of="m04.kMidSpotPips" /> Pips unter dem Spot und wirkt im Geld. Gegen den Forward von <Num of="ex.forward" /> liegt er aber <Num of="m04.kMidOtmPips" /> Pips darüber. Er ist aus dem Geld.
 
 - **ATMF** (at the money forward): Strike gleich Forward.
 - **ITM** (in the money): Beim Call liegt der Strike unter dem Forward, beim Put darüber.
@@ -12,7 +12,7 @@ Gemessen wird gegen den **Forward**, nicht gegen den Spot. Die Option wird erst 
 
 ### Prämie = innerer Wert + Zeitwert
 
-Der **innere Wert** ist, was du dir heute schon sichern kannst: Du verkaufst die Dollars per Forward und übst den Call bei Verfall aus. So sind dir F − K pro USD sicher. Beim Call ist der innere Wert darum max(F − K, 0), abgezinst auf heute. Der **Zeitwert** ist der Rest. Er bezahlt die Chance, dass sich der Kurs bis zum Verfall noch zu deinen Gunsten bewegt.
+Der **innere Wert** ist, was du dir heute schon sichern kannst: Du verkaufst die Dollars per Forward und übst den Call bei Verfall aus. So sind dir mindestens F − K pro USD sicher. Beim Call ist der innere Wert darum max(F − K, 0), abgezinst auf heute. Der **Zeitwert** ist der Rest. Er bezahlt die Chance, dass sich der Kurs bis zum Verfall noch zu deinen Gunsten bewegt.
 
 Drei USD Calls mit 3 Monaten Laufzeit:
 
@@ -42,7 +42,7 @@ Eine **europäische** Option kannst du nur am Verfallstag ausüben, eine **ameri
 
 <Derivation title="Herleitung: innerer Wert, Faustregel und Strike aus Delta">
 
-**Innerer Wert gegen den Forward.** Übst du den Call bei Verfall aus und verkaufst die Dollars heute schon per Forward, erhältst du bei Verfall sicher F − K pro USD. Heute ist das abgezinst wert:
+**Innerer Wert gegen den Forward.** Übst du den Call bei Verfall aus und verkaufst die Dollars heute schon per Forward, erhältst du bei Verfall sicher mindestens F − K pro USD. Liegt der Kurs dann unter dem Strike, kaufst du die Dollars für den Forward sogar günstiger am Markt. Der sichere Teil ist heute abgezinst wert:
 
 <Formula>
   innerer Wert = e<sup>−<i>r</i><sub>d</sub><i>T</i></sup> · max(<i>F</i> − <i>K</i>, 0)

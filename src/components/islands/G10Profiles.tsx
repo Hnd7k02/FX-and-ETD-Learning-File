@@ -189,7 +189,7 @@ export default function G10Profiles({ lang, initial = 'CHF' }: G10ProfilesProps)
               <span class="g10-detail-key">{t('conv')}</span>
               <span class="g10-detail-val">
                 <span class="g10-detail-line">
-                  <b class="mono">{t('convPair', { pair: conv.pair })}</b>
+                  <b>{t('convPair', { pair: conv.pair })}</b>
                 </span>
                 <span class="g10-detail-line">
                   {t('convDecimals', {

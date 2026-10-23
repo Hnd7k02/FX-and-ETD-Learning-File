@@ -1,8 +1,8 @@
 import MoneynessExplorerFigure from '@/components/figures/MoneynessExplorerFigure.astro';
 
-The importer is free to choose the strike. A higher strike only protects from a higher rate on, but it is cheaper. A lower strike protects sooner and costs more. How far a strike is "in the money" is called **moneyness**.
+The importer is free to choose the strike. A higher strike only starts protecting at a higher rate, but it is cheaper. A lower strike protects sooner and costs more. How far a strike is "in the money" is called **moneyness**.
 
-It is measured against the **forward**, not against spot. The option is only exercised in 3 months, and the fair rate for that day is the forward. An example: a USD call with a strike of <Num of="m04.kMid" /> sits <Num of="m04.kMidSpotPips" /> pips below spot and looks in the money. Against the forward of <Num of="ex.forward" digits={4} />, however, it sits <Num of="m04.kMidOtmPips" /> pips above. It is out of the money.
+It is measured against the **forward**, not against spot. The option is only exercised in 3 months, and the fair rate for that day is the forward. An example: a USD call with a strike of <Num of="m04.kMid" /> sits <Num of="m04.kMidSpotPips" /> pips below spot and looks in the money. Against the forward of <Num of="ex.forward" />, however, it sits <Num of="m04.kMidOtmPips" /> pips above. It is out of the money.
 
 - **ATMF** (at the money forward): strike equal to the forward.
 - **ITM** (in the money): for a call the strike is below the forward, for a put above it.
@@ -12,7 +12,7 @@ It is measured against the **forward**, not against spot. The option is only exe
 
 ### Premium = intrinsic value + time value
 
-The **intrinsic value** is what you can already lock in today: you sell the dollars forward and exercise the call at expiry. That makes F − K per USD certain. So for a call the intrinsic value is max(F − K, 0), discounted to today. The **time value** is the rest. It pays for the chance that the rate still moves in your favour before expiry.
+The **intrinsic value** is what you can already lock in today: you sell the dollars forward and exercise the call at expiry. That makes at least F − K per USD certain. So for a call the intrinsic value is max(F − K, 0), discounted to today. The **time value** is the rest. It pays for the chance that the rate still moves in your favour before expiry.
 
 Three USD calls with 3 months to expiry:
 
@@ -42,7 +42,7 @@ A **European** option can only be exercised on the expiry date, an **American** 
 
 <Derivation title="Derivation: intrinsic value, rule of thumb and strike from delta">
 
-**Intrinsic value against the forward.** If you exercise the call at expiry and sell the dollars forward today, you receive F − K per USD at expiry for certain. Today that is worth, discounted:
+**Intrinsic value against the forward.** If you exercise the call at expiry and sell the dollars forward today, you receive at least F − K per USD at expiry for certain. If the rate then sits below the strike, you buy the dollars for the forward even more cheaply in the market. The certain part, discounted to today, is worth:
 
 <Formula>
   intrinsic value = e<sup>−<i>r</i><sub>d</sub><i>T</i></sup> · max(<i>F</i> − <i>K</i>, 0)

@@ -71,7 +71,7 @@ const lang = pageLang(Astro.currentLocale);
     gap: 4px;
     min-height: 112px;
     min-width: 0;
-    padding: 12px 12px 10px;
+    padding: 12px 10px 10px;
     border: 1px solid var(--ff-line);
     border-radius: var(--ff-r-control);
     background: var(--ff-surface);
@@ -138,9 +138,10 @@ const lang = pageLang(Astro.currentLocale);
   }
   .g10-tend {
     margin-top: auto;
-    padding: 1px 8px;
+    padding: 1px 7px;
     border-radius: var(--ff-r-pill);
-    font-size: 12px;
+    white-space: nowrap;
+    font-size: 11px;
     font-weight: 800;
     line-height: 1.6;
     animation: g10-rise 320ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
@@ -241,14 +242,19 @@ const lang = pageLang(Astro.currentLocale);
   .g10-detail-val b {
     font-weight: 700;
   }
-  .g10-drivers {
+  .g10 .g10-drivers {
     margin: 0;
     padding-left: 18px;
     font-size: 14px;
     line-height: 1.45;
     color: var(--ff-ink);
   }
-  .g10-drivers li + li {
-    margin-top: 2px;
+  .g10 .g10-drivers li {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.45;
+  }
+  .g10 .g10-drivers li + li {
+    margin-top: 3px;
   }
 </style>

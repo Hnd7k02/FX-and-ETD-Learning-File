@@ -156,8 +156,8 @@ export default function MoneynessExplorer(props: MoneynessExplorerProps): JSX.El
     money.label === 'ATMF'
       ? t('mx.atmfText')
       : money.fMinusKPips > 0
-        ? t('mx.above', { pips: fmtNumber(money.fMinusKPips, lang) })
-        : t('mx.below', { pips: fmtNumber(-money.fMinusKPips, lang) });
+        ? t('mx.above', { pips: fmtPips(money.fMinusKPips, lang) })
+        : t('mx.below', { pips: fmtPips(-money.fMinusKPips, lang) });
   const premiumSub = t('mx.premiumSub', {
     chf: fmtMoney(pips(split.price) * 1e-4 * N, EXAMPLE.quote, lang),
     pct: fmtPct(split.pctBase, lang, 2),

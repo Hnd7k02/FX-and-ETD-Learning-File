@@ -27,7 +27,7 @@ import {
   probBeyond,
   sigmaRange,
 } from '@/lib/m01/exposure';
-import { snap, useSvgDrag } from './m01-shared';
+import { inside, snap, useSvgDrag } from './m01-shared';
 
 export interface SpotExposureProps {
   lang: Lang;
@@ -85,7 +85,7 @@ export default function SpotExposure({ lang }: SpotExposureProps): JSX.Element {
   const chf = (x: number, sign = false) => fmtMoney(x, EXAMPLE.quote, lang, 0, sign);
   const bf = chf(BIG_FIGURE * N);
   const today = chf(S0 * N);
-  const far = S > SIGMA[1] || S < SIGMA[0];
+  const far = !inside(S, SIGMA[0], SIGMA[1]);
   const noteKey =
     e.dir === 'flat'
       ? 'note.flat'
@@ -106,11 +106,11 @@ export default function SpotExposure({ lang }: SpotExposureProps): JSX.Element {
   });
 
   const xTicks = useMemo(
-    () => niceTicks(R.min, R.max, L.compact ? 3 : 8).filter((v) => v >= R.min && v <= R.max),
+    () => niceTicks(R.min, R.max, L.compact ? 3 : 8).filter((v) => inside(v, R.min, R.max)),
     [L.compact],
   );
   const yTicks = niceTicks(Y_DOMAIN[0], Y_DOMAIN[1], L.compact ? 4 : 5).filter(
-    (v) => v >= Y_DOMAIN[0] && v <= Y_DOMAIN[1],
+    (v) => inside(v, Y_DOMAIN[0], Y_DOMAIN[1]),
   );
   const fs = `${L.font}px`;
   const x = sx(shownS ?? S);

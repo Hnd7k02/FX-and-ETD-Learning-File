@@ -70,3 +70,8 @@ export function snap(v: number, step: number, lo: number, hi: number): number {
   const c = Math.min(hi, Math.max(lo, s));
   return Math.round(c * 1e8) / 1e8;
 }
+
+/** True if lo ≤ v ≤ hi (a named helper keeps comparison operators out of JSX-like lines). */
+export function inside(v: number, lo: number, hi: number): boolean {
+  return !(v < lo || v > hi);
+}

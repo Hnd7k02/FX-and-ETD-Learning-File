@@ -94,6 +94,45 @@ test('option vs forward: slider and drag move the rate at expiry', async ({ page
   await expect(fig).toHaveAttribute('data-region', 'middle');
 });
 
+test('option vs forward: the saving in the note equals forward minus option as shown', async ({
+  page,
+}) => {
+  await page.goto(path('en', '1'));
+  const fig = page.locator('[data-ovf]');
+  await fig.scrollIntoViewIfNeeded();
+  await hydrateAll(page);
+  await fig.locator('input[type="range"]').focus();
+  await page.keyboard.press('Home');
+  await expect(fig).toHaveAttribute('data-region', 'weakUsd');
+  const chf = (t: string) => Number(t.replace(/[^0-9]/g, ''));
+  const values = await fig.locator('.ff-stat-value').allInnerTexts();
+  const note = await fig.locator('[data-note]').innerText();
+  const saving = chf(note.match(/save (CHF [0-9,]+)/)![1]!);
+  // rows: unhedged, forward, option
+  expect(saving).toBe(chf(values[1]!) - chf(values[2]!));
+});
+
+test('four positions: a break-even dot per card and an aria-label with the values', async ({
+  page,
+}) => {
+  await page.goto(path('de', '2'));
+  const fp = page.locator('[data-four-positions]');
+  await expect(fp.locator('circle.fp-be')).toHaveCount(4);
+  await expect(fp.locator('svg[role="img"]').first()).toHaveAttribute('aria-label', /Break-even/);
+});
+
+test('payoff builder: stat values stay inside the card on phones', async ({ page }) => {
+  await page.goto(path('de', '4'));
+  const pb = page.locator('[data-pb]');
+  await pb.scrollIntoViewIfNeeded();
+  await hydrateAll(page);
+  const table = (await pb.locator('.ff-stat-table').boundingBox())!;
+  for (const v of await pb.locator('.ff-stat-value').all()) {
+    const box = (await v.boundingBox())!;
+    expect(box.x + box.width).toBeLessThanOrEqual(table.x + table.width + 0.5);
+  }
+});
+
 test('payoff builder: templates, view toggle and strike slider', async ({ page }) => {
   await page.goto(path('en', '2'));
   const pb = page.locator('[data-pb]');
@@ -169,6 +208,10 @@ test('moneyness explorer: desk strikes, chip and put switch', async ({ page }) =
   await expect(mx.locator('[data-aha]')).toContainText('25Δ');
   await mx.getByRole('button', { name: 'USD Put' }).click();
   await expect(mx).toHaveAttribute('data-money', 'ITM');
+  // the 10Δ put note is about the put, and says the call with the same strike is deep ITM
+  await mx.locator('[data-marker="p10"]').click();
+  await expect(mx).toHaveAttribute('data-money', 'OTM');
+  await expect(mx.locator('[data-aha]')).toContainText('tief im Geld');
   const slider = mx.locator('input[type="range"]');
   await slider.focus();
   await page.keyboard.press('Home');
