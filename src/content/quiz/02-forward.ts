@@ -410,8 +410,13 @@ const q4: QuizQuestion = {
   correct: 1,
 };
 
+/** Puts the options in a new order (indices into the original list); the answer follows. */
+function reorder(q: QuizQuestion, order: number[]): QuizQuestion {
+  return { ...q, options: order.map((i) => q.options[i]!), correct: order.indexOf(q.correct) };
+}
+
 export const quiz: ModuleQuiz = {
   slug: '02-forward',
-  quiz: [q1, q2, q3, q4],
-  checks: { '1': check1, '2': check2, '3': check3, '4': check4 },
+  quiz: [q1, q2, reorder(q3, [0, 2, 3, 1]), reorder(q4, [0, 2, 1, 3])],
+  checks: { '1': reorder(check1, [0, 2, 3, 1]), '2': check2, '3': check3, '4': check4 },
 };
