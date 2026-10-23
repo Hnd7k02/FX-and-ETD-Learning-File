@@ -137,7 +137,7 @@ export default function CashCarryCalculator({ lang }: CashCarryCalculatorProps):
   const react = () => {
     if (dir === 'none') return;
     setReacted(dir);
-    play.pause();
+    play.seek(order.length); // show every step while the profit melts away
     if (rm) {
       setMarketRaw(FAIR);
       setDraft(fmtRate(FAIR, PAIR, FD));

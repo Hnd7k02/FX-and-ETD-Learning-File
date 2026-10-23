@@ -132,11 +132,11 @@ export default function HedgeOutcome({ lang }: HedgeOutcomeProps): JSX.Element {
   const yF = yChf(N * F);
   const xF = sx(F);
 
-  const yTicks = niceTicks(H.yDomain[0], H.yDomain[1], L.compact ? 4 : 5).filter(
-    (v) => inside(v, H.yDomain[0], H.yDomain[1]),
+  const yTicks = niceTicks(H.yDomain[0], H.yDomain[1], L.compact ? 4 : 5).filter((v) =>
+    inside(v, H.yDomain[0], H.yDomain[1]),
   );
-  const xTicks = niceTicks(H.stRange[0], H.stRange[1], L.compact ? 4 : 6).filter(
-    (v) => inside(v, H.stRange[0] + 1e-9, H.stRange[1] - 1e-9),
+  const xTicks = niceTicks(H.stRange[0], H.stRange[1], L.compact ? 4 : 6).filter((v) =>
+    inside(v, H.stRange[0] + 1e-9, H.stRange[1] - 1e-9),
   );
 
   // Verdict bracket label: right of the guide, or left near the strip.

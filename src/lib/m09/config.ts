@@ -56,15 +56,25 @@ export const M09_CONFIG = {
   /** Orders in the matrix cards (section 2 text): example levels relative to spot. Choice. */
   orders: { limitBelow: 0.01, stopAbove: 0.01 },
 
-  /** Discount certificate on USD (section 4): cap and tenor. Choice: cap at spot, 3 months. */
-  discount: { capFactor: 1, T: EXAMPLE.T, days: EXAMPLE.mmDays },
+  /**
+   * Yield products (section 4, CarryCushion and the matrix cards): one strike for the dual
+   * currency investment and the cap of the discount certificate, so the two "twins" can be
+   * compared. Choice: 1 % below spot (as the DCI default of module 08), 3 months.
+   */
+  yieldProducts: { strikeBelow: 0.01, months: EXAMPLE.months },
 
   /**
-   * CarryCushion (section 4): a CHF investor buys USD 1 Mio. at spot, deposits them at the USD
-   * rate and compares with a CHF deposit. Money market Act/360, simple rates.
+   * CarryCushion (section 4): a CHF investor takes USD exposure for n months and compares the
+   * result with a CHF deposit of the same amount. Three steps on one axis:
+   *   1 carry      buy USD spot, deposit at the USD rate (= a long forward),
+   *   2 discount   + a sold USD call at the cap (discount certificate),
+   *   3 dci        the same curve read as CHF deposit + sold USD put (dual currency).
+   * Money market Act/360 with simple rates; the options are priced off the same discount
+   * factors (continuous-equivalent rates), so carry, forward and options share ONE forward.
+   * Choice: option time T = months / 12 (3 months = 0.25 = EXAMPLE.T).
    */
   carry: {
-    /** USD amount bought at spot (the example notional). */
+    /** USD exposure (the example notional). */
     notionalBase: EXAMPLE.notional,
     /** Tenor slider in months. */
     months: { min: 1, max: 12, step: 1, initial: EXAMPLE.months },
@@ -75,8 +85,10 @@ export const M09_CONFIG = {
     daysPerMonth: 30,
     /** USD rate slider (simple p.a.); CHF rate stays at the example's rd. */
     usdRate: { min: 0, max: 0.06, step: 0.0025 },
-    /** Vol slider for the 1σ ruler (decimal). */
+    /** Vol slider for the 1σ band and the option premium (decimal). */
     vol: { min: 0.04, max: 0.16, step: 0.005 },
+    /** Strike / cap slider: distance below spot (fraction), steps 2 and 3. */
+    strikeBelow: { min: 0, max: 0.04, step: 0.0025 },
     /** Chart range of S_T relative to spot (±10 %). */
     xRange: [-0.1, 0.1] as const,
     fixingStep: 0.0005,
@@ -86,8 +98,18 @@ export const M09_CONFIG = {
     playMs: 6000,
   },
 
-  /** Product matrix sparklines (section 1): x range relative to spot and the y clip in pips. */
-  matrix: { xRange: [-0.0625, 0.0625] as const, samples: 64, clipPips: 900 },
+  /**
+   * ProductMatrix (sections 1 and 3): chart range of S_T relative to spot, samples per curve
+   * and the y range in pips per USD (curves beyond it are clipped and marked "nicht begrenzt").
+   */
+  matrix: {
+    xRange: [-0.0625, 0.0625] as const,
+    samples: 120,
+    clipPips: 900,
+    fixingStep: 0.0005,
+    /** S_T shown first: the importer's fear, a dollar 3 % stronger. Choice. */
+    initialMove: 0.03,
+  },
 } as const;
 
 /** The example market in the payoff-builder format (module 06 templates). */

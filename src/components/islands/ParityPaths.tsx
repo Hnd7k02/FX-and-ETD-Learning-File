@@ -225,7 +225,8 @@ export default function ParityPaths({ lang }: ParityPathsProps): JSX.Element {
       ? t('pp.band.termRun', { day: Math.round(fr.day), days })
       : t('pp.band.term', { days });
   const dayFrac = days > 0 ? fr.day / days : 0;
-  const dotY = L.termY + (L.maturityY - L.termY) * dayFrac;
+  // The dot runs between the two band chips (22 px tall), never over their labels.
+  const dotY = L.termY + 16 + (L.maturityY - L.termY - 32) * dayFrac;
   const balanceShown = S.B3.state === 'done';
   const resultOn = S.result.state !== 'todo';
 

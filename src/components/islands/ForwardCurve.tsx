@@ -122,8 +122,8 @@ export default function ForwardCurve({ lang }: ForwardCurveProps): JSX.Element {
   const fs = `${L.font}px`;
   const xs = TENORS.map((tn) => sx(tn.days));
   const keep = new Set(visibleLabels(xs, L.font * 2.6));
-  const yTicks = niceTicks(dom[0], dom[1], L.compact ? 4 : 6).filter(
-    (v) => inside(v, dom[0] - 1e-9, dom[1] + 1e-9),
+  const yTicks = niceTicks(dom[0], dom[1], L.compact ? 4 : 6).filter((v) =>
+    inside(v, dom[0] - 1e-9, dom[1] + 1e-9),
   );
 
   const netLine = linePath([
@@ -449,7 +449,7 @@ export default function ForwardCurve({ lang }: ForwardCurveProps): JSX.Element {
             <span class="m2-small">{t('fc.prem.sub', { diff: pct(rd - rf, 2, true) })}</span>
           </div>
           <div class="sr-only" aria-live="polite" aria-atomic="true">
-            {`${t(chipKey)}. ${selText}, ${selFwd}.`}
+            {sliding || drag.dragging ? '' : `${t(chipKey)}. ${selText}, ${selFwd}.`}
           </div>
         </div>
       </div>
