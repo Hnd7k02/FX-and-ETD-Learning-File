@@ -703,7 +703,17 @@ export default function ParityPaths({ lang }: ParityPathsProps): JSX.Element {
           <div class="m2-box" data-cont>
             <div class="m2-box-head">
               <b>{t('pp.cont.title')}</b>
-              <span>{t('pp.cont.sub', { t: fmtNumber(r.tq, lang, { digits: 4 }) })}</span>
+              <span>
+                <span class="math">
+                  <i>S</i> · e
+                  <sup>
+                    (<i>r</i>
+                    <sub>CHF</sub> − <i>r</i>
+                    <sub>USD</sub>) · <i>t</i>
+                  </sup>
+                </span>
+                , {t('pp.cont.sub', { t: fmtNumber(r.tq, lang, { digits: 4 }) })}
+              </span>
             </div>
             <dl class="m2-dl">
               <div>
@@ -713,7 +723,7 @@ export default function ParityPaths({ lang }: ParityPathsProps): JSX.Element {
               <div>
                 <dt>{t('pp.cont.diff')}</dt>
                 <dd class="mono">
-                  {t('pp.cont.diffVal', { pips: fmtPips(r.diffPips, lang, 2, true) })}
+                  {t('pp.cont.diffVal', { pips: fmtPips(r.diffPips, lang, 1, true) })}
                 </dd>
               </div>
             </dl>

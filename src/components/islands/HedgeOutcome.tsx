@@ -139,11 +139,24 @@ export default function HedgeOutcome({ lang }: HedgeOutcomeProps): JSX.Element {
     inside(v, H.stRange[0] + 1e-9, H.stRange[1] - 1e-9),
   );
 
-  // Verdict bracket label: right of the guide, or left near the strip.
+  // Verdict bracket label on the side where the orange line moves away from it: right of the
+  // guide when the forward saves (the line rises to the right), left when it costs (the line
+  // falls to the left). Falls back to the other side if there is no room.
   const diffLabel = chf(Math.abs(shownDiff));
   const labelW = textWidth(diffLabel, L.font + 1) + 8;
-  const labelLeft = x + 12 + labelW > L.plotRight;
+  const fitsRight = x + 12 + labelW <= L.plotRight;
+  const fitsLeft = x - 12 - labelW >= L.left;
+  const labelLeft = verdict === 'costs' ? fitsLeft || !fitsRight : !fitsRight;
   const yMid = (yU + yF) / 2;
+
+  // Strip headers: centred over their columns unless they would collide, then pushed apart.
+  const headU = t('ho.strip.unhedged');
+  const headH = t('ho.strip.hedged');
+  const wU = textWidth(headU, L.font);
+  const wH = textWidth(headH, L.font);
+  const headsCollide = L.stripU + wU / 2 + 6 > L.stripH - wH / 2;
+  const headUX = headsCollide ? L.stripSep + 3 + wU / 2 : L.stripU;
+  const headHX = headsCollide ? L.width - 1 - wH / 2 : L.stripH;
 
   // Aha after a full run of all scenarios.
   const aha = play.done && shown === SC.count && play.started;
@@ -313,20 +326,20 @@ export default function HedgeOutcome({ lang }: HedgeOutcomeProps): JSX.Element {
               {/* strips: unhedged spread vs forward point */}
               <path d={`M${L.stripSep},${L.top - 6}V${L.plotBottom}`} class="m2-grid" />
               <text
-                x={L.stripU}
+                x={headUX}
                 y={L.top - 18}
                 class="m2-axis-title"
                 style={{ fontSize: fs, textAnchor: 'middle' }}
               >
-                {t('ho.strip.unhedged')}
+                {headU}
               </text>
               <text
-                x={L.stripH}
+                x={headHX}
                 y={L.top - 18}
                 class="m2-axis-title"
                 style={{ fontSize: fs, textAnchor: 'middle' }}
               >
-                {t('ho.strip.hedged')}
+                {headH}
               </text>
               {shown > 1 && (
                 <path

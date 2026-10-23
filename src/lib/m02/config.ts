@@ -105,6 +105,11 @@ export const M02_CONFIG = {
     ] as Tenor[],
     /** Tenor selected at start. */
     defaultTenor: '3M',
+    /**
+     * Order in which x labels are kept when they do not all fit (phones): the tenors the text
+     * names first, 1W and 2M only if there is room. The selected tenor always shows.
+     */
+    labelPriority: ['1M', '3M', '6M', '1Y', '9M', '1W', '2M'] as const,
     /** Slider ranges of the two rates (choice). */
     rateRange: [-0.01, 0.06] as [number, number],
     rateStep: 0.0005,

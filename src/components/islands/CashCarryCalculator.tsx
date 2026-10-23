@@ -158,6 +158,8 @@ export default function CashCarryCalculator({ lang }: CashCarryCalculatorProps):
   const money = (x: number, ccy: string, sign = true) => fmtMoney(x, ccy, lang, 0, sign);
   const notional = fmtMillions(N, '', lang).trim();
   const pipsTxt = (x: number) => fmtPips(x, lang, 1, true);
+  /** Size of the mispricing without sign; "too dear"/"too cheap" already says the direction. */
+  const pipsAbs = (x: number) => fmtPips(Math.abs(x), lang, 1);
   const gapPips = r.mispricingPips;
 
   // ---------- ruler ----------
@@ -167,7 +169,7 @@ export default function CashCarryCalculator({ lang }: CashCarryCalculatorProps):
   const ticks: number[] = [];
   for (let p = -span; p <= span + 1e-9; p += 10) ticks.push(Math.round(p));
   const labelTicks = ticks.filter((p) => p % (L.compact ? 50 : 25) === 0);
-  const gapLabel = t('cc.ruler.gap', { pips: pipsTxt(gapPips), chf: chf(r.profitQuote) });
+  const gapLabel = t('cc.ruler.gap', { pips: pipsAbs(gapPips), chf: chf(r.profitQuote) });
   const gapW = textWidth(gapLabel, L.font + 1);
   const gapX = clamp((x0 + xm) / 2, L.pad + gapW / 2, L.width - L.pad - gapW / 2);
   const mTxt = fmtRate(market, PAIR, FD);
@@ -195,7 +197,8 @@ export default function CashCarryCalculator({ lang }: CashCarryCalculatorProps):
       ? fmtPct(s.rate, lang, 2)
       : fmtRate(s.rate, PAIR, s.key.includes('Spot') ? 4 : FD);
   };
-  const ccyClass = (ccy: string) => (ccy === M.base ? 'is-usd' : 'is-chf');
+  /** Colour by direction, as in module 03: received blue, paid orange, zero neutral. */
+  const flowClass = (amount: number) => (amount > 0.5 ? 'is-in' : amount < -0.5 ? 'is-out' : '');
 
   const stepItem = (s: CarryStep, n: number) => {
     const on = revealed(s.key);
@@ -211,7 +214,7 @@ export default function CashCarryCalculator({ lang }: CashCarryCalculatorProps):
           <span class="cc-text">{t(`cc.step.${s.key}`, { rate: rateText(s), notional })}</span>
           <span class={`cc-amts${s.cashflow ? '' : ' is-contract'}`}>
             {flows.map((f) => (
-              <span key={f.ccy} class={`cc-amt mono ${ccyClass(f.ccy)}`}>
+              <span key={f.ccy} class={`cc-amt mono ${flowClass(f.amount)}`}>
                 {on ? money(f.amount, f.ccy) : '–'}
               </span>
             ))}
@@ -232,7 +235,7 @@ export default function CashCarryCalculator({ lang }: CashCarryCalculatorProps):
       <span class="cc-net-label">{label}</span>
       <span class="cc-net-vals mono">
         {[M.base, M.quote].map((ccy) => (
-          <span key={ccy} class={ccyClass(ccy)}>
+          <span key={ccy} class={flowClass(flows[ccy] ?? 0)}>
             {visible ? money(flows[ccy] ?? 0, ccy) : '–'}
           </span>
         ))}
@@ -260,7 +263,7 @@ export default function CashCarryCalculator({ lang }: CashCarryCalculatorProps):
           </div>
         </div>
         <span class={`m2-chip ${dir === 'none' ? 'is-good' : 'is-warn'}`} data-chip>
-          {t(chipKey, { pips: pipsTxt(gapPips) })}
+          {t(chipKey, { pips: pipsAbs(gapPips) })}
         </span>
       </div>
       <div class="ff-lab">
@@ -468,7 +471,7 @@ export default function CashCarryCalculator({ lang }: CashCarryCalculatorProps):
             <StatRow
               label={t('cc.row.gap')}
               sub={t('cc.row.gapSub')}
-              value={pipsTxt(gapPips)}
+              value={t('cc.row.gapVal', { pips: pipsTxt(gapPips) })}
               highlight
             />
           </StatTable>
@@ -478,11 +481,13 @@ export default function CashCarryCalculator({ lang }: CashCarryCalculatorProps):
           >
             <StatHero
               label={t('cc.profit')}
-              value={dir === 'none' ? chf(0) : chf(profitOn ? profitShown : 0, true)}
+              value={dir === 'none' ? chf(0) : profitOn ? chf(profitShown, true) : '–'}
               sub={
                 dir === 'none'
                   ? t('cc.profitNone')
-                  : t('cc.profitSub', { pv: chf(r.profitPresentValue) })
+                  : profitOn
+                    ? t('cc.profitSub', { pv: chf(r.profitPresentValue) })
+                    : undefined
               }
             />
           </div>

@@ -3,6 +3,7 @@
  * Shared styles of the module 02 figures (HedgeOutcome, ParityPaths, ForwardCurve,
  * CashCarryCalculator). Every figure wrapper renders this component; Astro includes the styles
  * once per page. Colour semantics: unhedged / cost orange, forward black, benefit / long blue,
+ * cash flows received blue and paid orange (as in module 03),
  * "forward saves" and profit green, "chance given up" amber. Animations are transform-only and
  * switched off under prefers-reduced-motion.
  */
@@ -876,12 +877,13 @@
     font-weight: 700;
     white-space: nowrap;
   }
-  .cc-amt.is-usd,
-  .cc-net-vals .is-usd {
+  /* Cash flows: received blue, paid orange (as in module 03), zero in ink. */
+  .cc-amt.is-in,
+  .cc-net-vals .is-in {
     color: var(--ff-linear-text);
   }
-  .cc-amt.is-chf,
-  .cc-net-vals .is-chf {
+  .cc-amt.is-out,
+  .cc-net-vals .is-out {
     color: var(--ff-exotics-text);
   }
   .cc-step.is-todo .cc-amt {
@@ -921,7 +923,7 @@
   .cc-net.is-todo .cc-net-vals span {
     color: var(--ff-muted);
   }
-  .cc-none {
+  .m2 .cc-none {
     padding: 14px 16px;
     border-radius: var(--ff-r-box);
     background: var(--ff-good-soft);

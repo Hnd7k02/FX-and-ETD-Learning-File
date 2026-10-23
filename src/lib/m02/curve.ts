@@ -102,6 +102,32 @@ export function visibleLabels(xs: readonly number[], minGap: number): number[] {
   return keep;
 }
 
+/**
+ * Indices of the x labels that fit, chosen by priority: the selected tenor first, then the ids in
+ * `priority` order, then all others left to right. A label is kept only if it sits at least
+ * `minGap` away from every label already kept. Returned in ascending order.
+ */
+export function visibleLabelsByPriority(
+  xs: readonly number[],
+  ids: readonly string[],
+  minGap: number,
+  priority: readonly string[] = [],
+  selected = -1,
+): number[] {
+  const order: number[] = [];
+  const push = (i: number) => {
+    if (i >= 0 && i < xs.length && !order.includes(i)) order.push(i);
+  };
+  push(selected);
+  for (const id of priority) push(ids.indexOf(id));
+  xs.forEach((_, i) => push(i));
+  const keep: number[] = [];
+  for (const i of order) {
+    if (keep.every((k) => Math.abs(xs[k]! - xs[i]!) >= minGap)) keep.push(i);
+  }
+  return keep.sort((a, b) => a - b);
+}
+
 /** Id of the preset whose rates match (within half a slider step), or null. */
 export function matchPreset(
   rd: number,

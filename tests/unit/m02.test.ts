@@ -37,6 +37,7 @@ import {
   pointsApprox,
   premiumWording,
   visibleLabels,
+  visibleLabelsByPriority,
 } from '@/lib/m02/curve';
 import {
   CARRY_MARKET,
@@ -251,6 +252,18 @@ describe('m02 forward curve', () => {
     expect(visibleLabels([0, 5, 30, 60, 62], 20)).toEqual([0, 2, 4]);
     expect(visibleLabels([0, 40, 80], 20)).toEqual([0, 1, 2]);
     expect(visibleLabels([], 20)).toEqual([]);
+  });
+
+  it('keeps the selected and the named tenors first when labels collide', () => {
+    const ids = ['1W', '1M', '2M', '3M'];
+    const xs = [0, 15, 30, 45];
+    // 1M and 3M by priority; 1W and 2M are too close to them.
+    expect(visibleLabelsByPriority(xs, ids, 20, ['1M', '3M'])).toEqual([1, 3]);
+    // The selected tenor wins over the priority list.
+    expect(visibleLabelsByPriority(xs, ids, 20, ['1M', '3M'], 0)).toEqual([0, 3]);
+    // Everything fits: all labels in order.
+    expect(visibleLabelsByPriority(xs, ids, 10, ['3M'])).toEqual([0, 1, 2, 3]);
+    expect(visibleLabelsByPriority([], [], 10)).toEqual([]);
   });
 });
 

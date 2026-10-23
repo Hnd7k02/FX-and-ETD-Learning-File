@@ -156,7 +156,8 @@ test('CashCarryCalculator: typed forward, both directions, the market closes the
   await input.press('Enter');
   await expect(fig).toHaveAttribute('data-dir', 'cheap');
   await expect(fig.locator('[data-key="buyBaseForward"]')).toBeVisible();
-  await expect(fig.locator('[data-chip]')).toContainText('−10.0');
+  await expect(fig.locator('[data-chip]')).toContainText('10.0');
+  await expect(fig.locator('[data-chip]')).not.toContainText('−');
   await fig.locator('[data-reset]').click();
   await expect(fig).toHaveAttribute('data-dir', 'rich');
   await expect

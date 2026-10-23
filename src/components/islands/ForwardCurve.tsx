@@ -26,7 +26,7 @@ import {
   matchPreset,
   nearestTenor,
   premiumWording,
-  visibleLabels,
+  visibleLabelsByPriority,
 } from '@/lib/m02/curve';
 import { textWidth } from '@/lib/m02/text';
 import { useDragX, useSliderDrag } from './m02-shared';
@@ -117,11 +117,22 @@ export default function ForwardCurve({ lang }: ForwardCurveProps): JSX.Element {
 
   const pips = (x: number, sign = true) => fmtPips(x, lang, 1, sign);
   const pct = (x: number, digits = 2, sign = false) => fmtPct(x, lang, digits, sign);
-  /** Rate difference with sign and the forward's decimals, e.g. "−0.00694". */
-  const signed = (x: number) => fmtNumber(x, lang, { digits: FD, sign: true });
+  /**
+   * Cost and benefit in rate units with the forward's decimals and their natural sign, so the
+   * rows read "Spot + Cost − Benefit = Forward" (e.g. 0.80000 + 0.00000 − 0.00694 = 0.79306).
+   */
+  const plain = (x: number) => fmtNumber(x, lang, { digits: FD });
   const fs = `${L.font}px`;
   const xs = TENORS.map((tn) => sx(tn.days));
-  const keep = new Set(visibleLabels(xs, L.font * 2.6));
+  const keep = new Set(
+    visibleLabelsByPriority(
+      xs,
+      TENORS.map((tn) => tn.id),
+      L.font * 2.6,
+      CC.labelPriority,
+      sel,
+    ),
+  );
   const yTicks = niceTicks(dom[0], dom[1], L.compact ? 4 : 6).filter((v) =>
     inside(v, dom[0] - 1e-9, dom[1] + 1e-9),
   );
@@ -157,6 +168,8 @@ export default function ForwardCurve({ lang }: ForwardCurveProps): JSX.Element {
         ? 'fc.insight.discount'
         : 'fc.insight.flat';
   const preset = matchPreset(rd, rf);
+  /** Annualised premium shown as a positive "Abschlag"/"Aufschlag"; tiny float noise is flat. */
+  const isDiscount = cur.premiumPa < -1e-9;
   const choosePreset = (id: string) => {
     const p = CC.presets.find((x) => x.id === id);
     if (!p) return;
@@ -309,7 +322,7 @@ export default function ForwardCurve({ lang }: ForwardCurveProps): JSX.Element {
 
               {/* x labels */}
               {TENORS.map((tn, i) =>
-                keep.has(i) || i === sel ? (
+                keep.has(i) ? (
                   <text
                     key={tn.id}
                     x={xs[i]}
@@ -351,8 +364,8 @@ export default function ForwardCurve({ lang }: ForwardCurveProps): JSX.Element {
               {pts.map((p) => (
                 <tr key={p.id}>
                   <th scope="row">{p.id}</th>
-                  <td>{pips(p.costPips)}</td>
-                  <td>{pips(-p.benefitPips)}</td>
+                  <td>{pips(p.costPips, false)}</td>
+                  <td>{pips(p.benefitPips, false)}</td>
                   <td>{pips(p.points)}</td>
                   <td>{fmtRate(p.forward, PAIR, FD)}</td>
                 </tr>
@@ -421,16 +434,16 @@ export default function ForwardCurve({ lang }: ForwardCurveProps): JSX.Element {
             <StatRow
               symbol={<span aria-hidden="true" class="m2-sq" style={{ background: COLOR.cost }} />}
               label={t('fc.eq.cost')}
-              sub={t('fc.eq.costSub', { pips: pips(cur.costPips) })}
-              value={signed(cur.costPips * PIP)}
+              sub={t('fc.eq.costSub', { pips: pips(cur.costPips, false) })}
+              value={plain(cur.costPips * PIP)}
             />
             <StatRow
               symbol={
                 <span aria-hidden="true" class="m2-sq" style={{ background: COLOR.benefit }} />
               }
               label={t('fc.eq.benefit')}
-              sub={t('fc.eq.benefitSub', { pips: pips(-cur.benefitPips) })}
-              value={signed(-cur.benefitPips * PIP)}
+              sub={t('fc.eq.benefitSub', { pips: pips(cur.benefitPips, false) })}
+              value={plain(cur.benefitPips * PIP)}
             />
             <StatRow
               label={t('fc.eq.fwd')}
@@ -442,11 +455,15 @@ export default function ForwardCurve({ lang }: ForwardCurveProps): JSX.Element {
           <div class="m2-box" data-prem>
             <dl class="m2-dl">
               <div>
-                <dt>{cur.premiumPa < 0 ? t('fc.prem.labelNeg') : t('fc.prem.label')}</dt>
-                <dd class="mono">{pct(cur.premiumPa, 2, true)}</dd>
+                <dt>{isDiscount ? t('fc.prem.labelNeg') : t('fc.prem.label')}</dt>
+                <dd class="mono">{pct(Math.abs(cur.premiumPa), 2)}</dd>
               </div>
             </dl>
-            <span class="m2-small">{t('fc.prem.sub', { diff: pct(rd - rf, 2, true) })}</span>
+            <span class="m2-small">
+              {isDiscount
+                ? t('fc.prem.subNeg', { diff: pct(rf - rd, 2) })
+                : t('fc.prem.sub', { diff: pct(rd - rf, 2) })}
+            </span>
           </div>
           <div class="sr-only" aria-live="polite" aria-atomic="true">
             {sliding || drag.dragging ? '' : `${t(chipKey)}. ${selText}, ${selFwd}.`}
