@@ -435,6 +435,7 @@ export default function BarrierLab({ lang, initial }: BarrierLabProps): JSX.Elem
               {t(s.io === 'out' ? 'bl.zone.out' : 'bl.zone.in')}
             </text>
             <g class="m7-handle" transform={`translate(${bx.toFixed(1)},${LV.top - 2})`}>
+              <circle r={22} class="m7-handle-hit" />
               <circle r={dragV.active === 'barrier' ? 11 : 9} class="m7-handle-dot" />
               <path d="M-2.5,-3.5V3.5M0.5,-3.5V3.5M3.5,-3.5V3.5" class="m7-handle-grip" />
             </g>

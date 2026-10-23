@@ -294,11 +294,13 @@ export default function BarrierPaths({ lang }: BarrierPathsProps): JSX.Element {
             {/* spot today */}
             <circle cx={x(0)} cy={y(S)} r={4.5} class="m7-spot" />
             {/* barrier with handle */}
+            <rect x={x0} y={by - 12} width={x1 - x0} height={24} class="m7-hitband" />
             <path d={`M${x0},${by.toFixed(1)}H${x1}`} class="m7-barrier" />
             <text x={x0 + 8} y={dir === 'up' ? by - 7 : by + 16} class="m7-barrier-label">
               {t('bp.label.barrier', { v: rate(barrier) })}
             </text>
             <g class="m7-handle" transform={`translate(${x1 + 10},${by.toFixed(1)})`}>
+              <circle r={22} class="m7-handle-hit" />
               <circle r={drag.active ? 11 : 9} class="m7-handle-dot" />
               <path d="M-3.5,-2.5H3.5M-3.5,0.5H3.5M-3.5,3.5H3.5" class="m7-handle-grip" />
             </g>

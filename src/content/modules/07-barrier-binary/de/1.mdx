@@ -17,11 +17,11 @@ Beides macht die Option billiger. Du kaufst nicht mehr alle Szenarien, sondern n
 
 Liegt die Barriere <Num of="m07.barrierPct" /> über dem Spot, also bei <Num of="m07.barrierUp" />, kostet der **Up-and-out Call** nur <Num of="m07.uocPips" /> Pips statt <Num of="m07.vanillaPips" />. Er ist rund <Num of="m07.uocDiscount" /> billiger. Liegt die Barriere gleich weit darunter, bei <Num of="m07.barrierDown" />, kostet der **Down-and-out Call** <Num of="m07.docPips" /> Pips. Das ist nur <Num of="m07.docDiscount" /> weniger.
 
-| Option, Strike <Num of="ex.strike" /> | Barriere | Preis | Auf USD 1 Mio. | Barriere berührt mit |
-| --- | --- | --- | --- | --- |
-| Vanilla Call | keine | <Num of="m07.vanillaPips" /> Pips | <Num of="ex.callChf" /> | – |
-| Up-and-out Call | <Num of="m07.barrierUp" /> | <Num of="m07.uocPips" /> Pips | <Num of="m07.uocChf" /> | <Num of="m07.touchUp" /> |
-| Down-and-out Call | <Num of="m07.barrierDown" /> | <Num of="m07.docPips" /> Pips | <Num of="m07.docChf" /> | <Num of="m07.touchDown" /> |
+| Option, Strike <Num of="ex.strike" /> | Barriere | Preis | Berührt mit |
+| --- | --- | --- | --- |
+| Vanilla Call | keine | <Num of="m07.vanillaPips" /> Pips · <Num of="ex.callChf" /> | – |
+| Up-and-out Call | <Num of="m07.barrierUp" /> | <Num of="m07.uocPips" /> Pips · <Num of="m07.uocChf" /> | <Num of="m07.touchUp" /> |
+| Down-and-out Call | <Num of="m07.barrierDown" /> | <Num of="m07.docPips" /> Pips · <Num of="m07.docChf" /> | <Num of="m07.touchDown" /> |
 
 Warum dieser Unterschied? Unten wird die Barriere sogar öfter berührt als oben. Entscheidend ist aber, *welche* Szenarien wegfallen. Der Down-and-out Call verschwindet, wenn der Dollar fällt. Dann wäre er ohnehin wenig wert, und der Importeur kauft seine Dollar billiger am Markt. Der Up-and-out Call verschwindet genau dann, wenn der Dollar stark steigt. Das sind die Szenarien, für die der Importeur den Schutz überhaupt kauft.
 

@@ -238,11 +238,13 @@ export default function TouchLab({ lang, mc, initialMode }: TouchLabProps): JSX.
           height={above ? Math.max(0, yy - LT.top) : Math.max(0, LT.height - LT.bottom - yy)}
           class="m7-zone"
         />
+        <rect x={x0} y={yy - 12} width={x1 - x0} height={24} class="m7-hitband" />
         <path d={`M${x0},${yy.toFixed(1)}H${x1}`} class="m7-barrier" />
         <text x={x0 + 8} y={above ? yy - 7 : yy + 16} class="m7-barrier-label">
           {t('tl.ref.barrier', { v: rate(v) })}
         </text>
         <g class="m7-handle" transform={`translate(${x1 + 10},${yy.toFixed(1)})`}>
+          <circle r={22} class="m7-handle-hit" />
           <circle r={dragTop.active === key ? 11 : 9} class="m7-handle-dot" />
           <path d="M-3.5,-2.5H3.5M-3.5,0.5H3.5M-3.5,3.5H3.5" class="m7-handle-grip" />
         </g>
@@ -288,6 +290,7 @@ export default function TouchLab({ lang, mc, initialMode }: TouchLabProps): JSX.
           {t('tl.ref.strike', { v: rate(s.strike) })}
         </text>
         <g class="m7-handle" transform={`translate(${kx.toFixed(1)},${LT.top - 2})`}>
+          <circle r={22} class="m7-handle-hit" />
           <circle r={dragTop.active === 'strike' ? 11 : 9} class="m7-handle-dot" />
           <path d="M-2.5,-3.5V3.5M0.5,-3.5V3.5M3.5,-3.5V3.5" class="m7-handle-grip" />
         </g>

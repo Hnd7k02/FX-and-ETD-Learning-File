@@ -114,6 +114,15 @@ export const payoff = defineDict({
       '{position}: Nettoprämie {premium} ({chf}). Max. Gewinn bei Verfall {gain}, max. Verlust {loss}, Break-even {be}. Delta {delta}.',
     'pb.live.zero': 'Zero Cost erreicht: Die Nettoprämie ist null.',
     'pb.live.lost': 'Nettoprämie {premium}.',
+    'pb.solved': 'Zero Cost bei {k}',
+    'pb.lg.valueVol': 'Wert heute, Vola {vol}',
+    'pb.lg.pnlTodayVol': 'G&V heute, Vola {vol}',
+    'pb.shock': 'Implizite Vola heute',
+    'pb.shockValue': '{vol} ({shift} Pkt.)',
+    'pb.shockHint':
+      'Schieb die Vola: Der blaue Wert heute wird neu gerechnet, die bezahlte Prämie bleibt.',
+    'pb.shockGain': 'Spot unverändert: Die Position gewinnt {chf}, nur weil die Vola sich bewegt.',
+    'pb.shockLoss': 'Spot unverändert: Die Position verliert {chf}, nur weil die Vola sich bewegt.',
   },
   en: {
     'pb.title': 'Payoff builder',
@@ -224,5 +233,14 @@ export const payoff = defineDict({
       '{position}: net premium {premium} ({chf}). Max. gain at expiry {gain}, max. loss {loss}, break-even {be}. Delta {delta}.',
     'pb.live.zero': 'Zero cost reached: the net premium is zero.',
     'pb.live.lost': 'Net premium {premium}.',
+    'pb.solved': 'Zero cost at {k}',
+    'pb.lg.valueVol': 'Value today, vol {vol}',
+    'pb.lg.pnlTodayVol': 'P&L today, vol {vol}',
+    'pb.shock': 'Implied vol today',
+    'pb.shockValue': '{vol} ({shift} pts)',
+    'pb.shockHint':
+      'Move the vol: the blue value today is repriced, the premium you paid stays the same.',
+    'pb.shockGain': 'Spot unchanged: the position gains {chf} just because the vol moves.',
+    'pb.shockLoss': 'Spot unchanged: the position loses {chf} just because the vol moves.',
   },
 });

@@ -237,6 +237,17 @@
   }
   .m7-handle {
     cursor: grab;
+    touch-action: none;
+  }
+  /* Invisible touch targets: 44 px around each handle, a 24 px band along horizontal barriers.
+     touch-action: none lets a finger drag them vertically instead of scrolling the page. */
+  .m7-handle-hit,
+  .m7-hitband {
+    fill: transparent;
+    touch-action: none;
+  }
+  .m7-hitband {
+    cursor: ns-resize;
   }
   .m7-handle-dot {
     fill: var(--ff-exotics);
@@ -587,6 +598,7 @@
   }
   .m7-bar .is-ki {
     background: var(--ff-short);
+    color: var(--ff-ink);
   }
   .m7-bar .is-van {
     background: var(--ff-ink);

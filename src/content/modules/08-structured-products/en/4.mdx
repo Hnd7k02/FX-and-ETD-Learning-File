@@ -1,0 +1,85 @@
+import PathSimulatorFigure from '@/components/figures/PathSimulatorFigure.astro';
+import StructureBlocksFigure from '@/components/figures/StructureBlocksFigure.astro';
+import DciCalculatorFigure from '@/components/figures/DciCalculatorFigure.astro';
+
+{/* 08 Structured products · Section 4 · TPF, RTPF and dual currency. Numbers only via <Num />, registry src/lib/nums/m08.ts. */}
+
+So far this module has been about a better rate. TPF and RTPF trade the rate for a **coupon**: a fixed amount per fixing for as long as the rate plays along. Nothing is bought or sold. Only coupons and settlement payments in CHF change hands.
+
+- **TPF (directional):** if the fixing is at or above the strike <Num of="m08.tpfStrike" /> (spot <Num of="m08.tpfStrikeVsSpot" />), you receive <Num of="m08.tpfCoupon" /> pips on <Num of="m08.tpfNotional" />, that is <Num of="m08.tpfCouponChf" />. Below it you pay twice the difference to the strike. After <Num of="m08.tpfTargetCoupons" /> coupons it ends.
+- **RTPF (range):** the coupon of <Num of="m08.rtpfCoupon" /> pips (<Num of="m08.rtpfCouponChf" />) is paid as long as the fixing lies between <Num of="m08.rtpfLower" /> and <Num of="m08.rtpfUpper" />. Outside the range you pay twice the distance to it.
+
+In building blocks: the TPF is a bought digital call that pays the coupon, paid for with two sold puts at the strike. The RTPF is a bought range digital, paid for with two sold puts at the lower and two sold calls at the upper bound.
+
+<StructureBlocksFigure
+  products={['tpf', 'rtpf']}
+  caption="One fixing of the TPF and the RTPF: a flat coupon on top, leveraged losses without a floor below."
+/>
+
+### Why the coupon looks so large
+
+<Num of="m08.tpfCouponChf" /> per fixing, up to <Num of="m08.tpfMaxChf" /> in total: that looks generous. The reason lies in the forward. The strike is set relative to the spot, <Num of="m08.tpfStrikeVsSpot" />. The forward, however, falls with the interest-rate differential: by <Num of="m08.tpfFwdDrop" /> pips to <Num of="m08.tpfFwdEnd" /> at the last fixing. From about month <Num of="m08.tpfCrossMonth" /> it lies below the strike. For the late fixings the market therefore ‘expects’ a rate below the strike. The sold puts are worth a lot, and their premium pays for the coupon. A forward is not a forecast, but it is the price.
+
+<PathSimulatorFigure
+  products={['tpf', 'rtpf']}
+  scenario="sideways"
+  caption="Sideways, the TPF collects its coupons and ends early. Switch to trend down or drag the end of the path down: the payments soon exceed the coupons."
+/>
+
+### Worked example: coupons against payments
+
+- **Sideways:** <Num of="m08.tpfTargetCoupons" /> coupons, then the TPF ends. Result <Num of="m08.tpfSidePnl" />, the maximum.
+- **Trend down, end of path at <Num of="m08.accDownMove" />:** only <Num of="m08.tpfDownCoupons" /> coupons (<Num of="m08.tpfDownReceived" />), then payments until the end. Result <Num of="m08.tpfDownPnl" />.
+- **RTPF in a trend up:** <Num of="m08.rtpfUpCoupons" /> coupons (<Num of="m08.rtpfUpReceived" />), then the rate breaks out of the range. Result <Num of="m08.rtpfUpPnl" />.
+
+<Callout variant="warn" title="Risk box: TPF and RTPF">
+
+- **Maximum loss:** not limited. The gain is capped at <Num of="m08.tpfMaxChf" /> (TPF) and <Num of="m08.rtpfMaxChf" /> (RTPF), the loss grows twice for every pip. Monte Carlo: one path in 20 loses more than <Num of="m08.tpfQ05" /> (TPF) and <Num of="m08.rtpfQ05" /> (RTPF), the worst <Num of="m08.tpfWorst" /> and <Num of="m08.rtpfWorst" />.
+- **Leverage:** 2 on every distance to the strike or the range.
+- **Path dependence:** the target ends the product after <Num of="m08.tpfTargetCoupons" /> coupons, for the TPF in <Num of="m08.tpfPTarget" /> of the paths, for the RTPF in <Num of="m08.rtpfPTarget" />. All others run to the end.
+
+</Callout>
+
+### Dual currency: a deposit with a sold option
+
+A dual currency investment is not a hedge but an investment for 1 to 3 months. You deposit <Num of="m08.dciCapital" /> for <Num of="m08.dciDays" /> days and sell a USD put / CHF call with strike <Num of="m08.dciStrike" /> (<Num of="m08.dciDistance" /> below the spot). You receive the premium of <Num of="m08.dciPremium" /> as extra interest. That makes <Num of="m08.dciYield" /> p.a., while the money market pays <Num of="m08.dciMm" /> in the example.
+
+At maturity a single fixing decides. If it is at or above the strike, you get your capital plus <Num of="m08.dciInterest" /> interest. If it is below, the capital is converted at the strike into <Num of="m08.dciUsd" />, plus interest. That is exactly when the dollar is worth less than the strike: this is the **conversion risk**.
+
+<DciCalculatorFigure caption="Drag the rate at maturity: below the strike your capital is converted, below the break-even you do worse than with a deposit. Move the strike closer to spot: more interest, more conversion." />
+
+In the example the break-even is <Num of="m08.dciBreakEven" />. At a fixing of <Num of="m08.dciFixing" /> the dollars plus interest are worth <Num of="m08.dciOutValue" />, <Num of="m08.dciOutDiff" /> against the deposit. The strike lies only <Num of="m08.dciStrikeVsFwdAbs" /> pips below the forward of <Num of="m08.dciForward" />. In the model the capital is converted in <Num of="m08.dciPConv" /> of cases. That is not a forecast but the price of the risk.
+
+<Callout variant="bad" title="When it goes wrong: dual currency">
+
+If the dollar falls sharply, you receive dollars at the strike that are worth much less in the market. The extra interest is then small compared with the loss. The capital is not protected in CHF: it only stays in CHF as long as the rate stays above the strike.
+
+</Callout>
+
+<Derivation title="Derivation: fair coupon and dual currency interest">
+
+**1.** Without the target, the TPF coupon <i>c</i> is fair when the digitals are worth as much as the sold puts. <i>D</i> is the price of a digital call that pays CHF 1:
+
+<Formula><span><i>c</i> · Σ<sub><i>i</i></sub> <i>D</i>(<i>K</i>, <i>t</i><sub><i>i</i></sub>) = 2 · Σ<sub><i>i</i></sub> <i>P</i>(<i>K</i>, <i>t</i><sub><i>i</i></sub>)</span></Formula>
+
+This gives <Num of="m08.tpfCouponNoTarget" /> pips (RTPF: <Num of="m08.rtpfCouponNoTarget" /> pips). The target cancels the coupons of the good scenarios. For the present value to stay zero, the coupon rises to <Num of="m08.tpfCoupon" /> pips (RTPF <Num of="m08.rtpfCoupon" />), standard error <Num of="m08.tpfSe" /> and <Num of="m08.rtpfSe" /> pips.
+
+**2.** Dual currency: the option uses <i>T</i> = days/365, the interest the money-market convention Act/360, τ = days/360. The rate p.a. is the money-market rate plus the annualised premium:
+
+<Formula><span>Rate p.a. = money-market rate + premium · <i>e</i><sup><i>r</i><sub>d</sub><i>T</i></sup> / (capital · τ)</span></Formula>
+
+**3.** Break-even: after conversion you hold capital/<i>K</i> dollars plus the interest <i>I</i>. That equals the deposit at <i>S</i><sub>be</sub> = <i>K</i> · (1 − <i>I</i>/capital) when, as here, the money market pays nothing: <Num of="m08.dciStrike" /> · (1 − <Num of="m08.dciInterest" /> / <Num of="m08.dciCapital" />) = <Num of="m08.dciBreakEven" />.
+
+</Derivation>
+
+<Desk title="Reading coupon products">
+
+Three numbers belong on every term sheet: the maximum gain (coupon times target), the loss per pip on the wrong side (twice the notional) and the distance of the strike to the forward, not to the spot. For dual currency there is a fourth: how large is the loss on conversion if the rate ends <Num of="m08.dciFixBelow" /> below the strike? In the example <Num of="m08.dciOutDiff" />. With a tenor of 3 months you earn more interest in francs (<Num of="m08.dci3Interest" />, <Num of="m08.dci3Yield" /> p.a.), but the dollar also has more time to fall.
+
+</Desk>
+
+<Takeaway>
+
+A coupon is the premium for sold options: it is capped, the loss is not. With dual currency you pay for the extra interest with the risk of ending up in the weaker currency.
+
+</Takeaway>

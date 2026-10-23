@@ -29,7 +29,7 @@ In Bausteinen: Der TPF ist ein gekaufter Digital-Call, der den Coupon zahlt, bez
 ### Rechenbeispiel: Coupons gegen Zahlungen
 
 - **Seitwärts:** <Num of="m08.tpfTargetCoupons" /> Coupons, dann endet der TPF. Ergebnis <Num of="m08.tpfSidePnl" />, das Maximum.
-- **Trend ab <Num of="m08.accDownMove" />:** nur <Num of="m08.tpfDownCoupons" /> Coupons (<Num of="m08.tpfDownReceived" />), danach Zahlungen bis zum Ende. Ergebnis <Num of="m08.tpfDownPnl" />.
+- **Trend ab, Pfadende auf <Num of="m08.accDownMove" />:** nur <Num of="m08.tpfDownCoupons" /> Coupons (<Num of="m08.tpfDownReceived" />), danach Zahlungen bis zum Ende. Ergebnis <Num of="m08.tpfDownPnl" />.
 - **RTPF bei Trend auf:** <Num of="m08.rtpfUpCoupons" /> Coupons (<Num of="m08.rtpfUpReceived" />), dann bricht der Kurs aus der Range aus. Ergebnis <Num of="m08.rtpfUpPnl" />.
 
 <Callout variant="warn" title="Risiko-Box: TPF und RTPF">
@@ -74,7 +74,7 @@ Das ergibt <Num of="m08.tpfCouponNoTarget" /> Pips (RTPF: <Num of="m08.rtpfCoupo
 
 <Desk title="Coupon-Produkte richtig lesen">
 
-Drei Zahlen gehören auf jedes Termsheet: der maximale Gewinn (Coupon mal Target), der Verlust pro Pip auf der falschen Seite (zweimal das Nominal) und der Abstand des Strikes zum Forward, nicht zum Spot. Bei Dual Currency kommt eine vierte dazu: Wie gross ist der Verlust bei einem Umtausch, wenn der Kurs <Num of="m08.dciFixBelow" /> unter dem Strike steht? Im Beispiel <Num of="m08.dciOutDiff" />, bei einer Laufzeit von 3 Monaten mehr Zins (<Num of="m08.dci3Yield" /> p.a.), aber auch mehr Zeit für den Dollar, zu fallen.
+Drei Zahlen gehören auf jedes Termsheet: der maximale Gewinn (Coupon mal Target), der Verlust pro Pip auf der falschen Seite (zweimal das Nominal) und der Abstand des Strikes zum Forward, nicht zum Spot. Bei Dual Currency kommt eine vierte dazu: Wie gross ist der Verlust bei einem Umtausch, wenn der Kurs <Num of="m08.dciFixBelow" /> unter dem Strike steht? Im Beispiel <Num of="m08.dciOutDiff" />. Mit 3 Monaten Laufzeit gibt es mehr Zins in Franken (<Num of="m08.dci3Interest" />, <Num of="m08.dci3Yield" /> p.a.), aber der Dollar hat auch mehr Zeit, zu fallen.
 
 </Desk>
 

@@ -1,0 +1,200 @@
+---
+/** Hedge shaper (module 06, section 1) for MDX: <HedgeShaperFigure caption="…" />. */
+import HedgeShaper from '@/components/islands/HedgeShaper';
+import Figure from '@/components/content/Figure.astro';
+import { pageLang } from '@/components/content/lang';
+
+interface Props {
+  caption?: string;
+}
+const { caption } = Astro.props;
+const lang = pageLang(Astro.currentLocale);
+---
+
+<Figure caption={caption}>
+  <HedgeShaper client:visible lang={lang} />
+</Figure>
+
+<style is:global>
+  .hs {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+    color: var(--ff-ink);
+  }
+  .hs .ff-lab-head {
+    margin-bottom: 0;
+  }
+  .hs p {
+    margin: 0;
+  }
+  .hs-head-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+  .hs-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .hs-name {
+    background: var(--ff-options-soft);
+    color: var(--ff-options-text);
+    font-weight: 800;
+    animation: hs-in 320ms ease-out both;
+  }
+  .hs-zero {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: var(--ff-r-pill);
+    background: var(--ff-good-soft);
+    color: var(--ff-good-text-strong);
+    font-size: 13px;
+    font-weight: 800;
+    animation: hs-pop 420ms cubic-bezier(0.2, 0.9, 0.3, 1.25) both;
+  }
+  /* the Legend is a <ul>; keep the .prose list styles away from it */
+  .hs .ff-legend {
+    flex-direction: row;
+    padding-left: 0;
+    gap: 8px 20px;
+  }
+  .hs .ff-legend li {
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--ff-ink-2);
+  }
+  .hs-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    font-family: var(--ff-font-ui);
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .hs-handle {
+    cursor: grab;
+    touch-action: none;
+  }
+  .hs-handle.is-active {
+    cursor: grabbing;
+  }
+  .hs .hs-hint {
+    font-size: 12px;
+    color: var(--ff-muted);
+  }
+  .hs-note {
+    animation: hs-in 320ms ease-out both;
+  }
+  .hs-aha {
+    animation: hs-in 360ms ease-out both;
+  }
+  .hs-blocks {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .hs-block {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 56px;
+    padding: 8px 14px;
+    border: 1px solid var(--ff-line-input);
+    border-radius: var(--ff-r-box);
+    background: var(--ff-surface);
+    color: var(--ff-ink);
+    font: inherit;
+    text-align: left;
+  }
+  .hs-block.is-base {
+    background: var(--ff-surface-2);
+    border-color: transparent;
+  }
+  button.hs-block {
+    cursor: pointer;
+    transition:
+      background-color 160ms ease,
+      border-color 160ms ease;
+  }
+  button.hs-block:hover {
+    border-color: var(--ff-ref);
+  }
+  button.hs-block[aria-pressed='true'] {
+    border-color: var(--ff-exotics-text);
+    background: var(--ff-exotics-soft);
+  }
+  .hs-block-tag {
+    flex: 0 0 auto;
+    width: 6px;
+    align-self: stretch;
+    border-radius: 3px;
+    background: var(--ff-long);
+  }
+  .hs-block.is-short .hs-block-tag {
+    background: var(--ff-short);
+    opacity: 0.35;
+    transition: opacity 160ms ease;
+  }
+  .hs-block.is-short[aria-pressed='true'] .hs-block-tag {
+    opacity: 1;
+  }
+  .hs-block-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .hs-block-name {
+    font-size: 14px;
+    font-weight: 800;
+  }
+  .hs-block-sub {
+    font-size: 12px;
+    color: var(--ff-muted);
+  }
+  .hs-block-state {
+    flex: 0 0 auto;
+    padding: 4px 10px;
+    border-radius: var(--ff-r-pill);
+    background: var(--ff-chip);
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--ff-ink-2);
+  }
+  .hs-block[aria-pressed='true'] .hs-block-state {
+    background: var(--ff-exotics-text);
+    color: #fff;
+  }
+  .hs .hs-desc {
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--ff-ink-2);
+    min-height: 4.6em;
+  }
+  @keyframes hs-pop {
+    0% {
+      transform: scale(0.7);
+    }
+    70% {
+      transform: scale(1.06);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  @keyframes hs-in {
+    from {
+      transform: translateY(4px);
+    }
+    to {
+      transform: none;
+    }
+  }
+</style>
