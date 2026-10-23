@@ -151,6 +151,12 @@ export const M08 = {
   tarfExpFix: P.tarf.stats.expectedFixings,
   tarfQ05: P.tarf.stats.pvQuantile05,
   tarfWorst: P.tarf.stats.pvMin,
+  /**
+   * Back-of-the-envelope loss of the paths without target: with PV = 0 (rd = 0, no discounting)
+   * and every target path earning the full target, P(target) · target · N + P(maturity) · L = 0.
+   */
+  tarfImpliedLoss: (-P.tarf.stats.pTarget * tarf.target * tarf.notional) / P.tarf.stats.pMaturity,
+  tarfPMaturity: P.tarf.stats.pMaturity,
   tarfUp,
   tarfShock,
   shockGap: presets.earlyShock.gap,
@@ -317,6 +323,12 @@ export const nums: NumTable = {
   'm08.tarfExpFix': { value: M.tarfExpFix, kind: 'num', digits: 1 },
   'm08.tarfQ05': { value: M.tarfQ05, kind: 'money' },
   'm08.tarfWorst': { value: M.tarfWorst, kind: 'money' },
+  'm08.tarfPMaturity': { value: M.tarfPMaturity, kind: 'pct' },
+  'm08.tarfImpliedLoss': {
+    value: M.tarfImpliedLoss,
+    kind: 'money',
+    note: 'Implied mean loss of the paths without target (PV = 0)',
+  },
   'm08.tarfUpEnd': { value: M.tarfUp.endedAt, kind: 'num', digits: 0 },
   'm08.tarfUpUsd': { value: M.tarfUp.base, kind: 'money', ccy: 'USD' },
   'm08.tarfUpPnl': { value: M.tarfUp.pnl, kind: 'money', sign: true },

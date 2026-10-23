@@ -26,6 +26,7 @@ import { M07_CONFIG, chartLayout, onGrid } from '@/lib/m07/config';
 import { M07_MARKET, directionOf, hitDays, pathsSummary, seededPaths } from '@/lib/m07/paths';
 import {
   annotationBox,
+  reached,
   usePlayback,
   useSliderDrag,
   useSvgDrag,
