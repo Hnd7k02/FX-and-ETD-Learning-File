@@ -105,23 +105,30 @@ export const M03_CONFIG = {
       basisQuote,
       basisBase,
     ),
-    /** How far the payment slips. Choice: 1 month = 30 days (default), 2 and 3 months. */
+    /**
+     * How far the payment slips. Choice: 1 month = 30 days (default), 2 and 3 months, with the
+     * same simplified month as the rest of the module (3 months = the example's 90 days).
+     */
     slips: [
       { id: '1M', days: 30 },
-      { id: '2M', days: 61 },
-      { id: '3M', days: 91 },
+      { id: '2M', days: 60 },
+      { id: '3M', days: 90 },
     ] as Tenor[],
     defaultSlip: '1M',
     /** Spot at the roll date: slider / handle range and step. */
     spotRange: [0.74, 0.86] as [number, number],
     spotStep: 0.0005,
-    /** Teaching scenarios: dollar stronger / weaker at the roll date (choice). */
-    scenarioUp: 0.81,
-    scenarioDown: 0.78,
-    /** Start value of the slider (choice: the stronger dollar). */
-    spotStart: 0.81,
+    /**
+     * Teaching scenarios: dollar stronger / weaker at the roll date (choice). Picked so that the
+     * rounded numbers in the text add up (old forward + swap points = all-in rate to 0.1 pip,
+     * gap between the two all-in rates); tests/unit/m03.test.ts checks this.
+     */
+    scenarioUp: 0.82,
+    scenarioDown: 0.775,
+    /** Start value of the slider (choice: case 1 of the text, the stronger dollar). */
+    spotStart: 0.82,
     /** Playback tour of the roll-date spot: waypoints and total duration. */
-    tour: { waypoints: [0.81, 0.75, 0.85, 0.81] as number[], ms: 7200 },
+    tour: { waypoints: [0.82, 0.75, 0.85, 0.82] as number[], ms: 7200 },
     /** y axis of the rate chart. */
     yDomain: [0.73, 0.87] as [number, number],
   },

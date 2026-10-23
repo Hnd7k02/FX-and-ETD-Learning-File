@@ -12,7 +12,14 @@ import {
   snapSpot,
   tourAt,
 } from '@/lib/m03/roll';
-import { fitCentre, innerTicks, stepTicks, textWidth } from '@/lib/m03/text';
+import {
+  fitCentre,
+  innerTicks,
+  nudgeY,
+  overlaps,
+  stepTicks,
+  textWidth,
+} from '@/lib/m03/text';
 import { EXAMPLE_MARKET as M, pathAt, roundTripChf, spotPath, tripSwap } from '@/lib/m03/trip';
 
 const N = E.notional;
@@ -260,6 +267,19 @@ describe('text helpers', () => {
     expect(fitCentre(98, 20, 0, 100)).toBe(90);
     expect(fitCentre(50, 20, 0, 100)).toBe(50);
     expect(fitCentre(50, 200, 0, 100)).toBe(50);
+  });
+
+  it('moves a label clear of other labels', () => {
+    const label = { x0: 0, x1: 100, y0: 40, y1: 52 };
+    const a = { x0: 50, x1: 150, y0: 45, y1: 57 };
+    const b = { x0: 0, x1: 40, y0: 20, y1: 32 };
+    expect(overlaps(label, a)).toBe(true);
+    expect(overlaps(label, { ...a, x0: 100 })).toBe(false);
+    expect(nudgeY(label, [], -1)).toBe(0);
+    // up: past a (top 45 → bottom of label at 43), then past b (top 20 → bottom at 18)
+    expect(nudgeY(label, [a, b], -1)).toBe(18 - 52);
+    // down: past a (bottom 57 → top of label at 59)
+    expect(nudgeY(label, [a, b], 1)).toBe(59 - 40);
   });
 
   it('places ticks at multiples of a step', () => {

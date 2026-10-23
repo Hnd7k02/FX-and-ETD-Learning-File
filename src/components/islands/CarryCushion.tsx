@@ -160,8 +160,8 @@ export default function CarryCushion(props: CarryCushionProps): JSX.Element {
     [xs, step, v],
   );
   const curve = useTween(mainCurve, 450, rm || dragging);
-  const blocks: YieldBlock[] =
-    step === 'carry' ? [] : step === 'discount' ? ['long', 'shortCall'] : ['shortPut'];
+  /* DCI: deposit (the zero line) + short put = the curve itself, so no separate block lines */
+  const blocks: YieldBlock[] = step === 'discount' ? ['long', 'shortCall'] : [];
   const blockCurves = blocks.map((b) => xs.map((x) => yieldBlockPerUsd(b, x, v) * N));
   const carryCurve = xs.map((x) => yieldPnl('carry', x, v));
   const be = v.breakEven[step];
@@ -259,8 +259,12 @@ export default function CarryCushion(props: CarryCushionProps): JSX.Element {
                 { label: t('cc.lg.long'), color: 'var(--ff-long)', width: 1.75 },
                 { label: t('cc.lg.shortCall'), color: 'var(--ff-short)', width: 1.75 },
               ]
-            : [{ label: t('cc.lg.shortPut'), color: 'var(--ff-short)', width: 1.75 }]),
-          { label: name, color: 'var(--ff-forward)', width: 3 },
+            : []),
+          {
+            label: step === 'dci' ? t('cc.lg.dciBlocks') : name,
+            color: 'var(--ff-forward)',
+            width: 3,
+          },
           {
             label: t('cc.lg.carry'),
             color: 'var(--ff-ref)',
@@ -443,6 +447,11 @@ export default function CarryCushion(props: CarryCushionProps): JSX.Element {
                 />
               </g>
 
+              {/* marker at S_T */}
+              <path
+                d={`M${x.toFixed(1)},${L.top + L.font + 10}V${L.rail}`}
+                style={{ fill: 'none', stroke: 'var(--ff-ink)', strokeWidth: 1.25 }}
+              />
               {/* cap of the sold option */}
               {step !== 'carry' && (
                 <text
@@ -473,13 +482,13 @@ export default function CarryCushion(props: CarryCushionProps): JSX.Element {
                 data-cushion
               />
               <text
-                x={Math.min(beX, spotX) - 6}
-                y={bracketY + 4}
+                x={clamp((beX + spotX) / 2, L.left + 50, L.width - L.right - 50)}
+                y={bracketY + L.font + 10}
                 style={{
                   fontSize: fs,
                   fontWeight: 800,
                   fill: 'var(--ff-apply-text)',
-                  textAnchor: 'end',
+                  textAnchor: 'middle',
                   ...halo,
                 }}
               >
@@ -491,25 +500,7 @@ export default function CarryCushion(props: CarryCushionProps): JSX.Element {
                 r={5.5}
                 style={{ fill: '#fff', stroke: 'var(--ff-ink)', strokeWidth: 2.5 }}
               />
-              <text
-                x={beX - 8}
-                y={y0 - 10}
-                style={{
-                  fontSize: fs,
-                  fontWeight: 800,
-                  fill: 'var(--ff-ink)',
-                  textAnchor: 'end',
-                  ...halo,
-                }}
-              >
-                {t('cc.be', { r: rate(be) })}
-              </text>
 
-              {/* marker at S_T */}
-              <path
-                d={`M${x.toFixed(1)},${L.top + L.font + 10}V${L.rail}`}
-                style={{ fill: 'none', stroke: 'var(--ff-ink)', strokeWidth: 1.25 }}
-              />
               <circle
                 cx={x}
                 cy={sy(clamp(tw[0]!, -Y_MAX, Y_MAX))}
