@@ -353,18 +353,20 @@ function navigate(route: string): void {
   const target = `#${route}`;
   const next = parseHashRoute(target);
   const now = parseHashRoute(window.location.hash);
-  if (resolve(next.path) === current && next.query === now.query) {
-    // Link to the page that is already open: no history entry (it would drop an island's query
-    // and the scroll position for Back), only the anchor if there is one.
+  if (resolve(next.path) === current && (!next.query || next.query === now.query)) {
+    // Link to the page that is already open (without a query of its own): no history entry and
+    // no remount, so an island keeps its state and query; only the anchor if there is one.
     navByLink = false;
     if (next.anchor) jumpToId(next.anchor);
     return;
   }
   navByLink = true;
-  // Same page with another query (e.g. a Riskometer deep link on the Riskometer): mount again.
+  // Same page with another query (e.g. a Riskometer deep link on the Riskometer): mount again and
+  // replace the entry, so Back never lands on a query the open island does not show.
   const force = resolve(next.path) === current;
   try {
-    history.pushState(null, '', target);
+    if (force) history.replaceState(null, '', target);
+    else history.pushState(null, '', target);
   } catch {
     window.location.hash = target;
     return;

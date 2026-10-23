@@ -11,7 +11,7 @@ import { FAMILIES } from '@/data/modules';
 import { glossary as dict } from '@/i18n/dict/glossary';
 import { translator, type Lang } from '@/i18n/types';
 import { matchRanges, matchesTokens, searchTokens } from '@/lib/glossary';
-import { readQuery, scrollToId, writeQuery } from '@/lib/url';
+import { jumpToId, readQuery, writeQuery } from '@/lib/url';
 
 type FamilyFilter = 'all' | Family;
 
@@ -131,7 +131,7 @@ export default function GlossarySearch({ lang, total, familyCounts }: GlossarySe
       setQuery('');
       setFamily('all');
       // hash routing in the offline file: never assign location.hash, scroll instead
-      requestAnimationFrame(() => scrollToId(id));
+      requestAnimationFrame(() => jumpToId(id));
     };
     document.addEventListener('keydown', onKey);
     document.addEventListener('click', onClick);

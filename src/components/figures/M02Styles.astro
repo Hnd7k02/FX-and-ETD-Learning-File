@@ -133,7 +133,8 @@
   }
   .m2-handle {
     cursor: grab;
-    touch-action: none;
+    /* drags only sideways: a vertical swipe on the large hit area scrolls the page */
+    touch-action: pan-y;
   }
   .m2-handle.is-active {
     cursor: grabbing;

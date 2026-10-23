@@ -150,6 +150,23 @@ test.describe('smoke', () => {
     await expect(page.locator('#main')).toHaveAttribute('data-route', '/module/05-greeks/1/');
   });
 
+  test('riskometer: the nav link to the open page keeps the chosen pair', async ({
+    page,
+    open,
+  }) => {
+    await open('/riskometer/');
+    await page.locator('[data-pair-btn="USDJPY"]').click();
+    await expect.poll(() => currentRoute(page)).toBe('/riskometer/?pair=USDJPY');
+    const len = await page.evaluate(() => history.length);
+    await page
+      .getByRole('navigation', { name: 'Hauptnavigation' })
+      .locator('a[aria-current="page"]')
+      .click();
+    await expect(page.locator('[data-rk]')).toHaveAttribute('data-pair', 'USD/JPY');
+    expect(await currentRoute(page)).toBe('/riskometer/?pair=USDJPY');
+    expect(await page.evaluate(() => history.length)).toBe(len);
+  });
+
   test('riskometer: deep link selects pair and event', async ({ page, open }) => {
     await open('/en/riskometer/?pair=EURUSD&event=ukraine-2022');
     await expect(page.locator('[data-rk]')).toHaveAttribute('data-pair', 'EUR/USD');
@@ -307,6 +324,41 @@ test.describe('touch', () => {
     test.skip(result === 'no-touch', 'project without touch input');
     expect(result).toBe('true/false');
   });
+});
+
+test('sideways-only handles: a sideways move drags, a vertical move scrolls', async ({
+  page,
+  open,
+}) => {
+  await open('/module/03-fx-swap/2/');
+  await expect(page.locator('.m3-handle').first()).toBeAttached();
+  const result = await page.evaluate(() => {
+    if (!('ontouchstart' in window)) return 'no-touch';
+    const handle = document.querySelector('.m3-handle');
+    if (!handle) return 'missing';
+    const ev = (type: string, x: number, y: number) => {
+      const e = new Event(type, { bubbles: true, cancelable: true });
+      Object.defineProperty(e, 'touches', { value: [{ identifier: 1, clientX: x, clientY: y }] });
+      handle.dispatchEvent(e);
+      return e.defaultPrevented;
+    };
+    const end = () => handle.dispatchEvent(new Event('touchend', { bubbles: true }));
+    const sideways = [
+      ev('touchstart', 100, 100),
+      ev('touchmove', 130, 104),
+      ev('touchmove', 160, 108),
+    ];
+    end();
+    const vertical = [
+      ev('touchstart', 100, 100),
+      ev('touchmove', 103, 140),
+      ev('touchmove', 104, 180),
+    ];
+    end();
+    return `${sideways.join(',')}|${vertical.join(',')}`;
+  });
+  test.skip(result === 'no-touch', 'project without touch input');
+  expect(result).toBe('false,true,true|false,false,false');
 });
 
 test.describe('fallbacks', () => {

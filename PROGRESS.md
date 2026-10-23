@@ -23,7 +23,7 @@ Dario tests `forward-first.html` on the work PC and the iPad, including module 0
 ## Current state
 
 - **Output:** one offline file `release/forward-first.html`, about 1.6 MB (CSS 475 KB, JS 740 KB, packed pages 446 KB). 99 pages, 19 route aliases, 38 islands, both languages. CSP `default-src 'none'`, no network request (tested).
-- **Tests:** `npm run check` green (Vitest 1’995 tests, coverage ≥ 90 % in `src/lib`). Offline file: 25 tests green in Chromium locally; WebKit iPad runs in CI. Web build component tests: 460 green.
+- **Tests:** `npm run check` green (Vitest 1’995 tests, coverage ≥ 90 % in `src/lib`). Offline file: 28 tests green locally in Chromium (desktop, and touch at iPad size); WebKit iPad runs in CI. Web build component tests: 460 green.
 - **Calculation core:** forward, swap, roll, arbitrage, Garman-Kohlhagen, Black-76, implied vol, delta strikes, six Greeks, smile, digitals, 8 barriers, touch, double no-touch; all §6 reference values within tolerance; cross-checked against independent formulas (max diff 1.8e-13).
 - **Monte Carlo:** 8 products, fair strikes/coupons with standard errors in `src/data/fx/mc-products.json`, independently re-implemented and reproduced; interactive pricing in chunks on the main thread.
 - **Riskometer data:** ECB until 14.09.2026; EUR/CHF 3.9 % (Normal, percentile 45). Manual update via Actions → Release.
