@@ -13,6 +13,7 @@ import { tweenProgress } from '@/lib/anim';
 import { Slider } from '@/components/ui/Slider';
 import { StatHero, StatRow, StatTable } from '@/components/ui/Stat';
 import {
+  sinceSlide,
   useElementWidth,
   useInView,
   usePrefersReducedMotion,
@@ -108,12 +109,15 @@ export default function CashCarryCalculator({ lang }: CashCarryCalculatorProps):
     }
   };
 
-  // Crossing the fair forward flips the trade: play the new steps.
+  // Crossing the fair forward flips the trade: play the new steps after a single change; while
+  // the rate is dragged or a slider moves, show them at once (nothing runs on, D-42).
   const lastDir = useRef<Dir>(dir);
   useEffect(() => {
     if (lastDir.current === dir) return;
     lastDir.current = dir;
-    if (dir !== 'none') play.restart();
+    if (dir === 'none') return;
+    if (sliding || drag.dragging || sinceSlide() < 300) play.seek(order.length);
+    else play.restart();
   }, [dir]);
 
   // "Market reacts": glide back to fair.

@@ -172,7 +172,7 @@ export function useDragX(
  * True while the pointer is down on a slider, so charts follow it instantly instead of
  * tweening. Returns the flag and the onPointerDown handler for the slider's wrapper.
  */
-export function useSliderDrag(): [boolean, () => void] {
+export function useSliderDrag(): [boolean, (e?: Event) => void] {
   const [sliding, setSliding] = useState(false);
   useEffect(() => {
     if (!sliding) return;
@@ -184,5 +184,13 @@ export function useSliderDrag(): [boolean, () => void] {
       window.removeEventListener('pointercancel', up);
     };
   }, [sliding]);
-  return [sliding, () => setSliding(true)];
+  // only a pointer down on a range slider counts: a button in the same panel (reset, toggle)
+  // keeps its animation (D-42)
+  return [
+    sliding,
+    (e?: Event) => {
+      const el = e?.target as Element | null | undefined;
+      if (!el?.closest || el.closest('input[type="range"]')) setSliding(true);
+    },
+  ];
 }

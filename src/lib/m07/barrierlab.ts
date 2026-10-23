@@ -192,6 +192,23 @@ export function labNumbers(s: LabState): LabNumbers {
 }
 
 /**
+ * The parity as shown, in pips with `digits` decimals (D-26: a shown sum adds up): KO and the
+ * vanilla are rounded, KI is the rest, so the displayed KO + KI equals the displayed vanilla.
+ * KO + KI = vanilla holds exactly before rounding (no rebate in the parity); a shown KI is at most
+ * one unit of the last digit away from its own rounding.
+ */
+export function parityShown(
+  koPips: number,
+  vanillaPips: number,
+  digits = 1,
+): { ko: number; ki: number; vanilla: number } {
+  const f = 10 ** digits;
+  const ko = Math.round(koPips * f) / f;
+  const vanilla = Math.round(vanillaPips * f) / f;
+  return { ko, ki: Math.round((vanilla - ko) * f) / f, vanilla };
+}
+
+/**
  * Spot grid on [a, b] every `stepPips`, plus the barrier itself and a few points just inside it
  * (½, 1 and 2 pips), so the steep approach to the barrier is drawn sharply.
  */

@@ -1,7 +1,7 @@
 /**
  * Shared Preact hooks for islands: reduced motion, element width, in-view and tweening.
  */
-import { useEffect, useRef, useState } from 'preact/hooks';
+import { useEffect, useLayoutEffect, useRef, useState } from 'preact/hooks';
 import { tweenProgress, tweenShouldJump } from '@/lib/anim';
 import type { RefObject } from 'preact';
 import { easeInOutCubic } from '@/lib/chart';
@@ -59,12 +59,114 @@ export function useInView<T extends Element>(ref: RefObject<T>, rootMargin = '0p
   return v;
 }
 
+/*
+ * Continuous input (D-42): the time of the last input on any range slider of the page or of the
+ * last pointer drag (more than 4 px) inside a figure. While a slider or a chart handle moves, and
+ * when a button in a figure is clicked again within 300 ms (a quick series of toggles or presets),
+ * finite CSS animations and transitions in that figure (a pop, a ring, a fade-in, a radius
+ * transition) end at once, for the frames right after each input, so nothing runs on after it.
+ * A single click keeps its animation.
+ */
+let lastSlide = Number.NEGATIVE_INFINITY;
+const QUICK_MS = 300;
+const settling = new Set<Element>();
+let settleUntil = 0;
+const lastClick = new WeakMap<Element, number>();
+
+function settleCss(root: Element): void {
+  const r = root as Element & { getAnimations?: (o?: { subtree?: boolean }) => Animation[] };
+  if (typeof r.getAnimations !== 'function') return;
+  for (const a of r.getAnimations({ subtree: true })) {
+    const css = 'animationName' in a || 'transitionProperty' in a;
+    if (!css || a.effect?.getTiming().iterations === Number.POSITIVE_INFINITY) continue;
+    try {
+      a.finish();
+    } catch {
+      // an animation that cannot finish keeps running
+    }
+  }
+}
+
+function settleLoop(): void {
+  for (const root of settling) settleCss(root);
+  if (performance.now() < settleUntil) requestAnimationFrame(settleLoop);
+  else settling.clear();
+}
+
+/** Ends the CSS animations of `root` in the frames of the next 80 ms. */
+function settleSoon(root: Element, now: number): void {
+  if (typeof requestAnimationFrame === 'undefined') return;
+  const idle = settling.size === 0;
+  settling.add(root);
+  settleUntil = now + 80;
+  if (idle) requestAnimationFrame(settleLoop);
+}
+
+const islandOf = (el: Element | null) => el?.closest?.('[data-ff-island], astro-island') ?? null;
+
+/** Where the current pointer went down (a drag counts from 4 px on). */
+let down: { x: number; y: number } | null = null;
+
+if (typeof document !== 'undefined') {
+  document.addEventListener(
+    'input',
+    (e) => {
+      const el = e.target as HTMLInputElement | null;
+      if (!el || el.type !== 'range') return;
+      lastSlide = performance.now();
+      const root = islandOf(el);
+      if (root) settleSoon(root, lastSlide);
+    },
+    true,
+  );
+  document.addEventListener(
+    'pointerdown',
+    (e) => {
+      down = { x: e.clientX, y: e.clientY };
+    },
+    true,
+  );
+  document.addEventListener(
+    'pointermove',
+    (e) => {
+      if (!down || e.buttons === 0) return;
+      if (Math.hypot(e.clientX - down.x, e.clientY - down.y) < 4) return;
+      const root = islandOf(e.target as Element | null);
+      if (!root) return;
+      lastSlide = performance.now();
+      settleSoon(root, lastSlide);
+    },
+    true,
+  );
+  const up = () => {
+    down = null;
+  };
+  document.addEventListener('pointerup', up, true);
+  document.addEventListener('pointercancel', up, true);
+  document.addEventListener(
+    'click',
+    (e) => {
+      const root = islandOf(e.target as Element | null);
+      if (!root) return;
+      const now = performance.now();
+      if (now - (lastClick.get(root) ?? Number.NEGATIVE_INFINITY) < QUICK_MS) settleSoon(root, now);
+      lastClick.set(root, now);
+    },
+    true,
+  );
+}
+
+/** Milliseconds since the last input on a range slider or the last drag anywhere on the page. */
+export function sinceSlide(now: number = performance.now()): number {
+  return now - lastSlide;
+}
+
 /**
  * Animates towards `target` (number or number[]) over `duration` ms with easeInOutCubic, but only
  * for a single, isolated change (toggle, preset, reset). A target that arrives while an animation
- * runs or within `duration` ms of the previous change jumps (slider, drag, held arrow key,
- * playback: mouse, touch and keyboard alike), and so does every change when `instant` is true
- * (reduced motion, dragging). DECISIONS D-42.
+ * runs, within `duration` ms of the previous change or within `duration` ms of a slider input
+ * jumps (slider, drag, held arrow key, playback: mouse, touch and keyboard alike), and so does
+ * every change when `instant` is true (reduced motion, dragging). DECISIONS D-42.
  */
 export function useTween<T extends number | number[]>(
   target: T,
@@ -80,7 +182,9 @@ export function useTween<T extends number | number[]>(
   const current = useRef<T>(target);
   current.current = value;
 
-  useEffect(() => {
+  // A layout effect: a jump is applied before the next frame, so a value that follows a slider
+  // is drawn in the same frame as the slider (also through a chain of tweens).
+  useLayoutEffect(() => {
     const now = typeof performance !== 'undefined' ? performance.now() : 0;
     const running = now < animUntil.current;
     const sinceLastChange = now - lastChange.current;
@@ -89,7 +193,7 @@ export function useTween<T extends number | number[]>(
     raf.current = null;
     if (
       typeof requestAnimationFrame === 'undefined' ||
-      tweenShouldJump({ instant, running, sinceLastChange, duration })
+      tweenShouldJump({ instant, running, sinceLastChange, duration, sinceSlide: sinceSlide(now) })
     ) {
       setValue(target);
       return;

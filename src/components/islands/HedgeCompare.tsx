@@ -15,6 +15,7 @@ import { tweenProgress } from '@/lib/anim';
 import { AxisX, GridY } from '@/components/ui/Chart';
 import { Slider } from '@/components/ui/Slider';
 import {
+  sinceSlide,
   useElementWidth,
   useInView,
   usePrefersReducedMotion,
@@ -201,6 +202,9 @@ export default function HedgeCompare(props: HedgeCompareProps): JSX.Element {
   /* ties (e.g. collar and unhedged between the collar strikes) share the first place */
   const bestIds = shown.filter((id) => tied(rates[HEDGE_IDS.indexOf(id)]!, minRate));
   const rowH = L.compact ? 66 : ROW_H;
+  // rows glide to a new rank only after a single change; while the rate is dragged or a slider
+  // moves they jump, so nothing runs on after the input (D-42)
+  const live = dragging || sinceSlide() < 300;
   const order = [...shown].sort((a, b) => {
     const d = rates[HEDGE_IDS.indexOf(a)]! - rates[HEDGE_IDS.indexOf(b)]!;
     return Math.abs(d) > 1e-9 ? d : HEDGE_IDS.indexOf(a) - HEDGE_IDS.indexOf(b);
@@ -544,7 +548,10 @@ export default function HedgeCompare(props: HedgeCompareProps): JSX.Element {
         <div class="ff-lab-side">
           <div class="hc-rank" data-rank>
             <div class="hc-rank-head">{t('hc.rank', { st: rate(st), n: notional })}</div>
-            <ol class="hc-rank-list" style={{ height: `${shown.length * rowH}px` }}>
+            <ol
+              class={`hc-rank-list${live ? ' is-live' : ''}`}
+              style={{ height: `${shown.length * rowH}px` }}
+            >
               {shown.map((id) => {
                 const i = HEDGE_IDS.indexOf(id);
                 const pos = order.indexOf(id);

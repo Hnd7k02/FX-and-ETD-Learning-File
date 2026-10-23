@@ -56,19 +56,24 @@ export const test = base.extend<{
 
 export { expect };
 
-let cache: string[] | null = null;
+let cache: Record<string, string> | null = null;
 
-/** Every route packed into the file, e.g. "/", "/en/module/05-greeks/2/". */
-export function routes(): string[] {
+/** The markup of every page packed into the file, by route (read from its data block). */
+export function pageHtml(): Record<string, string> {
   if (cache) return cache;
   const html = readFileSync(FILE, 'utf8');
   const m = /<script id="ff-data" type="application\/octet-stream">([^<]+)<\/script>/.exec(html);
   if (!m) throw new Error('data block not found');
   const data = JSON.parse(gunzipSync(Buffer.from(m[1]!.trim(), 'base64')).toString('utf8')) as {
-    pages: Record<string, unknown>;
+    pages: Record<string, { h: string }>;
   };
-  cache = Object.keys(data.pages).sort();
+  cache = Object.fromEntries(Object.entries(data.pages).map(([r, p]) => [r, p.h]));
   return cache;
+}
+
+/** Every route packed into the file, e.g. "/", "/en/module/05-greeks/2/". */
+export function routes(): string[] {
+  return Object.keys(pageHtml()).sort();
 }
 
 export async function expectNoHorizontalScroll(page: Page) {

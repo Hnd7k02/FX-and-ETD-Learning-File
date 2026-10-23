@@ -29,6 +29,7 @@ import {
   mirrorBarrier,
   mirrorDecomposition,
   numericGreeks,
+  parityShown,
   priceAt,
   spotGrid,
   maturityLabel,
@@ -201,6 +202,22 @@ describe('m07 barrier lab (figure b)', () => {
           };
           expect(Math.abs(labNumbers(st).parityGap)).toBeLessThan(1e-12);
         }
+      }
+    }
+  });
+
+  it('shown parity adds up: KO and vanilla rounded, KI the rest (D-26)', () => {
+    // independent rounding would show 10.0 + 20.0 = 30.1
+    expect(parityShown(10.04, 30.08)).toEqual({ ko: 10, ki: 20.1, vanilla: 30.1 });
+    for (const spot of [0.75, 0.78, 0.8, 0.8125, 0.83, 0.845]) {
+      for (const days of [1, 14, 91.25, 365]) {
+        const n = labNumbers({ ...defaultLabState(), spot, days });
+        const p = parityShown(n.ko / 1e-4, n.vanilla / 1e-4);
+        expect(Math.round((p.ko + p.ki) * 10)).toBe(Math.round(p.vanilla * 10));
+        expect(Math.abs(p.ko - n.ko / 1e-4)).toBeLessThanOrEqual(0.05 + 1e-9);
+        expect(Math.abs(p.ki - n.ki / 1e-4)).toBeLessThanOrEqual(0.1 + 1e-9);
+        expect(Math.abs(p.vanilla - n.vanilla / 1e-4)).toBeLessThanOrEqual(0.05 + 1e-9);
+        expect(p.ki).toBeGreaterThanOrEqual(0);
       }
     }
   });

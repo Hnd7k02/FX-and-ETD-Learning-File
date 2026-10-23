@@ -23,16 +23,25 @@ export function tweenProgress(now: number, t0: number, duration: number): number
 }
 
 /**
- * Tween rule (DECISIONS D-42): a new target jumps when it arrives while an animation runs or
- * within `duration` ms of the previous change — that is continuous input (slider, drag, held
- * arrow key, playback), where an ease-in-out restarted on every frame would lag behind and snap
- * back. Only a single, isolated change (toggle, preset, reset) animates.
+ * Tween rule (DECISIONS D-42): a new target jumps when it arrives while an animation runs, within
+ * `duration` ms of the previous change, or within `duration` ms of an input on a slider anywhere
+ * on the page (`sinceSlide`) — that is continuous input (slider, drag, held arrow key, playback),
+ * where an ease-in-out restarted on every frame would lag behind and snap back. The slider clause
+ * also covers values that follow a slider only now and then (an axis range that changes every
+ * few steps). Only a single, isolated change (toggle, preset, reset) animates.
  */
 export function tweenShouldJump(o: {
   instant: boolean;
   running: boolean;
   sinceLastChange: number;
   duration: number;
+  sinceSlide?: number;
 }): boolean {
-  return o.instant || o.running || !(o.duration > 0) || o.sinceLastChange < o.duration;
+  return (
+    o.instant ||
+    o.running ||
+    !(o.duration > 0) ||
+    o.sinceLastChange < o.duration ||
+    (o.sinceSlide ?? Number.POSITIVE_INFINITY) < o.duration
+  );
 }

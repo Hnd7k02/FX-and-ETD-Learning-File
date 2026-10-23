@@ -29,6 +29,7 @@ import {
   labAha,
   labCurves,
   labNumbers,
+  parityShown,
   maturityLabel,
   mirrorBarrier,
   type LabState,
@@ -282,6 +283,8 @@ export default function BarrierLab({ lang, initial }: BarrierLabProps): JSX.Elem
   }
 
   const sumPips = koPips + kiPips;
+  // shown parity adds up (D-26): KO and vanilla rounded, KI the rest
+  const shownParity = parityShown(koPips, vanillaPips, 1);
   const scaleMax = Math.max(sumPips, vanillaPips, 1e-9);
   const seg = (v: number) => `${Math.max(0, (v / scaleMax) * 100).toFixed(2)}%`;
   const fits = (v: number) => (v / scaleMax) * Math.max(width, 280) > 64;
@@ -523,14 +526,14 @@ export default function BarrierLab({ lang, initial }: BarrierLabProps): JSX.Elem
                   style={{ width: seg(koPips) }}
                   title={t('bl.parity.ko')}
                 >
-                  {fits(koPips) ? num(koPips, 1) : ''}
+                  {fits(koPips) ? num(shownParity.ko, 1) : ''}
                 </span>
                 <span
                   class={`is-ki${s.io === 'in' ? ' is-selected' : ''}${fits(kiPips) ? ' has-label' : ''}`}
                   style={{ width: seg(kiPips) }}
                   title={t('bl.parity.ki')}
                 >
-                  {fits(kiPips) ? num(kiPips, 1) : ''}
+                  {fits(kiPips) ? num(shownParity.ki, 1) : ''}
                 </span>
               </div>
             </div>
@@ -541,7 +544,7 @@ export default function BarrierLab({ lang, initial }: BarrierLabProps): JSX.Elem
                   class={`is-van${fits(vanillaPips) ? ' has-label' : ''}`}
                   style={{ width: seg(vanillaPips) }}
                 >
-                  {fits(vanillaPips) ? num(vanillaPips, 1) : ''}
+                  {fits(vanillaPips) ? num(shownParity.vanilla, 1) : ''}
                 </span>
               </div>
             </div>
@@ -557,10 +560,10 @@ export default function BarrierLab({ lang, initial }: BarrierLabProps): JSX.Elem
             </ul>
             <p class="m7-note mono">
               {t('bl.parity.eq', {
-                ko: num(koPips, 1),
-                ki: num(kiPips, 1),
-                sum: num(sumPips, 1),
-                v: num(vanillaPips, 1),
+                ko: num(shownParity.ko, 1),
+                ki: num(shownParity.ki, 1),
+                sum: num(shownParity.vanilla, 1),
+                v: num(shownParity.vanilla, 1),
               })}
             </p>
           </div>
@@ -650,7 +653,7 @@ export default function BarrierLab({ lang, initial }: BarrierLabProps): JSX.Elem
             <StatRow
               label={t('bl.row.vanilla', { type: t(`bl.type.${s.type}`) })}
               sub={t('bl.row.vanillaSub')}
-              value={t('bl.pips', { v: num(vanillaPips, 1) })}
+              value={t('bl.pips', { v: num(shownParity.vanilla, 1) })}
             />
             <StatRow
               label={t(discount >= 0 ? 'bl.row.discount' : 'bl.row.dearer')}

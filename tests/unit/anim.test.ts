@@ -39,6 +39,12 @@ describe('tweenShouldJump', () => {
     expect(tweenShouldJump({ ...base, sinceLastChange: 299 })).toBe(true);
     expect(tweenShouldJump({ ...base, sinceLastChange: 300 })).toBe(false);
   });
+  it('jumps within the duration of a slider input anywhere on the page', () => {
+    expect(tweenShouldJump({ ...base, sinceSlide: 20 })).toBe(true);
+    expect(tweenShouldJump({ ...base, sinceSlide: 299 })).toBe(true);
+    expect(tweenShouldJump({ ...base, sinceSlide: 300 })).toBe(false);
+    expect(tweenShouldJump({ ...base, sinceSlide: Number.POSITIVE_INFINITY })).toBe(false);
+  });
   it('jumps when instant or without a duration', () => {
     expect(tweenShouldJump({ ...base, instant: true })).toBe(true);
     expect(tweenShouldJump({ ...base, duration: 0 })).toBe(true);
