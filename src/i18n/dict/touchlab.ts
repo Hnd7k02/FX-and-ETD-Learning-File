@@ -32,7 +32,7 @@ export const touchlab = defineDict({
     'tl.head.level': 'Preis in % der Auszahlung gegen die Barriere',
     'tl.head.strike': 'Preis in % der Auszahlung gegen den Strike',
     'tl.head.vol': 'Preis in % der Auszahlung gegen die Vola',
-    'tl.legend.cone': 'Bandbreite 68 % / 95 %',
+    'tl.legend.cone': 'Bandbreite 68 % / 95 %',
     'tl.legend.forward': 'Forward',
     'tl.legend.pays': 'Pfad zahlt',
     'tl.legend.nopay': 'Pfad zahlt nicht',
@@ -81,7 +81,7 @@ export const touchlab = defineDict({
     'tl.check.hit':
       'Bei Berührung bezahlt ist der One-Touch mehr wert als die abgezinste Wahrscheinlichkeit ({v}), weil das Geld früher kommt.',
     'tl.check.hitZero':
-      'Bei 0 % CHF-Zins ist früheres Geld nicht mehr wert: Preis = Wahrscheinlichkeit = {v}, ob bei Berührung oder bei Verfall bezahlt.',
+      'Bei 0 % CHF-Zins ist früheres Geld nicht mehr wert: Preis = Wahrscheinlichkeit = {v}, ob bei Berührung oder bei Verfall bezahlt.',
     'tl.check.hitNeg':
       'Mit negativem CHF-Zins ist früheres Geld weniger wert: Bei Berührung bezahlt kostet der One-Touch weniger als die abgezinste Wahrscheinlichkeit ({v}).',
     'tl.check.dnt':
@@ -93,7 +93,7 @@ export const touchlab = defineDict({
     'tl.aha.hit.t': 'Früher bezahlt',
     'tl.aha.hit.d': 'Mit Zins über null ist Zahlung bei Berührung mehr wert.',
     'tl.aha.same.t': 'Gleich viel wert',
-    'tl.aha.same.d': 'Bei 0 % CHF-Zins spielt der Zahltag keine Rolle.',
+    'tl.aha.same.d': 'Bei 0 % CHF-Zins spielt der Zahltag keine Rolle.',
     'tl.aha.near.t': 'Fast sicher',
     'tl.aha.near.d': 'So nah am Spot wird die Barriere fast sicher berührt.',
     'tl.aha.narrow.t': 'Enger Korridor',

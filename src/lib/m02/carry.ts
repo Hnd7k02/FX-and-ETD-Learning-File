@@ -128,3 +128,16 @@ export function reactionAt(from: number, fair: number, k: number): number {
   if (k <= 0) return from;
   return from + (fair - from) * easeInOutCubic(k);
 }
+
+/** How a step's `rate` is shown: an interest rate p.a., an FX rate (spot/forward) or nothing. */
+export function stepRateKind(key: CarryStep['key']): 'pct' | 'fx' | 'none' {
+  if (key === 'profit') return 'none';
+  if (/^(borrow|invest|withdraw|repay)/.test(key)) return 'pct';
+  return 'fx';
+}
+
+/** Ids of the step list in reveal order (today, then maturity, then the profit line). */
+export function revealOrder(r: CashAndCarryResult): CarryStep['key'][] {
+  const g = groupSteps(r);
+  return [...g.today, ...g.maturity, ...(g.profit ? [g.profit] : [])].map((s) => s.key);
+}

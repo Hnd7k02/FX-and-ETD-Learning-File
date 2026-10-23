@@ -322,9 +322,10 @@ export default function DciCalculator(props: DciCalculatorProps): JSX.Element {
               </text>
               {/* break-even */}
               <circle cx={bex} cy={zero} r={5} class="dci-be" />
+              {/* above the deposit line: left of the break-even the DCI line runs below it */}
               <text
                 x={bex - 8}
-                y={zero + L.font + 10}
+                y={zero - 8}
                 class="dci-be-label"
                 style={{ fontSize: fs, textAnchor: 'end', ...halo }}
               >

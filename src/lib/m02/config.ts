@@ -132,5 +132,7 @@ export const M02_CONFIG = {
     stepPips: 0.1,
     /** "Market reacts": time for the market forward to glide back to fair. */
     reactionMs: 1800,
+    /** Playback of the arbitrage steps: time per step in ms (choice). */
+    stepMs: 700,
   },
 } as const;

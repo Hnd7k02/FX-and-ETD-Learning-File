@@ -737,6 +737,201 @@
     font-weight: 800;
   }
 
+  /* CashCarryCalculator */
+  .m2-input {
+    width: 100%;
+    min-height: var(--ff-touch);
+    padding: 0 14px;
+    border: 1px solid var(--ff-line-input);
+    border-radius: var(--ff-r-control);
+    background: var(--ff-surface);
+    color: var(--ff-ink);
+    font-size: 16px;
+    font-weight: 700;
+    box-sizing: border-box;
+  }
+  .m2-input:focus-visible {
+    outline: 2px solid var(--ff-linear);
+    outline-offset: 2px;
+  }
+  .cc-region {
+    font-weight: 700;
+    fill: var(--ff-muted);
+  }
+  .cc-fair-label {
+    font-weight: 800;
+    fill: var(--ff-ink);
+    text-anchor: middle;
+    font-variant-numeric: tabular-nums;
+  }
+  .cc-fair {
+    fill: none;
+    stroke: var(--ff-forward);
+    stroke-width: 2;
+  }
+  .cc-tick {
+    fill: var(--ff-muted);
+    text-anchor: middle;
+    font-variant-numeric: tabular-nums;
+  }
+  .cc-gap {
+    fill: var(--ff-good-soft);
+    stroke: var(--ff-good);
+    stroke-width: 1.5;
+  }
+  .cc-gap-label {
+    font-weight: 800;
+    fill: var(--ff-good-text-strong);
+    text-anchor: middle;
+    font-variant-numeric: tabular-nums;
+  }
+  .cc-timeline {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px;
+  }
+  .cc-col {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+  }
+  .cc-col-head {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ff-muted);
+  }
+  .m2 .cc-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .m2 .cc-step {
+    display: grid;
+    grid-template-columns: 24px minmax(0, 1fr);
+    gap: 10px;
+    align-items: start;
+    margin: 0;
+    padding: 10px 12px;
+    border: 1px solid var(--ff-line);
+    border-radius: 12px;
+    background: var(--ff-surface);
+    font-size: 13px;
+    line-height: 1.4;
+    transition:
+      border-color 300ms ease,
+      background-color 300ms ease;
+  }
+  .m2 .cc-step.is-todo {
+    border-style: dashed;
+    background: var(--ff-surface-2);
+    color: var(--ff-muted);
+  }
+  .m2 .cc-step.is-active {
+    border-color: var(--ff-ink);
+    animation: m2-rise 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+  .cc-n {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--ff-chip);
+    font-size: 12px;
+    font-weight: 800;
+  }
+  .cc-step.is-active .cc-n,
+  .cc-step.is-done .cc-n {
+    background: var(--ff-ink);
+    color: #fff;
+  }
+  .cc-body {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+  }
+  .cc-text {
+    font-weight: 700;
+  }
+  .cc-amts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 12px;
+    font-size: 13px;
+  }
+  .cc-amt {
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .cc-amt.is-usd,
+  .cc-net-vals .is-usd {
+    color: var(--ff-linear-text);
+  }
+  .cc-amt.is-chf,
+  .cc-net-vals .is-chf {
+    color: var(--ff-exotics-text);
+  }
+  .cc-step.is-todo .cc-amt {
+    color: var(--ff-muted);
+  }
+  .cc-amts.is-contract .cc-amt {
+    font-weight: 500;
+  }
+  .cc-contract {
+    font-size: 12px;
+    font-style: italic;
+    color: var(--ff-muted);
+  }
+  .cc-net {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 2px 12px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: var(--ff-surface-2);
+    font-size: 13px;
+  }
+  .cc-net-label {
+    font-weight: 800;
+  }
+  .cc-net-vals {
+    display: inline-flex;
+    gap: 12px;
+    font-weight: 700;
+  }
+  .cc-net-note {
+    flex-basis: 100%;
+    font-size: 12px;
+    color: var(--ff-good-text-strong);
+  }
+  .cc-net.is-todo .cc-net-vals span {
+    color: var(--ff-muted);
+  }
+  .cc-none {
+    padding: 14px 16px;
+    border-radius: var(--ff-r-box);
+    background: var(--ff-good-soft);
+    color: var(--ff-good-text-strong);
+    font-size: 14px;
+    line-height: 1.55;
+  }
+  .cc-hero .ff-stat-hero {
+    border-radius: var(--ff-r-box);
+    transition: background-color 300ms ease;
+  }
+  .cc-hero.is-todo .ff-stat-hero {
+    background: var(--ff-ink-2);
+  }
+
   @keyframes pp-pop {
     from {
       transform: scale(0.4);
@@ -753,11 +948,15 @@
     .ho-stripdot.is-new,
     .pp-card.is-active,
     .pp-eq,
-    .pp-result.is-on {
+    .pp-result.is-on,
+    .m2 .cc-step.is-active {
       animation: none;
     }
     .m2-chip,
-    .pp-card-box {
+    .pp-card-box,
+    .m2 .cc-step,
+    .cc-hero .ff-stat-hero,
+    .fc-bars {
       transition: none;
     }
   }

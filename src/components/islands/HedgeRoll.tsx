@@ -53,7 +53,7 @@ const COLOR = {
 function layoutFor(w: number) {
   const width = Math.max(300, Math.round(w));
   const compact = width < 560;
-  const height = compact ? 330 : Math.round(clamp(width * 0.55, 340, 400));
+  const height = compact ? 330 : Math.round(clamp(width * 0.68, 360, 450));
   const font = compact ? 11 : 12;
   const left = compact ? 40 : 50;
   const top = 32;
@@ -280,7 +280,7 @@ export default function HedgeRoll({ lang }: HedgeRollProps): JSX.Element {
                   style={{ stroke: side === 'receive' ? COLOR.receive : COLOR.pay }}
                 />
               )}
-              {side !== 'zero' && Math.abs(yFar - yAll) > 14 && (
+              {!L.compact && side !== 'zero' && Math.abs(yFar - yAll) > 14 && (
                 <text
                   x={glLeft ? x - 12 : x + 12}
                   y={(yFar + yAll) / 2 + L.font * 0.35}
@@ -345,6 +345,7 @@ export default function HedgeRoll({ lang }: HedgeRollProps): JSX.Element {
             {aha && <b>{t('hr.aha.title')}</b>}
             <span>{insight}</span>
           </div>
+          <p class="m3-hint">{t('hr.hint')}</p>
         </div>
 
         <div class="ff-lab-side">
@@ -419,7 +420,6 @@ export default function HedgeRoll({ lang }: HedgeRollProps): JSX.Element {
           <p class={`m3-note ${chipClass}`} data-note>
             {t(noteKey, { chf: absTxt })}
           </p>
-          <p class="m3-hint">{t('hr.hint')}</p>
           <div class="sr-only" aria-live="polite" aria-atomic="true">
             {moved && mode === 'manual'
               ? t('hr.live', { spot: r4(spot), settle: settleTxt, allIn: r5(v.allIn) })
@@ -461,9 +461,8 @@ export default function HedgeRoll({ lang }: HedgeRollProps): JSX.Element {
         </li>
         <li class="m3-tl-card is-total">
           <span class="m3-tl-head">{t('hr.tl.total')}</span>
-          <span class="m3-tl-big mono">
-            {t('hr.tl.totalText', { chf: chf(v.totalChf), notional })}
-          </span>
+          <span class="m3-tl-big mono">{chf(v.totalChf)}</span>
+          <span class="m3-tl-for">{t('hr.tl.forUsd', { notional })}</span>
           <span class="m3-tl-sub">
             {t('hr.tl.totalRate', { rate: r5(v.allIn), old: r5(OLD), pips: pipsTxt })}
           </span>

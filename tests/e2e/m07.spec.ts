@@ -128,6 +128,10 @@ test('TouchLab: modes, payment toggle and vol', async ({ page }) => {
   await expect(fig).toHaveAttribute('data-mode', 'oneTouch');
   await fig.getByRole('button', { name: 'bei Berührung', exact: true }).click();
   await expect(fig.locator('[data-aha="same"]')).toBeVisible();
+  // At a CHF rate of 0 % the check must not claim that paying at the hit is worth more.
+  await expect(fig.locator('.ff-check')).toContainText('nicht mehr wert');
+  await fig.locator('#tl-rd').fill('1');
+  await expect(fig.locator('.ff-check')).toContainText('früher kommt');
   await fig.getByRole('button', { name: 'Double No-Touch', exact: true }).click();
   await expect(fig).toHaveAttribute('data-mode', 'dnt');
   const hero = fig.locator('.ff-stat-hero-main');

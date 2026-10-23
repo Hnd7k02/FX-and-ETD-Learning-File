@@ -51,6 +51,7 @@ import { fmtMoney, fmtNumber, fmtPct, fmtPips, fmtRate } from '@/lib/format';
 import {
   PATHSIM_CONFIG,
   defaultScenario,
+  earlyEndFixings,
   eventAt,
   fairInfo,
   forwardToDay,
@@ -498,7 +499,10 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
 
   /* ---------- tweened numbers ---------- */
   const numInstant = rm || drag !== null;
-  const heroTarget = isHedge ? pState.diff : pState.cumPnl;
+  // product − forward from the whole-franc amounts shown beside it, so the three numbers add up
+  const heroTarget = isHedge
+    ? Math.round(pState.cumPnl) - Math.round(pState.cumBench)
+    : pState.cumPnl;
   const heroTw = useTween(heroTarget, 300, numInstant);
   const prodTw = useTween(pState.cumPnl, 300, numInstant);
   const benchTw = useTween(pState.cumBench, 300, numInstant);
@@ -705,7 +709,7 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
     view === 'path'
       ? [
           { label: t('ps.lg.path'), color: 'var(--ff-ink)', width: 2 },
-          { label: t('ps.lg.forward'), color: 'var(--ff-ref)', kind: 'dashed', width: 2 },
+          { label: t('ps.lg.forward'), color: 'var(--ff-forward)', kind: 'dashed', width: 2 },
           { label: t('ps.lg.fixGain'), color: 'var(--ff-long)', width: 6 },
           { label: t('ps.lg.fixLoss'), color: 'var(--ff-short)', width: 6 },
         ]
@@ -723,18 +727,30 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
     const adj = param !== undefined && pv.status === 'done' && pv.res;
     if (adj && pv.res) {
       const s = pv.res.stats;
+      const pEnd = earlyKey === 'ko' ? s.endProbability.knockout : s.endProbability.target;
       return {
-        pEnd: earlyKey === 'ko' ? s.endProbability.knockout : s.endProbability.target,
-        fixings: s.expectedFixings,
+        pEnd,
+        earlyFixings: earlyEndFixings(
+          s.expectedFixings,
+          s.endProbability.maturity,
+          pEnd,
+          product.fixingDays.length,
+        ),
         q05: s.pvQuantile05,
         worst: s.pvMin,
         paths: pv.res.paths,
         note: t('ps.st.mcNoteAdj', { paths: count(pv.res.paths) }),
       };
     }
+    const pEnd = earlyKey === 'ko' ? fair.pKnockOut : fair.pTarget;
     return {
-      pEnd: earlyKey === 'ko' ? fair.pKnockOut : fair.pTarget,
-      fixings: fair.expectedFixings,
+      pEnd,
+      earlyFixings: earlyEndFixings(
+        fair.expectedFixings,
+        fair.pMaturity,
+        pEnd,
+        product.fixingDays.length,
+      ),
       q05: fair.pvQuantile05,
       worst: fair.pvMin,
       paths: fair.paths,
@@ -1541,7 +1557,7 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
               <StatRow
                 label={t('ps.st.fixing')}
                 sub={statusText}
-                value={t('ps.st.fixingValue', { i: pState.passed, n: sim.rows.length })}
+                value={t('ps.st.fixingValue', { i: pState.passedActive, n: sim.rows.length })}
               />
               {isHedge && (
                 <StatRow
@@ -1585,7 +1601,13 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
               <StatRow
                 label={t(`ps.ens.early.${earlyKey}`)}
                 value={t('ps.ens.ofN', { v: earlyCount, n: ensSum.n })}
-                sub={t('ps.st.pEndSub', { f: fmtNumber(ensSum.meanFixings, lang, { digits: 1 }) })}
+                sub={
+                  ensSum.meanFixingsEarly !== null
+                    ? t('ps.st.pEndSub', {
+                        f: fmtNumber(ensSum.meanFixingsEarly, lang, { digits: 1 }),
+                      })
+                    : undefined
+                }
               />
               <StatRow label={t('ps.ens.best')} value={chf(ensSum.best, true)} />
               <StatRow
@@ -1608,7 +1630,13 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
               <StatRow label={secondRow.label} sub={secondRow.sub} value={secondRow.value} />
               <StatRow
                 label={t(`ps.st.pEnd.${earlyKey}`)}
-                sub={t('ps.st.pEndSub', { f: fmtNumber(fairStats.fixings, lang, { digits: 1 }) })}
+                sub={
+                  fairStats.earlyFixings !== null
+                    ? t('ps.st.pEndSub', {
+                        f: fmtNumber(fairStats.earlyFixings, lang, { digits: 1 }),
+                      })
+                    : undefined
+                }
                 value={fmtPct(fairStats.pEnd, lang, 1)}
               />
               <StatRow

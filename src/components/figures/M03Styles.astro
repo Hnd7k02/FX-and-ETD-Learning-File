@@ -350,8 +350,8 @@
     stroke-width: 2;
   }
   .m3-seg.is-ghost {
-    stroke-width: 2;
-    stroke-dasharray: 3 3;
+    stroke-width: 2.5;
+    stroke-dasharray: 2 3;
   }
   .m3-seg.is-in,
   .m3-seg-head.is-in {
@@ -362,8 +362,8 @@
     stroke: var(--ff-short);
   }
   .m3-seg.is-ghost.is-in {
-    stroke: var(--ff-linear);
-    opacity: 0.6;
+    stroke: var(--ff-short);
+    opacity: 0.8;
   }
   .m3-seg-head {
     fill: none;
@@ -516,6 +516,41 @@
   .m3 .m3-table tr.is-net td {
     background: var(--ff-surface-2);
   }
+  .m3 .m3-cmp-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0;
+  }
+  .m3-cmp-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 10px 12px;
+    border: 1px solid var(--ff-line);
+    border-radius: var(--ff-r-box);
+    font-size: 13px;
+    line-height: 1.45;
+    transition: background-color 300ms ease;
+  }
+  .m3-cmp-item.is-focus {
+    background: var(--ff-linear-soft);
+    border-color: transparent;
+  }
+  .m3-cmp-item dt {
+    font-weight: 800;
+  }
+  .m3-cmp-item dd {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    color: var(--ff-ink-2);
+  }
+  .m3-cmp-item dd b {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ff-muted);
+  }
   .m3 .m3-cmp-table tr {
     transition: background-color 300ms ease;
   }
@@ -530,6 +565,11 @@
   }
   .m3 .m3-hint {
     font-size: 12px;
+  }
+  /* StatRow without a symbol: text column flexible, value column sized to its content
+     (the shared grid would otherwise give the text the auto column). */
+  .m3 .ff-stat-row:not(:has(> .ff-stat-symbol)) {
+    grid-template-columns: minmax(0, 1fr) auto;
   }
   .m3-sw {
     display: inline-block;
@@ -769,6 +809,10 @@
   .m3-tl-big {
     font-size: 16px;
     font-weight: 700;
+  }
+  .m3-tl-for {
+    font-size: 13px;
+    color: var(--ff-ink-2);
   }
   .m3-tl-sub {
     font-size: 12px;

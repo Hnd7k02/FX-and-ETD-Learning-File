@@ -280,7 +280,14 @@ export default function StructureBlocks(props: StructureBlocksProps): JSX.Elemen
   const legend: LegendItem[] = [
     { label: t('sb.lg.product'), color: 'var(--ff-forward)' },
     ...(story
-      ? [{ label: t('sb.lg.forward'), color: 'var(--ff-ref)', kind: 'dashed' as const, width: 2 }]
+      ? [
+          {
+            label: t('sb.lg.forward'),
+            color: 'var(--ff-forward)',
+            kind: 'dashed' as const,
+            width: 2,
+          },
+        ]
       : []),
     ...(blocks
       ? [
@@ -323,20 +330,29 @@ export default function StructureBlocks(props: StructureBlocksProps): JSX.Elemen
     const d = (st.strike - F) / PIP;
     if (i === 0) return rate(st.strike);
     const base = `${rate(st.strike)} · ${t('sb.pipsDiff', { v: fmtPips(d, lang, 0, true) })}`;
-    return i === last ? `${base} · ± ${se}` : base;
+    return i === last ? `${base} · ±\u00a0${se}` : base;
   };
   const blockLabelPos = (b: BlockLine): [number, number, 'start' | 'end'] => {
     // calls rise to the right, puts to the left: label at the end where the line is away from 0
     const right = b.shape === 'call' || b.shape === 'digitalCall' || b.shape === 'rangeDigital';
-    const xr = right
-      ? X_RANGE[1] - (X_RANGE[1] - X_RANGE[0]) * 0.02
-      : X_RANGE[0] + (X_RANGE[1] - X_RANGE[0]) * 0.02;
+    const pad = (X_RANGE[1] - X_RANGE[0]) * 0.02;
+    let xr = right ? X_RANGE[1] - pad : X_RANGE[0] + pad;
+    // inside a knock-out zone the label would collide with the zone label: put it just outside
+    const koNow = featureAlpha > 0.5 ? ko : null;
+    let anchorOut: 'start' | 'end' | null = null;
+    if (koNow && right && xr >= koNow.from && koNow.to >= xr && Number.isFinite(koNow.from)) {
+      xr = koNow.from - pad;
+      anchorOut = 'end';
+    } else if (koNow && !right && xr >= koNow.from && koNow.to >= xr && Number.isFinite(koNow.to)) {
+      xr = koNow.to + pad;
+      anchorOut = 'start';
+    }
     const xm = b.shape === 'rangeDigital' ? (b.level + (b.upper ?? b.level)) / 2 : xr;
     const y = blockValue(b, xm) * N;
     return [
       xs(xm),
       ys(y) + (b.sign > 0 ? -8 : 16),
-      b.shape === 'rangeDigital' ? 'start' : right ? 'end' : 'start',
+      b.shape === 'rangeDigital' ? 'start' : (anchorOut ?? (right ? 'end' : 'start')),
     ];
   };
 
@@ -461,6 +477,21 @@ export default function StructureBlocks(props: StructureBlocksProps): JSX.Elemen
                 height={plotBottom - L.top + 8}
               />
             </clipPath>
+            {ko && (
+              <clipPath id={`${clipId}-live`}>
+                <rect
+                  x={buyer ? 0 : koX1}
+                  y={0}
+                  width={Math.max(0, buyer ? koX0 : L.width - koX1)}
+                  height={L.height}
+                />
+              </clipPath>
+            )}
+            {ko && (
+              <clipPath id={`${clipId}-ko`}>
+                <rect x={koX0} y={0} width={Math.max(0, koX1 - koX0)} height={L.height} />
+              </clipPath>
+            )}
           </defs>
           {ko && (
             <g style={{ opacity: featureAlpha }}>
@@ -477,7 +508,7 @@ export default function StructureBlocks(props: StructureBlocksProps): JSX.Elemen
                 class="sb-ko-label"
                 style={{ fontSize: fs, textAnchor: buyer ? 'start' : 'end', ...halo }}
               >
-                {t('sb.ko')}
+                {t(L.compact ? 'sb.koShort' : 'sb.ko')}
               </text>
             </g>
           )}
@@ -507,13 +538,22 @@ export default function StructureBlocks(props: StructureBlocksProps): JSX.Elemen
           )}
           <g clip-path={`url(#${clipId})`}>
             {story && <path d={forwardD} class="sb-forward" />}
+            {/* inside the knock-out zone the blocks are knocked out too: they fade there */}
             {blocks &&
-              stage.blocks.map((b, i) => (
-                <path
-                  key={`b${i}`}
-                  d={blockD(b)}
-                  class={b.sign > 0 ? 'sb-block sb-block--long' : 'sb-block sb-block--short'}
-                />
+              (ko ? [`${clipId}-live`, `${clipId}-ko`] : [null]).map((clip, c) => (
+                <g
+                  key={`bg${c}`}
+                  clip-path={clip ? `url(#${clip})` : undefined}
+                  style={c === 1 ? { opacity: 1 - 0.8 * featureAlpha } : undefined}
+                >
+                  {stage.blocks.map((b, i) => (
+                    <path
+                      key={`b${i}`}
+                      d={blockD(b)}
+                      class={b.sign > 0 ? 'sb-block sb-block--long' : 'sb-block sb-block--short'}
+                    />
+                  ))}
+                </g>
               ))}
             <path d={productD} class="sb-product" />
           </g>

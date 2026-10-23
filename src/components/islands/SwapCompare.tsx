@@ -163,7 +163,8 @@ export default function SwapCompare({ lang, tenor: tenorProp }: SwapCompareProps
       }
       const len = segs.reduce((a, s) => a + (s.kind === 'ghost' ? 0 : s.len), 0);
       const isEnd = g.day === 0 || g.day === tenor.days;
-      const showLabel = isEnd || (!couponLabelled && Math.abs(g.total) > 0.5 && g.ccy === 'base');
+      const showLabel =
+        isEnd || (!L.compact && !couponLabelled && Math.abs(g.total) > 0.5 && g.ccy === 'base');
       if (!isEnd && showLabel) couponLabelled = true;
       const text = g.ccy === 'base' ? usd(g.total) : chf(g.total);
       const w = textWidth(text, L.font, 0.6) + 4;
@@ -348,32 +349,50 @@ export default function SwapCompare({ lang, tenor: tenorProp }: SwapCompareProps
         </div>
       </div>
 
-      <div
-        class="ff-scroll-x m3-table-wrap"
-        tabIndex={0}
-        role="region"
-        aria-label={t('sc.table.caption')}
-      >
-        <table class="ff-table m3-table m3-cmp-table" data-cmp-table>
-          <caption class="sr-only">{t('sc.table.caption')}</caption>
-          <thead>
-            <tr>
-              <th scope="col">{t('sc.table.aspect')}</th>
-              <th scope="col">{t('sc.row.fx')}</th>
-              <th scope="col">{t('sc.row.ccs')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {tableRows.map((r) => (
-              <tr key={r.key} class={r.f ? rowClass(r.f) : ''}>
-                <th scope="row">{t(`sc.t.${r.key}` as 'sc.t.tenor')}</th>
-                <td>{t(`sc.t.${r.key}.fx` as 'sc.t.tenor.fx')}</td>
-                <td>{t(`sc.t.${r.key}.ccs` as 'sc.t.tenor.ccs')}</td>
+      {L.compact ? (
+        <dl class="m3-cmp-list" data-cmp-table>
+          {tableRows.map((r) => (
+            <div key={r.key} class={`m3-cmp-item ${r.f ? rowClass(r.f) : ''}`}>
+              <dt>{t(`sc.t.${r.key}` as 'sc.t.tenor')}</dt>
+              <dd>
+                <b>{t('sc.row.fx')}</b>
+                <span>{t(`sc.t.${r.key}.fx` as 'sc.t.tenor.fx')}</span>
+              </dd>
+              <dd>
+                <b>{t('sc.row.ccs')}</b>
+                <span>{t(`sc.t.${r.key}.ccs` as 'sc.t.tenor.ccs')}</span>
+              </dd>
+            </div>
+          ))}
+        </dl>
+      ) : (
+        <div
+          class="ff-scroll-x m3-table-wrap"
+          tabIndex={0}
+          role="region"
+          aria-label={t('sc.table.caption')}
+        >
+          <table class="ff-table m3-table m3-cmp-table" data-cmp-table>
+            <caption class="sr-only">{t('sc.table.caption')}</caption>
+            <thead>
+              <tr>
+                <th scope="col">{t('sc.table.aspect')}</th>
+                <th scope="col">{t('sc.row.fx')}</th>
+                <th scope="col">{t('sc.row.ccs')}</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {tableRows.map((r) => (
+                <tr key={r.key} class={r.f ? rowClass(r.f) : ''}>
+                  <th scope="row">{t(`sc.t.${r.key}` as 'sc.t.tenor')}</th>
+                  <td>{t(`sc.t.${r.key}.fx` as 'sc.t.tenor.fx')}</td>
+                  <td>{t(`sc.t.${r.key}.ccs` as 'sc.t.tenor.ccs')}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
       <p class="m3-hint">{t('sc.hint')}</p>
       <div class="sr-only" aria-live="polite" aria-atomic="true">
         {touched ? t('sc.live', { tenor: tenorId, far: farTxt, n: fmtNumber(nCoupons, lang) }) : ''}

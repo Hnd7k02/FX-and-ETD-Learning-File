@@ -44,7 +44,8 @@ Some knock-outs pay a fixed compensation when they are knocked out, the rebate. 
 **2.** The idea comes from physics: next to the vanilla, place a mirrored vanilla whose spot is reflected at the barrier, <i>H</i>²/<i>S</i>. Subtract it with the right weight:
 
 <Formula variant="accent">
-  <span><i>C</i><sub>DO</sub>(<i>S</i>) = <i>C</i>(<i>S</i>) − (<i>H</i>/<i>S</i>)<sup>2μ</sup> · <i>C</i>(<i>H</i>²/<i>S</i>), μ = (<i>r</i><sub>d</sub> − <i>r</i><sub>f</sub> − ½σ²) / σ²</span>
+  <span><i>C</i><sub>DO</sub>(<i>S</i>) = <i>C</i>(<i>S</i>) − (<i>H</i>/<i>S</i>)<sup>2μ</sup> · <i>C</i>(<i>H</i>²/<i>S</i>)</span>
+  <span>μ = (<i>r</i><sub>d</sub> − <i>r</i><sub>f</sub> − ½σ²) / σ²</span>
 </Formula>
 
 **3.** At the barrier <i>S</i> = <i>H</i>. Then <i>H</i>²/<i>S</i> = <i>H</i> and the weight is 1: both terms are equal and the option is worth zero. That is exactly what a knock-out requires.
@@ -61,7 +62,10 @@ The formulas assume continuous monitoring: every second counts. Some contracts, 
 
 Broadie, Glasserman and Kou showed that a barrier observed daily behaves almost like a continuous one placed a little further from spot.
 
-<Formula variant="dark"><span><i>H</i><sub>continuous</sub> ≈ <i>H</i> · <i>e</i><sup>±β · σ · √Δ<i>t</i></sup>, β = <Num of="m07.bgkBeta" />, Δ<i>t</i> = 1/365</span></Formula>
+<Formula variant="dark">
+  <span><i>H</i><sub>continuous</sub> ≈ <i>H</i> · <i>e</i><sup>±β · σ · √Δ<i>t</i></sup></span>
+  <span>β = <Num of="m07.bgkBeta" />, Δ<i>t</i> = 1/365</span>
+</Formula>
 
 With σ = <Num of="ex.vol" /> the factor is <Num of="m07.bgkFactor" />. The barrier at <Num of="m07.barrierUp" /> acts like one at <Num of="m07.bgkBarrier" />, about <Num of="m07.bgkShiftPips" /> pips further away. The up-and-out call then costs <Num of="m07.uocDailyPips" /> instead of <Num of="m07.uocPips" /> pips. In the lab, switch to "Daily (BGK)".
 

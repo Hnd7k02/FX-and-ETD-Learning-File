@@ -44,7 +44,8 @@ Manche Knock-outs zahlen bei der Berührung eine feste Entschädigung, das Rebat
 **2.** Die Idee aus der Physik: Stell neben den Vanilla einen gespiegelten Vanilla, dessen Spot an der Barriere reflektiert ist: <i>H</i>²/<i>S</i>. Mit dem passenden Gewicht ziehst du ihn ab:
 
 <Formula variant="accent">
-  <span><i>C</i><sub>DO</sub>(<i>S</i>) = <i>C</i>(<i>S</i>) − (<i>H</i>/<i>S</i>)<sup>2μ</sup> · <i>C</i>(<i>H</i>²/<i>S</i>), μ = (<i>r</i><sub>d</sub> − <i>r</i><sub>f</sub> − ½σ²) / σ²</span>
+  <span><i>C</i><sub>DO</sub>(<i>S</i>) = <i>C</i>(<i>S</i>) − (<i>H</i>/<i>S</i>)<sup>2μ</sup> · <i>C</i>(<i>H</i>²/<i>S</i>)</span>
+  <span>μ = (<i>r</i><sub>d</sub> − <i>r</i><sub>f</sub> − ½σ²) / σ²</span>
 </Formula>
 
 **3.** An der Barriere ist <i>S</i> = <i>H</i>. Dann ist <i>H</i>²/<i>S</i> = <i>H</i> und das Gewicht 1: Beide Terme sind gleich, die Option ist null wert. Genau das verlangt der Knock-out.
@@ -61,7 +62,10 @@ Die Formeln gehen von stetiger Beobachtung aus: Jede Sekunde zählt. Manche Vert
 
 Broadie, Glasserman und Kou haben gezeigt: Eine täglich beobachtete Barriere wirkt fast wie eine stetige, die ein Stück weiter vom Spot weg liegt.
 
-<Formula variant="dark"><span><i>H</i><sub>stetig</sub> ≈ <i>H</i> · <i>e</i><sup>±β · σ · √Δ<i>t</i></sup>, β = <Num of="m07.bgkBeta" />, Δ<i>t</i> = 1/365</span></Formula>
+<Formula variant="dark">
+  <span><i>H</i><sub>stetig</sub> ≈ <i>H</i> · <i>e</i><sup>±β · σ · √Δ<i>t</i></sup></span>
+  <span>β = <Num of="m07.bgkBeta" />, Δ<i>t</i> = 1/365</span>
+</Formula>
 
 Mit σ = <Num of="ex.vol" /> ist der Faktor <Num of="m07.bgkFactor" />. Die Barriere <Num of="m07.barrierUp" /> wirkt wie <Num of="m07.bgkBarrier" />, rund <Num of="m07.bgkShiftPips" /> Pips weiter weg. Der Up-and-out Call kostet dann <Num of="m07.uocDailyPips" /> statt <Num of="m07.uocPips" /> Pips. Im Labor schaltest du das mit «Täglich (BGK)» um.
 
