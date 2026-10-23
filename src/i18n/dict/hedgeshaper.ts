@@ -26,7 +26,7 @@ export const hedgeshaper = defineDict({
     'hs.desc.call-spread':
       'Der verkaufte Call macht den Schutz billiger. Über {k2} zahlst du wieder den Marktkurs, nur mit einem festen Abschlag.',
     'hs.desc.collar':
-      'Der verkaufte Put bezahlt den Call. Dafür kaufst du unter {kp} nie günstiger als {kp}.',
+      'Der verkaufte Put bezahlt den Call. Dafür kaufst du nie günstiger als {kp}, auch wenn der Dollar tiefer fällt.',
     'hs.desc.seagull':
       'Beides zusammen: Zero Cost mit einem tieferen Put. Dafür endet der Schutz über {k2}.',
     'hs.lg.structure': 'Mit Struktur',
@@ -37,17 +37,16 @@ export const hedgeshaper = defineDict({
     'hs.cap': 'Deckel {r}',
     'hs.floor': 'Boden {r}',
     'hs.ends': 'Schutz endet über {k}',
-    'hs.band.benefit': 'spart',
-    'hs.band.cost': 'kostet',
-    'hs.aha': 'Zero Cost: Der Put bezahlt den Call',
+    'hs.aha.collar': 'Zero Cost: Der Put bezahlt den Call',
+    'hs.aha.seagull': 'Zero Cost: Der Put bezahlt den Call-Spread',
     'hs.premium': 'Nettoprämie',
     'hs.pips': '{v} Pips',
     'hs.pay': '{chf} · du zahlst',
     'hs.zero': 'Zero Cost',
-    'hs.capRow': 'Schlechtester Kurs',
+    'hs.capRow': 'Deckel',
     'hs.capAlways': 'ab {from}, egal wie hoch der Dollar steigt',
     'hs.capUntil': 'von {from} bis {to}, darüber Markt minus {disc} Pips',
-    'hs.floorRow': 'Bester Kurs',
+    'hs.floorRow': 'Boden',
     'hs.floorOpen': 'offen',
     'hs.floorOpenSub': 'Fällt der Dollar, kaufst du günstiger (plus Prämie)',
     'hs.floorSub': 'Unter {k} kaufst du trotzdem zu {k}',
@@ -58,7 +57,7 @@ export const hedgeshaper = defineDict({
     'hs.aria':
       'Bezahlter Kurs bei Verfall für {name}: blau mit Struktur, orange ohne Absicherung, schwarz gestrichelt der Forward. Nettoprämie {premium}. Bei {st} zahlst du {rate} statt {unhedged}.',
     'hs.summary':
-      '{name}: Nettoprämie {premium}. Schlechtester Kurs {cap}. Bester Kurs {floor}. Bei {st} zahlst du {chf}.',
+      '{name}: Nettoprämie {premium}. Deckel {cap}, {capSub}. Boden {floor}. Bei {st} zahlst du {chf}.',
   },
   en: {
     'hs.title': 'Shaping cost and risk',
@@ -81,7 +80,7 @@ export const hedgeshaper = defineDict({
     'hs.desc.call-spread':
       'The sold call makes the protection cheaper. Above {k2} you pay the market rate again, just with a fixed discount.',
     'hs.desc.collar':
-      'The sold put pays for the call. In return you never buy cheaper than {kp}, even below {kp}.',
+      'The sold put pays for the call. In return you never buy cheaper than {kp}, even if the dollar falls further.',
     'hs.desc.seagull':
       'Both together: zero cost with a lower put. In return the protection ends above {k2}.',
     'hs.lg.structure': 'With the structure',
@@ -92,17 +91,16 @@ export const hedgeshaper = defineDict({
     'hs.cap': 'Cap {r}',
     'hs.floor': 'Floor {r}',
     'hs.ends': 'Protection ends above {k}',
-    'hs.band.benefit': 'saves',
-    'hs.band.cost': 'costs',
-    'hs.aha': 'Zero cost: the put pays for the call',
+    'hs.aha.collar': 'Zero cost: the put pays for the call',
+    'hs.aha.seagull': 'Zero cost: the put pays for the call spread',
     'hs.premium': 'Net premium',
     'hs.pips': '{v} pips',
     'hs.pay': '{chf} · you pay',
     'hs.zero': 'Zero cost',
-    'hs.capRow': 'Worst rate',
+    'hs.capRow': 'Cap',
     'hs.capAlways': 'from {from}, however high the dollar rises',
     'hs.capUntil': 'from {from} to {to}, above that market minus {disc} pips',
-    'hs.floorRow': 'Best rate',
+    'hs.floorRow': 'Floor',
     'hs.floorOpen': 'open',
     'hs.floorOpenSub': 'If the dollar falls, you buy cheaper (plus premium)',
     'hs.floorSub': 'Below {k} you still buy at {k}',
@@ -113,6 +111,6 @@ export const hedgeshaper = defineDict({
     'hs.aria':
       'Rate paid at expiry for the {name}: blue with the structure, orange unhedged, black dashed the forward. Net premium {premium}. At {st} you pay {rate} instead of {unhedged}.',
     'hs.summary':
-      '{name}: net premium {premium}. Worst rate {cap}. Best rate {floor}. At {st} you pay {chf}.',
+      '{name}: net premium {premium}. Cap {cap}, {capSub}. Floor {floor}. At {st} you pay {chf}.',
   },
 });

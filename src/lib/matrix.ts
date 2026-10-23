@@ -108,7 +108,15 @@ export const MATRIX: {
 
 /* ---------- product catalogue: risk chips and links ---------- */
 
-export type Family = 'linear' | 'order' | 'option' | 'structured' | 'deposit';
+export type Family = 'linear' | 'order' | 'option' | 'structured' | 'yield' | 'deposit';
+export const FAMILY_IDS: readonly Family[] = [
+  'linear',
+  'order',
+  'option',
+  'structured',
+  'yield',
+  'deposit',
+];
 export type PathKind = 'none' | 'trigger' | 'knockout' | 'target';
 export type LossKind =
   | 'none'
@@ -232,7 +240,7 @@ export const PRODUCTS: Record<ProductId, ProductDef> = {
     link: { slug: '08-structured-products', section: '4' },
   },
   dci: {
-    family: 'option',
+    family: 'yield',
     leverage: 1,
     path: 'none',
     loss: 'conversion',
@@ -240,7 +248,7 @@ export const PRODUCTS: Record<ProductId, ProductDef> = {
     link: { slug: '08-structured-products', section: '4' },
   },
   discount: {
-    family: 'option',
+    family: 'yield',
     leverage: 1,
     path: 'none',
     loss: 'market',

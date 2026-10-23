@@ -178,16 +178,21 @@ export default function SmileBuilder(props: SmileBuilderProps): JSX.Element {
     bf: pct(q.bf25, 2, true),
   });
   const eff = useMemo(() => premiumEffect(q, EXAMPLE.spot, T, EXAMPLE.rd, EXAMPLE.rf), [q]);
+  /* prices on the 0.1-pip display grid, so the difference shown is the difference of the two
+     prices shown (52.9 − 43.6 = +9.3) */
+  const r1 = (x: number) => Math.round(x * 10) / 10;
   const effRow = (k: 'put25' | 'call25') => {
     const e = eff[k];
+    const pSmile = r1(e.smile / PIP);
+    const pFlat = r1(e.flat / PIP);
     return {
       sub: t('sb.eff.sub', {
         smile: pct(e.volSmile),
         flat: pct(e.volFlat),
-        pSmile: fmtPips(e.smile / PIP, lang),
-        pFlat: fmtPips(e.flat / PIP, lang),
+        pSmile: fmtPips(pSmile, lang),
+        pFlat: fmtPips(pFlat, lang),
       }),
-      value: t('sb.pips', { v: fmtPips((e.smile - e.flat) / PIP, lang, 1, true) }),
+      value: t('sb.pips', { v: fmtPips(pSmile - pFlat, lang, 1, true) }),
     };
   };
 
@@ -305,7 +310,11 @@ export default function SmileBuilder(props: SmileBuilderProps): JSX.Element {
           <div class="sb-top">
             <Legend
               items={[
-                { label: t('sb.lg.smile'), color: 'var(--ff-options)', width: 3 },
+                {
+                  label: t(view === 'delta' ? 'sb.lg.smileDelta' : 'sb.lg.smile'),
+                  color: 'var(--ff-options)',
+                  width: 3,
+                },
                 { label: t('sb.lg.flat'), color: 'var(--ff-payoff)', kind: 'dashed', width: 1.75 },
                 { label: t('sb.lg.mid'), color: 'var(--ff-ink-2)', kind: 'dashed', width: 1.5 },
               ]}

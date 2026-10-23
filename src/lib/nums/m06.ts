@@ -113,6 +113,8 @@ const rrSmileLegs = rr.legs.map((l) => ({ ...l }));
 const rrPutSmile = solveZeroCostStrike(rrSmileLegs, 1, SMILE_MARKET) ?? NaN;
 const rrOnSmile = netPremium(rr.legs, SMILE_MARKET);
 const sqrt2pi = Math.sqrt(2 / Math.PI);
+/** Rounds to the 0.1-pip display grid, so that displayed differences add up (D-26, D-38). */
+const r1 = (x: number) => Math.round(x * 10) / 10;
 
 /** Raw values for the quiz file and tests (quote currency per 1 USD unless noted). */
 export const M06 = {
@@ -270,6 +272,17 @@ export const nums: NumTable = {
     kind: 'pips',
     note: '√(2/π)·σ√T·F·DF_d',
   },
+  'm06.straddleAtFPips': {
+    value: 2 * pips(gkPrice(S, F, T, vol, rd, rf, 'call')),
+    kind: 'pips',
+    digits: 1,
+    note: 'Exact Black-76 straddle with K = F (call = put there)',
+  },
+  'm06.expMovePct': {
+    value: sqrt2pi * vol * Math.sqrt(T),
+    kind: 'pct',
+    note: 'Expected absolute move by expiry relative to F: √(2/π)·σ√T',
+  },
   'm06.sqrt2pi': { value: sqrt2pi, kind: 'num', digits: 4, note: '√(2/π)' },
   'm06.sigmaSqrtT': { value: vol * Math.sqrt(T), kind: 'num', digits: 2, note: 'σ√T' },
   'm06.shockPts': {
@@ -334,16 +347,18 @@ export const nums: NumTable = {
   'm06.put25SmilePips': { value: pips(eff.put25.smile), kind: 'pips' },
   'm06.put25FlatPips': { value: pips(eff.put25.flat), kind: 'pips' },
   'm06.put25DiffPips': {
-    value: pips(eff.put25.smile - eff.put25.flat),
+    value: r1(pips(eff.put25.smile)) - r1(pips(eff.put25.flat)),
     kind: 'pips',
     sign: true,
+    note: 'Difference of the two displayed (rounded) prices, so the text adds up',
   },
   'm06.call25SmilePips': { value: pips(eff.call25.smile), kind: 'pips' },
   'm06.call25FlatPips': { value: pips(eff.call25.flat), kind: 'pips' },
   'm06.call25DiffPips': {
-    value: pips(eff.call25.smile - eff.call25.flat),
+    value: r1(pips(eff.call25.smile)) - r1(pips(eff.call25.flat)),
     kind: 'pips',
     sign: true,
+    note: 'Difference of the two displayed (rounded) prices, so the text adds up',
   },
   'm06.rrSmileCreditPips': {
     value: -rrOnSmile.pips,

@@ -227,6 +227,7 @@ export default function HedgeShaper({ lang }: HedgeShaperProps): JSX.Element {
     name,
     premium: premiumText,
     cap: rate(f.capRate),
+    capSub,
     floor: floorText,
     st: rate(st),
     chf: chf(rateAt * N),
@@ -417,7 +418,7 @@ export default function HedgeShaper({ lang }: HedgeShaperProps): JSX.Element {
                     ...halo,
                   }}
                 >
-                  {t('hs.aha')}
+                  {t(id === 'seagull' ? 'hs.aha.seagull' : 'hs.aha.collar')}
                 </text>
               )}
 

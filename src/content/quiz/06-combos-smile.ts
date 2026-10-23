@@ -22,6 +22,7 @@ const callPips = pips(M06.csCallPips);
 const soldPips = pips(M06.csSoldPips);
 const csPips = pips(M06.csPips);
 const widthPips = pips((M06.csK2 - M06.csK1) / PIP, 0);
+const maxGainPips = pips(M06.csMaxGain / N / PIP);
 /** "79.4 Pips" / "79.4 pips". */
 const pipsLabel = (x: number) => both((l) => `${fmtPips(x, l)} ${l === 'de' ? 'Pips' : 'pips'}`);
 
@@ -97,8 +98,8 @@ const q2: QuizQuestion = {
       label: chf(M06.rrPutK * N),
       mono: true,
       explain: {
-        de: `Richtig. Unter ${rate(M06.rrPutK)} wird der Put ausgeübt, und er kauft zum Put-Strike. Gegenüber dem Markt zahlt er ${chf((M06.rrPutK - M06.stDown) * N).de} mehr: der Preis für den Gratis-Schutz.`,
-        en: `Correct. Below ${rate(M06.rrPutK)} the put is exercised and he buys at the put strike. Compared with the market he pays ${chf((M06.rrPutK - M06.stDown) * N).en} more: the price of the free protection.`,
+        de: `Richtig. Unter ${rate(M06.rrPutK)} wird der Put ausgeübt, und er kauft zum Put-Strike. Gegenüber dem Markt zahlt er ${chf((M06.rrPutK - M06.stDown) * N).de} mehr: der Preis für den Schutz ohne Prämie.`,
+        en: `Correct. Below ${rate(M06.rrPutK)} the put is exercised and he buys at the put strike. Compared with the market he pays ${chf((M06.rrPutK - M06.stDown) * N).en} more: the price of protection without a premium.`,
       },
     },
     {
@@ -150,6 +151,9 @@ const q3: QuizQuestion = {
 const atm = pct(M06.atm);
 const rrQ = pct(M06.rr25, 2, true);
 const bfQ = pct(M06.bf25, 2, true);
+/** Terms of σ25P = ATM + BF − RR/2 without a doubled sign: "8.00 % + 0.25 % − (−0.50 %)". */
+const bfAbs = pct(M06.bf25);
+const halfRr = pct(M06.rr25 / 2, 2, true);
 
 const q4: QuizQuestion = {
   id: 'm06-q4',
@@ -162,8 +166,8 @@ const q4: QuizQuestion = {
       label: pct(M06.vol25P),
       mono: true,
       explain: {
-        de: `Richtig. σ25P = ATM + BF − RR/2 = ${atm.de} + ${bfQ.de} + ${pct(-M06.rr25 / 2).de} = ${pct(M06.vol25P).de}. Der negative RR macht den Put teurer.`,
-        en: `Correct. σ25P = ATM + BF − RR/2 = ${atm.en} + ${bfQ.en} + ${pct(-M06.rr25 / 2).en} = ${pct(M06.vol25P).en}. The negative RR makes the put dearer.`,
+        de: `Richtig. σ25P = ATM + BF − RR/2 = ${atm.de} + ${bfAbs.de} − (${halfRr.de}) = ${pct(M06.vol25P).de}. Der negative RR macht den Put teurer.`,
+        en: `Correct. σ25P = ATM + BF − RR/2 = ${atm.en} + ${bfAbs.en} − (${halfRr.en}) = ${pct(M06.vol25P).en}. The negative RR makes the put dearer.`,
       },
     },
     {
@@ -187,7 +191,7 @@ const q4: QuizQuestion = {
       mono: true,
       explain: {
         de: 'Hier wurde der ganze RR statt RR/2 verwendet. Die beiden Flügel liegen je RR/2 neben ihrer Mitte.',
-        en: 'This uses the whole RR instead of RR/2. Each wing sits RR/2 away from their middle.',
+        en: 'This uses the whole RR instead of RR/2. Each wing sits RR/2 away from the middle of the two wings.',
       },
     },
   ],
@@ -248,8 +252,8 @@ const c2: QuizQuestion = {
       label: chf(M06.csMaxGain),
       mono: true,
       explain: {
-        de: `Richtig. Breite minus Prämie: ${widthPips.de} − ${csPips.de} Pips, ab ${rate(M06.csK2)} erreicht.`,
-        en: `Correct. Width minus premium: ${widthPips.en} − ${csPips.en} pips, reached from ${rate(M06.csK2)} upwards.`,
+        de: `Richtig. Breite minus Prämie: ${widthPips.de} − ${csPips.de} = ${maxGainPips.de} Pips, ab ${rate(M06.csK2)} erreicht.`,
+        en: `Correct. Width minus premium: ${widthPips.en} − ${csPips.en} = ${maxGainPips.en} pips, reached from ${rate(M06.csK2)} upwards.`,
       },
     },
     {
@@ -304,8 +308,8 @@ const c3: QuizQuestion = {
       label: { de: `${rate(beLo!)} und ${rate(beHi!)}`, en: `${rate(beLo!)} and ${rate(beHi!)}` },
       mono: true,
       explain: {
-        de: `Richtig. Strike minus und plus die ganze Prämie. Der Kurs muss sich bis Verfall um mehr als ${pips(M06.straddlePips).de} Pips bewegen.`,
-        en: `Correct. Strike minus and plus the whole premium. The rate has to move by more than ${pips(M06.straddlePips).en} pips by expiry.`,
+        de: `Richtig. Strike minus und plus die ganze Prämie. Bei Verfall muss der Kurs mehr als ${pips(M06.straddlePips).de} Pips vom Strike entfernt liegen.`,
+        en: `Correct. Strike minus and plus the whole premium. At expiry the rate has to end more than ${pips(M06.straddlePips).en} pips away from the strike.`,
       },
     },
     {

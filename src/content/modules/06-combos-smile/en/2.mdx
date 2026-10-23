@@ -8,13 +8,13 @@ A **call spread** is a long call with strike <i>K</i><sub>1</sub> and a short ca
 
 A **put spread** is the mirror image: a long put at <i>K</i><sub>1</sub> and a short put at a lower <i>K</i><sub>2</sub>. It suits someone who fears a falling dollar, for example an exporter who will receive USD in 3 months.
 
-A **risk reversal** combines a long call with a short put, both out of the money. In the market they are usually the 25Δ strikes. For our importer this is the **zero-cost collar**: the USD call protects him and the USD put he sells pays for it. The put strike is solved so that the net premium is zero.
+A **risk reversal** buys an option on one side and sells one on the other, both out of the money. In the market they are usually the 25Δ strikes. For our importer that means a long USD call and a short USD put. This is the **zero-cost collar**: the USD call protects him and the USD put he sells pays for the call. The put strike is solved so that the net premium is zero.
 
-<PayoffBuilderFigure templates={['call-spread', 'put-spread', 'risk-reversal']} initial="risk-reversal" highlightSolved caption="Drag the call strike K1 along the axis: the put strike K2 follows so that the net premium stays zero. The green ring marks the solved strike. Switch to the call and put spreads and compare the premium and the maximum gain." />
+<PayoffBuilderFigure templates={['call-spread', 'put-spread', 'risk-reversal']} initial="risk-reversal" highlightSolved caption="Drag the call strike K1 along the axis: the put strike K2 follows so that the net premium stays zero. The green frame marks the solved strike. Switch to the call and put spreads and compare the premium and the maximum gain." />
 
 ### The call spread in numbers
 
-The importer buys the call with strike <Num of="m06.csK1" /> and sells a call with strike <Num of="m06.csK2" />, the 25Δ strike. The call alone costs <Num of="ex.callPips" digits={1} /> pips. The call he sells brings back <Num of="m06.csSoldPips" /> pips, which is <Num of="m06.csSavePct" /> of the premium. He pays <Num of="m06.csPips" /> pips net, or <Num of="m06.csChf" />.
+The importer starts from the ATMF call of module 04, strike <Num of="m06.csK1" />. On top he sells a call with strike <Num of="m06.csK2" />, the 25Δ strike. The call alone costs <Num of="ex.callPips" digits={1} /> pips. The call he sells brings back <Num of="m06.csSoldPips" /> pips, which is <Num of="m06.csSavePct" /> of the premium. He pays <Num of="m06.csPips" /> pips net, or <Num of="m06.csChf" />.
 
 - The **break-even** is <i>K</i><sub>1</sub> plus the premium: <Num of="m06.csBe" />.
 - The **maximum gain** at expiry is the width minus the premium: <Num of="m06.csWidthPips" /> − <Num of="m06.csPips" /> = <Num of="m06.csMaxGainPips" /> pips, or <Num of="m06.csMaxGainChf" />. It is reached from <Num of="m06.csK2" /> upwards.
@@ -54,7 +54,7 @@ In the example: <Num of="m06.csPips" /> pips lies between 0 and <Num of="m06.csW
 
 In the options market, "25Δ risk reversal" is not only a structure but also a price. It is quoted in vol: the implied vol of the 25Δ call minus the implied vol of the 25Δ put. Traders deal it delta-hedged. Its sign shows which side the market pays more for. More on this in section 4.
 
-For companies: whoever sells the put needs a credit line. And the put spread is the counterpart for exporters who receive USD and fear a weak dollar.
+Companies usually know the risk reversal as a collar or tunnel. With a premium or at zero cost, the put sold is an obligation, so a credit line is needed. Exporters use the mirror image: a long USD put and a short USD call.
 
 </Desk>
 

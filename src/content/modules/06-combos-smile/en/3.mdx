@@ -15,7 +15,7 @@ Picture a trader who is waiting for an important interest rate decision. She has
 
 ### Straddle and strangle: long vol
 
-The straddle has both legs at the ATM strike <Num of="m06.dns" />, the strike of the delta-neutral straddle. It costs <Num of="m06.straddlePips" /> pips, or <Num of="m06.straddleChf" />. It only makes money outside the two break-evens <Num of="m06.straddleBeLo" /> and <Num of="m06.straddleBeHi" />. So USD/CHF has to move by more than <Num of="m06.straddleMovePct" /> by expiry.
+The straddle has both legs at the ATM strike <Num of="m06.dns" />, the strike of the delta-neutral straddle. It costs <Num of="m06.straddlePips" /> pips, or <Num of="m06.straddleChf" />. It only makes money outside the two break-evens <Num of="m06.straddleBeLo" /> and <Num of="m06.straddleBeHi" />. So at expiry USD/CHF has to end more than <Num of="m06.straddleMovePct" /> away from the strike. The move is measured from the strike, and that sits close to the forward, not at the spot. If USD/CHF is still at <Num of="ex.spot" /> at expiry, the straddle loses money all the same.
 
 Vega is <Num of="m06.straddleVegaChf" /> per vol point, twice as much as a single option. If implied vol rises by <Num of="m06.shockPts" /> points to <Num of="m06.shockVol" />, the straddle gains <Num of="m06.straddleShockChf" sign={false} /> today without the spot moving. In return, every quiet day costs it time value: theta is <Num of="m06.straddleThetaChf" /> per day.
 
@@ -25,7 +25,7 @@ The strangle with <Num of="m06.put25K" /> and <Num of="m06.call25K" /> costs onl
 
 The butterfly buys calls at <Num of="m06.flyLow" /> and <Num of="m06.flyHigh" /> and sells two calls at <Num of="m06.flyMid" />. It costs <Num of="m06.flyPips" /> pips. If USD/CHF ends exactly at <Num of="m06.flyMid" />, it earns <Num of="m06.flyMaxGainChf" />. It makes money between <Num of="m06.flyBeLo" /> and <Num of="m06.flyBeHi" />. Vega is negative at <Num of="m06.flyVegaChf" />, and theta positive at <Num of="m06.flyThetaChf" /> per day: calm and time work in its favour.
 
-The importer's seagull (calls at <Num of="m06.sgK1" /> and <Num of="m06.sgK2" />, put at <Num of="m06.sgPut" />) costs nothing. But it is short vega: <Num of="m06.sgVegaChf" /> per point. If vol rises by <Num of="m06.shockPts" /> points, the structure loses <Num of="m06.sgShockLossChf" /> in value today. The hedge still works at expiry. Until then, though, the daily valuation shows a loss.
+The importer's seagull (calls at <Num of="m06.sgK1" /> and <Num of="m06.sgK2" />, put at <Num of="m06.sgPut" />) costs nothing. But it is short vega: <Num of="m06.sgVegaChf" /> per point. If vol rises by <Num of="m06.shockPts" /> points, the structure loses <Num of="m06.sgShockLossChf" /> in value today. The hedge still works at expiry. Until then, though, the daily valuation shows a loss in that case.
 
 | Structure | Vega per point | Vol +<Num of="m06.shockPts" /> points |
 | --- | --- | --- |
@@ -34,9 +34,11 @@ The importer's seagull (calls at <Num of="m06.sgK1" /> and <Num of="m06.sgK2" />
 | Butterfly | <Num of="m06.flyVegaChf" /> | <Num of="m06.flyShockChf" /> |
 | Seagull | <Num of="m06.sgVegaChf" /> | <Num of="m06.sgShockChf" /> |
 
+The right-hand column is a full revaluation, not simply vega times two. Vega itself changes with vol; that is volga from [module 05](/en/module/05-greeks/4/). Out-of-the-money options pick up vega as vol rises. So the strangle gains a little more than vega alone suggests, and the seagull, with its two out-of-the-money options sold, loses a little more.
+
 <Callout variant="warn" title="When the seagull hurts">
 
-If USD/CHF ends above <Num of="m06.sgK2" />, the protection stops: the importer pays the market rate minus <Num of="m06.shSeagullDiscPips" /> pips. If the rate falls below <Num of="m06.sgPut" />, he still has to buy at <Num of="m06.sgPut" />. And before expiry the structure loses value when the market gets nervous.
+If USD/CHF ends above <Num of="m06.sgK2" />, the protection stops: the importer pays the market rate minus <Num of="m06.shSeagullDiscPips" /> pips. At <Num of="m06.stUp" /> that is <Num of="m06.upSeagullChf" /> instead of <Num of="m06.upCollarChf" /> with the collar, and the higher the dollar rises, the wider the gap. If the rate falls below <Num of="m06.sgPut" />, he still has to buy at <Num of="m06.sgPut" />. And before expiry the structure loses value when the market gets nervous.
 
 </Callout>
 
@@ -50,11 +52,11 @@ If USD/CHF ends above <Num of="m06.sgK2" />, the protection stops: the importer 
 
 <Formula variant="accent"><span>Straddle ≈ √(2/π) · σ√<i>T</i> · <i>F</i> · <i>DF</i><sub>d</sub></span></Formula>
 
-**3.** In the example <i>DF</i><sub>d</sub> = <Num of="m06.discountRate" />, because the CHF rate is <Num of="ex.rd" />. So <Num of="m06.sqrt2pi" /> · <Num of="m06.sigmaSqrtT" /> · <Num of="ex.forward" digits={4} /> gives <Num of="m06.straddleApproxPips" /> pips. The exact value is <Num of="m06.straddlePips" /> pips.
+**3.** In the example <i>DF</i><sub>d</sub> = <Num of="m06.discountRate" />, because the CHF rate is <Num of="ex.rd" />. So <Num of="m06.sqrt2pi" /> · <Num of="m06.sigmaSqrtT" /> · <Num of="ex.forward" digits={4} /> gives <Num of="m06.straddleApproxPips" /> pips. The exact Black-76 value with <i>K</i> = <i>F</i> is <Num of="m06.straddleAtFPips" /> pips. The straddle in the lab sits at the DNS strike, a touch above the forward, and costs <Num of="m06.straddlePips" /> pips.
 
-**4.** What does this mean? If <i>F</i><sub>T</sub> is normally distributed around <i>F</i> with standard deviation σ√<i>T</i> · <i>F</i>, the expected absolute move is exactly √(2/π) · σ√<i>T</i> · <i>F</i>. So the straddle costs roughly the move the market expects. Buying it pays off if you expect larger swings than the implied vol prices in.
+**4.** What does this mean? If <i>F</i><sub>T</sub> is normally distributed around <i>F</i> with standard deviation σ√<i>T</i> · <i>F</i>, the expected absolute move is exactly √(2/π) · σ√<i>T</i> · <i>F</i>. So the straddle costs roughly the move the market expects. That is why the required move of <Num of="m06.straddleMovePct" /> is almost exactly √(2/π) · σ√<i>T</i> = <Num of="m06.expMovePct" />. Buying it pays off if you expect larger swings than the implied vol prices in.
 
-**5.** Vega is the derivative with respect to σ: in a straddle every leg counts, so it is doubled. In a butterfly the legs almost cancel, and the two calls sold in the middle have the largest vega. That is why it is short vega.
+**5.** Vega is the derivative with respect to σ: in a straddle every leg counts, so it is doubled. In a butterfly the legs almost cancel. With the middle close to the forward, the two calls sold there have the largest vega. That is why this butterfly is short vega.
 
 </Derivation>
 
@@ -62,12 +64,12 @@ If USD/CHF ends above <Num of="m06.sgK2" />, the protection stops: the importer 
 
 On the desk a straddle is usually traded delta-hedged. What remains is a pure bet on vol: the buyer earns when the rate swings more than the implied vol says, and loses theta on every quiet day. That is the gamma-versus-theta contest from [module 05](/en/module/05-greeks/4/).
 
-The butterfly has a second meaning too: as a quote, it shows how much dearer options far out of the money are than ATM options. That leads straight to the volatility smile.
+The butterfly has a second meaning too: as a quote, it shows how much more vol the market charges for out-of-the-money options than for ATM options. That leads straight to the volatility smile.
 
 </Desk>
 
 <Takeaway>
 
-Straddles and strangles buy movement: they are long vega and pay time value until the rate moves. Butterflies and seagulls sell movement: they are short vega and lose value when the market gets nervous.
+Straddles and strangles buy movement: they are long vega and pay time value until the rate moves. The butterfly sells movement, and the importer's seagull is short vega too: both lose value when the market gets nervous.
 
 </Takeaway>

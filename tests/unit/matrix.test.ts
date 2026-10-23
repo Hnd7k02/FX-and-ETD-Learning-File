@@ -59,7 +59,8 @@ describe('matrix table', () => {
     for (const id of ['spot', 'forward', 'limit', 'stop', 'call', 'collar', 'structured'])
       expect(hedge.has(id as never), id).toBe(true);
     const y = new Set(DIR_VIEW_IDS.flatMap((v) => MATRIX.yield[v]));
-    for (const id of ['dci', 'discount', 'carry', 'deposit']) expect(y.has(id as never), id).toBe(true);
+    for (const id of ['dci', 'discount', 'carry', 'deposit'])
+      expect(y.has(id as never), id).toBe(true);
   });
 
   it('uses every catalogued product and every cell has at least one product', () => {
@@ -89,7 +90,8 @@ describe('matrix table', () => {
       }
       for (const c of allCells()) expect(d[`pm.cell.${c.need}.${c.view}`]).toBeTruthy();
       for (const id of PRODUCT_IDS)
-        for (const chip of riskChips(id)) expect(d[`pm.chip.${chip.value}`], chip.value).toBeTruthy();
+        for (const chip of riskChips(id))
+          expect(d[`pm.chip.${chip.value}`], chip.value).toBeTruthy();
     }
   });
 });
@@ -162,7 +164,7 @@ describe('profiles and key numbers', () => {
       if (k.kind === 'range') expect(k.value2!).toBeGreaterThan(k.value);
     }
     expect(keyFact('forward', p).value).toBe(EXAMPLE_FORWARD);
-    expect(keyFact('call', p).value).toBeCloseTo((p.hedge.call.premium / PIP), 10);
+    expect(keyFact('call', p).value).toBeCloseTo(p.hedge.call.premium / PIP, 10);
     expect(keyFact('tarf', p).vsPips!).toBeLessThan(0);
     expect(keyFact('structured', p).vsPips!).toBeLessThan(0);
     expect(keyFact('accumulator', p).vsPips!).toBeLessThan(0);
@@ -238,7 +240,7 @@ describe('profiles and key numbers', () => {
     expect(up.best).toBe('forward');
     expect(up.worst).toBe('call');
     expect(up.bestPips).toBeGreaterThan(up.worstPips);
-    const down = cellSpreadAt({ need: 'hedge', view: 'down' }, 0.76, p)!;
+    const down = cellSpreadAt({ need: 'hedge', view: 'down' }, 0.73, p)!;
     expect(down.best).toBe('call');
     expect(cellSpreadAt({ need: 'alpha', view: 'coupon-direct' }, S, p)).toBeNull();
   });

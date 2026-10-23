@@ -8,13 +8,13 @@ Ein **Call-Spread** ist ein Long Call mit Strike <i>K</i><sub>1</sub> und ein Sh
 
 Ein **Put-Spread** ist das Spiegelbild: Long Put mit <i>K</i><sub>1</sub>, Short Put mit tieferem <i>K</i><sub>2</sub>. Er passt zu jemandem, der einen fallenden Dollar fürchtet. Das ist zum Beispiel ein Exporteur, der in 3 Monaten USD erhält.
 
-Ein **Risk Reversal** kombiniert einen Long Call mit einem Short Put, beide aus dem Geld. Am Markt nimmt man meist die 25Δ-Strikes. Für unseren Importeur ist das der **Zero-Cost-Collar**: Der USD Call schützt ihn, der verkaufte USD Put bezahlt ihn. Der Put-Strike wird so gelöst, dass die Nettoprämie null ist.
+Ein **Risk Reversal** kauft eine Option auf der einen Seite und verkauft eine auf der anderen, beide aus dem Geld. Am Markt nimmt man meist die 25Δ-Strikes. Für unseren Importeur heisst das: Long USD Call, Short USD Put. Das ist der **Zero-Cost-Collar**: Der USD Call schützt ihn, der verkaufte USD Put bezahlt den Call. Der Put-Strike wird so gelöst, dass die Nettoprämie null ist.
 
-<PayoffBuilderFigure templates={['call-spread', 'put-spread', 'risk-reversal']} initial="risk-reversal" highlightSolved caption="Zieh den Call-Strike K1 an der Achse: Der Put-Strike K2 folgt so, dass die Nettoprämie null bleibt. Der grüne Ring markiert den gelösten Strike. Wechsle zu Call- und Put-Spread und vergleiche Prämie und maximalen Gewinn." />
+<PayoffBuilderFigure templates={['call-spread', 'put-spread', 'risk-reversal']} initial="risk-reversal" highlightSolved caption="Zieh den Call-Strike K1 an der Achse: Der Put-Strike K2 folgt so, dass die Nettoprämie null bleibt. Der grüne Rahmen markiert den gelösten Strike. Wechsle zu Call- und Put-Spread und vergleiche Prämie und maximalen Gewinn." />
 
 ### Call-Spread in Zahlen
 
-Der Importeur kauft den Call mit Strike <Num of="m06.csK1" /> und verkauft einen Call mit Strike <Num of="m06.csK2" />, dem 25Δ-Strike. Der Call allein kostet <Num of="ex.callPips" digits={1} /> Pips. Der verkaufte Call bringt <Num of="m06.csSoldPips" /> Pips zurück, das sind <Num of="m06.csSavePct" /> der Prämie. Netto zahlt er <Num of="m06.csPips" /> Pips, also <Num of="m06.csChf" />.
+Der Importeur startet beim ATMF Call aus Modul 04 mit Strike <Num of="m06.csK1" />. Dazu verkauft er einen Call mit Strike <Num of="m06.csK2" />, dem 25Δ-Strike. Der Call allein kostet <Num of="ex.callPips" digits={1} /> Pips. Der verkaufte Call bringt <Num of="m06.csSoldPips" /> Pips zurück, das sind <Num of="m06.csSavePct" /> der Prämie. Netto zahlt er <Num of="m06.csPips" /> Pips, also <Num of="m06.csChf" />.
 
 - Der **Break-even** liegt bei <i>K</i><sub>1</sub> plus Prämie: <Num of="m06.csBe" />.
 - Der **maximale Gewinn** bei Verfall ist die Breite minus Prämie: <Num of="m06.csWidthPips" /> − <Num of="m06.csPips" /> = <Num of="m06.csMaxGainPips" /> Pips, also <Num of="m06.csMaxGainChf" />. Er wird ab <Num of="m06.csK2" /> erreicht.
@@ -54,7 +54,7 @@ Im Beispiel: <Num of="m06.csPips" /> Pips liegen zwischen 0 und <Num of="m06.csW
 
 Am Optionsmarkt ist «25Δ Risk Reversal» nicht nur eine Struktur, sondern auch ein Preis. Er wird in Vola notiert: implizite Vola des 25Δ Calls minus implizite Vola des 25Δ Puts. Händler handeln ihn delta-gehedgt. Sein Vorzeichen zeigt, welche Seite der Markt teurer bezahlt. Mehr dazu in Abschnitt 4.
 
-Für Firmen gilt: Wer den Put verkauft, braucht eine Kreditlinie. Und der Put-Spread ist das Gegenstück für Exporteure, die USD erhalten und einen schwachen Dollar fürchten.
+Firmen kennen den Risk Reversal meist als Collar oder Tunnel. Ob mit Prämie oder Zero Cost: Der verkaufte Put ist eine Pflicht, darum braucht es eine Kreditlinie. Für Exporteure gibt es das Spiegelbild: Long USD Put, Short USD Call.
 
 </Desk>
 

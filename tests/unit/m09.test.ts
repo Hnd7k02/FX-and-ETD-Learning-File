@@ -127,7 +127,8 @@ describe('HedgeCompare: the importer’s five strategies', () => {
     expect(tourPosition(0.5, [])).toBe(M09_MARKET.S);
     const stops = tourStops(hedgeEvents(s), w);
     expect(stops[0]).toBeCloseTo(w[0]!, 12);
-    for (const e of hedgeEvents(s)) expect(stops.some((x) => Math.abs(x - e.level) < 1e-12)).toBe(true);
+    for (const e of hedgeEvents(s))
+      expect(stops.some((x) => Math.abs(x - e.level) < 1e-12)).toBe(true);
     for (let i = 1; i < stops.length; i++) expect(stops[i]).not.toBe(stops[i - 1]);
   });
 
@@ -218,7 +219,7 @@ describe('CarryCushion: carry, discount certificate and dual currency', () => {
     const v1 = carryView({ ...CARRY_DEFAULTS, months: 1 });
     const v12 = carryView({ ...CARRY_DEFAULTS, months: 12 });
     expect(cushionPips('carry', v12) / cushionPips('carry', v1)).toBeCloseTo(
-      (12 / (1 + EXAMPLE.rf)) / (1 / (1 + EXAMPLE.rf / 12)),
+      12 / (1 + EXAMPLE.rf) / (1 / (1 + EXAMPLE.rf / 12)),
       9,
     );
     expect(v12.typicalMove / v1.typicalMove).toBeCloseTo(Math.sqrt(12), 9);

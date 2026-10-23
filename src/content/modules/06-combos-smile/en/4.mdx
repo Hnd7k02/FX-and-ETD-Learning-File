@@ -2,7 +2,7 @@ import SmileBuilderFigure from '@/components/figures/SmileBuilderFigure.astro';
 
 {/* 06 Combos & vol smile · section 4 · Volatility smile. Numbers only via <Num />, registry src/lib/nums/m06.ts. Smile values are example values, not market data. */}
 
-So far every option in the example had the same vol, <Num of="ex.vol" />. That is how Garman-Kohlhagen works: one number for all strikes. The market sees it differently. Options far out of the money usually cost more than that one number would explain. Rates sometimes jump further than the normal distribution allows, and the demand for protection is not equally strong on both sides.
+So far every option in the example had the same vol, <Num of="ex.vol" />. That is how Garman-Kohlhagen works: one number for all strikes. The market sees it differently. Options far out of the money usually cost more than that one number would explain. Rates sometimes jump further than the normal distribution would lead you to expect, and the demand for protection is not equally strong on both sides.
 
 So every strike has its own **implied vol**: the vol at which the model hits the market price of that option exactly. Plot it against the strike and you get a curve, usually higher at the edges than in the middle. That is the **volatility smile**.
 
@@ -21,7 +21,7 @@ The wings follow back from the quotes:
 
 ### Why RR can be negative in USD/CHF
 
-The franc is seen as a safe haven. In <Fact id="m06-snb-safe-haven-2009" /> the Swiss National Bank noted that the financial crisis had shown the franc still has that status. Whoever wants protection against a stronger franc buys **CHF calls**, and those are **USD puts**. When that demand rises, USD puts get dearer: their implied vol goes up. Then RR = σ<sub>25C</sub> − σ<sub>25P</sub> is negative, and the left wing of the smile, at the low strikes, lifts.
+The franc is seen as a safe haven. In a <Fact id="m06-snb-safe-haven-2009" /> speech, a member of the Swiss National Bank's Governing Board noted that the financial crisis had shown the franc still has that status. Whoever wants protection against a stronger franc buys **CHF calls**, and those are **USD puts**. When that demand rises, USD puts get dearer: their implied vol goes up. Then RR = σ<sub>25C</sub> − σ<sub>25P</sub> is negative, and the left wing of the smile, at the low strikes, lifts.
 
 Our example reflects this: ATM <Num of="m06.smAtm" />, RR <Num of="m06.smRr" />, BF <Num of="m06.smBf" />. These are example values, not market data.
 
@@ -29,15 +29,15 @@ Our example reflects this: ATM <Num of="m06.smAtm" />, RR <Num of="m06.smRr" />,
 
 ### The smile in numbers
 
-With the example quotes the wings sit at σ<sub>25C</sub> = <Num of="m06.smAtm" /> + <Num of="m06.smBf" /> + (<Num of="m06.smRrHalf" />) = <Num of="m06.sm25c" /> and σ<sub>25P</sub> = <Num of="m06.sm25p" />. Their average is <Num of="m06.smWingAvg" />, which is BF above ATM. The three points belong to the strikes <Num of="m06.smK25p" /> (25Δ put), <Num of="m06.smKatm" /> (ATM) and <Num of="m06.smK25c" /> (25Δ call). The example strike <Num of="ex.strike" /> sits almost ATM; its vol is <Num of="m06.smVolAtStrike" />. The 25Δ strikes of section 2, <Num of="m06.put25K" /> and <Num of="m06.call25K" />, were slightly different: there we used a flat vol, the spot delta and a 5-pip grid.
+With the example quotes the wings sit at σ<sub>25C</sub> = <Num of="m06.smAtm" /> + <Num of="m06.smBf" /> + (<Num of="m06.smRrHalf" />) = <Num of="m06.sm25c" /> and σ<sub>25P</sub> = <Num of="m06.sm25p" />. Their average is <Num of="m06.smWingAvg" />, which is BF above ATM. The three points belong to the strikes <Num of="m06.smK25p" /> (25Δ put), <Num of="m06.smKatm" /> (ATM) and <Num of="m06.smK25c" /> (25Δ call). The example strike <Num of="ex.strike" /> sits almost ATM; its vol is <Num of="m06.smVolAtStrike" />. The 25Δ strikes of sections 2 and 3, <Num of="m06.put25K" /> and <Num of="m06.call25K" />, were slightly different: there we used a flat vol, the spot delta and a 5-pip grid.
 
-What does this do to prices? On the smile the 25Δ USD put costs <Num of="m06.put25SmilePips" /> instead of <Num of="m06.put25FlatPips" /> pips, a difference of <Num of="m06.put25DiffPips" /> pips. The 25Δ USD call costs <Num of="m06.call25SmilePips" /> instead of <Num of="m06.call25FlatPips" /> pips (<Num of="m06.call25DiffPips" />).
+What does this do to prices? On the smile the 25Δ USD put costs <Num of="m06.put25SmilePips" /> instead of <Num of="m06.put25FlatPips" /> pips, a difference of <Num of="m06.put25DiffPips" /> pips. The 25Δ USD call costs <Num of="m06.call25SmilePips" /> instead of <Num of="m06.call25FlatPips" /> pips (<Num of="m06.call25DiffPips" /> pips).
 
-For the importer's collar from section 2 this is good news. He **buys** the cheaper call and **sells** the dearer put. With the same strikes <Num of="m06.rrCallK" /> and <Num of="m06.rrPutK" /> he receives <Num of="m06.rrSmileCreditPips" /> pips net on the smile, or <Num of="m06.rrSmileCreditChf" />. Or he stays at zero cost and moves the put lower, to <Num of="m06.rrPutKSmile" />.
+For the importer's collar from section 2 this is good news. He **buys** the cheaper call and **sells** the dearer put. The market pays him for carrying a risk that others hedge against: a strong franc. With the same strikes <Num of="m06.rrCallK" /> and <Num of="m06.rrPutK" /> he receives <Num of="m06.rrSmileCreditPips" /> pips net on the smile, or <Num of="m06.rrSmileCreditChf" />. Or he stays at zero cost and moves the put lower, to <Num of="m06.rrPutKSmile" />.
 
 <Derivation title="Derivation: the smile in delta and the way to the strike">
 
-**1.** The smile is measured in the forward delta of the USD call, Δ = <i>N</i>(<i>d</i><sub>1</sub>). It runs from 1 (low strikes) to 0 (high strikes). The 25Δ call sits at Δ = 0.25 and the 25Δ put at Δ = 0.75, because its put delta is Δ − 1 = −0.25. ATM is Δ = 0.5.
+**1.** Here the smile is measured in the forward delta of the USD call without premium adjustment, Δ = <i>N</i>(<i>d</i><sub>1</sub>). It runs from 1 (low strikes) to 0 (high strikes). The 25Δ call sits at Δ = 0.25 and the 25Δ put at Δ = 0.75, because its put delta is Δ − 1 = −0.25. ATM is Δ = 0.5.
 
 **2.** Between the points the smile is interpolated quadratically in delta:
 
@@ -59,7 +59,7 @@ For the 25Δ call, −<i>N</i><sup>−1</sup>(0.25) = <Num of="m06.ninv25" /> an
 
 The butterfly here is the **smile strangle**: the distance of the wing vols from ATM. In the market the 25Δ butterfly is often dealt as a **broker fly**. There it is a price: a strangle with 25Δ strikes is valued at a single vol, ATM plus the broker fly, and the smile has to value that strangle at the same price. With a small risk reversal the two values are close; with a large one they diverge.
 
-Delta has conventions too: spot or forward delta, with or without premium adjustment, depending on the currency pair and the tenor. That shifts the strikes slightly, so whoever quotes always says which convention applies. A trader reads the risk reversal as sentiment: it shows on which side the market pays more for protection.
+Delta has conventions too: spot or forward delta, with or without premium adjustment, depending on the currency pair and the tenor. That shifts the strikes slightly, so whoever quotes always says which convention applies. A trader reads the risk reversal as sentiment: it shows on which side the market pays more for protection. And the smile keeps mattering: the desk values the barrier options of [module 07](/en/module/07-barrier-binary/1/) not with a single vol but consistently with the smile.
 
 </Desk>
 

@@ -9,7 +9,7 @@
 import rawCsv from '../../../data/raw/ecb-eur-reference.csv?raw';
 import { parseRawCsv } from '@/lib/data/csv';
 import { pairSeries } from '@/lib/data/series';
-import { EXAMPLE as E } from '@/lib/fx/example';
+import { EXAMPLE as E, EXAMPLE_FORWARD } from '@/lib/fx/example';
 import {
   BIG_FIGURE,
   M01_SCENARIOS,
@@ -35,6 +35,10 @@ const SC = M01_SCENARIOS;
 const up = exposure(SC.stUp);
 const down = exposure(SC.stDown);
 const [lo, hi] = sigmaRange(S, vol, T);
+/** Band edges on the pip grid, so the CHF amounts in the text match the rates shown. */
+const onPip = (x: number) => Math.round(x / PIP) * PIP;
+const loChf = costChf(onPip(lo), N) - costChf(S, N);
+const hiChf = costChf(onPip(hi), N) - costChf(S, N);
 
 // Section 3: two-way price
 const base = twoWayQuote(SPREAD_MODEL.mid, SPREAD_MODEL.basePips);
@@ -106,16 +110,29 @@ export const nums: NumTable = {
   'm01.costDown': { value: down.cost, kind: 'money' },
   'm01.diffUp': { value: up.diff, kind: 'money', sign: true },
   'm01.diffDown': { value: down.diff, kind: 'money', sign: true },
+  'm01.saveDown': { value: -down.diff, kind: 'money', note: 'CHF saved at stDown (positive)' },
   'm01.bfUp': { value: up.bigFigures, kind: 'num', digits: 0, note: 'Big figures to stUp' },
   'm01.pctUp': { value: up.pct, kind: 'pct', sign: true },
   'm01.inverse': { value: inverseRate(S), kind: 'rate', note: 'CHF/USD = 1/S' },
   'm01.inverseUp': { value: up.inverse, kind: 'rate' },
   'm01.inversePctUp': { value: up.inversePct, kind: 'pct', digits: 2, sign: true },
+  'm01.inverseLossUp': {
+    value: -up.inversePct,
+    kind: 'pct',
+    digits: 2,
+    note: 'Loss of CHF/USD when USD/CHF rises to stUp (positive)',
+  },
   'm01.sigmaSqrtT': { value: vol * Math.sqrt(T), kind: 'pct', note: 'σ√T' },
   'm01.rangeLo': { value: lo, kind: 'rate' },
   'm01.rangeHi': { value: hi, kind: 'rate' },
-  'm01.rangeLoChf': { value: costChf(lo, N) - costChf(S, N), kind: 'money', sign: true },
-  'm01.rangeHiChf': { value: costChf(hi, N) - costChf(S, N), kind: 'money', sign: true },
+  'm01.rangeLoChf': { value: loChf, kind: 'money', sign: true, note: 'At rangeLo (pip grid)' },
+  'm01.rangeHiChf': { value: hiChf, kind: 'money', sign: true, note: 'At rangeHi (pip grid)' },
+  'm01.rangeLoSave': { value: -loChf, kind: 'money', note: 'CHF less than today at rangeLo' },
+  'm01.fwdBelowPips': {
+    value: (S - EXAMPLE_FORWARD) / PIP,
+    kind: 'pips',
+    note: 'Option-model forward below spot, in pips (positive)',
+  },
   'm01.probUp': { value: probBeyond(SC.stUp), kind: 'pct', digits: 0, note: 'P(S_T ≥ stUp)' },
   'm01.probDown': { value: probBeyond(SC.stDown), kind: 'pct', digits: 0, note: 'P(S_T ≤ stDown)' },
 
@@ -189,6 +206,11 @@ export const nums: NumTable = {
   },
   'm01.apr25UsdChfLow': { value: aprUsdChf.low.value, kind: 'rate', note: 'April 2025 low' },
   'm01.apr25UsdChfPct': { value: aprUsdChf.lowPct, kind: 'pct', sign: true },
+  'm01.apr25UsdChfFall': {
+    value: -aprUsdChf.lowPct,
+    kind: 'pct',
+    note: 'Fall of USD/CHF to the April low (positive)',
+  },
   'm01.apr25EurUsdStart': { value: aprEurUsd.start.value, kind: 'rate' },
   'm01.apr25EurUsdHigh': { value: aprEurUsd.high.value, kind: 'rate', note: 'April 2025 high' },
   'm01.apr25EurUsdPct': { value: aprEurUsd.highPct, kind: 'pct', sign: true },

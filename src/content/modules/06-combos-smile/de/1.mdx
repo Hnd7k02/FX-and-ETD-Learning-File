@@ -15,10 +15,10 @@ Der Importeur hat zwei Hebel:
 
 ### Vier Formen in Zahlen
 
-Basis ist ein USD Call mit Strike <Num of="m06.shCallK" />, dem heutigen Spot. Er kostet <Num of="m06.shCallPips" /> Pips, also <Num of="m06.shCallChf" />. Damit zahlt der Importeur nie mehr als <Num of="m06.shCallCap" /> CHF je USD: Strike plus Prämie.
+Basis ist ein USD Call mit Strike <Num of="m06.shCallK" />. Das ist der heutige Spot: Mehr als heute will der Importeur nicht bezahlen. Der Strike liegt über dem Forward von <Num of="ex.forward" digits={4} />, darum ist dieser Call billiger als der ATMF Call aus Modul 04 mit <Num of="ex.callPips" digits={1} /> Pips. Er kostet <Num of="m06.shCallPips" /> Pips, also <Num of="m06.shCallChf" />. Damit zahlt der Importeur nie mehr als <Num of="m06.shCallCap" /> CHF je USD: Strike plus Prämie.
 
 - **Call-Spread.** Er verkauft zusätzlich einen USD Call mit Strike <Num of="m06.shSellCallK" />. Das bringt <Num of="m06.shSpreadSavePips" /> Pips, netto zahlt er <Num of="m06.shSpreadPips" /> Pips. Der Deckel sinkt auf <Num of="m06.shSpreadCap" />, gilt aber nur bis <Num of="m06.shSellCallK" />. Darüber zahlt er wieder den Marktkurs, minus <Num of="m06.shSpreadDiscPips" /> Pips.
-- **Collar.** Statt des Calls verkauft er einen USD Put. Den Strike wählt er so, dass die Put-Prämie den Call genau bezahlt: <Num of="m06.shCollarPut" />. Das ist **Zero Cost**. Er zahlt nie mehr als <Num of="m06.shCallK" /> und nie weniger als <Num of="m06.shCollarPut" />.
+- **Collar.** Statt des oberen Calls verkauft er einen USD Put. Den Strike wählt er so, dass die Put-Prämie den Call genau bezahlt: <Num of="m06.shCollarPut" />. Das ist **Zero Cost**. Er zahlt nie mehr als <Num of="m06.shCallK" /> und nie weniger als <Num of="m06.shCollarPut" />.
 - **Seagull.** Er verkauft beides. Der Call-Spread ist billiger als der Call allein, darum reicht ein Put mit tieferem Strike: <Num of="m06.shSeagullPut" />. Wieder Zero Cost, aber über <Num of="m06.shSellCallK" /> ist er nicht mehr geschützt.
 
 Was kosten ihn die USD 1 Mio. am Ende? Zwei Szenarien, alle Beträge inklusive Prämie:
@@ -26,16 +26,19 @@ Was kosten ihn die USD 1 Mio. am Ende? Zwei Szenarien, alle Beträge inklusive P
 | Bei Verfall | Dollar stark: <Num of="m06.stUp" /> | Dollar schwach: <Num of="m06.stDown" /> |
 | --- | --- | --- |
 | Ohne Absicherung | <Num of="m06.upUnhedgedChf" /> | <Num of="m06.downUnhedgedChf" /> |
+| Forward | <Num of="m06.fwdChf" /> | <Num of="m06.fwdChf" /> |
 | Call | <Num of="m06.upCallChf" /> | <Num of="m06.downCallChf" /> |
 | Call-Spread | <Num of="m06.upSpreadChf" /> | <Num of="m06.downSpreadChf" /> |
 | Collar | <Num of="m06.upCollarChf" /> | <Num of="m06.downCollarChf" /> |
 | Seagull | <Num of="m06.upSeagullChf" /> | <Num of="m06.downSeagullChf" /> |
 
-Keine Struktur gewinnt in beiden Spalten. Der Collar ist bei starkem Dollar am günstigsten. Bei schwachem Dollar kostet er dafür <Num of="m06.downCollarMissChf" /> mehr als ohne Absicherung. Der Call-Spread spart Prämie, lässt aber den sehr starken Dollar wieder durch. Kombinieren heisst nicht gewinnen. Es heisst: **das Risiko dorthin legen, wo es dich am wenigsten stört.**
+Keine Struktur gewinnt in beiden Spalten. Die beiden Extreme sind «ohne Absicherung» und der Forward: Der Forward fixiert den Kurs, egal was passiert. Jede Optionsstruktur liegt dazwischen. Sie zahlt bei starkem Dollar mehr als der Forward und lässt dir dafür bei schwachem Dollar einen Teil der Chance.
+
+Unter den Optionsstrukturen ist der Collar bei starkem Dollar am günstigsten. Bei schwachem Dollar kostet er dafür <Num of="m06.downCollarMissChf" /> mehr als ohne Absicherung. Der Call-Spread spart Prämie, lässt aber den sehr starken Dollar wieder durch. Kombinieren heisst nicht gewinnen. Es heisst: **das Risiko dorthin legen, wo es dich am wenigsten stört.**
 
 <Derivation title="Herleitung: der effektive Kurs und der Zero-Cost-Strike">
 
-Der Importeur kauft seine Dollar bei Verfall am Markt zum Kurs <i>S</i><sub>T</sub>. Die Struktur zahlt ihm ihre Auszahlung <i>A</i>(<i>S</i><sub>T</sub>), die Prämie <i>P</i> hat er heute bezahlt. Pro USD Nominal <i>N</i>:
+Der Importeur kauft seine Dollar bei Verfall am Markt zum Kurs <i>S</i><sub>T</sub>. Die Struktur zahlt ihm ihre Auszahlung <i>A</i>(<i>S</i><sub>T</sub>), die Prämie <i>P</i> hat er heute bezahlt. Beides in CHF, auf das Nominal <i>N</i> in USD. Pro USD gilt:
 
 <Formula variant="accent"><span>Kurs = <i>S</i><sub>T</sub> − <i>A</i>(<i>S</i><sub>T</sub>) / <i>N</i> + <i>P</i> · <i>e</i><sup><i>r</i><sub>d</sub><i>T</i></sup> / <i>N</i></span></Formula>
 
@@ -47,7 +50,7 @@ Beim Collar mit Call-Strike <i>K</i><sub>C</sub> und Put-Strike <i>K</i><sub>P</
   <span><i>S</i><sub>T</sub> ≤ <i>K</i><sub>P</sub>: Kurs = <i>K</i><sub>P</sub></span>
 </Formula>
 
-Den Put-Strike findest du so: Gesucht ist <i>K</i><sub>P</sub> mit Put(<i>K</i><sub>P</sub>) = Call(<i>K</i><sub>C</sub>). Der Put wird mit steigendem Strike teurer, von fast null bis weit über den Call-Preis. Darum gibt es genau eine Lösung, und der Rechner findet sie mit Bisektion. Beim Seagull steht rechts der Call-Spread, Call(<i>K</i><sub>C</sub>) − Call(<i>K</i><sub>2</sub>). Der ist kleiner, also liegt <i>K</i><sub>P</sub> tiefer.
+Den Put-Strike findest du so: Gesucht ist <i>K</i><sub>P</sub> mit Put(<i>K</i><sub>P</sub>) = Call(<i>K</i><sub>C</sub>). Der Put wird mit steigendem Strike teurer, von fast null bis weit über den Call-Preis. Darum gibt es genau eine Lösung, und der Rechner findet sie mit Bisektion. Beim Seagull kommt der verkaufte Call mit Strike <i>K</i><sub>2</sub> dazu. Rechts steht dann der Call-Spread, Call(<i>K</i><sub>C</sub>) − Call(<i>K</i><sub>2</sub>). Der ist kleiner, also liegt <i>K</i><sub>P</sub> tiefer.
 
 Im Beispiel ist der CHF-Zins <Num of="ex.rd" />, der Faktor <i>e</i><sup><i>r</i><sub>d</sub><i>T</i></sup> also 1: Die Prämie zählt heute und bei Verfall gleich viel.
 
