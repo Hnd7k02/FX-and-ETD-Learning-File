@@ -1,0 +1,97 @@
+# Manual release of forward-first.html (MASTER_PROMPT §9, DECISIONS D-13). No schedule.
+#
+# Actions → "Release" → "Run workflow":
+#   1. fetch the ECB reference rates and validate them (optional, on by default),
+#   2. compute the Riskometer data,
+#   3. check (types, lint, unit tests), build, and test the offline file in Chromium and WebKit,
+#   4. commit changed data to the branch the workflow ran on,
+#   5. publish a GitHub Release with forward-first.html as download.
+# Any failing step stops the run before anything is committed or released.
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      update_data:
+        description: 'Fetch new ECB reference rates first'
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      - name: Fetch and validate ECB reference rates
+        if: ${{ inputs.update_data }}
+        run: npm run data:fetch
+
+      - name: Compute Riskometer data
+        if: ${{ inputs.update_data }}
+        run: npm run data:build
+
+      - name: Check (types, lint, unit tests with coverage)
+        run: npm run check
+
+      - name: Build forward-first.html
+        run: npm run build
+
+      - name: Install Playwright Chromium and WebKit
+        run: npx playwright install --with-deps chromium webkit
+
+      - name: Test the offline file (Chromium and WebKit, network blocked)
+        run: npm run e2e
+
+      - name: Commit changed data
+        run: |
+          if [ -z "$(git status --porcelain -- data/raw src/data/fx)" ]; then
+            echo "Data unchanged."
+            exit 0
+          fi
+          AS_OF=$(node -p "require('./src/data/fx/summary.json').asOf")
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/raw src/data/fx
+          git commit -m "data: ECB ${AS_OF}"
+          git push
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          AS_OF=$(node -p "require('./src/data/fx/summary.json').asOf")
+          SIZE=$(du -k release/forward-first.html | cut -f1)
+          TAG="v$(date -u +%Y.%m.%d)-${GITHUB_RUN_NUMBER}"
+          {
+            echo "Forward First als eine Offline-Datei. / Forward First as one offline file."
+            echo
+            echo "- Datenstand / data as of: ECB ${AS_OF}"
+            echo "- Grösse / size: ${SIZE} KB"
+            echo "- Branch: ${GITHUB_REF_NAME} · Commit: $(git rev-parse --short HEAD)"
+            echo
+            echo "Arbeits-PC: herunterladen, Doppelklick, öffnet in Chrome oder Edge."
+            echo "iPad: herunterladen, in der Dateien-App antippen."
+            echo
+            echo "Nur zu Bildungszwecken. Keine Anlageberatung. / For educational purposes only. Not investment advice."
+          } > notes.md
+          gh release create "$TAG" release/forward-first.html \
+            --target "$(git rev-parse HEAD)" \
+            --title "Forward First · ECB ${AS_OF}" \
+            --notes-file notes.md \
+            --latest

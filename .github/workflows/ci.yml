@@ -1,3 +1,8 @@
+# Checks every push: types, lint, unit tests, both builds, and the end-to-end tests.
+# The product is the single offline file release/forward-first.html (DECISIONS D-13); its tests
+# open it over file:// with the network blocked, in Chromium (work PC) and WebKit (iPad).
+# The web build (dist/) is only a test harness for the detailed component tests; nothing is deployed.
+# Runner pinned to Ubuntu 24.04: Playwright 1.56 has no browser builds for Ubuntu 26.04.
 name: CI
 
 on:
@@ -14,8 +19,9 @@ permissions:
   contents: read
 
 jobs:
-  check-build-e2e:
-    runs-on: ubuntu-latest
+  offline-file:
+    name: Check, build and test forward-first.html
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v5
@@ -26,15 +32,45 @@ jobs:
       - run: npm ci
       - name: Check (types, lint, unit tests with coverage)
         run: npm run check
-      - name: Build
+      - name: Build (web build + single offline file)
         run: npm run build
-      - name: Install Playwright Chromium
-        run: npx playwright install --with-deps chromium
-      - name: End-to-end tests (incl. axe)
+      - name: Install Playwright Chromium and WebKit
+        run: npx playwright install --with-deps chromium webkit
+      - name: Offline file tests (Chromium 1440 × 900, WebKit iPad portrait and landscape)
         run: npm run e2e
+      - name: Upload forward-first.html
+        uses: actions/upload-artifact@v4
+        with:
+          name: forward-first-html
+          path: release/forward-first.html
+          if-no-files-found: error
+          retention-days: 30
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: playwright-report
-          path: playwright-report/
+          name: offline-test-results
+          path: test-results/
+          retention-days: 7
+
+  web-e2e:
+    name: Component tests on the web build (incl. axe)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run build:web
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+      - name: End-to-end tests (390 px and 1440 px, incl. axe)
+        run: npm run e2e:web
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: web-test-results
+          path: test-results/
           retention-days: 7

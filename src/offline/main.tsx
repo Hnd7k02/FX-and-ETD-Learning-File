@@ -263,6 +263,7 @@ function swap(path: string, page: PageRec): void {
   }
   updateChrome(path, page);
   main.innerHTML = page.h;
+  main.dataset.route = path;
   rewriteLinks(main);
   mountIslands(main);
 }
