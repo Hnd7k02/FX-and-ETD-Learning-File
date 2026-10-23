@@ -17,6 +17,7 @@ import {
   type LabState,
 } from '../../src/lib/m07/barrierlab';
 import { PIP } from '../../src/lib/m07/config';
+import { TRI_CONFIG, defaultMids, triState } from '../../src/lib/m01/triangle';
 import { expect, test } from './fixtures';
 import {
   changeSpan,
@@ -190,6 +191,29 @@ test.describe('a single change animates, a quick series does not lag', () => {
     expectOnTheLines(series, 'barrier lab toggles');
     expectSettledWithinTwoFrames(series, 'barrier lab toggles');
   });
+});
+
+test('an endless animation that appears with the last input is no movement (triangular arbitrage)', async ({
+  page,
+  open,
+}) => {
+  // One arrow key step on USD/CHF opens the arbitrage: the round trip appears with its arrows
+  // (an endless dash animation, not a movement) and the amounts (a short rise that settles).
+  await open('/module/01-spot/3/');
+  const slider = page.locator('input[id^="tri-usdchf-"]');
+  await slider.scrollIntoViewIfNeeded();
+  const m = defaultMids();
+  const snap4 = (x: number) => Math.round(x / TRI_CONFIG.step) * TRI_CONFIG.step;
+  let v = m.usdchf;
+  while (triState({ ...m, usdchf: snap4(v + TRI_CONFIG.step) }, true).direction === 'none') {
+    v = snap4(v + TRI_CONFIG.step);
+  }
+  expect(triState({ ...m, usdchf: v }, true).direction).toBe('none');
+  await slider.fill(v.toFixed(4));
+  await expect(page.locator('.tri-flow')).toHaveCount(0);
+  const rec = await record(page, slider, () => slider.press('ArrowRight'));
+  await expect(page.locator('.tri-flow')).toHaveCount(3);
+  expectSettledWithinTwoFrames(rec, 'triangular arbitrage opens');
 });
 
 /** Reads the shown parity (pips) and the rendered bar widths of the barrier lab. */

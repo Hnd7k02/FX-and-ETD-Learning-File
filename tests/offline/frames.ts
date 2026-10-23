@@ -100,6 +100,9 @@ export async function startRecorder(
       if (ms.some((m) => (m.target as Element).getAttribute('data-pv') !== 'busy')) stamp();
     }).observe(root, { subtree: true, attributes: true, attributeFilter: ['data-pv'] });
 
+    // Elements with an endless animation (a flowing dash, a pulse) are not measured. Found in
+    // every frame: an element that appears with an input is left out from its first frame on,
+    // instead of dropping out of the fingerprint a few frames later, which looked like movement.
     let endless = new Set<Element>();
     const findEndless = () => {
       endless = new Set(
@@ -110,9 +113,8 @@ export async function startRecorder(
           .filter((t): t is Element => t instanceof Element),
       );
     };
-    let n = 0;
     const sample = () => {
-      if (n++ % 10 === 0) findEndless();
+      findEndless();
       const parts: string[] = [];
       const keyed: Record<string, string> = {};
       const seen: Record<string, number> = {};
