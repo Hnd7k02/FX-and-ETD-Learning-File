@@ -14,6 +14,7 @@ import {
   inverseRate,
   moveIn,
   pctChange,
+  probBeyond,
   sigmaRange,
 } from '@/lib/m01/exposure';
 import {
@@ -46,9 +47,14 @@ import { TRI_CONFIG, defaultMids, directAt, quoteAround, triState } from '@/lib/
 import {
   G10,
   G10_ROLES,
+  G10_SCENARIOS,
+  G10_SCENARIO_RULES,
   matchingCodes,
+  pairConvention,
   profileOf,
   selectionAfterFilter,
+  tendencies,
+  tendency,
   type G10Code,
 } from '@/lib/m01/g10';
 import { M01, nums } from '@/lib/nums/m01';
@@ -90,6 +96,18 @@ describe('exposure (section 1)', () => {
     expect(Math.log(S0 / lo)).toBeCloseTo(EXAMPLE.vol * Math.sqrt(EXAMPLE.T), 12);
     expect(lo).toBeLessThan(S0);
     expect(hi).toBeGreaterThan(S0);
+  });
+
+  it('gives the model probability of ending beyond a rate', () => {
+    const k = EXAMPLE.vol * Math.sqrt(EXAMPLE.T);
+    expect(probBeyond(S0)).toBeCloseTo(0.5, 12);
+    // one sigma up or down: about 15.9 % each, symmetric in log terms
+    expect(probBeyond(S0 * Math.exp(k))).toBeCloseTo(0.158655, 5);
+    expect(probBeyond(S0 * Math.exp(-k))).toBeCloseTo(0.158655, 5);
+    // monotone: further away is less likely
+    expect(probBeyond(0.84)).toBeLessThan(probBeyond(0.82));
+    expect(probBeyond(0.84)).toBeGreaterThan(0.05);
+    expect(() => probBeyond(0)).toThrow(RangeError);
   });
 
   it('splits a move into whole big-figure blocks and a rest', () => {
@@ -349,6 +367,33 @@ describe('G10 profiles (section 4)', () => {
     for (const r of G10_ROLES) expect(matchingCodes(r).length).toBeGreaterThan(0);
     expect(selectionAfterFilter('CHF', 'safeHaven')).toBe('CHF');
     expect(selectionAfterFilter('GBP', 'commodity')).toBe('AUD');
+  });
+
+  it('maps scenarios to textbook tendencies by role', () => {
+    expect(G10_SCENARIOS[0]).toBe('none');
+    for (const p of G10) expect(tendency(p.code, 'none')).toBe('flat');
+    const off = tendencies('riskOff');
+    expect(off.up).toEqual(['USD', 'JPY', 'CHF']);
+    expect(off.down).toEqual(['AUD', 'NZD', 'CAD', 'NOK']);
+    expect(off.flat).toEqual(['EUR', 'GBP', 'SEK']);
+    const on = tendencies('riskOn');
+    expect(on.up).toEqual(['AUD', 'NZD', 'CAD', 'NOK']);
+    expect(on.down).toEqual(['JPY', 'CHF']);
+    expect(tendencies('commodityBoom').up).toEqual(['AUD', 'NZD', 'CAD', 'NOK']);
+    expect(tendencies('commodityBoom').down).toEqual([]);
+    // every rule only names known roles
+    for (const r of Object.values(G10_SCENARIO_RULES))
+      for (const role of [...r.up, ...r.down]) expect(G10_ROLES).toContain(role);
+  });
+
+  it('gives the quoting convention of the usual pair', () => {
+    const jpy = pairConvention('JPY');
+    expect(jpy).toMatchObject({ pair: 'USD/JPY', base: 'USD', quote: 'JPY', decimals: 2, pip: 0.01 });
+    expect(jpy.pipValuePerMillion).toBe(10_000);
+    const chf = pairConvention('CHF');
+    expect(chf).toMatchObject({ pair: 'USD/CHF', decimals: 4, pipValuePerMillion: 100, spotDays: 2 });
+    expect(pairConvention('CAD').spotDays).toBe(1);
+    expect(pairConvention('USD').pair).toBe('EUR/USD');
   });
 });
 

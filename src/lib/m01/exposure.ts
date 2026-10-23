@@ -10,6 +10,7 @@
  * drift: S · e^(±σ√T). With σ = 8 % and T = 0.25 it covers roughly two thirds of outcomes.
  */
 import { EXAMPLE } from '@/lib/fx/example';
+import { normCdf } from '@/lib/fx/normal';
 
 /** Pip and big figure of USD/CHF (and every non-JPY pair). */
 export const PIP = 1e-4;
@@ -97,6 +98,22 @@ export function sigmaRange(
 ): [number, number] {
   const k = vol * Math.sqrt(T);
   return [S * Math.exp(-k), S * Math.exp(k)];
+}
+
+/**
+ * Model probability that the rate after T years lies at S or further away from S0 on the same
+ * side (above S if S > S0, below S if S < S0). Same log-normal model without drift as
+ * {@link sigmaRange}: P = N(−|ln(S/S0)| / (σ√T)). At S = S0 the answer is ½.
+ */
+export function probBeyond(
+  S: number,
+  S0: number = EXAMPLE.spot,
+  vol: number = EXAMPLE.vol,
+  T: number = EXAMPLE.T,
+): number {
+  if (!(S > 0) || !(S0 > 0)) throw new RangeError(`rates must be positive, got ${S}, ${S0}`);
+  const z = Math.log(S / S0) / (vol * Math.sqrt(T));
+  return normCdf(-Math.abs(z));
 }
 
 /**

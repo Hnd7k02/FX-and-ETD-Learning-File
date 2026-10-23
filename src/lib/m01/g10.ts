@@ -56,3 +56,80 @@ export function selectionAfterFilter(current: G10Code, filter: G10Filter): G10Co
   const m = matchingCodes(filter);
   return m.includes(current) ? current : (m[0] ?? current);
 }
+
+/* ---------- Scenarios: textbook tendencies by role ---------- */
+
+export type G10Scenario = 'none' | 'riskOff' | 'riskOn' | 'commodityBoom';
+export const G10_SCENARIOS: readonly G10Scenario[] = ['none', 'riskOff', 'riskOn', 'commodityBoom'];
+export type Tendency = 'up' | 'down' | 'flat';
+
+/**
+ * One config object for the scenario view (D-22). Each scenario maps a ROLE to a tendency of the
+ * currency against the others; a currency without a matching role stays 'flat' ("no clear
+ * tendency"). Textbook tendencies, not laws: there are crises in which they fail, and the module
+ * text shows a sourced counter-example.
+ * - riskOff (crisis, flight to safety): safe havens tend to gain, commodity currencies to lose.
+ * - riskOn (calm markets, carry trades are built): funding currencies tend to lose (they are
+ *   borrowed and sold), pro-cyclical commodity currencies to gain.
+ * - commodityBoom (commodity prices rise): commodity currencies tend to gain.
+ * A role listed under 'up' wins over the same currency's role under 'down' (JPY and CHF are
+ * both safe haven and funding currency).
+ */
+export const G10_SCENARIO_RULES: Record<
+  Exclude<G10Scenario, 'none'>,
+  { up: readonly G10Role[]; down: readonly G10Role[] }
+> = {
+  riskOff: { up: ['safeHaven'], down: ['commodity'] },
+  riskOn: { up: ['commodity'], down: ['funding'] },
+  commodityBoom: { up: ['commodity'], down: [] },
+};
+
+/** Tendency of a currency in a scenario ('flat' = no clear tendency). */
+export function tendency(code: G10Code, scenario: G10Scenario): Tendency {
+  if (scenario === 'none') return 'flat';
+  const rule = G10_SCENARIO_RULES[scenario];
+  const { roles } = profileOf(code);
+  if (roles.some((r) => rule.up.includes(r))) return 'up';
+  if (roles.some((r) => rule.down.includes(r))) return 'down';
+  return 'flat';
+}
+
+/** Codes per tendency in a scenario (for the summary line and the screen-reader text). */
+export function tendencies(scenario: G10Scenario): Record<Tendency, G10Code[]> {
+  const out: Record<Tendency, G10Code[]> = { up: [], down: [], flat: [] };
+  for (const p of G10) out[tendency(p.code, scenario)].push(p.code);
+  return out;
+}
+
+/* ---------- Market convention of the usual pair ---------- */
+
+export interface PairConvention {
+  pair: string;
+  base: string;
+  quote: string;
+  /** Decimals of the quote (4, JPY pairs 2). */
+  decimals: 2 | 4;
+  /** Size of one pip (0.0001, JPY pairs 0.01). */
+  pip: number;
+  /** Value of one pip on 1 Mio. units of the base currency, in the quote currency. */
+  pipValuePerMillion: number;
+  /** Spot value date in business days (T+2, USD/CAD T+1). */
+  spotDays: 1 | 2;
+}
+
+/** Quoting convention of a currency's usual pair (see section 3 of the module). */
+export function pairConvention(code: G10Code): PairConvention {
+  const p = profileOf(code);
+  const [base = '', quote = ''] = p.pair.split('/');
+  const jpy = p.pair.includes('JPY');
+  const pip = jpy ? 0.01 : 0.0001;
+  return {
+    pair: p.pair,
+    base,
+    quote,
+    decimals: jpy ? 2 : 4,
+    pip,
+    pipValuePerMillion: Math.round(pip * 1_000_000 * 1e6) / 1e6,
+    spotDays: p.spotDays,
+  };
+}

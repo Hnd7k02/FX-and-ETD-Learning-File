@@ -50,7 +50,7 @@ Steigt USD/CHF bei Verfall über <Num of="m06.sgK2" />, endet der Schutz: Der Im
 
 <Formula variant="accent"><span>Straddle ≈ √(2/π) · σ√<i>T</i> · <i>F</i> · <i>DF</i><sub>d</sub></span></Formula>
 
-**3.** Im Beispiel: <Num of="m06.sqrt2pi" /> · <Num of="m06.sigmaSqrtT" /> · <Num of="ex.forward" digits={4} /> ergibt <Num of="m06.straddleApproxPips" /> Pips. Exakt sind es <Num of="m06.straddlePips" /> Pips.
+**3.** Im Beispiel ist <i>DF</i><sub>d</sub> = <Num of="m06.discountRate" />, denn der CHF-Zins ist <Num of="ex.rd" />. Also: <Num of="m06.sqrt2pi" /> · <Num of="m06.sigmaSqrtT" /> · <Num of="ex.forward" digits={4} /> ergibt <Num of="m06.straddleApproxPips" /> Pips. Exakt sind es <Num of="m06.straddlePips" /> Pips.
 
 **4.** Was bedeutet das? Ist <i>F</i><sub>T</sub> normalverteilt um <i>F</i> mit Standardabweichung σ√<i>T</i> · <i>F</i>, ist die erwartete absolute Bewegung genau √(2/π) · σ√<i>T</i> · <i>F</i>. Der Straddle kostet also ungefähr die Bewegung, die der Markt erwartet. Kaufen lohnt sich, wenn du mit grösseren Ausschlägen rechnest, als die implizite Vola einpreist.
 

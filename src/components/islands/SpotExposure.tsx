@@ -23,6 +23,7 @@ import {
   EXPOSURE_RANGE as R,
   bigFigureBlocks,
   exposure,
+  probBeyond,
   sigmaRange,
 } from '@/lib/m01/exposure';
 import { M01_SCENARIOS } from '@/lib/nums/m01';
@@ -101,6 +102,7 @@ export default function SpotExposure({ lang }: SpotExposureProps): JSX.Element {
     months,
     pct: fmtPct(Math.abs(e.pct), lang, 2),
     diff: chf(Math.abs(e.diff)),
+    prob: fmtPct(probBeyond(S), lang, 0),
   });
 
   const xTicks = useMemo(
@@ -127,6 +129,17 @@ export default function SpotExposure({ lang }: SpotExposureProps): JSX.Element {
     blockRects.push({ y: top, h, part });
   }
   const up = dirSign > 0;
+  // annotation bracket beside the column: left of it in the right half of the plot
+  const annotLeft = x > (L.left + L.width - L.right) / 2;
+  const annotTick = annotLeft ? 5 : -5;
+  const annotX = annotLeft ? x - L.block / 2 - 8 : x + L.block / 2 + 8;
+  const bfShown = Math.round(shown.bigFigures * 100) / 100;
+  const annotBf = t(Math.abs(bfShown) === 1 ? 'annotBfOne' : 'annotBf', {
+    bf: fmtNumber(bfShown, lang, {
+      digits: Number.isInteger(bfShown) ? 0 : 2,
+      sign: true,
+    }),
+  });
   const blockFill = up ? 'var(--ff-exotics-soft)' : 'var(--ff-good-soft)';
   const blockStroke = up ? 'var(--ff-short)' : 'var(--ff-good)';
   const blockText = up ? 'var(--ff-exotics-text)' : 'var(--ff-good-text)';
@@ -257,7 +270,7 @@ export default function SpotExposure({ lang }: SpotExposureProps): JSX.Element {
                     {!b.part && b.h >= 14 && (
                       <text
                         x={x}
-                        y={b.y + b.h / 2 + 4}
+                        y={b.y + b.h / 2 + 5}
                         style={{
                           fontSize: '11px',
                           fontWeight: 700,
@@ -272,6 +285,37 @@ export default function SpotExposure({ lang }: SpotExposureProps): JSX.Element {
                   </g>
                 ))}
               </g>
+              {/* aha: the column in big figures and francs */}
+              {Math.abs(shown.pips) >= 50 && (
+                <g class="spx-annot" data-annot aria-hidden="true">
+                  <path
+                    d={`M${(annotX + annotTick).toFixed(1)},${y0.toFixed(1)}H${annotX.toFixed(1)}V${yCost.toFixed(1)}H${(annotX + annotTick).toFixed(1)}`}
+                    style={{ fill: 'none', stroke: blockStroke, strokeWidth: 1.5 }}
+                  />
+                  <text
+                    x={annotX + (annotLeft ? -8 : 8)}
+                    y={(y0 + yCost) / 2 - 2}
+                    style={{
+                      fontSize: fs,
+                      fontWeight: 800,
+                      fill: blockText,
+                      textAnchor: annotLeft ? 'end' : 'start',
+                      paintOrder: 'stroke',
+                      stroke: '#fff',
+                      strokeWidth: 4,
+                    }}
+                  >
+                    <tspan x={annotX + (annotLeft ? -8 : 8)}>{annotBf}</tspan>
+                    <tspan
+                      x={annotX + (annotLeft ? -8 : 8)}
+                      dy={L.font + 5}
+                      style={{ fontFamily: 'var(--ff-font-mono)' }}
+                    >
+                      {chf(shown.diff, true)}
+                    </tspan>
+                  </text>
+                </g>
+              )}
               <circle
                 cx={x}
                 cy={yCost}

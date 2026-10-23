@@ -50,7 +50,7 @@ If USD/CHF ends above <Num of="m06.sgK2" />, the protection stops: the importer 
 
 <Formula variant="accent"><span>Straddle ≈ √(2/π) · σ√<i>T</i> · <i>F</i> · <i>DF</i><sub>d</sub></span></Formula>
 
-**3.** In the example: <Num of="m06.sqrt2pi" /> · <Num of="m06.sigmaSqrtT" /> · <Num of="ex.forward" digits={4} /> gives <Num of="m06.straddleApproxPips" /> pips. The exact value is <Num of="m06.straddlePips" /> pips.
+**3.** In the example <i>DF</i><sub>d</sub> = <Num of="m06.discountRate" />, because the CHF rate is <Num of="ex.rd" />. So <Num of="m06.sqrt2pi" /> · <Num of="m06.sigmaSqrtT" /> · <Num of="ex.forward" digits={4} /> gives <Num of="m06.straddleApproxPips" /> pips. The exact value is <Num of="m06.straddlePips" /> pips.
 
 **4.** What does this mean? If <i>F</i><sub>T</sub> is normally distributed around <i>F</i> with standard deviation σ√<i>T</i> · <i>F</i>, the expected absolute move is exactly √(2/π) · σ√<i>T</i> · <i>F</i>. So the straddle costs roughly the move the market expects. Buying it pays off if you expect larger swings than the implied vol prices in.
 

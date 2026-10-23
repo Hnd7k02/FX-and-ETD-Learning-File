@@ -4,13 +4,13 @@
  * (src/lib/nums/m06.ts → M06) and formatted with src/lib/format.ts.
  */
 import type { Lang } from '@/i18n/types';
-import { fmtMoney, fmtNumber, fmtPct, fmtPips, fmtRate } from '@/lib/format';
+import { fmtMoney, fmtNumber, fmtPct, fmtPips, fmtRate, pipSize } from '@/lib/format';
 import { EXAMPLE as E } from '@/lib/fx/example';
 import { M06 } from '@/lib/nums/m06';
 import type { ModuleQuiz, QuizQuestion } from './types';
 
 const PAIR = E.pair;
-const PIP = 1e-4;
+const PIP = pipSize(PAIR);
 const N = E.notional;
 const both = (f: (lang: Lang) => string) => ({ de: f('de'), en: f('en') });
 const rate = (x: number) => fmtRate(x, PAIR);
