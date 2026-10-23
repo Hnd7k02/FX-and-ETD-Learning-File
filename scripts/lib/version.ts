@@ -3,7 +3,7 @@
  * while loading and on the About page and names the copy release/forward-first-v<number>.html;
  * the tests read it from here.
  */
-export const OFFLINE_VERSION = { number: 5 } as const;
+export const OFFLINE_VERSION = { number: 6 } as const;
 
 /** File name of the versioned copy. */
 export const versionedFileName = (n: number = OFFLINE_VERSION.number) => `forward-first-v${n}.html`;

@@ -442,3 +442,101 @@ Format: `D-xx · date · origin`, then question, decision, reasoning. Origin is 
 - Version 6 (Review 2, 23.10.2026): in source entries, publishers and authors are allowed (e.g. a textbook's author and publisher, the authors of a BIS article). A book is listed with its ISBN instead of a URL; no links to copies of books, statements are paraphrased, never copied.
 
 **Reasoning:** The rule protects against advertising and against any link to a real firm or person; a source has to name its publisher, and a model is known by its authors' names.
+
+## D-51 · 2026-10-23 · Review 2, 23.10.2026
+
+**Double Knock-in: ein engerer Korridor macht ihn teurer (Punkt 1)**
+
+**Question:** 07.4 said «Je enger der Korridor, desto billiger, und desto wahrscheinlicher das Aus». That holds for the double knock-out and the double no-touch, not for the double knock-in.
+**Decision:** 07.4 names both directions: the double knock-out gets cheaper, the double knock-in dearer (the same event brings it to life more often); without a rebate both add up to the vanilla with the same barriers, strike and expiry (in-out parity). The 07.1 caption says the same for one barrier. Glossary (double barrier, barrier option, knock-out, knock-in, in-out parity) says «ohne Rebate» / "without a rebate" wherever the parity is stated. Source: `hull-2012`, «Exotic Options». Tests: Monte Carlo on nested corridors (pathwise and in price), in-out parity on the core (17.2343 + 109.4569 = 126.6912 pips; a 20-pip rebate adds 7.6171 pips), wording guard `RETIRED_V6`.
+**Reasoning:** The parity forces the opposite direction for the knock-in; a learner who reads «narrower = cheaper» for every barrier misprices half of them.
+
+## D-52 · 2026-10-23 · Review 2, 23.10.2026
+
+**Gamma-Maximum bei d1 = −σ√T (Punkt 2)**
+
+**Question:** 05.2 said gamma peaks at the strike because φ(d1) peaks at d1 = 0. Across spot, gamma has S in the denominator.
+**Decision:** 05.2 gives the exact peak across spot, d1 = −σ√T (F = K · e^(−1.5σ²T)), with a fifth derivation step (∂Γ/∂S = −(Γ/S) · [d1/(σ√T) + 1] = 0), then the rule of thumb «am grössten, wenn der Forward nahe am Strike liegt». Across strikes the peak stays at d1 = 0. 05.3 adds the mirror case for vega (d1 = +σ√T, i.e. d2 = 0, spot 0.80061). The takeaway ties the theta statement to the gamma share of theta; 05.4 to the last weeks. New numbers `m05.gammaPeakSpot` (0.79805, Γ 12.3786), `m05.spotD1Zero` (0.79933, Γ 12.3687), `m05.gammaPeakFwdPips` (19); Γ at spot 0.8000 is 12.3556. Glossary gamma and the module 05.3 teaser («nahe ATMF») follow. Source: `hull-2012`, «The Greek Letters». Test: the numerical maximum on a fine spot grid equals the analytic spot (tolerance 1e-5).
+**Reasoning:** The rule of thumb stays useful (ATMF gamma is within e^(−9σ²T/8) of the peak), but the exact place must not be taught wrong.
+
+## D-53 · 2026-10-23 · Review 2, 23.10.2026
+
+**Alpha ist der risikobereinigte Mehrertrag (Punkt 3)**
+
+**Question:** 09.3 defined alpha as «einen Ertrag, der aus einer Marktsicht kommt»; the glossary had the textbook definition.
+**Decision:** 09.3 (text and takeaway), 09.1, the section check of 09 and the glossary say: alpha is the excess return over a benchmark, adjusted for risk; here the benchmark is the forward or the money market; whether a view earns alpha only shows in that comparison, and a gain from a rising dollar is first of all the result of the dollar position. The module name «Hedge, Alpha, Yield» stays. Source: `jensen-1968`.
+**Reasoning:** A view is not alpha; only a risk-adjusted outperformance of the benchmark is.
+
+## D-54 · 2026-10-23 · Review 2, 23.10.2026
+
+**Carry: CHF 6’939 bei Fälligkeit, CHF 7’000 heute (Punkt 4)**
+
+**Question:** Module 01 computes the carry on USD 1 Mio. bought today (CHF 7’000), module 09 on USD 1 Mio. at maturity (CHF 6’939); 09.4 did not say so.
+**Decision:** New core function `moneyMarketCarry` (`src/lib/fx/forward.ts`) for both notionals. 09.4 says: for USD 1 Mio. at maturity he buys USD 991’325.90 today; his head start is CHF 6’939.28, exactly the forward discount (69.39 pips on USD 1 Mio.); with USD 1 Mio. today, as in module 01, it is CHF 7’000.00 because he deposits more dollars; forward, break-even and pips are the same for both. The derivation shows N · (S − F) = S · N / (1 + r_USD τ) · (r_USD − r_CHF) τ. New numbers `m09.carryUsdToday`, `m09.carryChfStart`, `m09.carryPipsExact`. Tests: the identity (also for r_CHF ≠ 0), the ratio 1 + r_USD τ and D-26 (shown pips × USD 1 Mio. = shown CHF).
+**Reasoning:** Two correct numbers for two different notionals look like a mistake unless the text names the notional.
+
+## D-55 · 2026-10-23 · Review 2, 23.10.2026
+
+**TPF und RTPF zahlen überall den vertraglichen Coupon (Punkt 5)**
+
+**Question:** Module 08 paid the contractual coupon (775.4 pips, CHF 7’754, maximum CHF 46’524), module 09 the unrounded fair coupon (maximum CHF 46’522).
+**Decision:** Every paid coupon and every maximum gain comes from the contractual coupon (`simProduct`: the Monte Carlo fair coupon rounded to 0.1 pip): matrix profiles and key numbers (`matrixParams`, readout to 0.1 pip via `pipsDigits`), the building blocks (`fullStage`, `stageCoupon`), the path simulator (`paidCoupon`: contractual or chosen coupon) and the texts of 08.4 and 09.3. TPF: 6 × CHF 7’754 = CHF 46’524; RTPF: 6 × CHF 8’105 = CHF 48’630, in both modules. The unrounded coupon appears only as «fairer Coupon (Monte Carlo) ± Standardfehler»: 775.37 ± 0.97 and 810.54 ± 1.61 pips. The maximum loss does not depend on the coupon. Tests: `m09.tpfMaxChf = m08.tpfMaxChf = coupons × shown coupon in CHF`, the same for the RTPF, and the matrix, simulator and building blocks against the same coupon.
+**Reasoning:** One product, one coupon; the rounding is far inside the standard error, so the contractual coupon is still fair.
+
+## D-56 · 2026-10-23 · Review 2, 23.10.2026
+
+**Methodik: eingefrorener Datenstand, Update nur von Hand (Punkt 6)**
+
+**Question:** The About page still described a GitHub Action that fetched rates on weekdays at 15:30 UTC; since D-13 the release workflow is manual and the file holds a frozen snapshot.
+**Decision:** About (DE/EN) describes the real process: the workflow «Release» has no schedule and runs only when started; it fetches the ECB rates, validates them with the rules and constants of `src/lib/data/validate.ts` (filled in from there: last value at most 5 bank days old at the time of the fetch, absolute daily log return below 10 % with documented exception, dates valid, ascending, unique, not in the future, no stored date missing), runs the checks, builds and tests the file. A new bullet says the file is a frozen snapshot; its date is shown in the Riskometer and in every footer. Labels that read «heute» for a frozen value now say «Letzter Stand», «zuletzt», «Stufe zum Datenstand» (EN "latest reading", "level at the data date"). The ECB publishes «an jedem Arbeitstag um ca. 16:00 MEZ». Test: no text claims an automatic or daily update. Data were not updated: `npm run data:fetch` could not reach the ECB from the sandbox (proxy 403), so the data date stays 14.09.2026; Dario runs the Release workflow with the ECB fetch.
+**Reasoning:** The methodology must describe what the file really is.
+
+## D-57 · 2026-10-23 · Review 2, 23.10.2026
+
+**Forward Points: Zinsparität plus Cross-Currency Basis (Punkt 7)**
+
+**Question:** 02.3 and the quiz said the forward follows «allein aus Spot und Zinsen» and the only cause of the points is the interest differential.
+**Decision:** The core message stays «kein Forecast»: the forward follows from spot and interest rates, not from an expectation; in the market the cross-currency basis comes on top (links to 02.2 and 03.4, where the basis is discussed). Same in 02.3/02.4, 03.1/03.2, quiz 02 and 03, the forward-curve and cash-and-carry figures («nahe beim fairen Wert»), 09.1 (the risk-neutral mean follows from the absence of arbitrage between spot, money market and forward), 01.4 («mit diesem Forward») and the glossary (forward, forward points, interest rate parity, swap points, covered interest arbitrage, forward premium/discount, cross-currency basis). Formulas and examples keep the parity forward and say so. Sources: `hull-2012` («Determination of Forward and Futures Prices»), `bis-2016-cip`.
+**Reasoning:** Covered interest parity has not held exactly since 2008; the basis is small for USD/CHF but real, and it is still no forecast.
+
+## D-58 · 2026-10-23 · Review 2, 23.10.2026
+
+**Letztes TARF-Fixing: volles Nominal zum angepassten Kurs (Punkt 8)**
+
+**Question:** 08.3 said the last gain «wird so gekappt», but not how.
+**Decision:** The text states the rule of the core (`LastFixingRule` 'capped', `targetTrade` in `src/lib/fx/mc/payoffs.ts`): on the fixing that reaches the target you trade the full notional at an adjusted rate, the fixing minus what is left to the target (selling in the pivot TARF: plus); the counted total is exactly the target and the rate lies between strike and fixing. One sentence names the market variants («der volle Gewinn am letzten Fixing oder keine Zahlung; massgebend ist das Term Sheet»). Same in the pivot TARF paragraph, the glossary (tarf, pivot TARF, target), the building-block texts and the 08 quiz. Test: kernel test for the target fixing (total = target, notional = N, rate = fixing ∓ remaining).
+**Reasoning:** «Capped» without the mechanics hides that the full notional is still traded.
+
+## D-59 · 2026-10-23 · Review 2, 23.10.2026
+
+**Barriere und Sprung (Punkt 9)**
+
+**Question:** 07.4 said stops and barriers both assume a continuous rate. A barrier is triggered by a jump past it just as well.
+**Decision:** 07.4 (gap paragraph, example, risk box, takeaway), quiz 07 and the glossary (gap risk, knock-out, knock-in: «erreicht oder durchbricht») say: a stop needs a tradable price at its level; a barrier does not, a jump past it triggers it; only the pricing formulas (and hedging by them) assume a continuous rate, so they underestimate gap risk. The sentence on extinction without a trade stays. The replay counts the first fixing «auf oder jenseits» of a level, as the code does.
+**Reasoning:** The model assumption belongs to the formulas, not to the contract.
+
+## D-60 · 2026-10-23 · Review 2, 23.10.2026
+
+**Spot-Delta tief im Geld: e^(−r_f·T), nicht 1 (Punkt 10)**
+
+**Question:** The lab hint said «Delta läuft gegen eins»; the spot delta e^(−r_f·T) · N(d1) tends to e^(−r_f·T).
+**Decision:** 05.2 (text and lab tour), quiz 05, the lab annotation («Forward-Delta gegen 1») and the glossary (synthetic forward) say: the spot delta rises towards e^(−r_f·T) ≈ 0.991, which is the spot delta of a forward; the forward delta tends to 1. New number `m05.spotDeltaLimit` (0.991288). Test: deep in the money spot delta = e^(−r_f·T) and forward delta = 1 (tolerance 1e-6). Source: `hull-2012`, «The Greek Letters».
+**Reasoning:** With r_f = 3.5 % the difference is almost a percent of the hedge.
+
+## D-61 · 2026-10-23 · Review 2, 23.10.2026
+
+**Vega absichern (Punkt 11)**
+
+**Question:** 05.1 and 05.3 said vega can «nur mit anderen Optionen» be hedged.
+**Decision:** «Mit Spot und Forwards lässt sich Vega nicht absichern, sie haben kein Vega. Am FX-Desk nimmt man dafür andere Optionen, seltener Volatilitäts- oder Varianz-Swaps.» (EN analog). Source: `hull-2012`, «Exotic Options» (volatility and variance swaps).
+**Reasoning:** Options are the usual tool, not the only one.
+
+## D-62 · 2026-10-23 · Review 2, 23.10.2026
+
+**Ladetext ohne JavaScript (Punkt 12)**
+
+**Question:** Dario's iPad test: the preview of the iPad Files app runs no JavaScript, so only the loading text stays.
+**Decision:** The loading text (ASCII after `htmlAscii`) keeps its start and adds, DE then EN: if only this text stays (no yellow diagnostics box), the view runs no JavaScript, for example the preview of the iPad Files app; open the file in Chrome, Edge or Safari on a computer and allow JavaScript. README, the release notes of `release.yml` and the runtime header say the same. The iPad stays a target and its viewports stay tested in WebKit in CI; how the file is best opened on the iPad (D-13's device test ran inline JavaScript) is an open question in PROGRESS.
+**Reasoning:** A silent «wird geladen» gives no hint; the text now says what to do.
+
+Wordings retired by D-51 to D-62 are guarded in both languages by `RETIRED_V6` in `tests/unit/content-lint.test.ts`.

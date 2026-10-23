@@ -92,7 +92,7 @@ npm run e2e:web    # component tests on the web build
 
 ## Download and release
 
-- **Use it:** download `forward-first.html` from the [latest release](../../releases/latest). PC: double-click, it opens in Chrome or Edge. iPad: tap the download, save it to Files, open it there.
+- **Use it:** download `forward-first.html` from the [latest release](../../releases/latest). PC: double-click, it opens in Chrome or Edge. iPad: tap the download, save it to Files, open it there. If only the loading text stays on screen (no yellow diagnostics box), that view runs no JavaScript; then open the file on a computer in Chrome, Edge or Safari, as the loading text says.
 - **New release** (e.g. with fresh ECB data): GitHub → Actions → **Release** → Run workflow. Untick "Fetch new ECB reference rates first" to rebuild without new data.
 - Every CI run also attaches the tested file as the artifact `forward-first-html`.
 
