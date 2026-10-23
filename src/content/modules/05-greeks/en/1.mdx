@@ -23,13 +23,13 @@ Five levers, but six Greeks: spot gets two. Delta measures the slope, gamma the 
 | CHF rate | Rho CHF ρ<sub>d</sub> | ∂<i>V</i>/∂<i>r</i><sub>d</sub> | <Num of="ex.rhoDChf" /> per +1% |
 | USD rate | Rho USD ρ<sub>f</sub> | ∂<i>V</i>/∂<i>r</i><sub>f</sub> | <Num of="ex.rhoFChf" /> per +1% |
 
-Read the table as a league table. Spot is by far the strongest lever: one big figure moves the premium by several thousand francs. A vol point is worth about one and a half thousand, one percentage point of interest about a thousand, a day only a few dozen. Theta is small, but it arrives every single day.
+Read each row together with its step. One big figure moves the premium by several thousand francs, a vol point by about one and a half thousand, one percentage point of interest by about a thousand, a day by only a few dozen. But the steps are not equally common. A typical daily move in USD/CHF at this volatility is only about <Num of="ex.breakEvenPips1" /> pips (σ · <i>S</i> / √365), and a whole percentage point of interest rarely arrives overnight. Theta is small, but it arrives for sure, every single day.
 
 ### How good are the Greeks' estimates?
 
 If USD/CHF rises by one big figure, delta alone estimates a gain of <Num of="m05.spotUpDeltaChf" />. Gamma adds the curvature: delta plus gamma give <Num of="m05.spotUpDeltaGammaChf" />. The exact repricing delivers <Num of="m05.spotUpChf" />. For small moves the Greeks are very accurate.
 
-For large steps they are less so. A whole month costs the call <Num of="m05.monthChf" />, whereas about 30 times today's theta predicts only <Num of="m05.monthThetaChf" />. The reason: a Greek is a snapshot. Time decay speeds up towards expiry, and today's theta cannot see that yet.
+For large steps they are less so. Over a whole month the premium changes by <Num of="m05.monthChf" />, whereas about 30 times today's theta predicts only <Num of="m05.monthThetaChf" />. The reason: a Greek is a snapshot. Time decay speeds up towards expiry, and today's theta cannot see that yet.
 
 <Derivation title="Derivation: the Greeks as a Taylor expansion">
 
@@ -48,7 +48,7 @@ When all levers move a little, the Taylor expansion splits the price change into
   d<i>V</i> ≈ Δ · d<i>S</i> + ½ · Γ · (d<i>S</i>)² + ν · dσ + Θ · d<i>t</i> + ρ<sub>d</sub> · d<i>r</i><sub>d</sub> + ρ<sub>f</sub> · d<i>r</i><sub>f</sub>
 </Formula>
 
-Only for spot is the second-order term included. Spot moves the most from day to day, and (d<i>S</i>)² is not negligible there. Cross terms such as spot times vol (vanna) appear in section 4 as an outlook.
+Only for spot is the second-order term included. That is where the price curve bends most, and moves are large enough for (d<i>S</i>)² to matter. Against volatility and rates the curve is almost a straight line near ATMF. Cross terms such as spot times vol (vanna) appear in section 4 as an outlook.
 
 A word on units: theta counts the time that passes. It is −∂<i>V</i>/∂<i>T</i> with time to expiry <i>T</i>, shown per calendar day in this tool. Vega is per vol point, rho per percentage point of interest. All values refer to USD 1m and are in CHF.
 
@@ -58,7 +58,7 @@ A word on units: theta counts the time that passes. It is −∂<i>V</i>/∂<i>T
 
 An options desk holds thousands of positions. Nobody looks at each one. The Greeks are added up instead: delta in USD, vega in CHF per vol point, theta per day. That way a whole book can be read in a handful of numbers.
 
-Each Greek has its own tool. Delta is hedged with spot or forwards: against small moves, the importer's call behaves like a spot position of <Num of="m05.deltaUsd" />. Vega can only be hedged with other options, because spot and forwards have no volatility. Theta cannot be hedged on its own, since it always comes together with gamma: it is the price the buyer pays for gamma.
+Each Greek has its own tool. Delta is hedged with spot or forwards: against small moves, the importer's call behaves like a spot position of <Num of="m05.deltaUsd" />. Vega can only be hedged with other options, because spot and forwards have no vega. Theta cannot be hedged on its own: whoever wants less theta sells options and gives up gamma with them. Most of theta is the price the buyer pays for gamma (section 4).
 
 </Desk>
 

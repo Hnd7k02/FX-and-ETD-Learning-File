@@ -604,11 +604,22 @@ export default function GreeksLab({ lang, mode = 'delta-gamma' }: GreeksLabProps
     );
   };
 
-  const panelHead = (head: Head) => (
+  // The grey dashed payoff needs a key where the chart has no room for a label (delta-gamma).
+  const panelHead = (head: Head, payoffKey = false) => (
     <div class="gl-head">
       <span class="gl-legend">
-        <span aria-hidden="true" class="gl-swatch" style={{ borderTopColor: head.color }} />
-        <span>{greek(head.title)}</span>
+        <span class="gl-legend-item">
+          <span aria-hidden="true" class="gl-swatch" style={{ borderTopColor: head.color }} />
+          <span>{greek(head.title)}</span>
+        </span>
+        {payoffKey && (
+          <span class="gl-legend-item gl-legend-payoff" data-payoff-key>
+            <svg width="22" height="4" viewBox="0 0 22 4" aria-hidden="true">
+              <path d="M0 2H22" class="gl-payoff" />
+            </svg>
+            {t('gl.ref.payoff')}
+          </span>
+        )}
       </span>
       <span class="gl-pill" style={{ background: head.pillBg }}>
         <span aria-hidden="true" class={head.tangent ? 'gl-pill-line' : 'gl-pill-dot'} />
@@ -747,7 +758,7 @@ export default function GreeksLab({ lang, mode = 'delta-gamma' }: GreeksLabProps
 
       <div class="ff-lab">
         <div class="ff-lab-main gl-main" ref={box}>
-          {panelHead(heads[0])}
+          {panelHead(heads[0], top.payoff !== null && mode !== 'theta')}
           {chart('top', top, heads[0], topGeo)}
           {panelHead(heads[1])}
           {chart('bottom', bottom, heads[1], botGeo)}

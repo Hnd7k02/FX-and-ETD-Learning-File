@@ -41,6 +41,12 @@ export interface PriceDriversProps {
 const PAIR = EXAMPLE.pair;
 const N = EXAMPLE.notional;
 const SAMPLES = 80;
+/**
+ * Both options here are bought (prices), so the put is not drawn in the "short" orange:
+ * call blue (long), put in the options violet and dashed, so the pair also differs without colour.
+ */
+const PUT_COLOR = 'var(--ff-options)';
+const PUT_DASH = '7 5';
 
 function layoutFor(w: number) {
   const width = Math.max(280, Math.round(w));
@@ -196,13 +202,13 @@ export default function PriceDrivers({ lang }: PriceDriversProps): JSX.Element {
             </div>
           </div>
           <div class="pd-parity math" data-parity>
-            {t('pd.parity', { diff: fmtPips(parity, lang, 2, true) })}
+            {t('pd.parity', { diff: fmtPips(parity, lang, 1, true) })}
           </div>
           <div class="pd-chart-head">
             <Legend
               items={[
                 { label: t('pd.call'), color: 'var(--ff-long)' },
-                { label: t('pd.put'), color: 'var(--ff-short)' },
+                { label: t('pd.put'), color: PUT_COLOR, kind: 'dashed', width: 2.5 },
               ]}
             />
             <span class="ff-pill-note pd-slope" key={active}>
@@ -234,9 +240,9 @@ export default function PriceDrivers({ lang }: PriceDriversProps): JSX.Element {
                 d={linePath(pts(n))}
                 style={{
                   fill: 'none',
-                  stroke: 'var(--ff-short)',
+                  stroke: PUT_COLOR,
                   strokeWidth: 2.5,
-                  strokeLinecap: 'round',
+                  strokeDasharray: PUT_DASH,
                   strokeLinejoin: 'round',
                 }}
               />
@@ -254,7 +260,7 @@ export default function PriceDrivers({ lang }: PriceDriversProps): JSX.Element {
                 cx={sx(xNow)}
                 cy={sy(put)}
                 r={5}
-                style={{ fill: 'var(--ff-short)', stroke: '#fff', strokeWidth: 2.5 }}
+                style={{ fill: PUT_COLOR, stroke: '#fff', strokeWidth: 2.5 }}
               />
               <circle
                 cx={sx(xNow)}

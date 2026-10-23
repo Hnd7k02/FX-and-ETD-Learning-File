@@ -99,6 +99,10 @@ export const M05 = {
   /** CHF for a 10-pip move, delta only. */
   deltaPnl10PipsChf: delta * 10 * PIP * N,
   bigFigure: BIG_FIGURE,
+  /** CHF for +1 big figure: delta only, delta + ½ gamma, exact repricing. */
+  spotUpDeltaChf: delta * BIG_FIGURE * N,
+  spotUpDeltaGammaChf: spotUp.estimate,
+  spotUpChf: spotUp.exact,
   callChf: priceAt(T) * N,
   /** Hedged one-day P&L for a 20-pip and a 50-pip move (CHF). */
   pnl20Chf: gammaTheta(20, vol * 100).pnlChf,
@@ -136,7 +140,7 @@ export const nums: NumTable = {
     note: 'exact premium change for spot +1 big figure',
   },
   'm05.spotUpDeltaChf': {
-    value: delta * BIG_FIGURE * N,
+    value: M05.spotUpDeltaChf,
     kind: 'money',
     sign: true,
     note: 'delta-only estimate for +1 big figure',
@@ -213,6 +217,17 @@ export const nums: NumTable = {
     value: vegaPeakSpot(LAB_CONFIG.defaults),
     kind: 'rate',
     note: 'spot where vega (fixed strike) peaks: d2 = 0',
+  },
+  'm05.vegaPeakSpot1y': {
+    value: vegaPeakSpot({ ...LAB_CONFIG.defaults, weeks: 52 }),
+    kind: 'rate',
+    note: 'spot where vega (strike 0.7930) peaks with one year to expiry, as in the lab',
+  },
+  'm05.fwdPoints1y': {
+    value: (F1y - S) / PIP,
+    kind: 'pips',
+    digits: 0,
+    note: '1-year forward points (continuous), negative: the forward sits below spot',
   },
   'm05.spotOtm': { value: SPOT_OTM, kind: 'rate', note: 'spot two big figures lower' },
   'm05.fwdOtmPips': {

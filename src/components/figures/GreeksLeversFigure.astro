@@ -44,16 +44,21 @@ const lang = pageLang(Astro.currentLocale);
     font-weight: 800;
     font-size: 15px;
   }
+  /* One grid for all rows (subgrid), so every bar track has the same width and the zero lines
+     align: the bars share one CHF axis and stay comparable across levers. */
   .glv-rows {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 16px;
     border: 1px solid var(--ff-line);
     border-radius: var(--ff-r-box);
     overflow: hidden;
   }
   .glv-row {
+    grid-column: 1 / -1;
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: subgrid;
     grid-template-areas:
       'name ctrl'
       'bar value'

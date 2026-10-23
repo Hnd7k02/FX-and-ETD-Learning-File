@@ -1,6 +1,6 @@
 import MoneynessExplorerFigure from '@/components/figures/MoneynessExplorerFigure.astro';
 
-Der Importeur kann den Strike frei wählen. Ein höherer Strike schützt erst später, ist aber billiger. Ein tieferer Strike schützt früher und kostet mehr. Wie weit ein Strike «im Geld» liegt, nennt man **Moneyness**.
+Der Importeur kann den Strike frei wählen. Ein höherer Strike schützt erst ab einem höheren Kurs, ist dafür billiger. Ein tieferer Strike schützt schon früher und kostet mehr. Wie weit ein Strike «im Geld» liegt, nennt man **Moneyness**.
 
 Gemessen wird gegen den **Forward**, nicht gegen den Spot. Die Option wird erst in 3 Monaten ausgeübt, und der faire Kurs für diesen Tag ist der Forward. Ein Beispiel: Ein USD Call mit Strike <Num of="m04.kMid" /> liegt <Num of="m04.kMidSpotPips" /> Pips unter dem Spot und wirkt im Geld. Gegen den Forward von <Num of="ex.forward" digits={4} /> liegt er aber <Num of="m04.kMidOtmPips" /> Pips darüber. Er ist aus dem Geld.
 
@@ -12,21 +12,23 @@ Gemessen wird gegen den **Forward**, nicht gegen den Spot. Die Option wird erst 
 
 ### Prämie = innerer Wert + Zeitwert
 
-Der **innere Wert** ist, was du heute schon sicher hättest: Du könntest den Call ausüben und die Dollars gleichzeitig per Forward verkaufen. Beim Call ist das max(F − K, 0), abgezinst auf heute. Der **Zeitwert** ist der Rest. Er bezahlt die Chance, dass sich der Kurs bis zum Verfall noch zu deinen Gunsten bewegt.
+Der **innere Wert** ist, was du dir heute schon sichern kannst: Du verkaufst die Dollars per Forward und übst den Call bei Verfall aus. So sind dir F − K pro USD sicher. Beim Call ist der innere Wert darum max(F − K, 0), abgezinst auf heute. Der **Zeitwert** ist der Rest. Er bezahlt die Chance, dass sich der Kurs bis zum Verfall noch zu deinen Gunsten bewegt.
 
 Drei USD Calls mit 3 Monaten Laufzeit:
 
-- **ATMF**, Strike am Forward: <Num of="m04.atmfPips" /> Pips. Das ist reiner Zeitwert.
+- **ATMF**, Strike genau am Forward (<Num of="ex.forward" />): <Num of="m04.atmfPips" /> Pips. Das ist reiner Zeitwert.
 - **ITM**, Strike <Num of="m04.kItm" />: <Num of="m04.itmPips" /> Pips. Davon sind <Num of="m04.itmIntrinsicPips" /> Pips innerer Wert und <Num of="m04.itmTimePips" /> Pips Zeitwert.
 - **OTM**, Strike <Num of="m04.kOtm" />: <Num of="m04.otmPips" /> Pips, also <Num of="m04.otmChf" />. Auch das ist reiner Zeitwert.
+
+Unser Call aus Abschnitt 1 hat den gerundeten Strike <Num of="ex.strike" />. Der liegt <Num of="m04.fwdVsStrikePips" /> Pips unter dem Forward, darum kostet er eine Spur mehr: <Num of="ex.callPips" /> Pips.
 
 Der Zeitwert ist am Forward am grössten und wird gegen beide Flügel kleiner. Tief im Geld verhält sich die Option fast wie ein Forward, weit aus dem Geld ist sie fast wertlos.
 
 ### Delta statt Kurs: 25Δ und 10Δ
 
-Am Desk nennt man Strikes oft nicht als Kurs, sondern über das **Delta**. Delta sagt, wie stark der Optionswert auf den Spot reagiert. Grob ist es auch die Chance, dass die Option im Geld verfällt. Ein 25Δ Call hat also etwa eine Chance von eins zu vier.
+Am Desk nennt man Strikes oft nicht als Kurs, sondern über das **Delta**. Delta sagt, wie stark der Optionswert auf den Spot reagiert. Grob ist es auch die Chance, dass die Option im Geld verfällt. Ein 25Δ Call endet also etwa in einem von vier Fällen im Geld.
 
-Im Beispiel liegt der 25Δ Call bei <Num of="m04.call25" />, der 25Δ Put bei <Num of="m04.put25" />. Weiter draussen liegen die 10Δ-Strikes, <Num of="m04.call10" /> und <Num of="m04.put10" />. Der Vorteil: «25Δ» bedeutet in jedem Paar, bei jeder Laufzeit und jeder Vola dieselbe Moneyness.
+Im Beispiel liegt der 25Δ Call bei <Num of="m04.call25" />, der 25Δ Put bei <Num of="m04.put25" />. Weiter draussen liegen die 10Δ-Strikes, <Num of="m04.call10" /> und <Num of="m04.put10" />. Der Vorteil: «25Δ» bedeutet in jedem Paar, bei jeder Laufzeit und jeder Vola eine vergleichbare Moneyness.
 
 Auch «ATM» hat am Desk eine eigene Bedeutung. Gemeint ist meist der **delta-neutrale Straddle** (ATM DNS): der Strike, bei dem sich Call-Delta und Put-Delta genau aufheben. Er liegt bei <Num of="m04.dns" />, also <Num of="m04.dnsGapPips" /> Pips über dem Forward. Das Call-Delta ist dort <Num of="m04.dnsDelta" />, das Put-Delta gleich gross mit negativem Vorzeichen.
 
@@ -69,9 +71,9 @@ Mit σ√<i>T</i> = <Num of="m04.sigmaSqrtT" /> ergibt das <Num of="m04.atmfAppr
 
 <Desk title="Welches ATM ist gemeint?">
 
-ATM kann den Spot, den Forward oder den delta-neutralen Straddle meinen. Im Interbankmarkt ist für Vola-Quotes meist ATM DNS gemeint. Zusammen mit dem 25Δ Risk Reversal und dem 25Δ Butterfly beschreibt es den ganzen Vola-Smile (Modul 06).
+ATM kann den Spot, den Forward oder den delta-neutralen Straddle meinen. Im Interbankmarkt ist für Vola-Quotes meist ATM DNS gemeint. Zusammen mit dem 25Δ Risk Reversal und dem 25Δ Butterfly beschreibt es die Form des Vola-Smiles (Modul 06).
 
-Wird die Prämie in USD bezahlt, rechnet der Desk oft mit einem prämienadjustierten Delta. Die Strikes verschieben sich dann leicht. Frag bei jedem Delta-Strike, welche Konvention gilt.
+Wird die Prämie in USD bezahlt, wie in USD/CHF üblich, rechnet der Desk mit einem prämienadjustierten Delta. Die Strikes verschieben sich dann leicht. ATM DNS liegt so sogar knapp unter dem Forward, bei <Num of="m04.dnsPa" />. Frag bei jedem Delta-Strike, welche Konvention gilt.
 
 </Desk>
 

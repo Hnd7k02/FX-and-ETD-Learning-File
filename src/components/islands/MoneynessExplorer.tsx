@@ -58,6 +58,13 @@ const KS = Array.from(
 const Y_DOMAIN: [number, number] = [0, 600];
 /** Slider and drag snap onto a desk strike within this distance (2 pips). */
 const SNAP = 2e-4;
+/**
+ * Strikes on the 5-pip grid show 4 decimals; computed desk strikes (the exact forward 0.79303,
+ * DNS, delta strikes) show 5, so the ATMF strike is not mistaken for the rounded example
+ * strike 0.7930 (126.69 pips) of sections 1 and 2.
+ */
+const fmtK = (k: number): string =>
+  fmtRate(k, PAIR, Math.abs(k / K_STEP - Math.round(k / K_STEP)) < 1e-6 ? 4 : 5);
 
 function layoutFor(w: number) {
   const width = Math.max(280, Math.round(w));
@@ -157,7 +164,7 @@ export default function MoneynessExplorer(props: MoneynessExplorerProps): JSX.El
   });
   const aria = t('mx.aria', {
     type: typeLabel,
-    k: fmtRate(K, PAIR),
+    k: fmtK(K),
     price: pipsText(pips(split.price)),
     intrinsic: pipsText(pips(split.intrinsic)),
     time: pipsText(pips(split.time)),
@@ -192,7 +199,7 @@ export default function MoneynessExplorer(props: MoneynessExplorerProps): JSX.El
             {t('mx.sub', {
               pair: PAIR,
               spot: fmtRate(M.S, PAIR),
-              forward: fmtRate(split.F, PAIR),
+              forward: fmtK(split.F),
               months: EXAMPLE.months,
               vol: fmtPct(M.vol, lang, 0),
             })}
@@ -387,7 +394,7 @@ export default function MoneynessExplorer(props: MoneynessExplorerProps): JSX.El
                     pointerEvents: 'none',
                   }}
                 >
-                  {fmtRate(K, PAIR)}
+                  {fmtK(K)}
                 </text>
               </g>
               <AxisX
@@ -409,7 +416,7 @@ export default function MoneynessExplorer(props: MoneynessExplorerProps): JSX.El
                 onClick={() => setStrike(mk.K, 'jump')}
               >
                 <span>{t(`mx.m.${mk.id as MarkerId}`)}</span>
-                <span class="mono">{fmtRate(mk.K, PAIR)}</span>
+                <span class="mono">{fmtK(mk.K)}</span>
               </button>
             ))}
           </div>
@@ -442,7 +449,7 @@ export default function MoneynessExplorer(props: MoneynessExplorerProps): JSX.El
               min={K_RANGE[0]}
               max={K_RANGE[1]}
               step={K_STEP}
-              valueText={fmtRate(K, PAIR)}
+              valueText={fmtK(K)}
               onInput={(v) => setStrike(v, 'slider')}
             />
           </div>

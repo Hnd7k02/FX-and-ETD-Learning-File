@@ -64,7 +64,7 @@ const lang = pageLang(Astro.currentLocale);
     border-left: 4px solid var(--ff-long);
   }
   .pd-price--put {
-    border-left-color: var(--ff-short);
+    border-left-color: var(--ff-options);
   }
   .pd-price-label {
     font-size: 12px;
@@ -164,8 +164,8 @@ const lang = pageLang(Astro.currentLocale);
   }
   .pd-eff--put.is-up,
   .pd-eff--put.is-down {
-    background: var(--ff-exotics-soft);
-    color: #9a3412;
+    background: var(--ff-options-soft);
+    color: var(--ff-options-text);
   }
   .pd-eff svg {
     transition: transform 250ms ease;

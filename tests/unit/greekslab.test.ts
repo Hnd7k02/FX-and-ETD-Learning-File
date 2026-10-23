@@ -240,6 +240,9 @@ describe('greeks lab: annotations', () => {
     expect(aha('delta-gamma', { ...D, spot: 0.84 })?.key).toBe('deltaHigh');
     expect(aha('delta-gamma', { ...D, spot: 0.76 })?.key).toBe('deltaLow');
     expect(aha('delta-gamma', { ...D, spot: 0.815 })).toBeNull();
+    // long-dated, high-vol gamma is flat: no "peak" note 300 pips away from the peak spot
+    expect(aha('delta-gamma', { ...D, weeks: 52, volPct: 16, spot: 0.76 })).toBeNull();
+    expect(aha('delta-gamma', { ...D, weeks: 52, volPct: 16, spot: 0.79 })?.key).toBe('gammaPeak');
     expect(aha('vega', { ...D, spot: 0.82 })).toBeNull();
   });
 

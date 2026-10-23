@@ -1,10 +1,10 @@
 import OptionVsForwardFigure from '@/components/figures/OptionVsForwardFigure.astro';
 
-Unser Importeur muss in 3 Monaten USD 1 Mio. bezahlen. Mit dem Forward aus Modul 02 fixiert er den Kurs schon heute: Er kauft die Dollars zu <Num of="ex.forward" digits={4} /> CHF je USD. Das schützt ihn vor einem starken Dollar. Es nimmt ihm aber auch jede Chance. Fällt USD/CHF, zahlt er trotzdem den Forward-Kurs.
+Unser Importeur muss in 3 Monaten USD 1 Mio. bezahlen. Mit dem Forward aus Modul 02 fixiert er den Kurs schon heute: Er kauft die Dollars zu <Num of="m04.fwdDeal" /> CHF je USD. Das schützt ihn vor einem starken Dollar. Es nimmt ihm aber auch jede Chance. Fällt USD/CHF, zahlt er trotzdem den Forward-Kurs.
 
 Eine Option trennt die gute von der schlechten Seite. Sie gibt ihm das **Recht, aber nicht die Pflicht**, in 3 Monaten USD 1 Mio. zum **Strike** von <Num of="ex.strike" /> zu kaufen. Steigt der Dollar über den Strike, übt er aus und kauft zum Strike. Fällt der Dollar, lässt er die Option verfallen und kauft günstiger am Markt.
 
-Dieses Recht hat einen Preis. Der Verkäufer der Option verlangt heute eine **Prämie**: <Num of="ex.callPips" /> Pips, also <Num of="ex.callChf" /> auf USD 1 Mio. Wie bei einer Versicherung zahlst du die Prämie im Voraus, ob der Schadenfall eintritt oder nicht.
+Dieses Recht hat einen Preis. Der Verkäufer der Option verlangt heute eine **Prämie**: <Num of="ex.callPips" /> Pips, also <Num of="ex.callChf" /> auf USD 1 Mio. Wie bei einer Versicherung zahlst du die Prämie im Voraus, ob der Schadenfall eintritt oder nicht. Woher diese Zahl kommt, zeigt Abschnitt 4.
 
 ### Ein USD Call ist ein CHF Put
 
@@ -12,7 +12,7 @@ Im Devisenmarkt tauschst du immer zwei Währungen gegeneinander. Das Recht, USD 
 
 Aus Sicht des Frankens sieht dieselbe Option so aus: Nominal <Num of="m04.chfNotional" />, Strike <Num of="m04.strikeInv" /> USD je CHF. Gleiches Geschäft, andere Brille. Deshalb nennt man am Desk immer beide Währungen.
 
-<OptionVsForwardFigure caption="Zieh am Kurs bei Verfall. Die Option (blau) ist im Nachhinein nie die günstigste Wahl. Sie schützt dich aber vor der teuersten, sobald sich der Kurs deutlich bewegt." />
+<OptionVsForwardFigure caption="Zieh am Kurs bei Verfall. Die Option (blau) ist im Nachhinein nie die günstigste Wahl. Bewegt sich der Kurs deutlich, ist sie aber auch nie die teuerste." />
 
 ### Drei Szenarien in Zahlen
 
@@ -20,9 +20,9 @@ Mit dem Forward zahlt der Importeur in jedem Fall <Num of="m04.fwdChf" />. Mit d
 
 - **Der Dollar steigt auf <Num of="m04.stUp" />.** Ohne Absicherung zahlt er <Num of="m04.unhedgedUpChf" />. Mit dem Call übt er aus und zahlt <Num of="m04.capChf" />, also Strike plus Prämie. Er spart <Num of="m04.saveUpChf" />.
 - **Der Dollar fällt auf <Num of="m04.stDown" />.** Der Forward kostet ihn weiterhin <Num of="m04.fwdChf" />. Mit dem Call kauft er am Markt und zahlt <Num of="m04.optionDownChf" /> inklusive Prämie: <Num of="m04.saveDownChf" /> weniger als mit dem Forward.
-- **Der Kurs bewegt sich kaum.** Dann ist die Option die teuerste Wahl. Die Prämie war der Preis einer Versicherung, die er nicht gebraucht hat.
+- **Der Kurs landet nahe beim Strike.** Dann ist die Option die teuerste Wahl. Die Prämie war der Preis einer Versicherung, die sich diesmal nicht gelohnt hat.
 
-Die Option deckelt seinen Kurs bei <Num of="m04.capRate" />: Strike plus Prämie pro USD. Gegen den Forward lohnt sie sich im Nachhinein erst, wenn USD/CHF bei Verfall unter <Num of="m04.beatFwdRate" /> liegt. Dafür muss der Importeur heute nicht wissen, wohin der Kurs geht.
+Die Option deckelt seinen Kurs bei <Num of="m04.capRate" />, Strike plus Prämie pro USD. Über diesem Kurs schlägt sie «ohne Absicherung». Unter <Num of="m04.beatFwdRate" /> schlägt sie sogar den Forward. Dazwischen ist sie im Nachhinein die teuerste Wahl. Dafür muss der Importeur heute nicht wissen, wohin der Kurs geht.
 
 <Derivation title="Herleitung: Kosten mit Call und die Sicht als CHF Put">
 
@@ -42,6 +42,8 @@ Dieselbe Option als CHF Put: Nominal <i>N</i><sub>CHF</sub> = <i>K</i> · <i>N</
 </Formula>
 
 Das ist genau die Auszahlung des USD Calls. Zwei Namen, ein Geschäft.
+
+Zum Forward: Optionsmodelle rechnen mit stetigen Zinsen, <i>F</i> = <i>S</i> · e<sup>(<i>r</i><sub>d</sub> − <i>r</i><sub>f</sub>)<i>T</i></sup> = <Num of="ex.forward" />. Dieser Wert liegt nur <Num of="ex.fwdDiffPips" /> Pips unter dem Geldmarkt-Forward aus Modul 02. Damit Forward und Option auf derselben Basis stehen, nutzt dieses Modul überall den stetigen Forward.
 
 </Derivation>
 

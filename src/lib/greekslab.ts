@@ -85,6 +85,11 @@ export const LAB_CONFIG = {
   /** Annotation thresholds. */
   aha: {
     gammaPeakShare: 0.97,
+    /**
+     * …and at most this many pips from the peak spot: long-dated, high-vol gamma is so flat that
+     * 97 % of the peak reaches hundreds of pips, where "delta turns fastest here" would mislead.
+     */
+    gammaPeakMaxPips: 50,
     vegaPeakShare: 0.99,
     deltaHigh: 0.85,
     deltaLow: 0.15,
@@ -595,8 +600,10 @@ export function aha(mode: LabMode, p: LabParams, n = labNumbers(p)): Aha | null 
   const A = LAB_CONFIG.aha;
   const { T, vol, rd, rf } = inputs(p);
   if (mode === 'delta-gamma') {
-    const gMax = greeks(gammaPeakSpot(p), K, T, vol, rd, rf, TYPE).gamma;
-    if (n.gamma >= A.gammaPeakShare * gMax) return { key: 'gammaPeak', panel: 'bottom' };
+    const sPeak = gammaPeakSpot(p);
+    const gMax = greeks(sPeak, K, T, vol, rd, rf, TYPE).gamma;
+    const nearPeak = Math.abs(p.spot - sPeak) <= A.gammaPeakMaxPips * PIP;
+    if (n.gamma >= A.gammaPeakShare * gMax && nearPeak) return { key: 'gammaPeak', panel: 'bottom' };
     if (n.deltaFwd >= A.deltaHigh) return { key: 'deltaHigh', panel: 'bottom' };
     if (n.deltaFwd <= A.deltaLow) return { key: 'deltaLow', panel: 'bottom' };
     return null;

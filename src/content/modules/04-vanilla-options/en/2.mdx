@@ -5,7 +5,7 @@ Every option has two sides. The buyer is **long**: he pays the premium and recei
 
 Then there are two types. A **call** is the right to buy the base currency at the strike, in USD/CHF that is USD. A **put** is the right to sell it at the strike. Two sides times two types give four basic positions.
 
-<FourPositionsFigure caption="The four basic positions at expiry, after the premium, all with the strike at the forward. Blue are the options bought, orange the options sold." />
+<FourPositionsFigure caption="The four basic positions: profit or loss at expiry after the premium, all with the strike at the forward. Blue are the options bought, orange the options sold. The dot marks the break-even." />
 
 Our importer is **long a call**: he fears a rising dollar. An exporter who will receive USD in 3 months fears the opposite and buys a **put**. On the other side are sellers who collect the premium for taking the risk.
 
@@ -13,7 +13,7 @@ Our importer is **long a call**: he fears a rising dollar. An exporter who will 
 
 ### Payoff and profit
 
-The payoff builder shows two lines. Grey and dashed is the **payoff at expiry**: what the option is worth then. Blue is the **value today**, three months before expiry. The blue dot at the spot is exactly the premium. Switch to "P&L after premium" and the premium is deducted: now you see whether the trade paid off.
+The payoff builder shows two lines. Grey and dashed is the **payoff at expiry**: what the option is worth then. Blue is the **value today**, three months before expiry. The blue dot at the spot is exactly the premium. Why does the blue curve not sit on the grey one? The rate can still wander before expiry; that is time value. And for the expiry date the forward counts, not spot. Section 3 shows both. Switch to "P&L after premium" and the premium is deducted. Now you see whether the trade paid off.
 
 A worked example with the long call, strike <Num of="ex.strike" />, premium <Num of="ex.callPips" /> pips:
 
@@ -36,13 +36,13 @@ At expiry only the position of the rate <i>S</i><sub>T</sub> against the strike 
   <span>Short put: −max(<i>K</i> − <i>S</i><sub>T</sub>, 0)</span>
 </Formula>
 
-For the P&L you deduct the premium (buyer) or add it (seller), carried forward with e<sup><i>r</i><sub>d</sub><i>T</i></sup>. For a long call with premium <i>c</i> the P&L at expiry is zero when
+For the P&L you deduct the premium (buyer) or add it (seller), carried forward with e<sup><i>r</i><sub>d</sub><i>T</i></sup>. For a long call with carried-forward premium <i>c</i> the P&L at expiry is zero when
 
 <Formula variant="accent">
   <i>S</i><sub>T</sub> − <i>K</i> − <i>c</i> = 0 ⇒ <i>S</i><sub>T</sub> = <i>K</i> + <i>c</i>
 </Formula>
 
-For a put with premium <i>p</i> the break-even is <i>K</i> − <i>p</i>. The largest loss of the short put arises when the rate goes towards zero: −(<i>K</i> − <i>p</i>) per USD. A short call has no upper limit; its loss is unlimited.
+For a put with carried-forward premium <i>p</i> the break-even is <i>K</i> − <i>p</i>. The largest loss of the short put arises when the rate goes towards zero: −(<i>K</i> − <i>p</i>) per USD. A short call has no upper limit; its loss is unlimited.
 
 </Derivation>
 
@@ -50,7 +50,7 @@ For a put with premium <i>p</i> the break-even is <i>K</i> − <i>p</i>. The lar
 
 Banks act as market makers and quote prices to buyers and sellers. They do not simply leave a sold option open; they hedge its risk continuously with spot and forwards. Module 05 shows how, using delta.
 
-A company rarely sells options on their own. Usually the sale is part of a structure that pays for a purchase, for example a zero-cost collar (module 06). Whoever is short must be able to deliver at expiry, so needs credit lines or collateral.
+A company rarely sells options on their own. Usually the sale is part of a structure that pays for a purchase, for example a zero-cost collar (module 06). Whoever is short may owe a lot of money at expiry, so the counterparty asks for a credit line or collateral.
 
 </Desk>
 

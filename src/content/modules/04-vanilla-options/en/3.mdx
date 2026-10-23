@@ -1,6 +1,6 @@
 import MoneynessExplorerFigure from '@/components/figures/MoneynessExplorerFigure.astro';
 
-The importer is free to choose the strike. A higher strike only protects later, but it is cheaper. A lower strike protects sooner and costs more. How far a strike is "in the money" is called **moneyness**.
+The importer is free to choose the strike. A higher strike only protects from a higher rate on, but it is cheaper. A lower strike protects sooner and costs more. How far a strike is "in the money" is called **moneyness**.
 
 It is measured against the **forward**, not against spot. The option is only exercised in 3 months, and the fair rate for that day is the forward. An example: a USD call with a strike of <Num of="m04.kMid" /> sits <Num of="m04.kMidSpotPips" /> pips below spot and looks in the money. Against the forward of <Num of="ex.forward" digits={4} />, however, it sits <Num of="m04.kMidOtmPips" /> pips above. It is out of the money.
 
@@ -12,13 +12,15 @@ It is measured against the **forward**, not against spot. The option is only exe
 
 ### Premium = intrinsic value + time value
 
-The **intrinsic value** is what you could already lock in today: you could exercise the call and sell the dollars forward at the same time. For a call this is max(F − K, 0), discounted to today. The **time value** is the rest. It pays for the chance that the rate still moves in your favour before expiry.
+The **intrinsic value** is what you can already lock in today: you sell the dollars forward and exercise the call at expiry. That makes F − K per USD certain. So for a call the intrinsic value is max(F − K, 0), discounted to today. The **time value** is the rest. It pays for the chance that the rate still moves in your favour before expiry.
 
 Three USD calls with 3 months to expiry:
 
-- **ATMF**, strike at the forward: <Num of="m04.atmfPips" /> pips. That is pure time value.
+- **ATMF**, strike exactly at the forward (<Num of="ex.forward" />): <Num of="m04.atmfPips" /> pips. That is pure time value.
 - **ITM**, strike <Num of="m04.kItm" />: <Num of="m04.itmPips" /> pips. Of this, <Num of="m04.itmIntrinsicPips" /> pips are intrinsic value and <Num of="m04.itmTimePips" /> pips time value.
 - **OTM**, strike <Num of="m04.kOtm" />: <Num of="m04.otmPips" /> pips, or <Num of="m04.otmChf" />. Again pure time value.
+
+Our call from section 1 has the rounded strike <Num of="ex.strike" />. That sits <Num of="m04.fwdVsStrikePips" /> pips below the forward, so it costs a touch more: <Num of="ex.callPips" /> pips.
 
 Time value is largest at the forward and shrinks towards both wings. Deep in the money the option behaves almost like a forward; far out of the money it is almost worthless.
 
@@ -26,7 +28,7 @@ Time value is largest at the forward and shrinks towards both wings. Deep in the
 
 On the desk strikes are often named by their **delta** rather than by a rate. Delta tells you how strongly the option value reacts to spot. Roughly, it is also the chance that the option ends in the money. A 25Δ call therefore has about a one-in-four chance.
 
-In the example the 25Δ call sits at <Num of="m04.call25" />, the 25Δ put at <Num of="m04.put25" />. Further out are the 10Δ strikes, <Num of="m04.call10" /> and <Num of="m04.put10" />. The advantage: "25Δ" means the same moneyness in every pair, at every tenor and every vol.
+In the example the 25Δ call sits at <Num of="m04.call25" />, the 25Δ put at <Num of="m04.put25" />. Further out are the 10Δ strikes, <Num of="m04.call10" /> and <Num of="m04.put10" />. The advantage: "25Δ" means a comparable moneyness in every pair, at every tenor and every vol.
 
 "ATM" also has its own meaning on the desk. It usually refers to the **delta-neutral straddle** (ATM DNS): the strike at which the call delta and the put delta cancel out exactly. It sits at <Num of="m04.dns" />, <Num of="m04.dnsGapPips" /> pips above the forward. The call delta there is <Num of="m04.dnsDelta" />, and the put delta has the same size with a negative sign.
 
@@ -69,9 +71,9 @@ With σ√<i>T</i> = <Num of="m04.sigmaSqrtT" /> this gives <Num of="m04.atmfApp
 
 <Desk title="Which ATM do you mean?">
 
-ATM can mean spot, the forward or the delta-neutral straddle. In the interbank market, vol quotes usually refer to ATM DNS. Together with the 25Δ risk reversal and the 25Δ butterfly it describes the whole vol smile (module 06).
+ATM can mean spot, the forward or the delta-neutral straddle. In the interbank market, vol quotes usually refer to ATM DNS. Together with the 25Δ risk reversal and the 25Δ butterfly it describes the shape of the vol smile (module 06).
 
-If the premium is paid in USD, the desk often works with a premium-adjusted delta. The strikes then shift slightly. For every delta strike, ask which convention applies.
+If the premium is paid in USD, as is usual in USD/CHF, the desk works with a premium-adjusted delta. The strikes then shift slightly. ATM DNS even moves just below the forward, to <Num of="m04.dnsPa" />. For every delta strike, ask which convention applies.
 
 </Desk>
 

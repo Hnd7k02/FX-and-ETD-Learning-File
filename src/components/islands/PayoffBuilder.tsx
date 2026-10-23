@@ -711,6 +711,10 @@ export default function PayoffBuilder(props: PayoffBuilderProps): JSX.Element {
                   fontWeight: 600,
                   fill: 'var(--ff-muted)',
                   textAnchor: labelRight ? 'end' : 'start',
+                  paintOrder: 'stroke',
+                  stroke: '#fff',
+                  strokeWidth: 4,
+                  strokeLinejoin: 'round',
                 }}
               >
                 {t('pb.spot')} {fmtRate(EXAMPLE.spot, PAIR)}

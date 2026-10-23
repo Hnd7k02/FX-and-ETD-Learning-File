@@ -162,8 +162,10 @@ export default function GammaTheta({ lang }: GammaThetaProps): JSX.Element {
         <div class="ff-lab-main gl-main" ref={box}>
           <div class="gl-head">
             <span class="gl-legend">
-              <span aria-hidden="true" class="gl-swatch" />
-              {t('gt.head')}
+              <span class="gl-legend-item">
+                <span aria-hidden="true" class="gl-swatch" />
+                {t('gt.head')}
+              </span>
             </span>
           </div>
           <div class="gl-chart" style={{ height: `max(${MIN_H}px, ${RATIO * 100}cqw)` }}>

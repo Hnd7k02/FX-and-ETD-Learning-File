@@ -1,10 +1,10 @@
 import OptionVsForwardFigure from '@/components/figures/OptionVsForwardFigure.astro';
 
-Our importer has to pay USD 1m in 3 months. With the forward from module 02 he fixes the rate today: he buys the dollars at <Num of="ex.forward" digits={4} /> CHF per USD. That protects him against a strong dollar. But it also takes away every opportunity. If USD/CHF falls, he still pays the forward rate.
+Our importer has to pay USD 1m in 3 months. With the forward from module 02 he fixes the rate today: he buys the dollars at <Num of="m04.fwdDeal" /> CHF per USD. That protects him against a strong dollar. But it also takes away every opportunity. If USD/CHF falls, he still pays the forward rate.
 
 An option separates the good side from the bad one. It gives him the **right, but not the obligation**, to buy USD 1m in 3 months at a **strike** of <Num of="ex.strike" />. If the dollar rises above the strike, he exercises and buys at the strike. If the dollar falls, he lets the option lapse and buys more cheaply in the market.
 
-That right has a price. The seller of the option asks for a **premium** today: <Num of="ex.callPips" /> pips, or <Num of="ex.callChf" /> on USD 1m. As with insurance, you pay the premium up front, whether or not the bad event happens.
+That right has a price. The seller of the option asks for a **premium** today: <Num of="ex.callPips" /> pips, or <Num of="ex.callChf" /> on USD 1m. As with insurance, you pay the premium up front, whether or not the bad event happens. Section 4 shows where this number comes from.
 
 ### A USD call is a CHF put
 
@@ -12,7 +12,7 @@ In the FX market you always exchange two currencies. The right to buy USD agains
 
 Seen from the franc, the same option looks like this: notional <Num of="m04.chfNotional" />, strike <Num of="m04.strikeInv" /> USD per CHF. Same deal, different lens. That is why the desk always names both currencies.
 
-<OptionVsForwardFigure caption="Drag the rate at expiry. With hindsight the option (blue) is never the cheapest choice. But it protects you from the dearest one as soon as the rate moves a lot." />
+<OptionVsForwardFigure caption="Drag the rate at expiry. With hindsight the option (blue) is never the cheapest choice. But once the rate moves a lot, it is never the dearest either." />
 
 ### Three scenarios in numbers
 
@@ -20,9 +20,9 @@ With the forward the importer pays <Num of="m04.fwdChf" /> whatever happens. Wit
 
 - **The dollar rises to <Num of="m04.stUp" />.** Unhedged he pays <Num of="m04.unhedgedUpChf" />. With the call he exercises and pays <Num of="m04.capChf" />, strike plus premium. He saves <Num of="m04.saveUpChf" />.
 - **The dollar falls to <Num of="m04.stDown" />.** The forward still costs him <Num of="m04.fwdChf" />. With the call he buys in the market and pays <Num of="m04.optionDownChf" /> including the premium: <Num of="m04.saveDownChf" /> less than with the forward.
-- **The rate hardly moves.** Then the option is the dearest choice. The premium was the price of insurance he did not need.
+- **The rate ends close to the strike.** Then the option is the dearest choice. The premium was the price of insurance that did not pay off this time.
 
-The option caps his rate at <Num of="m04.capRate" />: strike plus premium per USD. With hindsight it only beats the forward if USD/CHF ends below <Num of="m04.beatFwdRate" />. In return, the importer does not need to know today where the rate is heading.
+The option caps his rate at <Num of="m04.capRate" />, strike plus premium per USD. Above that rate it beats staying unhedged. Below <Num of="m04.beatFwdRate" /> it even beats the forward. In between it is, with hindsight, the dearest choice. In return, the importer does not need to know today where the rate is heading.
 
 <Derivation title="Derivation: the cost with a call, and the view as a CHF put">
 
@@ -42,6 +42,8 @@ The same option as a CHF put: notional <i>N</i><sub>CHF</sub> = <i>K</i> · <i>N
 </Formula>
 
 That is exactly the payoff of the USD call. Two names, one deal.
+
+A note on the forward: option models work with continuous rates, <i>F</i> = <i>S</i> · e<sup>(<i>r</i><sub>d</sub> − <i>r</i><sub>f</sub>)<i>T</i></sup> = <Num of="ex.forward" />. That is only <Num of="ex.fwdDiffPips" /> pips below the money-market forward from module 02. So that forward and option stand on the same footing, this module uses the continuous forward throughout.
 
 </Derivation>
 

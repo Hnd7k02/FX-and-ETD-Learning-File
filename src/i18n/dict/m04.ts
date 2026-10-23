@@ -27,7 +27,7 @@ export const m04 = defineDict({
     'ovf.text.weakUsd':
       'Der Dollar ist schwach. Mit dem Forward zahlst du trotzdem {forward}. Die Option lässt du verfallen und kaufst günstig am Markt: Du sparst {save} gegenüber dem Forward, trotz Prämie.',
     'ovf.text.middle':
-      'Der Kurs ist kaum gestiegen oder gefallen. Hier ist die Option die teuerste Wahl: Die Prämie von {premium} ist der Preis der Versicherung, die du nicht gebraucht hast.',
+      'Der Kurs liegt nahe beim Strike. Hier ist die Option die teuerste Wahl: Die Prämie von {premium} ist der Preis einer Versicherung, die sich diesmal nicht gelohnt hat.',
     'ovf.text.strongUsd':
       'Der Dollar ist stark. Ohne Absicherung zahlst du {unhedged}. Die Option deckelt deine Kosten bei {cap}: Du übst sie aus und kaufst zum Strike.',
     'ovf.drag': 'Zieh am Kurs bei Verfall, direkt im Chart oder am Regler',
@@ -75,10 +75,14 @@ export const m04 = defineDict({
       'ATMF: kein innerer Wert, die Prämie ist reiner Zeitwert. Call und Put kosten gleich viel.',
     'mx.aha.dns':
       'ATM DNS: Call-Delta {c} und Put-Delta {p} heben sich auf. Ein Straddle hier ist delta-neutral.',
-    'mx.aha.p25': '25Δ Put: Das Put-Delta ist −0.25. So quotiert der Markt die Flügel.',
-    'mx.aha.c25': '25Δ Call: Das Call-Delta ist 0.25. So quotiert der Markt die Flügel.',
-    'mx.aha.p10': '10Δ Put: weit aus dem Geld, fast nur Zeitwert, und wenig davon.',
-    'mx.aha.c10': '10Δ Call: weit aus dem Geld, fast nur Zeitwert, und wenig davon.',
+    'mx.aha.p25':
+      '25Δ Put: Ein Put mit diesem Strike hat das Delta {p}. So quotiert der Markt die Flügel.',
+    'mx.aha.c25':
+      '25Δ Call: Ein Call mit diesem Strike hat das Delta {c}. So quotiert der Markt die Flügel.',
+    'mx.aha.p10':
+      '10Δ Put: Ein Put mit diesem Strike ist weit aus dem Geld, reiner Zeitwert und billig. Für den Call liegt derselbe Strike tief im Geld.',
+    'mx.aha.c10':
+      '10Δ Call: Ein Call mit diesem Strike ist weit aus dem Geld, reiner Zeitwert und billig. Für den Put liegt derselbe Strike tief im Geld.',
     'mx.aria':
       'Prämie in Abhängigkeit vom Strike für den {type}. Beim Strike {k}: Prämie {price}, innerer Wert {intrinsic}, Zeitwert {time}, {money}.',
     // PriceDrivers
@@ -129,7 +133,11 @@ export const m04 = defineDict({
     'pd.summary': 'Call {call}, Put {put}. Wirkung, wenn der Treiber steigt: {effects}.',
     'pd.parity': 'C − P = {diff} Pips = DF · (F − K)',
     // Four positions (static sketch)
-    'fp.aria': 'Auszahlung bei Verfall von {name}',
+    'fp.aria':
+      '{name}: Gewinn und Verlust bei Verfall nach Prämie, abhängig vom Kurs bei Verfall. Knick beim Strike {k}, Break-even bei {be}.',
+    'fp.legend':
+      'Waagrecht: USD/CHF bei Verfall. Senkrecht: Gewinn oder Verlust nach Prämie. Strike {k}.',
+    'fp.legendBe': 'Break-even',
     'fp.long-call': 'Long Call',
     'fp.short-call': 'Short Call',
     'fp.long-put': 'Long Put',
@@ -145,13 +153,12 @@ export const m04 = defineDict({
     'fp.loss': 'Verlust',
     'fp.unlimited': 'unbegrenzt',
     'fp.capPremium': 'höchstens die Prämie',
-    'fp.toZero': 'bis Strike minus Prämie',
+    'fp.toZero': 'höchstens Strike minus Prämie',
     'fp.view': 'Sicht',
     'fp.view.long-call': 'USD steigt',
     'fp.view.short-call': 'USD steigt nicht',
     'fp.view.long-put': 'USD fällt',
     'fp.view.short-put': 'USD fällt nicht',
-    'fp.x': 'Kurs bei Verfall',
     'fp.k': 'K',
   },
   en: {
@@ -174,7 +181,7 @@ export const m04 = defineDict({
     'ovf.text.weakUsd':
       'The dollar is weak. With the forward you still pay {forward}. You let the option lapse and buy cheaply in the market: you save {save} against the forward, premium included.',
     'ovf.text.middle':
-      'The rate has hardly moved. Here the option is the dearest choice: the premium of {premium} is the price of insurance you did not need.',
+      'The rate ends close to the strike. Here the option is the dearest choice: the premium of {premium} is the price of insurance that did not pay off this time.',
     'ovf.text.strongUsd':
       'The dollar is strong. Unhedged you pay {unhedged}. The option caps your cost at {cap}: you exercise it and buy at the strike.',
     'ovf.drag': 'Drag the rate at expiry, on the chart or with the slider',
@@ -221,10 +228,14 @@ export const m04 = defineDict({
       'ATMF: no intrinsic value, the premium is pure time value. Call and put cost the same.',
     'mx.aha.dns':
       'ATM DNS: call delta {c} and put delta {p} cancel out. A straddle here is delta-neutral.',
-    'mx.aha.p25': '25Δ put: the put delta is −0.25. This is how the market quotes the wings.',
-    'mx.aha.c25': '25Δ call: the call delta is 0.25. This is how the market quotes the wings.',
-    'mx.aha.p10': '10Δ put: far out of the money, almost only time value, and little of it.',
-    'mx.aha.c10': '10Δ call: far out of the money, almost only time value, and little of it.',
+    'mx.aha.p25':
+      '25Δ put: a put with this strike has a delta of {p}. This is how the market quotes the wings.',
+    'mx.aha.c25':
+      '25Δ call: a call with this strike has a delta of {c}. This is how the market quotes the wings.',
+    'mx.aha.p10':
+      '10Δ put: a put with this strike is far out of the money, pure time value and cheap. For the call the same strike is deep in the money.',
+    'mx.aha.c10':
+      '10Δ call: a call with this strike is far out of the money, pure time value and cheap. For the put the same strike is deep in the money.',
     'mx.aria':
       'Premium depending on the strike for the {type}. At strike {k}: premium {price}, intrinsic value {intrinsic}, time value {time}, {money}.',
     'pd.title': 'Price drivers',
@@ -273,7 +284,11 @@ export const m04 = defineDict({
       'Price of the USD call and USD put depending on {driver}. Now: call {call}, put {put}.',
     'pd.summary': 'Call {call}, put {put}. Effect when the driver rises: {effects}.',
     'pd.parity': 'C − P = {diff} pips = DF · (F − K)',
-    'fp.aria': 'Payoff at expiry of {name}',
+    'fp.aria':
+      '{name}: profit and loss at expiry after the premium, depending on the rate at expiry. Kink at the strike {k}, break-even at {be}.',
+    'fp.legend':
+      'Across: USD/CHF at expiry. Up and down: profit or loss after the premium. Strike {k}.',
+    'fp.legendBe': 'Break-even',
     'fp.long-call': 'Long call',
     'fp.short-call': 'Short call',
     'fp.long-put': 'Long put',
@@ -289,13 +304,12 @@ export const m04 = defineDict({
     'fp.loss': 'Loss',
     'fp.unlimited': 'unlimited',
     'fp.capPremium': 'at most the premium',
-    'fp.toZero': 'up to strike minus premium',
+    'fp.toZero': 'at most strike minus premium',
     'fp.view': 'View',
     'fp.view.long-call': 'USD rises',
     'fp.view.short-call': 'USD does not rise',
     'fp.view.long-put': 'USD falls',
     'fp.view.short-put': 'USD does not fall',
-    'fp.x': 'Rate at expiry',
     'fp.k': 'K',
   },
 });

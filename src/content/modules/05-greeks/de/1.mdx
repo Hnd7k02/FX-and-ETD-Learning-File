@@ -23,13 +23,13 @@ Fünf Hebel, aber sechs Greeks: Der Spot bekommt zwei. Delta misst die Steigung,
 | CHF-Zins | Rho CHF ρ<sub>d</sub> | ∂<i>V</i>/∂<i>r</i><sub>d</sub> | <Num of="ex.rhoDChf" /> je +1 % |
 | USD-Zins | Rho USD ρ<sub>f</sub> | ∂<i>V</i>/∂<i>r</i><sub>f</sub> | <Num of="ex.rhoFChf" /> je +1 % |
 
-Lies die Tabelle als Rangliste. Der Spot ist der mit Abstand stärkste Hebel: Eine Big Figure bewegt die Prämie um mehrere Tausend Franken. Ein Vola-Punkt bringt rund eineinhalb Tausend, ein Prozent Zins rund Tausend, ein Tag nur ein paar Dutzend. Theta ist klein, aber es kommt jeden Tag.
+Lies jede Zeile zusammen mit ihrem Schritt. Eine Big Figure bewegt die Prämie um mehrere Tausend Franken, ein Vola-Punkt um rund eineinhalb Tausend, ein Prozent Zins um rund Tausend, ein Tag nur um ein paar Dutzend. Die Schritte sind aber nicht gleich häufig. Eine typische Tagesbewegung von USD/CHF ist bei dieser Vola nur rund <Num of="ex.breakEvenPips1" /> Pips (σ · <i>S</i> / √365), und ein ganzes Prozent Zins kommt selten über Nacht. Theta ist klein, aber es kommt sicher, jeden Tag.
 
 ### Wie gut schätzen die Greeks?
 
 Steigt USD/CHF um eine Big Figure, schätzt Delta allein einen Gewinn von <Num of="m05.spotUpDeltaChf" />. Gamma ergänzt die Krümmung: Delta plus Gamma ergeben <Num of="m05.spotUpDeltaGammaChf" />. Die exakte Neubewertung liefert <Num of="m05.spotUpChf" />. Für kleine Bewegungen sind die Greeks sehr genau.
 
-Für grosse Schritte stimmen sie weniger. Ein ganzer Monat kostet den Call <Num of="m05.monthChf" />, rund 30-mal das heutige Theta sagt nur <Num of="m05.monthThetaChf" /> voraus. Der Grund: Ein Greek ist eine Momentaufnahme. Der Zeitverfall wird gegen Verfall hin schneller, und das sieht das heutige Theta noch nicht.
+Für grosse Schritte stimmen sie weniger. Über einen ganzen Monat ändert sich die Prämie um <Num of="m05.monthChf" />. Rund 30-mal das heutige Theta sagt nur <Num of="m05.monthThetaChf" /> voraus. Der Grund: Ein Greek ist eine Momentaufnahme. Der Zeitverfall wird gegen Verfall hin schneller, und das sieht das heutige Theta noch nicht.
 
 <Derivation title="Herleitung: Greeks als Taylor-Entwicklung">
 
@@ -48,7 +48,7 @@ Bewegen sich alle Hebel ein kleines Stück, zerlegt die Taylor-Entwicklung die P
   d<i>V</i> ≈ Δ · d<i>S</i> + ½ · Γ · (d<i>S</i>)² + ν · dσ + Θ · d<i>t</i> + ρ<sub>d</sub> · d<i>r</i><sub>d</sub> + ρ<sub>f</sub> · d<i>r</i><sub>f</sub>
 </Formula>
 
-Nur beim Spot nimmt man den Term zweiter Ordnung dazu. Der Spot bewegt sich täglich am stärksten, und (d<i>S</i>)² ist dort nicht vernachlässigbar. Gemischte Terme wie Spot mal Vola (Vanna) kommen in Abschnitt 4 als Ausblick.
+Nur beim Spot nimmt man den Term zweiter Ordnung dazu. Dort ist die Preiskurve am stärksten gekrümmt, und Kursbewegungen sind gross genug, dass (d<i>S</i>)² zählt. In Vola und Zinsen ist die Kurve nahe ATMF fast eine Gerade. Gemischte Terme wie Spot mal Vola (Vanna) kommen in Abschnitt 4 als Ausblick.
 
 Zu den Einheiten: Theta zählt die Zeit, die vergeht. Es ist also −∂<i>V</i>/∂<i>T</i> mit der Restlaufzeit <i>T</i>, im Tool pro Kalendertag. Vega gilt je Vola-Punkt, Rho je Prozentpunkt Zins. Alle Werte beziehen sich auf USD 1 Mio. und sind in CHF.
 
@@ -58,7 +58,7 @@ Zu den Einheiten: Theta zählt die Zeit, die vergeht. Es ist also −∂<i>V</i>
 
 Ein Options-Desk hat Tausende von Positionen. Niemand schaut jede einzeln an. Man addiert die Greeks: Delta in USD, Vega in CHF je Vola-Punkt, Theta pro Tag. So lässt sich ein ganzes Buch in wenigen Zahlen lesen.
 
-Jeder Greek hat sein eigenes Werkzeug. Delta sicherst du mit Spot oder Forwards ab: Gegen kleine Kursbewegungen wirkt der Call des Importeurs wie eine Spot-Position über <Num of="m05.deltaUsd" />. Vega lässt sich nur mit anderen Optionen absichern, denn Spot und Forward haben keine Vola. Theta lässt sich nicht separat absichern, es kommt immer zusammen mit Gamma: Es ist der Preis, den der Käufer für Gamma bezahlt.
+Jeder Greek hat sein eigenes Werkzeug. Delta sicherst du mit Spot oder Forwards ab: Gegen kleine Kursbewegungen wirkt der Call des Importeurs wie eine Spot-Position über <Num of="m05.deltaUsd" />. Vega lässt sich nur mit anderen Optionen absichern, denn Spot und Forwards haben kein Vega. Theta lässt sich nicht separat absichern: Wer weniger Theta will, verkauft Optionen und gibt damit auch Gamma ab. Der grösste Teil von Theta ist der Preis, den der Käufer für Gamma bezahlt (Abschnitt 4).
 
 </Desk>
 

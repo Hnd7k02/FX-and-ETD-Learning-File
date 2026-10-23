@@ -4,17 +4,19 @@ import GreeksLabFigure from '@/components/figures/GreeksLabFigure.astro';
 
 Delta sagt, wie viel der Call gewinnt, wenn USD/CHF ein kleines Stück steigt. Bei einem Delta von 0.50 bewegt sich der Optionswert etwa halb so stark wie der Kurs.
 
-Gamma sagt, wie schnell sich dieses Delta selbst verändert. Weit aus dem Geld ist Delta fast null, tief im Geld fast eins. Rund um den Strike ändert es sich am schnellsten: Dort ist Gamma am grössten.
+Gamma sagt, wie schnell sich dieses Delta selbst verändert. Weit aus dem Geld ist Delta fast null, tief im Geld fast eins. Dazwischen, nahe ATMF, wo der Forward beim Strike liegt, ändert es sich am schnellsten: Dort ist Gamma am grössten.
 
 Für den Importeur heisst das: Sein Call über <Num of="ex.notional" /> verhält sich heute wie ein Forward über etwa die Hälfte des Betrags. Steigt der Dollar, wächst dieser Anteil, fällt er, schrumpft er. Genau diese Anpassung misst Gamma. Sie ist der Grund, warum eine Option mehr kann als ein halber Forward.
 
 <GreeksLabFigure mode="delta-gamma" caption="Zieh am Spot-Regler oder direkt am schwarzen Punkt: Die schwarze Tangente oben hat die Steigung Delta, die Tangente unten die Steigung Gamma." />
 
-Probier drei Dinge im Labor. Zieh den Spot ganz nach rechts: Delta läuft gegen eins, der Call wird zum Forward. Zieh ihn nach links: Delta fällt gegen null. Verkürze dann die Laufzeit auf wenige Wochen: Die Delta-Kurve wird zur steilen Stufe, und Gamma am Strike schiesst in die Höhe.
+Probier drei Dinge im Labor. Zieh den Spot ganz nach rechts: Delta läuft gegen eins, der Call wird zum Forward. Zieh ihn nach links: Delta fällt gegen null. Verkürze dann die Laufzeit auf wenige Wochen: Die Delta-Kurve wird zur steilen Stufe, und Gamma schiesst in die Höhe.
+
+Achte dabei auf zwei Details. Beide führen zurück zum Forward. Die steilste Stelle der Delta-Kurve liegt nicht an der Strike-Linie, sondern weiter rechts, nahe beim heutigen Spot von <Num of="ex.spot" />. Erst dort liegt der Forward am Strike, denn die Forward Points betragen <Num of="ex.fwdPoints" /> Pips. Und tief im Geld verläuft die Preiskurve sogar unter der gestrichelten Auszahlung bei Verfall. Der Call rechnet mit dem Forward, nicht mit dem Spot.
 
 ### Delta und Gamma im Beispiel
 
-Mit <i>S</i> = <Num of="ex.spot" />, σ = <Num of="ex.vol" />, <i>T</i> = <Num of="m05.T" /> und <i>r</i><sub>f</sub> = <Num of="ex.rf" /> liegt <i>d</i><sub>1</sub> bei etwa <Num of="m05.d1" />. Delta ist <i>e</i><sup>−<i>r</i><sub>f</sub><i>T</i></sup> · <i>N</i>(<i>d</i><sub>1</sub>) = <Num of="m05.dff" /> · <Num of="m05.nd1" /> ≈ <Num of="m05.delta" />. Steigt USD/CHF um 10 Pips, gewinnt der Call also rund <Num of="m05.deltaPnl10Pips" />.
+Mit <i>S</i> = <Num of="ex.spot" />, <i>K</i> = <Num of="ex.strike" />, σ = <Num of="ex.vol" />, <i>T</i> = <Num of="m05.T" />, <i>r</i><sub>d</sub> = <Num of="ex.rd" /> und <i>r</i><sub>f</sub> = <Num of="ex.rf" /> liegt <i>d</i><sub>1</sub> bei etwa <Num of="m05.d1" />. Delta ist <i>e</i><sup>−<i>r</i><sub>f</sub><i>T</i></sup> · <i>N</i>(<i>d</i><sub>1</sub>) = <Num of="m05.dff" /> · <Num of="m05.nd1" /> ≈ <Num of="m05.delta" />. Steigt USD/CHF um 10 Pips, gewinnt der Call also rund <Num of="m05.deltaPnl10Pips" />.
 
 Für Gamma kommt die Dichte φ(<i>d</i><sub>1</sub>) = <Num of="m05.phiD1" /> ins Spiel:
 
@@ -30,7 +32,7 @@ Delta je einen Pip über und unter dem Spot, Differenz durch zwei Pips: Γ ≈ <
 
 <Callout title="Spot-Delta oder Forward-Delta?">
 
-Das Labor zeigt das Spot-Delta <Num of="m05.delta" />: so viele USD pro Dollar Nominal musst du heute in Spot halten. Am Markt wird Delta oft als Forward-Delta <i>N</i>(<i>d</i><sub>1</sub>) = <Num of="m05.deltaFwd" /> angegeben, die Absicherung mit einem Forward auf denselben Verfall. Der Unterschied ist der Faktor <i>e</i><sup>−<i>r</i><sub>f</sub><i>T</i></sup>.
+Das Labor zeigt das Spot-Delta <Num of="m05.delta" />: Pro Dollar Nominal verhält sich der Call heute wie so viele USD in Spot. Zum Absichern verkaufst du diesen Betrag. Am Markt wird Delta oft als Forward-Delta <i>N</i>(<i>d</i><sub>1</sub>) = <Num of="m05.deltaFwd" /> angegeben, die Absicherung mit einem Forward auf denselben Verfall. Der Unterschied ist der Faktor <i>e</i><sup>−<i>r</i><sub>f</sub><i>T</i></sup>.
 
 </Callout>
 
@@ -44,7 +46,7 @@ Das Labor zeigt das Spot-Delta <Num of="m05.delta" />: so viele USD pro Dollar N
 
 <Formula><span>Γ = ∂Δ / ∂<i>S</i> = ∂²<i>V</i> / ∂<i>S</i>²</span></Formula>
 
-**3.** Im Garman-Kohlhagen-Modell gilt für den Call Δ = <i>e</i><sup>−<i>r</i><sub>f</sub><i>T</i></sup> · <i>N</i>(<i>d</i><sub>1</sub>). Dass Delta so schlicht aussieht, liegt an der Identität <i>F</i> · φ(<i>d</i><sub>1</sub>) = <i>K</i> · φ(<i>d</i><sub>2</sub>): Beim Ableiten des Preises heben sich die Terme aus <i>d</i><sub>1</sub> und <i>d</i><sub>2</sub> gegenseitig auf. Nach dem Spot abgeleitet wird für Gamma nur noch <i>N</i>(<i>d</i><sub>1</sub>), mit der Kettenregel. φ ist die Dichte der Standardnormalverteilung.
+**3.** Im Garman-Kohlhagen-Modell gilt für den Call Δ = <i>e</i><sup>−<i>r</i><sub>f</sub><i>T</i></sup> · <i>N</i>(<i>d</i><sub>1</sub>). Dass Delta so schlicht aussieht, liegt an der Identität <i>F</i> · φ(<i>d</i><sub>1</sub>) = <i>K</i> · φ(<i>d</i><sub>2</sub>): Beim Ableiten des Preises heben sich die Terme aus <i>d</i><sub>1</sub> und <i>d</i><sub>2</sub> gegenseitig auf. Für Gamma leitest du deshalb nur noch <i>N</i>(<i>d</i><sub>1</sub>) nach dem Spot ab, mit der Kettenregel. φ ist die Dichte der Standardnormalverteilung.
 
 <Formula><span>∂<i>d</i><sub>1</sub> / ∂<i>S</i> = 1 / (<i>S</i> · σ · √<i>T</i>)</span><span>⇒ Γ = <i>e</i><sup>−<i>r</i><sub>f</sub><i>T</i></sup> · φ(<i>d</i><sub>1</sub>) / (<i>S</i> · σ · √<i>T</i>)</span></Formula>
 
@@ -60,12 +62,12 @@ Wer eine Option kauft, ist long Gamma. Beim Delta-Hedging verkauft er nach Ansti
 
 <Formula variant="dark"><span>P&L ≈ ½ · Γ · [(Δ<i>S</i>)² − σ²<i>S</i>² · Δ<i>t</i>]</span></Formula>
 
-Break-even pro Tag: σ · <i>S</i> / √365 = <Num of="ex.spot" /> · <Num of="ex.vol" /> / √365 ≈ <b><Num of="m05.breakEvenPips" /> Pips</b>. Bewegt sich USD/CHF stärker als die implizite Tagesvola, verdient der delta-gehedgte Gamma-Käufer. Der Gamma-Anteil des Thetas beträgt rund <Num of="m05.thetaGammaDay" /> pro Tag; das Theta im Labor (<Num of="m05.thetaDay" />) enthält zusätzlich den Zins-Carry von rund <Num of="m05.thetaCarryDay" /> pro Tag. Abschnitt 4 rechnet das im Detail.
+Break-even pro Tag: σ · <i>S</i> / √365 = <Num of="ex.spot" /> · <Num of="ex.vol" /> / √365 ≈ <b><Num of="m05.breakEvenPips" /> Pips</b>. Bewegt sich USD/CHF stärker, als die implizite Vola für einen Tag erwarten lässt, verdient der delta-gehedgte Gamma-Käufer. Der Gamma-Anteil des Thetas beträgt rund <Num of="m05.thetaGammaDay" /> pro Tag; das Theta im Labor (<Num of="m05.thetaDay" />) enthält zusätzlich den Zins-Carry von rund <Num of="m05.thetaCarryDay" /> pro Tag. Abschnitt 4 rechnet das im Detail.
 
 </Desk>
 
 <Takeaway>
 
-Delta ist die Steigung, Gamma die Krümmung. Rund um den Strike ist Gamma am grössten, und genau dort kostet jeder Tag am meisten Zeitwert.
+Delta ist die Steigung, Gamma die Krümmung. Nahe ATMF, wo der Forward beim Strike liegt, ist Gamma am grössten, und genau dort kostet jeder Tag am meisten Zeitwert.
 
 </Takeaway>

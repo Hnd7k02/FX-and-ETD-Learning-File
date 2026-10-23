@@ -186,6 +186,12 @@ const lang = pageLang(Astro.currentLocale);
   .pb .segmented > button {
     min-height: 44px;
   }
+  /* Stat rows without a symbol (max. gain/loss, break-even) only have two cells; give the
+     value its own auto column so a long sub-label wraps instead of pushing the value out of
+     the card on phones (the shared grid assumes a symbol cell). */
+  .pb .ff-stat-row:not(:has(> .ff-stat-symbol)) {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
   .pb-svg {
     display: block;
     width: 100%;

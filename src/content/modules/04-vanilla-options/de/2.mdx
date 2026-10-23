@@ -5,7 +5,7 @@ Jede Option hat zwei Seiten. Der Käufer ist **long**: Er zahlt die Prämie und 
 
 Dazu kommen zwei Typen. Ein **Call** ist das Recht, die Base-Währung zum Strike zu kaufen, in USD/CHF also USD. Ein **Put** ist das Recht, sie zum Strike zu verkaufen. Zwei Seiten mal zwei Typen ergeben vier Grundpositionen.
 
-<FourPositionsFigure caption="Die vier Grundpositionen bei Verfall, nach Prämie, alle mit dem Strike am Forward. Blau sind die gekauften, orange die verkauften Optionen." />
+<FourPositionsFigure caption="Die vier Grundpositionen: Gewinn oder Verlust bei Verfall nach Prämie, alle mit dem Strike beim Forward. Blau sind die gekauften, orange die verkauften Optionen. Der Punkt markiert den Break-even." />
 
 Unser Importeur ist **long Call**: Er fürchtet einen steigenden Dollar. Ein Exporteur, der in 3 Monaten USD erhält, fürchtet das Gegenteil und kauft einen **Put**. Auf der anderen Seite stehen Verkäufer, die für das Risiko die Prämie kassieren.
 
@@ -13,7 +13,7 @@ Unser Importeur ist **long Call**: Er fürchtet einen steigenden Dollar. Ein Exp
 
 ### Auszahlung und Gewinn
 
-Der Payoff-Builder zeigt zwei Linien. Grau gestrichelt ist die **Auszahlung bei Verfall**: Was die Option dann wert ist. Blau ist der **Wert heute**, drei Monate vor Verfall. Der blaue Punkt beim Spot ist genau die Prämie. Schaltest du auf «G&V nach Prämie», wird die Prämie abgezogen: Jetzt siehst du, ob sich das Geschäft gelohnt hat.
+Der Payoff-Builder zeigt zwei Linien. Grau gestrichelt ist die **Auszahlung bei Verfall**: was die Option dann wert ist. Blau ist der **Wert heute**, drei Monate vor Verfall. Der blaue Punkt beim Spot ist genau die Prämie. Warum liegt die blaue Kurve nicht auf der grauen? Bis zum Verfall kann der Kurs noch wandern, das ist der Zeitwert. Und für den Verfalltag zählt der Forward, nicht der Spot. Beides zeigt Abschnitt 3. Schaltest du auf «G&V nach Prämie», wird die Prämie abgezogen. Jetzt siehst du, ob sich das Geschäft gelohnt hat.
 
 Ein Rechenbeispiel mit dem Long Call, Strike <Num of="ex.strike" />, Prämie <Num of="ex.callPips" /> Pips:
 
@@ -36,13 +36,13 @@ Bei Verfall zählt nur, wo der Kurs <i>S</i><sub>T</sub> gegenüber dem Strike <
   <span>Short Put: −max(<i>K</i> − <i>S</i><sub>T</sub>, 0)</span>
 </Formula>
 
-Für G&V ziehst du die Prämie ab (Käufer) oder zählst sie dazu (Verkäufer), aufgezinst mit e<sup><i>r</i><sub>d</sub><i>T</i></sup>. Beim Long Call mit Prämie <i>c</i> ist die G&V bei Verfall gleich null, wenn
+Für G&V ziehst du die Prämie ab (Käufer) oder zählst sie dazu (Verkäufer), aufgezinst mit e<sup><i>r</i><sub>d</sub><i>T</i></sup>. Beim Long Call mit aufgezinster Prämie <i>c</i> ist die G&V bei Verfall gleich null, wenn
 
 <Formula variant="accent">
   <i>S</i><sub>T</sub> − <i>K</i> − <i>c</i> = 0 ⇒ <i>S</i><sub>T</sub> = <i>K</i> + <i>c</i>
 </Formula>
 
-Beim Put mit Prämie <i>p</i> liegt der Break-even entsprechend bei <i>K</i> − <i>p</i>. Der grösste Verlust des Short Puts entsteht, wenn der Kurs gegen null geht: −(<i>K</i> − <i>p</i>) pro USD. Beim Short Call gibt es keine Grenze nach oben, sein Verlust ist unbegrenzt.
+Beim Put mit aufgezinster Prämie <i>p</i> liegt der Break-even entsprechend bei <i>K</i> − <i>p</i>. Der grösste Verlust des Short Puts entsteht, wenn der Kurs gegen null geht: −(<i>K</i> − <i>p</i>) pro USD. Beim Short Call gibt es keine Grenze nach oben, sein Verlust ist unbegrenzt.
 
 </Derivation>
 
@@ -50,7 +50,7 @@ Beim Put mit Prämie <i>p</i> liegt der Break-even entsprechend bei <i>K</i> −
 
 Banken stellen als Market Maker Kurse für Käufer und Verkäufer. Sie halten eine verkaufte Option nicht einfach offen, sondern sichern ihr Risiko laufend mit Spot und Forwards ab. Wie das geht, zeigt Modul 05 mit dem Delta.
 
-Eine Firma verkauft Optionen selten allein. Meist ist der Verkauf Teil einer Struktur, die den Kauf finanziert, zum Beispiel ein Zero-Cost-Collar (Modul 06). Wer short ist, muss bei Verfall liefern können. Darum braucht er Kreditlinien oder Sicherheiten.
+Eine Firma verkauft Optionen selten allein. Meist ist der Verkauf Teil einer Struktur, die den Kauf finanziert, zum Beispiel ein Zero-Cost-Collar (Modul 06). Wer short ist, schuldet bei Verfall womöglich viel Geld. Darum verlangt die Gegenpartei eine Kreditlinie oder Sicherheiten.
 
 </Desk>
 
