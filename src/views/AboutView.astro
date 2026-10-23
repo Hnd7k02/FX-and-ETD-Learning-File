@@ -433,6 +433,7 @@ const sid = (i: number) => toc[i]!.id;
         </div>
         <h1 class="h1-module">{t('about.h1')}</h1>
         <p class="lead ab-lead">{t('about.lead')}</p>
+        <p class="ab-version" data-ff-version data-template={t('about.version')} hidden></p>
         <aside class="ab-disclaimer" aria-labelledby="ab-disclaimer-title">
           <span class="ab-disclaimer-icon" aria-hidden="true">
             <svg width="22" height="22" viewBox="0 0 22 22">
@@ -925,6 +926,12 @@ const sid = (i: number) => toc[i]!.id;
   .ab-lead {
     max-width: var(--ff-measure);
     margin-top: -4px;
+  }
+  .ab-version {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ff-ink-2);
   }
   .ab-disclaimer {
     display: flex;

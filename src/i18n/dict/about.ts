@@ -9,6 +9,7 @@ export const about = defineDict({
     'about.crumb': 'Über',
     'about.chip': 'Methodik',
     'about.h1': 'Über Forward First',
+    'about.version': 'Offline-Datei Version {n} vom {date}',
     'about.lead':
       'Wie das Tool rechnet, woher die Daten kommen und was es bewusst nicht ist. Für alle, die wissen wollen, warum eine Zahl so ist, wie sie ist.',
     'about.disclaimer': 'Nur zu Bildungszwecken. Keine Anlageberatung.',
@@ -190,6 +191,7 @@ export const about = defineDict({
     'about.crumb': 'About',
     'about.chip': 'Methodology',
     'about.h1': 'About Forward First',
+    'about.version': 'Offline file version {n} of {date}',
     'about.lead':
       'How the tool calculates, where the data comes from and what it deliberately is not. For anyone who wants to know why a number is what it is.',
     'about.disclaimer': 'For educational purposes only. Not investment advice.',

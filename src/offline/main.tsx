@@ -21,6 +21,7 @@ import '@/client/about-toc';
 import '@/client/home';
 import '@/client/svg-touch';
 import { switchLangPath } from '@/i18n/routes';
+import { fmtDate } from '@/lib/format';
 import { jumpToId, parseHashRoute } from '@/lib/url';
 import { ISLANDS } from 'virtual:ff-islands';
 
@@ -50,6 +51,8 @@ interface Chrome {
 interface OfflineData {
   asOf: string;
   built: string;
+  /** version of the offline file and its build date (ISO) */
+  version?: { number: number; date: string };
   pages: Record<string, PageRec>;
   aliases: Record<string, string>;
   chrome: Record<Lang, Chrome>;
@@ -290,7 +293,19 @@ function swap(path: string, page: PageRec): void {
   main.innerHTML = page.h;
   main.dataset.route = path;
   rewriteLinks(main);
+  showVersion(page.l);
   mountIslands(main);
+}
+
+/** About page: "Offline-Datei Version 5 vom 23.10.2026" (template from the page, data from the build). */
+function showVersion(lang: Lang): void {
+  const v = data.version;
+  if (!v) return;
+  main.querySelectorAll<HTMLElement>('[data-ff-version]').forEach((el) => {
+    const tpl = el.dataset.template ?? '';
+    el.textContent = tpl.replace('{n}', String(v.number)).replace('{date}', fmtDate(v.date, lang));
+    el.hidden = false;
+  });
 }
 
 function show(force = false): void {

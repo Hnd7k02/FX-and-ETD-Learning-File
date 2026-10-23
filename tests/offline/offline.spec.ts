@@ -29,6 +29,9 @@ test.describe('the file', () => {
     expect(csp).toBeTruthy();
     expect(csp).toContain("default-src 'none'");
     expect(csp).toContain("connect-src 'none'");
+    // inline scripts by 'unsafe-inline', not by hash: a transport change must not block them (D-41)
+    expect(csp).toContain("script-src 'unsafe-inline'");
+    expect(csp).not.toContain('sha256');
     // no resource is loaded from outside the file
     expect(html).not.toMatch(/<(script|link|img|iframe)\b[^>]*\s(src|href)="(?!data:|#)/i);
     expect(html).not.toMatch(/url\(\s*["']?(https?:|\/\/|\/)/i);

@@ -7,19 +7,49 @@
  * - all pages (DE + EN) as gzip + base64 data block, unpacked at runtime (fflate),
  * - all CSS inline, fonts as woff2 data URIs (Latin and Greek subsets only),
  * - one IIFE script (esbuild) with Preact, every island, the page scripts and the hash router,
- * - a Content-Security-Policy that allows no network request at all.
+ * - a Content-Security-Policy that allows no network request at all,
+ * - a small start-diagnostics script (src/offline/diagnose.ts).
  * No external files, no network. Fails if the file exceeds 5 MB, warns above 3 MB.
+ *
+ * Transport hardening (DECISIONS D-41): the file travels by e-mail, where backslash + n turned
+ * into a line break once. The whole file is plain ASCII (0x0A, 0x20…0x7E), every escape in the
+ * scripts is rewritten into a form that arrived intact (scripts/lib/transport.ts), the CSP allows
+ * inline scripts instead of a hash (a changed character must not block the script silently), and
+ * the build fails if anything unsafe is left.
  */
-import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import {
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  statSync,
+  writeFileSync,
+} from 'node:fs';
 import { basename, join, relative, resolve } from 'node:path';
+import { Script } from 'node:vm';
 import { gzipSync } from 'node:zlib';
 import { build, type Plugin } from 'esbuild';
+import { fmtDate } from '../src/lib/format';
+import {
+  cssAscii,
+  htmlAscii,
+  rewriteJsEscapes,
+  simulateMail,
+  transportProblems,
+} from './lib/transport';
+
+/**
+ * Version of the offline file: shown while loading, on the About page and in the name of the
+ * copy release/forward-first-v<number>.html. The date is the build date in Zurich.
+ */
+export const OFFLINE_VERSION = { number: 5 } as const;
 
 const ROOT = process.cwd();
 const DIST = join(ROOT, 'dist');
 const OUT_DIR = join(ROOT, 'release');
 const OUT = join(OUT_DIR, 'forward-first.html');
+const OUT_VERSIONED = join(OUT_DIR, `forward-first-v${OFFLINE_VERSION.number}.html`);
 const MB = 1024 * 1024;
 const TARGET_BYTES = 3 * MB;
 const MAX_BYTES = 5 * MB;
@@ -188,7 +218,8 @@ async function bundleJs(islandNames: string[]): Promise<string> {
     // FF_DEBUG=1 keeps names and line breaks for readable stack traces while debugging.
     minify: process.env.FF_DEBUG !== '1',
     legalComments: 'none',
-    charset: 'utf8',
+    // ASCII only: every non-ASCII character becomes an escape (rewritten below)
+    charset: 'ascii',
     target: ['chrome100', 'edge100', 'safari15'],
     jsx: 'automatic',
     jsxImportSource: 'preact',
@@ -203,9 +234,52 @@ async function bundleJs(islandNames: string[]): Promise<string> {
     plugins: [islandsPlugin(islandNames)],
     logLevel: 'warning',
   });
-  const js = res.outputFiles[0]!.text;
-  // never let the code close the script element early
-  return js.replace(/<\/(script)/gi, '<\\/$1').replace(/<!--/g, '<\\!--');
+  return inlineScript(res.outputFiles[0]!.text, 'main script');
+}
+
+/**
+ * Makes a script safe to inline and to send by mail: no "</script" or "<!--", every escape in a
+ * transport-safe form, no String.raw (raw template strings would keep the original escapes), and
+ * it must still compile.
+ */
+function inlineScript(code: string, label: string): string {
+  const js = rewriteJsEscapes(
+    code.replace(/<\/(script)/gi, '<\\/$1').replace(/<!--/g, '<\\u0021--'),
+  ).trim();
+  if (js.includes('String.raw')) fail(`${label} contains String.raw`);
+  try {
+    new Script(js, { filename: label });
+  } catch (e) {
+    fail(`${label} does not compile after the escape rewrite: ${String(e)}`);
+  }
+  return js;
+}
+
+/** Start diagnostics, bundled like the main script with the values measured at build time. */
+async function bundleDiagnose(values: { v: number; d: string; ld: number; lm: number }) {
+  const res = await build({
+    entryPoints: [join(ROOT, 'src/offline/diagnose.ts')],
+    bundle: true,
+    write: false,
+    format: 'iife',
+    minify: true,
+    legalComments: 'none',
+    charset: 'ascii',
+    target: ['chrome100', 'edge100', 'safari15'],
+    define: { __FF_DIAG__: JSON.stringify(values) },
+    logLevel: 'warning',
+  });
+  return inlineScript(res.outputFiles[0]!.text, 'diagnostics script');
+}
+
+/** Build date in Zurich as ISO date (yyyy-mm-dd). */
+function zurichDate(): string {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Europe/Zurich',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(new Date());
 }
 
 /* ---------------------------------------------------------------------------------------- */
@@ -284,8 +358,11 @@ async function main(): Promise<void> {
       fail(`external reference left in ${route}: …${p.h.slice(bad.index - 40, bad.index + 60)}…`);
   }
 
-  const css = processCss([...cssParts, ...bodyCss].join('\n'));
+  const cssAsciiResult = cssAscii(processCss([...cssParts, ...bodyCss].join('\n')));
+  const css = cssAsciiResult.css;
   if (/url\(\s*(?!["']?data:)/.test(css)) fail('CSS still references external files');
+  if (cssAsciiResult.unsafe.length)
+    fail(`CSS characters without a transport-safe escape: ${cssAsciiResult.unsafe.join(', ')}`);
 
   const names = [...islandNames].sort();
   for (const n of names) {
@@ -293,17 +370,19 @@ async function main(): Promise<void> {
       fail(`island source ${n}.tsx not found`);
   }
   const js = await bundleJs(names);
-  const scriptHash = createHash('sha256').update(js, 'utf8').digest('base64');
 
   const riskometer = JSON.parse(
     readFileSync(join(ROOT, 'src/data/fx/riskometer.json'), 'utf8'),
   ) as {
     asOf: string;
   };
-  const built = new Date().toISOString().slice(0, 10);
+  const built = zurichDate();
+  const version = { number: OFFLINE_VERSION.number, date: built };
+  const versionLabel = `${OFFLINE_VERSION.number} (${fmtDate(built, 'de')})`;
   const data = {
     asOf: riskometer.asOf,
     built,
+    version,
     pages,
     aliases,
     chrome: {
@@ -316,7 +395,9 @@ async function main(): Promise<void> {
 
   const csp = [
     "default-src 'none'",
-    `script-src 'sha256-${scriptHash}'`,
+    // inline scripts instead of a hash: a character changed in transport must not block the
+    // script silently (D-41); everything else stays locked
+    "script-src 'unsafe-inline'",
     "style-src 'unsafe-inline'",
     'img-src data:',
     'font-src data:',
@@ -331,6 +412,19 @@ async function main(): Promise<void> {
   const icon =
     "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'%3E%3Crect width='36' height='36' rx='11' fill='%230E1116'/%3E%3Cpath d='M8.3 25.9H19.6L30.6 12.6' fill='none' stroke='%23fff' stroke-width='3.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E";
 
+  const diag = await bundleDiagnose({
+    v: OFFLINE_VERSION.number,
+    d: fmtDate(built, 'de'),
+    ld: packed.length,
+    lm: js.length,
+  });
+  const description = htmlAscii(
+    'Forward First: ein interaktives Lerntool für den Devisenmarkt. Offline-Datei, nur zu Bildungszwecken.',
+  );
+  const loading = htmlAscii(
+    `Forward First ${versionLabel} wird geladen … Falls nichts erscheint: Datei in Chrome, Edge oder Safari öffnen und JavaScript erlauben. / Loading … If nothing appears, open the file in Chrome, Edge or Safari with JavaScript enabled.`,
+  );
+
   const html = `<!doctype html>
 <html lang="de">
 <head>
@@ -338,26 +432,39 @@ async function main(): Promise<void> {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="${csp}">
 <meta name="referrer" content="no-referrer">
-<meta name="description" content="Forward First: ein interaktives Lerntool für den Devisenmarkt. Offline-Datei, nur zu Bildungszwecken.">
+<meta name="description" content="${description}">
 <meta name="ff-data-as-of" content="${riskometer.asOf}">
 <meta name="ff-built" content="${built}">
+<meta name="ff-version" content="${OFFLINE_VERSION.number}">
 <title>Forward First</title>
 <link rel="icon" href="${icon}">
 <style>${css}</style>
 </head>
 <body>
 <div id="ff-top"></div>
-<div id="main" tabindex="-1"><p class="container" style="padding:48px 16px;font-family:system-ui,sans-serif">Forward First wird geladen … Falls nichts erscheint: Datei in Chrome, Edge oder Safari öffnen und JavaScript erlauben. / Loading … If nothing appears, open the file in Chrome, Edge or Safari with JavaScript enabled.</p></div>
+<div id="main" tabindex="-1"><p class="container" id="ff-loading" style="padding:48px 16px;font-family:system-ui,sans-serif">${loading}</p></div>
 <div id="ff-bottom"></div>
 <div id="ff-announcer" class="sr-only" aria-live="polite"></div>
+<script id="ff-diag">${diag}</script>
 <script id="ff-data" type="application/octet-stream">${packed}</script>
-<script>${js}</script>
+<script id="ff-main">${js}</script>
 </body>
 </html>
 `;
 
+  // transport check of the finished file: ASCII only, no unsafe escape, the mail simulation
+  // (also the worst case with \r and \t) changes nothing
+  const problems = transportProblems(html);
+  if (problems.length) {
+    fail(
+      `file is not transport-safe:\n${problems.map((p) => `  ${p.kind} @${p.index}: ${p.text}`).join('\n')}`,
+    );
+  }
+  if (simulateMail(html, true) !== html) fail('mail simulation changes the file');
+
   mkdirSync(OUT_DIR, { recursive: true });
   writeFileSync(OUT, html);
+  copyFileSync(OUT, OUT_VERSIONED);
   const size = Buffer.byteLength(html);
   const kb = (n: number) => `${(n / 1024).toFixed(0)} KB`;
   log(
@@ -367,6 +474,7 @@ async function main(): Promise<void> {
     `css ${kb(css.length)} · js ${kb(Buffer.byteLength(js))} · data ${kb(packed.length)} (json ${kb(json.length)})`,
   );
   log(`${basename(OUT)}: ${(size / MB).toFixed(2)} MB → ${relative(ROOT, OUT)}`);
+  log(`version ${versionLabel} · copy ${relative(ROOT, OUT_VERSIONED)} · transport check passed`);
   if (size > MAX_BYTES) fail(`file is larger than 5 MB`);
   if (size > TARGET_BYTES) console.warn('[offline] WARNING: file is larger than the 3 MB target');
 }

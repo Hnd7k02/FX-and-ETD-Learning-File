@@ -90,7 +90,7 @@ jobs:
             echo
             echo "Nur zu Bildungszwecken. Keine Anlageberatung. / For educational purposes only. Not investment advice."
           } > notes.md
-          gh release create "$TAG" release/forward-first.html \
+          gh release create "$TAG" release/forward-first.html release/forward-first-v*.html \
             --target "$(git rev-parse HEAD)" \
             --title "Forward First · ECB ${AS_OF}" \
             --notes-file notes.md \

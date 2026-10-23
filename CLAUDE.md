@@ -11,6 +11,7 @@ A light, calm learning tool for FX: spot → forward → FX swap → vanilla opt
 ## Non-negotiable rules
 
 - **Single file.** Everything (CSS, JS, fonts, data, both languages) stays inside `release/forward-first.html`; no external file, no request (CSP `default-src 'none'`). Target < 3 MB, build fails > 5 MB. Optional browser features need feature detection and a fallback (View Transitions, `localStorage`, Web Worker → chunked main thread). Internal links are site paths (`/module/…/`); the file rewrites them to hash routes. Read/write query strings only through `src/lib/url.ts`.
+- **Transport-safe file (D-41).** The file travels by mail; backslash + n once became a line break. The build (`scripts/lib/transport.ts`) makes the file plain ASCII (0x0A, 0x20–0x7E), rewrites every script escape to a tested form and fails on anything else. Tested escapes: `\uXXXX`, `\\`, `\/`, `\.`, `\{`, `\}`, `\d`, `\s`, `\w`, `\B`. In source code avoid `\b`, `\S`, `\D`, `\W`, back-references and `String.raw` (write `[^0-9]` instead of `\D`); non-ASCII in CSS only where its escape starts with `\d`. CSP `script-src 'unsafe-inline'` (no hash). Version in `OFFLINE_VERSION` (`scripts/build-offline.ts`), copy `release/forward-first-v<n>.html`.
 
 - **Education only.** No names of banks, companies, people or clients. No internal terms, systems or processes of any bank. Dario's employer never appears in the tool or the repo.
 - **Disclaimer** in every footer and on the About page: "Nur zu Bildungszwecken. Keine Anlageberatung." / "For educational purposes only. Not investment advice."
