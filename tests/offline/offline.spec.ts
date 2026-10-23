@@ -203,6 +203,20 @@ test.describe('hash routing', () => {
     await expect(page.locator('#main')).toHaveAttribute('data-route', '/module/05-greeks/1/');
   });
 
+  test('quick successive route changes end on the last route without errors', async ({
+    page,
+    open,
+  }) => {
+    await open();
+    await page.evaluate(() => {
+      window.location.hash = '#/riskometer/';
+      window.location.hash = '#/glossar/';
+      window.location.hash = '#/module/05-greeks/3/';
+    });
+    await expect(page.locator('#main')).toHaveAttribute('data-route', '/module/05-greeks/3/');
+    await expect(page.locator('[data-greekslab]').first()).toBeVisible();
+  });
+
   test('short, redirect and unknown routes', async ({ page, open }) => {
     await open('/module/05-greeks/2');
     await expect(page.locator('#main')).toHaveAttribute('data-route', '/module/05-greeks/2/');

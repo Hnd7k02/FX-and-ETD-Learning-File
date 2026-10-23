@@ -283,7 +283,7 @@ function show(): void {
 
   const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
   const doc = document as Document & {
-    startViewTransition?: (cb: () => void) => { finished: Promise<void> };
+    startViewTransition?: (cb: () => void) => { ready?: Promise<void>; finished?: Promise<void> };
   };
   const wasFirst = first;
   const byLink = navByLink;
@@ -304,13 +304,38 @@ function show(): void {
   };
   if (!wasFirst && prev && !reduce && typeof doc.startViewTransition === 'function') {
     try {
-      doc.startViewTransition(run);
+      const vt = doc.startViewTransition(run);
+      // A skipped transition (e.g. a second tap before the first one ends) rejects these
+      // promises; the page itself has been swapped either way.
+      vt.ready?.catch(() => {});
+      vt.finished?.catch(() => {});
     } catch {
       run();
     }
   } else {
     run();
   }
+}
+
+/**
+ * Goes to a route inside the file. history.pushState changes only the fragment and starts no
+ * navigation, so it also works in embedded web views that refuse link navigations (the iPad
+ * Files app preview). Fallback: set the hash and let 'hashchange' do the rest.
+ */
+function navigate(route: string): void {
+  const target = `#${route}`;
+  navByLink = true;
+  if (window.location.hash === target) {
+    show();
+    return;
+  }
+  try {
+    history.pushState(null, '', target);
+  } catch {
+    window.location.hash = target;
+    return;
+  }
+  show();
 }
 
 /* ------------------------------------------------------------------------------------------ */
@@ -327,12 +352,12 @@ document.addEventListener('click', (e) => {
   if (!href) return;
   if (isInternalPath(href)) {
     e.preventDefault();
-    navByLink = true;
-    window.location.hash = `#${href}`;
+    navigate(href);
     return;
   }
   if (href.startsWith('#/')) {
-    navByLink = true;
+    e.preventDefault();
+    navigate(href.slice(1));
     return;
   }
   if (href.startsWith('#')) {
@@ -347,6 +372,9 @@ document.addEventListener('click', (e) => {
   }
 });
 
+// Back/forward after pushState fires 'popstate'; typed or programmatic hash changes fire
+// 'hashchange'. show() ignores the second call for the same route.
+window.addEventListener('popstate', show);
 window.addEventListener('hashchange', show);
 
 // Links created later by islands or page scripts (e.g. "Weiterlernen") are rewritten as well.
