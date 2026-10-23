@@ -208,8 +208,32 @@ const lang = pageLang(Astro.currentLocale);
   .sc-control .segmented > button {
     min-height: 44px;
   }
-  .sc-now-btn {
-    align-self: flex-start;
+  .sc-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .sc-play {
+    min-width: 150px;
+  }
+  .sc-flash {
+    fill: none;
+    stroke: var(--ff-long);
+    stroke-width: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: sc-flash 700ms ease-out both;
+    pointer-events: none;
+  }
+  @keyframes sc-flash {
+    from {
+      stroke-width: 8px;
+      stroke-opacity: 0.45;
+    }
+    to {
+      stroke-width: 0;
+      stroke-opacity: 0;
+    }
   }
   .sc-now-btn:disabled {
     opacity: 0.6;

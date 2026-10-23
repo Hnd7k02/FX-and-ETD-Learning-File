@@ -306,7 +306,11 @@ export default function OrderDemo({ lang }: OrderDemoProps): JSX.Element {
                 </g>
               )}
               {/* fill */}
-              <g key={`f-${scenario}`} class="od-fill" style={{ animationDelay: `${(fill.index / COUNT) * 1.4}s` }}>
+              <g
+                key={`f-${scenario}`}
+                class="od-fill"
+                style={{ animationDelay: `${(fill.index / COUNT) * 1.4}s` }}
+              >
                 <circle
                   cx={fx}
                   cy={fy}
@@ -437,7 +441,11 @@ export default function OrderDemo({ lang }: OrderDemoProps): JSX.Element {
               />
             )}
           </div>
-          <p class={`od-note${fill.viaGap && type === 'stop' ? ' is-gap' : ''}`} data-note aria-live="polite">
+          <p
+            class={`od-note${fill.viaGap && type === 'stop' ? ' is-gap' : ''}`}
+            data-note
+            aria-live="polite"
+          >
             {note}
           </p>
         </div>

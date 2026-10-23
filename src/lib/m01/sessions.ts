@@ -149,12 +149,7 @@ export function visibleSegments(intervals: Array<[number, number]>): Array<[numb
 const smoothstep = (x: number): number => (x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x));
 
 /** Activity of a session at hour h (0 … 1, before weighting): soft box times fading profile. */
-export function sessionActivity(
-  s: SessionDef,
-  season: Season,
-  day: DayType,
-  h: number,
-): number {
+export function sessionActivity(s: SessionDef, season: Season, day: DayType, h: number): number {
   const r = SESSION_CONFIG.rampHours;
   let a = 0;
   for (const [start, end] of sessionIntervals(s, season, day)) {
@@ -218,7 +213,10 @@ export function liquidityLevel(season: Season, day: DayType, h: number): Liquidi
 export function overlapWindow(season: Season, day: DayType): [number, number] | null {
   if (day === 'sat' || day === 'sun') return null;
   const [l, n] = (['london', 'newYork'] as const).map((id) =>
-    zurichWindow(SESSION_CONFIG.sessions.find((s) => s.id === id)!, season),
+    zurichWindow(
+      SESSION_CONFIG.sessions.find((s) => s.id === id)!,
+      season,
+    ),
   );
   const a = Math.max(l!.open, n!.open);
   const b = Math.min(l!.close, n!.close);

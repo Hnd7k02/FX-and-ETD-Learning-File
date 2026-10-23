@@ -219,11 +219,21 @@ export default function SpotExposure({ lang }: SpotExposureProps): JSX.Element {
               {/* today: vertical spot line and horizontal cost line */}
               <path
                 d={`M${sx(S0).toFixed(1)},${L.top}V${L.plotBottom}`}
-                style={{ fill: 'none', stroke: 'var(--ff-ref)', strokeWidth: 1, strokeDasharray: '4 5' }}
+                style={{
+                  fill: 'none',
+                  stroke: 'var(--ff-ref)',
+                  strokeWidth: 1,
+                  strokeDasharray: '4 5',
+                }}
               />
               <path
                 d={`M${L.left},${y0.toFixed(1)}H${L.width - L.right}`}
-                style={{ fill: 'none', stroke: 'var(--ff-ref)', strokeWidth: 1, strokeDasharray: '4 5' }}
+                style={{
+                  fill: 'none',
+                  stroke: 'var(--ff-ref)',
+                  strokeWidth: 1,
+                  strokeDasharray: '4 5',
+                }}
               />
               <text
                 x={L.width - L.right}
@@ -324,7 +334,12 @@ export default function SpotExposure({ lang }: SpotExposureProps): JSX.Element {
               />
               <path
                 d={`M${x.toFixed(1)},${(yCost + 8).toFixed(1)}V${L.rail}`}
-                style={{ fill: 'none', stroke: 'var(--ff-ink)', strokeWidth: 1, strokeDasharray: '2 3' }}
+                style={{
+                  fill: 'none',
+                  stroke: 'var(--ff-ink)',
+                  strokeWidth: 1,
+                  strokeDasharray: '2 3',
+                }}
               />
               {/* drag surface: horizontal drags move the rate, vertical swipes still scroll */}
               <rect
@@ -338,10 +353,21 @@ export default function SpotExposure({ lang }: SpotExposureProps): JSX.Element {
               />
               <path
                 d={`M${L.left},${L.rail}H${L.width - L.right}`}
-                style={{ fill: 'none', stroke: 'var(--ff-line)', strokeWidth: 4, strokeLinecap: 'round' }}
+                style={{
+                  fill: 'none',
+                  stroke: 'var(--ff-line)',
+                  strokeWidth: 4,
+                  strokeLinecap: 'round',
+                }}
               />
               <g class={`spx-handle${dragging ? ' is-active' : ''}`} data-handle {...handlers}>
-                <rect x={x - 30} y={L.rail - 22} width={60} height={44} style={{ fill: 'transparent' }} />
+                <rect
+                  x={x - 30}
+                  y={L.rail - 22}
+                  width={60}
+                  height={44}
+                  style={{ fill: 'transparent' }}
+                />
                 <rect
                   x={x - 34}
                   y={L.rail - 11}

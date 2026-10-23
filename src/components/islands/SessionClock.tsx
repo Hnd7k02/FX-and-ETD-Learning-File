@@ -6,13 +6,20 @@
  * events) or use the slider; switch the day (the week starts on Sunday evening in Zurich, i.e.
  * Monday morning in Wellington) and the season (daylight saving time). The current Zurich time
  * is marked on the client only and updates every 30 seconds; the server render shows no marker.
- * Curves morph in 300 ms (instant under reduced motion). Logic: src/lib/m01/sessions.ts.
+ * "Play" runs the cursor through the day; each session flashes when it opens. Curves morph in
+ * 300 ms (instant under reduced motion; playback then jumps hour by hour). Logic:
+ * src/lib/m01/sessions.ts.
  */
 import type { JSX } from 'preact';
 import { useEffect, useId, useMemo, useRef, useState } from 'preact/hooks';
 import { Segmented } from '@/components/ui/Segmented';
 import { Slider } from '@/components/ui/Slider';
-import { useElementWidth, usePrefersReducedMotion, useTween } from '@/components/ui/hooks';
+import {
+  useElementWidth,
+  useInView,
+  usePrefersReducedMotion,
+  useTween,
+} from '@/components/ui/hooks';
 import { sessionclock as dict } from '@/i18n/dict/sessionclock';
 import { translator, type Lang } from '@/i18n/types';
 import { areaPath, linePath, scaleLinear, type Point } from '@/lib/chart';
@@ -46,12 +53,17 @@ const SEASONS: Season[] = ['winter', 'summer'];
 const LEVELS: LiquidityLevel[] = ['closed', 'thin', 'moderate', 'high', 'peak'];
 const STEP = 0.25;
 const SAMPLES = 144;
+const LAST = 24 - STEP;
+/** Playback timing (UI choice, D-22): one day in `playSeconds`; reduced motion jumps hourly. */
+const CLOCK_UI = { playSeconds: 16, rmStepHours: 1, rmStepMs: 700 } as const;
+const NEW_YORK = SESSION_CONFIG.sessions.find((s) => s.id === 'newYork')!;
 
 function layoutFor(w: number) {
   const width = Math.max(280, Math.round(w));
   const compact = width < 560;
   const labelW = compact ? 74 : 96;
-  const curveTop = 30;
+  // compact: the curve title and the overlap label sit on two lines above the curve
+  const curveTop = compact ? 50 : 30;
   const curveH = compact ? 96 : 176;
   const rowsTop = curveTop + curveH + 20;
   const rowH = compact ? 20 : 28;
@@ -87,10 +99,14 @@ export default function SessionClock({ lang }: SessionClockProps): JSX.Element {
   const [season, setSeason] = useState<Season>('winter');
   const [hour, setHour] = useState(10);
   const [now, setNow] = useState<ZurichClock | null>(null);
+  const [playing, setPlaying] = useState(false);
   const touched = useRef(false);
+  const hourRef = useRef(hour);
+  hourRef.current = hour;
   const box = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const L = layoutFor(useElementWidth(box, 640));
+  const inView = useInView(box);
 
   // Client only: read the Zurich clock, follow it until the learner takes over.
   useEffect(() => {
@@ -100,7 +116,7 @@ export default function SessionClock({ lang }: SessionClockProps): JSX.Element {
       if (!touched.current) {
         setDay(c.day);
         setSeason(c.season);
-        setHour(snap(c.hour, STEP, 0, 24 - STEP));
+        setHour(snap(c.hour, STEP, 0, LAST));
       }
     };
     tick();
@@ -112,13 +128,56 @@ export default function SessionClock({ lang }: SessionClockProps): JSX.Element {
   const sy = scaleLinear([0, 1], [L.curveBottom, L.curveTop + 8]);
   const setH = (h: number) => {
     touched.current = true;
-    setHour(snap(h, STEP, 0, 24 - STEP));
+    setPlaying(false);
+    setHour(snap(h, STEP, 0, LAST));
+  };
+
+  // Playback: the cursor runs through the day and stops at its end (paused off-screen).
+  useEffect(() => {
+    if (!playing || !inView) return;
+    const advance = (dh: number): boolean => {
+      const n = Math.min(LAST, hourRef.current + dh);
+      hourRef.current = n;
+      setHour(n);
+      if (n >= LAST) {
+        setPlaying(false);
+        return false;
+      }
+      return true;
+    };
+    if (rm) {
+      const id = window.setInterval(() => advance(CLOCK_UI.rmStepHours), CLOCK_UI.rmStepMs);
+      return () => window.clearInterval(id);
+    }
+    let raf = 0;
+    let last = performance.now();
+    const step = (t: number) => {
+      const dt = Math.min(0.1, (t - last) / 1000);
+      last = t;
+      if (advance((dt * 24) / CLOCK_UI.playSeconds)) raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [playing, inView, rm]);
+
+  const togglePlay = () => {
+    touched.current = true;
+    if (playing) {
+      setPlaying(false);
+      setHour(snap(hourRef.current, STEP, 0, LAST));
+      return;
+    }
+    if (hourRef.current >= LAST - 1e-9) {
+      hourRef.current = 0;
+      setHour(0);
+    }
+    setPlaying(true);
   };
   const { dragging, handlers } = useSvgDrag(svgRef, L, 'x', (x) => setH(sx.invert(x)));
 
   const curve = useMemo(() => liquidityCurve(season, day, SAMPLES).map((p) => p[1]), [season, day]);
   const shownCurve = useTween(curve, 300, rm);
-  const [shownHour] = useTween([hour], 300, rm || dragging);
+  const [shownHour] = useTween([hour], 300, rm || dragging || playing);
   const h = shownHour ?? hour;
 
   const level = liquidityLevel(season, day, hour);
@@ -126,6 +185,7 @@ export default function SessionClock({ lang }: SessionClockProps): JSX.Element {
   const overlap = overlapWindow(season, day);
   const inPeak = level === 'peak';
   const ws = weekStart(season);
+  const nyClose = zurichWindow(NEW_YORK, season).close;
 
   const pts: Point[] = shownCurve.map((v, i) => [sx((24 * i) / SAMPLES), sy(v)]);
   const area = areaPath(
@@ -188,6 +248,7 @@ export default function SessionClock({ lang }: SessionClockProps): JSX.Element {
       data-hour={hour.toFixed(2)}
       data-level={level}
       data-open={open.join(',')}
+      data-playing={playing}
     >
       <div class="ff-lab-head">
         <div class="sc-head-text">
@@ -219,7 +280,7 @@ export default function SessionClock({ lang }: SessionClockProps): JSX.Element {
               )}
               <text
                 x={L.x0}
-                y={L.curveTop - 12}
+                y={L.curveTop - (L.compact ? 30 : 12)}
                 style={{ fontSize: fs, fontWeight: 600, fill: 'var(--ff-muted)' }}
               >
                 {t('curve')}
@@ -227,7 +288,7 @@ export default function SessionClock({ lang }: SessionClockProps): JSX.Element {
               {overlap && (
                 <text
                   x={(sx(overlap[0]) + sx(overlap[1])) / 2}
-                  y={L.curveTop - 12}
+                  y={L.curveTop - (L.compact ? 8 : 12)}
                   style={{
                     fontSize: fs,
                     fontWeight: 700,
@@ -311,6 +372,20 @@ export default function SessionClock({ lang }: SessionClockProps): JSX.Element {
                       rx={L.rowH / 2}
                       style={{ fill: 'var(--ff-surface-2)' }}
                     />
+                    {playing &&
+                      isOpen &&
+                      segs.map(([a, b]) => (
+                        <rect
+                          key={`flash-${a}-${b}`}
+                          x={sx(a)}
+                          y={y}
+                          width={Math.max(0, sx(b) - sx(a))}
+                          height={L.rowH}
+                          rx={L.rowH / 2}
+                          class="sc-flash"
+                          aria-hidden="true"
+                        />
+                      ))}
                     {segs.map(([a, b]) => (
                       <rect
                         key={`${a}-${b}-${w.open}`}
@@ -334,11 +409,11 @@ export default function SessionClock({ lang }: SessionClockProps): JSX.Element {
               {day === 'fri' && (
                 <g>
                   <path
-                    d={`M${sx(23).toFixed(1)},${L.curveTop + 6}V${L.rowsBottom}`}
+                    d={`M${sx(nyClose).toFixed(1)},${L.curveTop + 6}V${L.rowsBottom}`}
                     style={{ fill: 'none', stroke: 'var(--ff-ink)', strokeWidth: 1.5 }}
                   />
                   {note(
-                    sx(23),
+                    sx(nyClose),
                     L.rowsTop + L.rowH / 2 + L.font * 0.35,
                     t('weekEnd'),
                     'end',
@@ -519,32 +594,56 @@ export default function SessionClock({ lang }: SessionClockProps): JSX.Element {
               label={t('slider')}
               value={hour}
               min={0}
-              max={24 - STEP}
+              max={LAST}
               step={STEP}
               valueText={fmtClock(hour)}
               onInput={setH}
             />
-            <button
-              type="button"
-              class="btn btn-light sc-now-btn"
-              disabled={!now}
-              onClick={() => {
-                if (!now) return;
-                touched.current = false;
-                setDay(now.day);
-                setSeason(now.season);
-                setHour(snap(now.hour, STEP, 0, 24 - STEP));
-              }}
-            >
-              {t('nowButton')}
-            </button>
+            <div class="sc-buttons">
+              <button
+                type="button"
+                class="btn btn-dark sc-play"
+                aria-pressed={playing}
+                data-play
+                onClick={togglePlay}
+              >
+                {playing ? (
+                  <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true">
+                    <path
+                      d="M5 3.5V12.5M11 3.5V12.5"
+                      style={{ stroke: 'currentColor', strokeWidth: 2.4, strokeLinecap: 'round' }}
+                    />
+                  </svg>
+                ) : (
+                  <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true">
+                    <path d="M4.5 2.8L13 8L4.5 13.2Z" style={{ fill: 'currentColor' }} />
+                  </svg>
+                )}
+                {playing ? t('pause') : t('play')}
+              </button>
+              <button
+                type="button"
+                class="btn btn-light sc-now-btn"
+                disabled={!now}
+                onClick={() => {
+                  if (!now) return;
+                  touched.current = false;
+                  setPlaying(false);
+                  setDay(now.day);
+                  setSeason(now.season);
+                  setHour(snap(now.hour, STEP, 0, LAST));
+                }}
+              >
+                {t('nowButton')}
+              </button>
+            </div>
           </div>
           <p class={`sc-hint-box sc-hint-box--${level}`} data-hint>
             {t(`hint.${level}`)}
           </p>
           <p class="sc-dst">{t('dst')}</p>
           <div class="sr-only" aria-live="polite" aria-atomic="true">
-            {dragging ? '' : `${fmtClock(hour)}: ${openText}. ${t(`level.${level}`)}.`}
+            {dragging || playing ? '' : `${fmtClock(hour)}: ${openText}. ${t(`level.${level}`)}.`}
           </div>
           {now && <p class="sr-only">{t('ariaNow', { time: fmtClock(now.hour) })}</p>}
         </div>

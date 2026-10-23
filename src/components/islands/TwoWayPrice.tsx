@@ -161,7 +161,11 @@ export default function TwoWayPrice({ lang }: TwoWayPriceProps): JSX.Element {
                 width={Math.max(0, xa - xb)}
                 height={24}
                 rx={6}
-                style={{ fill: 'var(--ff-exotics-soft)', stroke: 'var(--ff-short)', strokeWidth: 1.5 }}
+                style={{
+                  fill: 'var(--ff-exotics-soft)',
+                  stroke: 'var(--ff-short)',
+                  strokeWidth: 1.5,
+                }}
               />
               <path
                 d={`M${left},${axisY}H${right}`}
@@ -174,14 +178,24 @@ export default function TwoWayPrice({ lang }: TwoWayPriceProps): JSX.Element {
               <text
                 x={xb - 6}
                 y={axisY - 18}
-                style={{ fontSize: `${fs}px`, fontWeight: 700, fill: 'var(--ff-ink)', textAnchor: 'end' }}
+                style={{
+                  fontSize: `${fs}px`,
+                  fontWeight: 700,
+                  fill: 'var(--ff-ink)',
+                  textAnchor: 'end',
+                }}
               >
                 {t('bid')} {fmtRate(q.bid, PAIR)}
               </text>
               <text
                 x={xa + 6}
                 y={axisY - 18}
-                style={{ fontSize: `${fs}px`, fontWeight: 700, fill: 'var(--ff-ink)', textAnchor: 'start' }}
+                style={{
+                  fontSize: `${fs}px`,
+                  fontWeight: 700,
+                  fill: 'var(--ff-ink)',
+                  textAnchor: 'start',
+                }}
               >
                 {t('ask')} {fmtRate(q.ask, PAIR)}
               </text>

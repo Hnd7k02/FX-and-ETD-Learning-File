@@ -87,7 +87,10 @@ describe('exposure (section 1)', () => {
     // the inverse moves by −x/(1+x)
     const x = 0.05;
     expect(inversePctChange(1, 1 + x)).toBeCloseTo(-x / (1 + x), 12);
-    expect(moveIn(0.8, 0.8125)).toEqual({ pips: expect.closeTo(125, 6), bigFigures: expect.closeTo(1.25, 9) });
+    expect(moveIn(0.8, 0.8125)).toEqual({
+      pips: expect.closeTo(125, 6),
+      bigFigures: expect.closeTo(1.25, 9),
+    });
   });
 
   it('gives a ±1σ range symmetric in log terms', () => {
@@ -388,10 +391,21 @@ describe('G10 profiles (section 4)', () => {
 
   it('gives the quoting convention of the usual pair', () => {
     const jpy = pairConvention('JPY');
-    expect(jpy).toMatchObject({ pair: 'USD/JPY', base: 'USD', quote: 'JPY', decimals: 2, pip: 0.01 });
+    expect(jpy).toMatchObject({
+      pair: 'USD/JPY',
+      base: 'USD',
+      quote: 'JPY',
+      decimals: 2,
+      pip: 0.01,
+    });
     expect(jpy.pipValuePerMillion).toBe(10_000);
     const chf = pairConvention('CHF');
-    expect(chf).toMatchObject({ pair: 'USD/CHF', decimals: 4, pipValuePerMillion: 100, spotDays: 2 });
+    expect(chf).toMatchObject({
+      pair: 'USD/CHF',
+      decimals: 4,
+      pipValuePerMillion: 100,
+      spotDays: 2,
+    });
     expect(pairConvention('CAD').spotDays).toBe(1);
     expect(pairConvention('USD').pair).toBe('EUR/USD');
   });

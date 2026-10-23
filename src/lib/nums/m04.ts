@@ -12,6 +12,7 @@ import { d1d2, gkPrice } from '@/lib/fx/vanilla';
 import { greeks } from '@/lib/fx/greeks';
 import { atmDnsStrike, strikeFromDelta } from '@/lib/fx/implied';
 import { pipSize } from '@/lib/format';
+import { FORWARD_DIGITS, hedgeCosts, hedgeFacts, savingChf, type HedgeSetup } from '@/lib/hedge-cost';
 import { roundStrike } from '@/lib/payoff';
 import type { NumTable } from './types';
 
@@ -49,7 +50,16 @@ const kOtm = roundStrike(call25);
 const atmf = gkPrice(S, F, T, vol, rd, rf, 'call');
 const itm = gkPrice(S, kItm, T, vol, rd, rf, 'call');
 const itmIntrinsic = dfd * Math.max(F - kItm, 0);
-const cost = (st: number) => (Math.min(st, K) + call * growth) * N;
+const otm = gkPrice(S, kOtm, T, vol, rd, rf, 'call');
+
+/**
+ * Section 1 uses the same maths as the OptionVsForward figure: the forward as dealt (5 decimals,
+ * 0.79303), whole-franc amounts, and savings computed from the amounts shown, so they add up.
+ */
+const HEDGE: HedgeSetup = { S, K, T, vol, rd, rf, notional: N, forwardDigits: FORWARD_DIGITS };
+const HF = hedgeFacts(HEDGE);
+const up = hedgeCosts(SC.stUp, HEDGE, HF);
+const down = hedgeCosts(SC.stDown, HEDGE, HF);
 
 /** Raw values for the quiz file and tests (quote currency per 1 USD unless noted). */
 export const M04 = {
@@ -61,16 +71,25 @@ export const M04 = {
   putChf: put * N,
   F,
   K,
+  /** Forward as dealt by the importer (5 decimals). */
+  Fdeal: HF.F,
   /** Option cap per USD: K + premium carried to expiry. */
-  cap: K + call * growth,
+  cap: HF.cap,
   /** Below this rate at expiry the call beats the forward: F − premium. */
-  beatFwd: F - call * growth,
+  beatFwd: HF.optionBeatsForwardBelow,
   /** Long put / short put break-even: K − put premium. */
   bePut: K - put * growth,
-  costUp: cost(SC.stUp),
-  costDown: cost(SC.stDown),
-  fwdChf: F * N,
+  costUp: up.option,
+  costDown: down.option,
+  fwdChf: down.forward,
   parityPips: pips(call - put),
+  /** ITM / OTM call examples of section 3 (strikes = rounded 25Δ strikes). */
+  kItm,
+  itmPips: pips(itm),
+  itmIntrinsicPips: pips(itmIntrinsic),
+  itmTimePips: pips(itm - itmIntrinsic),
+  /** Intrinsic value of the ITM call measured (wrongly) against spot, for the check question. */
+  itmVsSpotPips: pips(Math.max(S - kItm, 0)),
   deltaCall: greeks(S, K, T, vol, rd, rf, 'call').delta,
   deltaPut: greeks(S, K, T, vol, rd, rf, 'put').delta,
   dff: Math.exp(-rf * T),
@@ -87,7 +106,13 @@ export const nums: NumTable = {
     note: 'Strike of the CHF put in USD per CHF, 1/K',
   },
   'm04.chfNotional': { value: K * N, kind: 'money', note: 'CHF notional of the CHF put, K·N' },
-  'm04.fwdChf': { value: F * N, kind: 'money', note: 'CHF paid with the forward, F·N' },
+  'm04.fwdDeal': {
+    value: HF.F,
+    kind: 'rate',
+    digits: FORWARD_DIGITS,
+    note: 'Forward as dealt by the importer (continuous forward, 5 decimals)',
+  },
+  'm04.fwdChf': { value: down.forward, kind: 'money', note: 'CHF paid with the forward, F·N' },
   'm04.capRate': { value: M04.cap, kind: 'rate', note: 'Worst rate with the call: K + premium' },
   'm04.capChf': { value: M04.cap * N, kind: 'money', note: 'Worst case with the call in CHF' },
   'm04.beatFwdRate': {
@@ -97,18 +122,23 @@ export const nums: NumTable = {
   },
   'm04.stUp': { value: SC.stUp, kind: 'rate', note: 'Scenario: strong dollar' },
   'm04.stDown': { value: SC.stDown, kind: 'rate', note: 'Scenario: weak dollar' },
-  'm04.unhedgedUpChf': { value: SC.stUp * N, kind: 'money' },
-  'm04.unhedgedDownChf': { value: SC.stDown * N, kind: 'money' },
-  'm04.optionDownChf': { value: M04.costDown, kind: 'money' },
+  'm04.unhedgedUpChf': { value: up.unhedged, kind: 'money' },
+  'm04.unhedgedDownChf': { value: down.unhedged, kind: 'money' },
+  'm04.optionDownChf': { value: down.option, kind: 'money' },
   'm04.saveUpChf': {
-    value: SC.stUp * N - M04.costUp,
+    value: savingChf(up, 'option', 'unhedged'),
     kind: 'money',
-    note: 'Saving of the call against unhedged at the strong-dollar scenario',
+    note: 'Saving of the call against unhedged at the strong-dollar scenario (shown amounts)',
   },
   'm04.saveDownChf': {
-    value: M04.fwdChf - M04.costDown,
+    value: savingChf(down, 'option', 'forward'),
     kind: 'money',
-    note: 'Saving of the call against the forward at the weak-dollar scenario',
+    note: 'Saving of the call against the forward at the weak-dollar scenario (shown amounts)',
+  },
+  'm04.fwdVsStrikePips': {
+    value: pips(F - K),
+    kind: 'pips',
+    note: 'The rounded strike sits this far below the forward',
   },
 
   // Section 2: four positions
@@ -116,12 +146,14 @@ export const nums: NumTable = {
   'm04.payoffPnlPips': {
     value: pips(SC.stPnl - K),
     kind: 'pips',
-    note: 'Long call payoff at expiry at stPnl',
+    digits: 0,
+    note: 'Long call payoff at expiry at stPnl (a whole number of pips)',
   },
   'm04.pnlPips': {
     value: pips(SC.stPnl - K - call * growth),
     kind: 'pips',
-    note: 'Long call P&L after premium at stPnl',
+    digits: 2,
+    note: 'Long call P&L after premium at stPnl; 2 digits like ex.callPips, so they add up',
   },
   'm04.pnlChf': { value: (SC.stPnl - K - call * growth) * N, kind: 'money' },
   'm04.beCall': { value: M04.cap, kind: 'rate', note: 'Long call break-even K + premium' },
@@ -165,8 +197,13 @@ export const nums: NumTable = {
     kind: 'rate',
     note: 'OTM call example strike (25Δ call strike rounded)',
   },
-  'm04.otmPips': { value: pips(gkPrice(S, kOtm, T, vol, rd, rf, 'call')), kind: 'pips' },
-  'm04.otmChf': { value: gkPrice(S, kOtm, T, vol, rd, rf, 'call') * N, kind: 'money' },
+  'm04.otmPips': { value: pips(otm), kind: 'pips' },
+  'm04.otmChf': { value: otm * N, kind: 'money' },
+  'm04.dnsPa': {
+    value: F * Math.exp(-0.5 * vol * vol * T),
+    kind: 'rate',
+    note: 'ATM DNS strike with premium-adjusted delta, F·e^(−½σ²T) (below the forward)',
+  },
   'm04.call25': { value: call25, kind: 'rate' },
   'm04.put25': { value: put25, kind: 'rate' },
   'm04.call10': { value: call10, kind: 'rate' },
@@ -196,8 +233,12 @@ export const nums: NumTable = {
   'm04.parityGapPips': {
     value: pips(F - K),
     kind: 'pips',
-    digits: 2,
-    note: 'F − K in pips (forward above the rounded strike)',
+    note: 'F − K in pips (forward above the rounded strike); 1 digit, like m04.parityPips',
+  },
+  'm04.parityPips': {
+    value: pips(call - put),
+    kind: 'pips',
+    note: 'C − P in pips, 1 digit so that 126.69 − 126.39 matches on screen',
   },
   'm04.arbPips': { value: SC.arbPips, kind: 'pips', digits: 0 },
   'm04.arbChf': { value: SC.arbPips * PIP * N, kind: 'money' },

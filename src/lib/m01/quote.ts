@@ -11,7 +11,13 @@ import { EXAMPLE } from '@/lib/fx/example';
 
 export type SpreadDriver = 'liquidity' | 'time' | 'size' | 'vol' | 'event';
 
-export const SPREAD_DRIVERS: readonly SpreadDriver[] = ['liquidity', 'time', 'size', 'vol', 'event'];
+export const SPREAD_DRIVERS: readonly SpreadDriver[] = [
+  'liquidity',
+  'time',
+  'size',
+  'vol',
+  'event',
+];
 
 /** One config object for the spread demo (schematic teaching values). */
 export const SPREAD_MODEL = {
@@ -49,7 +55,10 @@ export function twoWayQuote(mid: number, spread: number, pair: string = EXAMPLE.
  * Splits a rate into big figure and pips as a dealing screen shows it:
  * 0.7998 → { big: "0.79", pips: "98" }; USD/JPY 145.23 → { big: "145.", pips: "23" }.
  */
-export function quoteParts(rate: number, pair: string = EXAMPLE.pair): { big: string; pips: string } {
+export function quoteParts(
+  rate: number,
+  pair: string = EXAMPLE.pair,
+): { big: string; pips: string } {
   const s = fmtRate(rate, pair);
   const cut = s.length - 2;
   return { big: s.slice(0, cut), pips: s.slice(cut) };
@@ -74,4 +83,3 @@ export function spreadCost(
 export function pipValue(notional: number = EXAMPLE.notional, pair: string = EXAMPLE.pair): number {
   return pipSize(pair) * notional;
 }
-

@@ -47,6 +47,8 @@ export default function TriangularArbitrage({ lang }: TriangularArbitrageProps):
   const r4 = (x: number) => fmtRate(x, 'EUR/CHF');
   const q = st.quotes;
   const fs = compact ? 11 : 12;
+  /** Room for an edge label ("0.8798 / 0.8802" in mono) so it never leaves the SVG. */
+  const labelW = Math.ceil(15 * fs * 0.62) + 4;
 
   // ---------- triangle ----------
   const H = compact ? 250 : 290;
@@ -98,17 +100,17 @@ export default function TriangularArbitrage({ lang }: TriangularArbitrageProps):
   const { dragging, handlers } = useSvgDrag(rulerRef, { width: W, height: RH }, 'x', (x) =>
     setDirect(st.implied + rx.invert(x) * PIP),
   );
-  const gapLo = st.direction === 'sellDirectBuyCross' ? ia : st.direction === 'buyDirectSellCross' ? da : 0;
-  const gapHi = st.direction === 'sellDirectBuyCross' ? db : st.direction === 'buyDirectSellCross' ? ib : 0;
+  const gapLo =
+    st.direction === 'sellDirectBuyCross' ? ia : st.direction === 'buyDirectSellCross' ? da : 0;
+  const gapHi =
+    st.direction === 'sellDirectBuyCross' ? db : st.direction === 'buyDirectSellCross' ? ib : 0;
 
   const aria = t('aria', {
     eurusd: r4(mids.eurusd),
     usdchf: r4(mids.usdchf),
     eurchf: r4(mids.eurchf),
     implied: fmtRate(st.implied, 'EUR/CHF', 5),
-    result: arb
-      ? t('ariaProfit', { profit: money(st.profitPerEurMillion, 'EUR') })
-      : t('ariaNone'),
+    result: arb ? t('ariaProfit', { profit: money(st.profitPerEurMillion, 'EUR') }) : t('ariaNone'),
   });
   const note = t(`note.${st.direction}`, {
     end: money(M + st.profitPerEurMillion, 'EUR'),
@@ -121,7 +123,12 @@ export default function TriangularArbitrage({ lang }: TriangularArbitrageProps):
   ];
 
   return (
-    <div class="tri" data-tri data-direction={st.direction} data-profit={st.profitPerEurMillion.toFixed(2)}>
+    <div
+      class="tri"
+      data-tri
+      data-direction={st.direction}
+      data-profit={st.profitPerEurMillion.toFixed(2)}
+    >
       <div class="ff-lab-head">
         <div class="tri-head-text">
           <div class="ff-lab-title">{t('title')}</div>
@@ -184,7 +191,14 @@ export default function TriangularArbitrage({ lang }: TriangularArbitrageProps):
               const [lx, ly] = mid('EUR', 'USD');
               const [rx2, ry] = mid('EUR', 'CHF');
               const [bx, by] = mid('USD', 'CHF');
-              const lbl = (x: number, y: number, anchor: string, title: string, val: string, sub?: string) => (
+              const lbl = (
+                x: number,
+                y: number,
+                anchor: string,
+                title: string,
+                val: string,
+                sub?: string,
+              ) => (
                 <text x={x} y={y} style={{ fontSize: `${fs}px`, textAnchor: anchor }}>
                   <tspan x={x} style={{ fontWeight: 800, fill: 'var(--ff-ink)' }}>
                     {title}
@@ -193,7 +207,11 @@ export default function TriangularArbitrage({ lang }: TriangularArbitrageProps):
                   <tspan
                     x={x}
                     dy={fs + 5}
-                    style={{ fontFamily: 'var(--ff-font-mono)', fontWeight: 600, fill: 'var(--ff-ink-2)' }}
+                    style={{
+                      fontFamily: 'var(--ff-font-mono)',
+                      fontWeight: 600,
+                      fill: 'var(--ff-ink-2)',
+                    }}
                   >
                     {val}
                   </tspan>
@@ -201,9 +219,28 @@ export default function TriangularArbitrage({ lang }: TriangularArbitrageProps):
               );
               return (
                 <g>
-                  {lbl(lx - 14, ly - 4, 'end', t('eurusd'), quoteText(q.eurusd.bid, q.eurusd.ask, mids.eurusd))}
-                  {lbl(rx2 + 14, ry - 4, 'start', 'EUR/CHF', quoteText(q.eurchf.bid, q.eurchf.ask, mids.eurchf), t('direct'))}
-                  {lbl(bx, by + 18, 'middle', t('usdchf'), quoteText(q.usdchf.bid, q.usdchf.ask, mids.usdchf))}
+                  {lbl(
+                    Math.max(lx - 14, labelW),
+                    ly - 4,
+                    'end',
+                    t('eurusd'),
+                    quoteText(q.eurusd.bid, q.eurusd.ask, mids.eurusd),
+                  )}
+                  {lbl(
+                    Math.min(rx2 + 14, W - labelW),
+                    ry - 4,
+                    'start',
+                    'EUR/CHF',
+                    quoteText(q.eurchf.bid, q.eurchf.ask, mids.eurchf),
+                    t('direct'),
+                  )}
+                  {lbl(
+                    bx,
+                    by + 18,
+                    'middle',
+                    t('usdchf'),
+                    quoteText(q.usdchf.bid, q.usdchf.ask, mids.usdchf),
+                  )}
                 </g>
               );
             })()}
@@ -314,7 +351,12 @@ export default function TriangularArbitrage({ lang }: TriangularArbitrageProps):
             <text
               x={cx((ib + ia) / 2)}
               y={14}
-              style={{ fontSize: `${fs}px`, fontWeight: 700, fill: 'var(--ff-ink-2)', textAnchor: 'middle' }}
+              style={{
+                fontSize: `${fs}px`,
+                fontWeight: 700,
+                fill: 'var(--ff-ink-2)',
+                textAnchor: 'middle',
+              }}
             >
               {t('viaUsd')}
             </text>
@@ -359,7 +401,8 @@ export default function TriangularArbitrage({ lang }: TriangularArbitrageProps):
                   textAnchor: 'middle',
                 }}
               >
-                {t('directQuote')} {t('gap', { pips: fmtNumber(st.offsetPips, lang, { digits: 1, sign: true }) })}
+                {t('directQuote')}{' '}
+                {t('gap', { pips: fmtNumber(st.offsetPips, lang, { digits: 1, sign: true }) })}
               </text>
             </g>
             {/* surface for drag anywhere on the ruler */}
@@ -395,7 +438,10 @@ export default function TriangularArbitrage({ lang }: TriangularArbitrageProps):
                 step={C.step}
                 valueText={r4(mids[key])}
                 onInput={(v) =>
-                  setMids((m) => ({ ...m, [key]: snap(v, C.step, C.ranges[key][0], C.ranges[key][1]) }))
+                  setMids((m) => ({
+                    ...m,
+                    [key]: snap(v, C.step, C.ranges[key][0], C.ranges[key][1]),
+                  }))
                 }
               />
             ))}

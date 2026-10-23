@@ -3,6 +3,8 @@
  * expiry, depending on the spot at expiry S_T, with three choices:
  * - unhedged: buy at S_T                                  → S_T · N
  * - forward:  buy at the forward F agreed today            → F · N
+ *   (F is the outright as dealt: the continuous forward rounded to `forwardDigits` decimals,
+ *   so that "rate × USD 1 Mio." on screen equals the CHF amount on screen)
  * - USD call / CHF put with strike K (premium p per USD, paid today, compounded at rd):
  *   exercise above K, buy in the market below K           → (min(S_T, K) + p · e^(rd T)) · N
  * Pure functions, no DOM. Convention: rd = CHF rate (quote), rf = USD rate (base), T = days/365.
@@ -22,10 +24,15 @@ export interface HedgeSetup {
   rf: number;
   /** USD amount to pay at expiry. */
   notional: number;
+  /** Decimals of the dealt forward outright (default: unrounded model forward). */
+  forwardDigits?: number;
 }
 
+/** Decimals of a USD/CHF forward outright as dealt (0.79303), as in module 02. */
+export const FORWARD_DIGITS = 5;
+
 export interface HedgeFacts {
-  /** Forward F = S · e^((rd − rf) T). */
+  /** Forward F = S · e^((rd − rf) T), rounded to `forwardDigits` if given (the dealt rate). */
   F: number;
   /** Call premium per USD, paid today (CHF). */
   premium: number;
@@ -40,7 +47,9 @@ export interface HedgeFacts {
 }
 
 export function hedgeFacts(h: HedgeSetup): HedgeFacts {
-  const F = forwardContinuous(h.S, h.rd, h.rf, h.T);
+  const Fmodel = forwardContinuous(h.S, h.rd, h.rf, h.T);
+  const F =
+    h.forwardDigits === undefined ? Fmodel : Number(Fmodel.toFixed(Math.max(0, h.forwardDigits)));
   const premium = gkPrice(h.S, h.K, h.T, h.vol, h.rd, h.rf, 'call');
   const premiumAtExpiry = premium * Math.exp(h.rd * h.T);
   return {
@@ -69,6 +78,14 @@ export function hedgeCosts(ST: number, h: HedgeSetup, f: HedgeFacts = hedgeFacts
     forward: f.F * h.notional,
     option: (Math.min(ST, h.K) + f.premiumAtExpiry) * h.notional,
   };
+}
+
+/**
+ * CHF saved by choice `a` against choice `b`, computed from the whole-franc amounts shown on
+ * screen, so that "b − a" on screen equals the saving on screen.
+ */
+export function savingChf(c: HedgeCosts, a: HedgeChoice, b: HedgeChoice): number {
+  return Math.round(c[b]) - Math.round(c[a]);
 }
 
 /** Cheapest and dearest choice in hindsight (ties: forward before option before unhedged). */

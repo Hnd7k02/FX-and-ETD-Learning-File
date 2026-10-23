@@ -17,6 +17,7 @@ import { clamp, linePath, niceTicks, scaleLinear, type Point } from '@/lib/chart
 import { EXAMPLE, EXAMPLE_STRIKE } from '@/lib/fx/example';
 import { fmtMillions, fmtMoney, fmtNumber, fmtRate } from '@/lib/format';
 import {
+  FORWARD_DIGITS,
   ST_RANGE,
   ST_START,
   ST_STEP,
@@ -24,6 +25,7 @@ import {
   hedgeFacts,
   hedgeRegion,
   rankCosts,
+  savingChf,
   type HedgeChoice,
   type HedgeRegion,
   type HedgeSetup,
@@ -44,6 +46,7 @@ const SETUP: HedgeSetup = {
   rd: EXAMPLE.rd,
   rf: EXAMPLE.rf,
   notional: EXAMPLE.notional,
+  forwardDigits: FORWARD_DIGITS,
 };
 const FACTS = hedgeFacts(SETUP);
 const PAIR = EXAMPLE.pair;
@@ -157,7 +160,7 @@ export default function OptionVsForward({ lang }: OptionVsForwardProps): JSX.Ele
   };
   const text = t(`ovf.text.${region}`, {
     forward: chf(costs.forward),
-    save: chf(costs.forward - costs.option),
+    save: chf(savingChf(costs, 'option', 'forward')),
     premium: chf(FACTS.premium * N),
     unhedged: chf(costs.unhedged),
     cap: chf(FACTS.cap * N),
@@ -183,7 +186,7 @@ export default function OptionVsForward({ lang }: OptionVsForwardProps): JSX.Ele
             {t('ovf.sub', {
               notional,
               months: EXAMPLE.months,
-              forward: fmtRate(FACTS.F, PAIR),
+              forward: fmtRate(FACTS.F, PAIR, FORWARD_DIGITS),
               k: fmtRate(SETUP.K, PAIR),
               premium: chf(FACTS.premium * N),
             })}
@@ -273,13 +276,15 @@ export default function OptionVsForward({ lang }: OptionVsForwardProps): JSX.Ele
               <path d={path(lines.unhedged)} style={lineStyle(COLORS.unhedged, 2.25)} />
               <path d={path(lines.forward)} style={lineStyle(COLORS.forward, 2.25)} />
               <path d={path(lines.option)} style={lineStyle(COLORS.option, 3)} />
+              {/* cap label left of the kink, above the line: free space there, and away from
+                  the start marker at a strong dollar */}
               <text
-                x={L.width - L.right}
+                x={sx(SETUP.K) - 6}
                 y={yk(FACTS.cap * N) - 8}
                 style={{
                   fontSize: fs,
                   fontWeight: 700,
-                  fill: 'var(--ff-long)',
+                  fill: 'var(--ff-linear-text)',
                   textAnchor: 'end',
                   paintOrder: 'stroke',
                   stroke: '#fff',
