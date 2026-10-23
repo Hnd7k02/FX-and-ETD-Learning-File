@@ -1,0 +1,158 @@
+---
+/** Spot exposure (module 01, section 1) for MDX. Props: caption. */
+import SpotExposure from '@/components/islands/SpotExposure';
+import Figure from '@/components/content/Figure.astro';
+import { pageLang } from '@/components/content/lang';
+
+interface Props {
+  caption?: string;
+}
+const { caption } = Astro.props;
+const lang = pageLang(Astro.currentLocale);
+---
+
+<Figure caption={caption}>
+  <SpotExposure client:visible lang={lang} />
+</Figure>
+
+<style is:global>
+  .spx {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+  }
+  .spx .ff-lab-head {
+    margin-bottom: 0;
+  }
+  .spx-head-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+  .spx-chip {
+    background: var(--ff-linear-soft);
+    color: var(--ff-linear-text);
+    font-weight: 800;
+  }
+  .spx p {
+    margin: 0;
+  }
+  .spx-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    font-family: var(--ff-font-ui);
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .spx-surface {
+    cursor: ew-resize;
+    touch-action: pan-y;
+  }
+  .spx-handle {
+    cursor: grab;
+    touch-action: none;
+  }
+  .spx-handle.is-active {
+    cursor: grabbing;
+  }
+  .spx-chip[data-pulse='true'] {
+    animation: spx-pulse 420ms ease-out both;
+  }
+  @keyframes spx-pulse {
+    0% {
+      transform: scale(1);
+    }
+    40% {
+      transform: scale(1.08);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  .spx-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--ff-ink-2);
+  }
+  .spx-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .spx-swatch {
+    display: inline-block;
+    flex: 0 0 auto;
+  }
+  .spx-swatch--line {
+    width: 22px;
+    border-top: 3px solid var(--ff-short);
+  }
+  .spx-swatch--block {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    background: var(--ff-exotics-soft);
+    border: 1.25px solid var(--ff-short);
+  }
+  .spx-swatch--band {
+    width: 18px;
+    height: 12px;
+    border-radius: 3px;
+    background: var(--ff-surface-2);
+    border: 1px solid var(--ff-line);
+  }
+  .spx .spx-hint {
+    font-size: 12px;
+    color: var(--ff-muted);
+  }
+  .spx-presets {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+  }
+  .spx-preset {
+    min-height: 44px;
+    min-width: 0;
+    padding: 0 4px;
+    border-radius: var(--ff-r-pill);
+    border: 1px solid var(--ff-line-strong);
+    background: var(--ff-surface);
+    color: var(--ff-ink);
+    font-size: 13px;
+    cursor: pointer;
+    transition:
+      background-color 150ms ease,
+      color 150ms ease;
+  }
+  .spx-preset:hover {
+    background: var(--ff-chip);
+  }
+  .spx-preset[aria-pressed='true'] {
+    background: var(--ff-ink);
+    border-color: var(--ff-ink);
+    color: #fff;
+  }
+  .spx .spx-note {
+    padding: 14px 16px;
+    border-radius: var(--ff-r-box);
+    background: var(--ff-surface-2);
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--ff-ink-2);
+  }
+  .spx .spx-note--up {
+    background: var(--ff-exotics-soft);
+    color: var(--ff-ink);
+  }
+  .spx .spx-note--down {
+    background: var(--ff-good-soft);
+    color: var(--ff-good-text-strong);
+  }
+</style>

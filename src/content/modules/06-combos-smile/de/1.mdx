@@ -1,5 +1,68 @@
 import HedgeShaperFigure from '@/components/figures/HedgeShaperFigure.astro';
 
-Stub.
+{/* 06 Kombos & Vola-Smile · Abschnitt 1 · Intuition. Zahlen nur über <Num />, Registry src/lib/nums/m06.ts. */}
 
-<HedgeShaperFigure caption="Test" />
+Unser Importeur muss in 3 Monaten USD 1 Mio. bezahlen. In Modul 04 hat er gesehen, was ein USD Call leistet: Er deckelt den Kurs nach oben und lässt ihm die Chance auf einen schwächeren Dollar. Nur kostet dieses Recht eine Prämie, und die ist sofort fällig. Der Finanzchef fragt: Geht das billiger?
+
+Es geht, wenn du Optionen **kombinierst**. Jede gekaufte Option kostet Prämie, jede verkaufte bringt Prämie. Wer etwas verkauft, gibt aber immer etwas ab. Die Frage ist also nicht, ob du für den Schutz bezahlst, sondern **womit**: mit Geld oder mit einem Stück Risiko.
+
+Der Importeur hat zwei Hebel:
+
+- **Schutz ganz oben abgeben.** Er verkauft einen USD Call mit höherem Strike. Steigt der Dollar sehr stark, endet sein Schutz dort. Diese extremen Szenarien hält er vielleicht für unwahrscheinlich.
+- **Chance unten abgeben.** Er verkauft einen USD Put. Fällt der Dollar, profitiert er nur bis zum Put-Strike. Darunter muss er trotzdem zum Strike kaufen.
+
+<HedgeShaperFigure caption="Füge Bausteine hinzu. Die blaue Linie zeigt, welchen Kurs der Importeur bei Verfall effektiv bezahlt, die Prämie eingerechnet. Blau gefüllt spart die Struktur gegenüber ohne Absicherung, orange gefüllt kostet sie. Zieh den Kurs bei Verfall an der Achse." />
+
+### Vier Formen in Zahlen
+
+Basis ist ein USD Call mit Strike <Num of="m06.shCallK" />, dem heutigen Spot. Er kostet <Num of="m06.shCallPips" /> Pips, also <Num of="m06.shCallChf" />. Damit zahlt der Importeur nie mehr als <Num of="m06.shCallCap" /> CHF je USD: Strike plus Prämie.
+
+- **Call-Spread.** Er verkauft zusätzlich einen USD Call mit Strike <Num of="m06.shSellCallK" />. Das bringt <Num of="m06.shSpreadSavePips" /> Pips, netto zahlt er <Num of="m06.shSpreadPips" /> Pips. Der Deckel sinkt auf <Num of="m06.shSpreadCap" />, gilt aber nur bis <Num of="m06.shSellCallK" />. Darüber zahlt er wieder den Marktkurs, minus <Num of="m06.shSpreadDiscPips" /> Pips.
+- **Collar.** Statt des Calls verkauft er einen USD Put. Den Strike wählt er so, dass die Put-Prämie den Call genau bezahlt: <Num of="m06.shCollarPut" />. Das ist **Zero Cost**. Er zahlt nie mehr als <Num of="m06.shCallK" /> und nie weniger als <Num of="m06.shCollarPut" />.
+- **Seagull.** Er verkauft beides. Der Call-Spread ist billiger als der Call allein, darum reicht ein Put mit tieferem Strike: <Num of="m06.shSeagullPut" />. Wieder Zero Cost, aber über <Num of="m06.shSellCallK" /> ist er nicht mehr geschützt.
+
+Was kosten ihn die USD 1 Mio. am Ende? Zwei Szenarien, alle Beträge inklusive Prämie:
+
+| Bei Verfall | Dollar stark: <Num of="m06.stUp" /> | Dollar schwach: <Num of="m06.stDown" /> |
+| --- | --- | --- |
+| Ohne Absicherung | <Num of="m06.upUnhedgedChf" /> | <Num of="m06.downUnhedgedChf" /> |
+| Call | <Num of="m06.upCallChf" /> | <Num of="m06.downCallChf" /> |
+| Call-Spread | <Num of="m06.upSpreadChf" /> | <Num of="m06.downSpreadChf" /> |
+| Collar | <Num of="m06.upCollarChf" /> | <Num of="m06.downCollarChf" /> |
+| Seagull | <Num of="m06.upSeagullChf" /> | <Num of="m06.downSeagullChf" /> |
+
+Keine Struktur gewinnt in beiden Spalten. Der Collar ist bei starkem Dollar am günstigsten. Bei schwachem Dollar kostet er dafür <Num of="m06.downCollarMissChf" /> mehr als ohne Absicherung. Der Call-Spread spart Prämie, lässt aber den sehr starken Dollar wieder durch. Kombinieren heisst nicht gewinnen. Es heisst: **das Risiko dorthin legen, wo es dich am wenigsten stört.**
+
+<Derivation title="Herleitung: der effektive Kurs und der Zero-Cost-Strike">
+
+Der Importeur kauft seine Dollar bei Verfall am Markt zum Kurs <i>S</i><sub>T</sub>. Die Struktur zahlt ihm ihre Auszahlung <i>A</i>(<i>S</i><sub>T</sub>), die Prämie <i>P</i> hat er heute bezahlt. Pro USD Nominal <i>N</i>:
+
+<Formula variant="accent"><span>Kurs = <i>S</i><sub>T</sub> − <i>A</i>(<i>S</i><sub>T</sub>) / <i>N</i> + <i>P</i> · <i>e</i><sup><i>r</i><sub>d</sub><i>T</i></sup> / <i>N</i></span></Formula>
+
+Beim Collar mit Call-Strike <i>K</i><sub>C</sub> und Put-Strike <i>K</i><sub>P</sub> ist <i>A</i> = <i>N</i> · max(<i>S</i><sub>T</sub> − <i>K</i><sub>C</sub>, 0) − <i>N</i> · max(<i>K</i><sub>P</sub> − <i>S</i><sub>T</sub>, 0). Mit <i>P</i> = 0 eingesetzt:
+
+<Formula>
+  <span><i>S</i><sub>T</sub> ≥ <i>K</i><sub>C</sub>: Kurs = <i>K</i><sub>C</sub></span>
+  <span><i>K</i><sub>P</sub> ≤ <i>S</i><sub>T</sub> ≤ <i>K</i><sub>C</sub>: Kurs = <i>S</i><sub>T</sub></span>
+  <span><i>S</i><sub>T</sub> ≤ <i>K</i><sub>P</sub>: Kurs = <i>K</i><sub>P</sub></span>
+</Formula>
+
+Den Put-Strike findest du so: Gesucht ist <i>K</i><sub>P</sub> mit Put(<i>K</i><sub>P</sub>) = Call(<i>K</i><sub>C</sub>). Der Put wird mit steigendem Strike teurer, von fast null bis weit über den Call-Preis. Darum gibt es genau eine Lösung, und der Rechner findet sie mit Bisektion. Beim Seagull steht rechts der Call-Spread, Call(<i>K</i><sub>C</sub>) − Call(<i>K</i><sub>2</sub>). Der ist kleiner, also liegt <i>K</i><sub>P</sub> tiefer.
+
+Im Beispiel ist der CHF-Zins <Num of="ex.rd" />, der Faktor <i>e</i><sup><i>r</i><sub>d</sub><i>T</i></sup> also 1: Die Prämie zählt heute und bei Verfall gleich viel.
+
+</Derivation>
+
+<Desk title="Zero Cost ist nicht gratis">
+
+Strukturen ohne Prämie sind für Firmen attraktiv: Es fliesst kein Geld, und es braucht kein Budget für Absicherungskosten. Der Preis steckt in der verkauften Option. Wer einen Put verkauft, übernimmt eine Pflicht. Darum verlangt der Anbieter eine Kreditlinie oder Sicherheiten.
+
+Auch seine Marge fliesst nicht als Prämie, sondern über die Strikes: Ein etwas höherer Put-Strike reicht dafür. Ein Vergleich lohnt sich also. Und eine Grenze kennst du schon aus Modul 04: Legst du Call- und Put-Strike beide auf den Forward, wird aus dem Collar ein Forward.
+
+</Desk>
+
+<Takeaway>
+
+Kombinieren heisst tauschen: Mit verkauften Optionen bezahlst du gekaufte. Zero Cost heisst keine Prämie, aber nie kein Risiko.
+
+</Takeaway>

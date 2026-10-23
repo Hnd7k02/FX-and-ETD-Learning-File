@@ -265,7 +265,7 @@ export const nums: NumTable = {
     kind: 'pips',
     note: '√(2/π)·σ√T·F·DF_d',
   },
-  'm06.sqrt2pi': { value: sqrt2pi, kind: 'num', digits: 2, note: '√(2/π)' },
+  'm06.sqrt2pi': { value: sqrt2pi, kind: 'num', digits: 4, note: '√(2/π)' },
   'm06.sigmaSqrtT': { value: vol * Math.sqrt(T), kind: 'num', digits: 2, note: 'σ√T' },
   'm06.shockPts': {
     value: SC.volShock * 100,

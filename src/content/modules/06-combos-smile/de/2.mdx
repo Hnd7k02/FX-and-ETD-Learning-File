@@ -1,5 +1,65 @@
 import PayoffBuilderFigure from '@/components/figures/PayoffBuilderFigure.astro';
 
-Stub.
+{/* 06 Kombos & Vola-Smile · Abschnitt 2 · Spreads und Risk Reversal. Zahlen nur über <Num />, Registry src/lib/nums/m06.ts. */}
 
-<PayoffBuilderFigure templates={['call-spread', 'put-spread', 'risk-reversal']} initial="risk-reversal" highlightSolved caption="Test" />
+Im ersten Abschnitt hast du gesehen, welchen Kurs der Importeur am Ende bezahlt. Jetzt schauen wir dieselben Bausteine so an, wie ein Händler sie sieht: als Optionsposition mit Auszahlung, Prämie und Risiko. Drei Klassiker bestehen aus nur zwei Beinen.
+
+Ein **Call-Spread** ist ein Long Call mit Strike <i>K</i><sub>1</sub> und ein Short Call mit höherem Strike <i>K</i><sub>2</sub>, beide mit gleichem Nominal. Die Auszahlung steigt ab <i>K</i><sub>1</sub> und bleibt ab <i>K</i><sub>2</sub> flach. Mehr als <i>K</i><sub>2</sub> − <i>K</i><sub>1</sub> zahlt er nie aus. Dafür ist er billiger als der Call allein, denn der verkaufte Call holt einen Teil der Prämie zurück.
+
+Ein **Put-Spread** ist das Spiegelbild: Long Put mit <i>K</i><sub>1</sub>, Short Put mit tieferem <i>K</i><sub>2</sub>. Er passt zu jemandem, der einen fallenden Dollar fürchtet. Das ist zum Beispiel ein Exporteur, der in 3 Monaten USD erhält.
+
+Ein **Risk Reversal** kombiniert einen Long Call mit einem Short Put, beide aus dem Geld. Am Markt nimmt man meist die 25Δ-Strikes. Für unseren Importeur ist das der **Zero-Cost-Collar**: Der USD Call schützt ihn, der verkaufte USD Put bezahlt ihn. Der Put-Strike wird so gelöst, dass die Nettoprämie null ist.
+
+<PayoffBuilderFigure templates={['call-spread', 'put-spread', 'risk-reversal']} initial="risk-reversal" highlightSolved caption="Zieh den Call-Strike K1 an der Achse: Der Put-Strike K2 folgt so, dass die Nettoprämie null bleibt. Der grüne Ring markiert den gelösten Strike. Wechsle zu Call- und Put-Spread und vergleiche Prämie und maximalen Gewinn." />
+
+### Call-Spread in Zahlen
+
+Der Importeur kauft den Call mit Strike <Num of="m06.csK1" /> und verkauft einen Call mit Strike <Num of="m06.csK2" />, dem 25Δ-Strike. Der Call allein kostet <Num of="ex.callPips" digits={1} /> Pips. Der verkaufte Call bringt <Num of="m06.csSoldPips" /> Pips zurück, das sind <Num of="m06.csSavePct" /> der Prämie. Netto zahlt er <Num of="m06.csPips" /> Pips, also <Num of="m06.csChf" />.
+
+- Der **Break-even** liegt bei <i>K</i><sub>1</sub> plus Prämie: <Num of="m06.csBe" />.
+- Der **maximale Gewinn** bei Verfall ist die Breite minus Prämie: <Num of="m06.csWidthPips" /> − <Num of="m06.csPips" /> = <Num of="m06.csMaxGainPips" /> Pips, also <Num of="m06.csMaxGainChf" />. Er wird ab <Num of="m06.csK2" /> erreicht.
+- Der **maximale Verlust** ist die Prämie.
+
+Der **Put-Spread** mit <Num of="m06.psK1" /> und <Num of="m06.psK2" /> kostet <Num of="m06.psPips" /> Pips. Sein Break-even liegt bei <Num of="m06.psBe" />, sein maximaler Gewinn bei <Num of="m06.psMaxGainChf" />.
+
+### Der Risk Reversal des Importeurs
+
+Der Importeur kauft den 25Δ USD Call mit Strike <Num of="m06.rrCallK" />. Er kostet <Num of="m06.rrCallPips" /> Pips, also <Num of="m06.rrCallChf" />. Genau so viel bringt ein USD Put mit Strike <Num of="m06.rrPutK" />. Zusammen kostet die Struktur nichts. Bei Verfall gilt:
+
+- Über <Num of="m06.rrCallK" /> übt er den Call aus. Bei <Num of="m06.stUp" /> zahlt er <Num of="m06.upRrChf" />.
+- Zwischen den Strikes kauft er am Markt. Der Forward von <Num of="ex.forward" digits={4} /> liegt in diesem Band, das <Num of="m06.rrBandPips" /> Pips breit ist.
+- Unter <Num of="m06.rrPutK" /> wird der Put ausgeübt, er muss zum Strike kaufen. Bei <Num of="m06.stDown" /> zahlt er <Num of="m06.downRrChf" />.
+
+Schau im Payoff-Builder auf die Greeks. Das Delta ist <Num of="m06.rrDelta" />: Der Collar wirkt wie ein halber Forward. Vega ist mit <Num of="m06.rrVegaChf" /> fast null. Der Long Call allein hat <Num of="m06.callVegaChf" /> je Vola-Punkt, der Short Put nimmt fast gleich viel weg. Auf die allgemeine Höhe der Vola reagiert ein Risk Reversal also kaum. Er reagiert aber darauf, ob Calls oder Puts teurer werden. Das ist das Thema von Abschnitt 4.
+
+<Derivation title="Herleitung: Grenzen eines Spreads und die Zero-Cost-Bedingung">
+
+**1.** Die Auszahlung des Call-Spreads pro USD liegt immer zwischen 0 und <i>K</i><sub>2</sub> − <i>K</i><sub>1</sub>:
+
+<Formula><span>0 ≤ max(<i>S</i><sub>T</sub> − <i>K</i><sub>1</sub>, 0) − max(<i>S</i><sub>T</sub> − <i>K</i><sub>2</sub>, 0) ≤ <i>K</i><sub>2</sub> − <i>K</i><sub>1</sub></span></Formula>
+
+**2.** Was bei Verfall immer zwischen zwei Grenzen liegt, muss auch heute dazwischen liegen. Sonst gäbe es Arbitrage. Mit dem Diskontfaktor <i>DF</i><sub>d</sub> = <i>e</i><sup>−<i>r</i><sub>d</sub><i>T</i></sup> folgt:
+
+<Formula variant="accent"><span>0 ≤ <i>C</i>(<i>K</i><sub>1</sub>) − <i>C</i>(<i>K</i><sub>2</sub>) ≤ <i>DF</i><sub>d</sub> · (<i>K</i><sub>2</sub> − <i>K</i><sub>1</sub>)</span></Formula>
+
+Im Beispiel: <Num of="m06.csPips" /> Pips liegen zwischen 0 und <Num of="m06.csWidthPips" /> Pips (<i>DF</i><sub>d</sub> = <Num of="m06.discountRate" />).
+
+**3.** Beim Risk Reversal ist die Nettoprämie <i>C</i>(<i>K</i><sub>C</sub>) − <i>P</i>(<i>K</i><sub>P</sub>). Zero Cost heisst <i>P</i>(<i>K</i><sub>P</sub>) = <i>C</i>(<i>K</i><sub>C</sub>). Weil der Put mit dem Strike steigt, gibt es genau einen Put-Strike, der das erfüllt.
+
+**4.** Ein Grenzfall verbindet das mit Modul 04. Sind beide Strikes gleich <i>K</i>, ist Long Call plus Short Put ein Forward zu <i>K</i>. Nach der Put-Call-Parität ist die Nettoprämie dann <i>DF</i><sub>d</sub> · (<i>F</i> − <i>K</i>), also null genau bei <i>K</i> = <i>F</i>. Ein Collar liegt damit zwischen zwei Extremen: dem Forward (Band null) und dem reinen Call (kein Put).
+
+</Derivation>
+
+<Desk title="Risk Reversal als Markt-Quote">
+
+Am Optionsmarkt ist «25Δ Risk Reversal» nicht nur eine Struktur, sondern auch ein Preis. Er wird in Vola notiert: implizite Vola des 25Δ Calls minus implizite Vola des 25Δ Puts. Händler handeln ihn delta-gehedgt. Sein Vorzeichen zeigt, welche Seite der Markt teurer bezahlt. Mehr dazu in Abschnitt 4.
+
+Für Firmen gilt: Wer den Put verkauft, braucht eine Kreditlinie. Und der Put-Spread ist das Gegenstück für Exporteure, die USD erhalten und einen schwachen Dollar fürchten.
+
+</Desk>
+
+<Takeaway>
+
+Ein Spread verkauft den Schutz, den du kaum brauchst, und macht die Absicherung billiger. Ein Risk Reversal bezahlt den Call mit einem Put: Zero Cost, dafür ein festes Band, in dem du kaufst.
+
+</Takeaway>

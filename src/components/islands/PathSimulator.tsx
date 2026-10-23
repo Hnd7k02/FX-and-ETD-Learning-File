@@ -492,6 +492,9 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
   );
   const ended = ens.filter((p) => p.reason !== 'maturity' && tDay + 1e-9 >= p.endDay).length;
   const ensDone = tDay >= days - 1e-9;
+  /** Class of an ensemble path: neutral while it runs, then coloured by the sign of its P&L. */
+  const ensClass = (endDay: number, pnl: number) =>
+    endDay > tDay + 1e-9 ? 'ps-ens--run' : pnl >= 0 ? 'ps-ens--gain' : 'ps-ens--loss';
 
   /* ---------- tweened numbers ---------- */
   const numInstant = rm || drag !== null;
@@ -1258,11 +1261,7 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
               ) : (
                 <g clip-path={`url(#${clipPlayed})`}>
                   {ens.map((p, i) => (
-                    <path
-                      key={`e${i}`}
-                      d={ensD[i]}
-                      class={`ps-ens ${p.endDay > tDay + 1e-9 ? 'ps-ens--run' : p.pnl < 0 ? 'ps-ens--loss' : 'ps-ens--gain'}`}
-                    />
+                    <path key={`e${i}`} d={ensD[i]} class={`ps-ens ${ensClass(p.endDay, p.pnl)}`} />
                   ))}
                   {ens.map((p, i) =>
                     p.reason !== 'maturity' ? (

@@ -1,0 +1,68 @@
+import HedgeShaperFigure from '@/components/figures/HedgeShaperFigure.astro';
+
+{/* 06 Combos & vol smile · section 1 · Intuition. Numbers only via <Num />, registry src/lib/nums/m06.ts. */}
+
+Our importer has to pay USD 1m in 3 months. In module 04 he saw what a USD call does for him: it caps the rate on the upside and keeps the chance of a weaker dollar. But the right costs a premium, and it is due straight away. The finance director asks: can we do this more cheaply?
+
+You can, if you **combine** options. Every option you buy costs premium, every option you sell brings premium in. But whoever sells something always gives something up. So the question is not whether you pay for the protection, but **how**: with money or with a slice of risk.
+
+The importer has two levers:
+
+- **Give up protection at the very top.** He sells a USD call with a higher strike. If the dollar rises very sharply, his protection ends there. He may consider those extreme scenarios unlikely.
+- **Give up the upside of a falling dollar.** He sells a USD put. If the dollar falls, he only benefits down to the put strike. Below it, he still has to buy at the strike.
+
+<HedgeShaperFigure caption="Add building blocks. The blue line shows the rate the importer effectively pays at expiry, premium included. Shaded blue, the structure saves money compared with staying unhedged; shaded orange, it costs money. Drag the rate at expiry along the axis." />
+
+### Four shapes in numbers
+
+The starting point is a USD call with strike <Num of="m06.shCallK" />, today's spot. It costs <Num of="m06.shCallPips" /> pips, or <Num of="m06.shCallChf" />. With it the importer never pays more than <Num of="m06.shCallCap" /> CHF per USD: strike plus premium.
+
+- **Call spread.** He also sells a USD call with strike <Num of="m06.shSellCallK" />. That brings in <Num of="m06.shSpreadSavePips" /> pips, so he pays <Num of="m06.shSpreadPips" /> pips net. The cap falls to <Num of="m06.shSpreadCap" />, but only holds up to <Num of="m06.shSellCallK" />. Above that he pays the market rate again, minus <Num of="m06.shSpreadDiscPips" /> pips.
+- **Collar.** Instead of the call he sells a USD put. He picks its strike so that the put premium pays for the call exactly: <Num of="m06.shCollarPut" />. That is **zero cost**. He never pays more than <Num of="m06.shCallK" /> and never less than <Num of="m06.shCollarPut" />.
+- **Seagull.** He sells both. The call spread is cheaper than the call alone, so a put with a lower strike is enough: <Num of="m06.shSeagullPut" />. Zero cost again, but above <Num of="m06.shSellCallK" /> he is no longer protected.
+
+What do the USD 1m cost him in the end? Two scenarios, all amounts including premium:
+
+| At expiry | Strong dollar: <Num of="m06.stUp" /> | Weak dollar: <Num of="m06.stDown" /> |
+| --- | --- | --- |
+| Unhedged | <Num of="m06.upUnhedgedChf" /> | <Num of="m06.downUnhedgedChf" /> |
+| Call | <Num of="m06.upCallChf" /> | <Num of="m06.downCallChf" /> |
+| Call spread | <Num of="m06.upSpreadChf" /> | <Num of="m06.downSpreadChf" /> |
+| Collar | <Num of="m06.upCollarChf" /> | <Num of="m06.downCollarChf" /> |
+| Seagull | <Num of="m06.upSeagullChf" /> | <Num of="m06.downSeagullChf" /> |
+
+No structure wins in both columns. The collar is the cheapest when the dollar is strong. In return, when the dollar is weak it costs <Num of="m06.downCollarMissChf" /> more than staying unhedged. The call spread saves premium but lets a very strong dollar back through. Combining options is not about winning. It is about **putting the risk where it bothers you least.**
+
+<Derivation title="Derivation: the effective rate and the zero-cost strike">
+
+At expiry the importer buys his dollars in the market at the rate <i>S</i><sub>T</sub>. The structure pays him its payoff <i>A</i>(<i>S</i><sub>T</sub>), and he paid the premium <i>P</i> today. Per USD of notional <i>N</i>:
+
+<Formula variant="accent"><span>Rate = <i>S</i><sub>T</sub> − <i>A</i>(<i>S</i><sub>T</sub>) / <i>N</i> + <i>P</i> · <i>e</i><sup><i>r</i><sub>d</sub><i>T</i></sup> / <i>N</i></span></Formula>
+
+For a collar with call strike <i>K</i><sub>C</sub> and put strike <i>K</i><sub>P</sub>, <i>A</i> = <i>N</i> · max(<i>S</i><sub>T</sub> − <i>K</i><sub>C</sub>, 0) − <i>N</i> · max(<i>K</i><sub>P</sub> − <i>S</i><sub>T</sub>, 0). With <i>P</i> = 0:
+
+<Formula>
+  <span><i>S</i><sub>T</sub> ≥ <i>K</i><sub>C</sub>: rate = <i>K</i><sub>C</sub></span>
+  <span><i>K</i><sub>P</sub> ≤ <i>S</i><sub>T</sub> ≤ <i>K</i><sub>C</sub>: rate = <i>S</i><sub>T</sub></span>
+  <span><i>S</i><sub>T</sub> ≤ <i>K</i><sub>P</sub>: rate = <i>K</i><sub>P</sub></span>
+</Formula>
+
+This is how you find the put strike: you need <i>K</i><sub>P</sub> with Put(<i>K</i><sub>P</sub>) = Call(<i>K</i><sub>C</sub>). The put gets dearer as its strike rises, from almost nothing to far above the call price. So there is exactly one solution, and the calculator finds it by bisection. For the seagull the right-hand side is the call spread, Call(<i>K</i><sub>C</sub>) − Call(<i>K</i><sub>2</sub>). That is smaller, so <i>K</i><sub>P</sub> sits lower.
+
+In the example the CHF rate is <Num of="ex.rd" />, so the factor <i>e</i><sup><i>r</i><sub>d</sub><i>T</i></sup> is 1: the premium counts the same today and at expiry.
+
+</Derivation>
+
+<Desk title="Zero cost is not free">
+
+Structures without a premium appeal to companies: no money changes hands and no budget for hedging costs is needed. The price sits in the option that is sold. Whoever sells a put takes on an obligation, so the provider asks for a credit line or collateral.
+
+The provider's margin does not arrive as a premium either, but through the strikes: a slightly higher put strike is enough. So it pays to compare. And you already know one limit from module 04: put both the call strike and the put strike on the forward, and the collar becomes a forward.
+
+</Desk>
+
+<Takeaway>
+
+Combining means trading off: options you sell pay for options you buy. Zero cost means no premium, but never no risk.
+
+</Takeaway>

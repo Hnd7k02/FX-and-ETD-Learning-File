@@ -1,0 +1,65 @@
+import PayoffBuilderFigure from '@/components/figures/PayoffBuilderFigure.astro';
+
+{/* 06 Combos & vol smile · section 2 · Spreads and risk reversals. Numbers only via <Num />, registry src/lib/nums/m06.ts. */}
+
+In the first section you saw what rate the importer ends up paying. Now we look at the same building blocks the way a trader sees them: as an option position with a payoff, a premium and risks. Three classics need only two legs.
+
+A **call spread** is a long call with strike <i>K</i><sub>1</sub> and a short call with a higher strike <i>K</i><sub>2</sub>, both with the same notional. The payoff rises from <i>K</i><sub>1</sub> and stays flat from <i>K</i><sub>2</sub>. It never pays more than <i>K</i><sub>2</sub> − <i>K</i><sub>1</sub>. In return it is cheaper than the call alone, because the call you sell brings back part of the premium.
+
+A **put spread** is the mirror image: a long put at <i>K</i><sub>1</sub> and a short put at a lower <i>K</i><sub>2</sub>. It suits someone who fears a falling dollar, for example an exporter who will receive USD in 3 months.
+
+A **risk reversal** combines a long call with a short put, both out of the money. In the market they are usually the 25Δ strikes. For our importer this is the **zero-cost collar**: the USD call protects him and the USD put he sells pays for it. The put strike is solved so that the net premium is zero.
+
+<PayoffBuilderFigure templates={['call-spread', 'put-spread', 'risk-reversal']} initial="risk-reversal" highlightSolved caption="Drag the call strike K1 along the axis: the put strike K2 follows so that the net premium stays zero. The green ring marks the solved strike. Switch to the call and put spreads and compare the premium and the maximum gain." />
+
+### The call spread in numbers
+
+The importer buys the call with strike <Num of="m06.csK1" /> and sells a call with strike <Num of="m06.csK2" />, the 25Δ strike. The call alone costs <Num of="ex.callPips" digits={1} /> pips. The call he sells brings back <Num of="m06.csSoldPips" /> pips, which is <Num of="m06.csSavePct" /> of the premium. He pays <Num of="m06.csPips" /> pips net, or <Num of="m06.csChf" />.
+
+- The **break-even** is <i>K</i><sub>1</sub> plus the premium: <Num of="m06.csBe" />.
+- The **maximum gain** at expiry is the width minus the premium: <Num of="m06.csWidthPips" /> − <Num of="m06.csPips" /> = <Num of="m06.csMaxGainPips" /> pips, or <Num of="m06.csMaxGainChf" />. It is reached from <Num of="m06.csK2" /> upwards.
+- The **maximum loss** is the premium.
+
+The **put spread** with <Num of="m06.psK1" /> and <Num of="m06.psK2" /> costs <Num of="m06.psPips" /> pips. Its break-even is <Num of="m06.psBe" /> and its maximum gain <Num of="m06.psMaxGainChf" />.
+
+### The importer's risk reversal
+
+The importer buys the 25Δ USD call with strike <Num of="m06.rrCallK" />. It costs <Num of="m06.rrCallPips" /> pips, or <Num of="m06.rrCallChf" />. A USD put with strike <Num of="m06.rrPutK" /> brings in exactly the same. Together the structure costs nothing. At expiry:
+
+- Above <Num of="m06.rrCallK" /> he exercises the call. At <Num of="m06.stUp" /> he pays <Num of="m06.upRrChf" />.
+- Between the strikes he buys in the market. The forward of <Num of="ex.forward" digits={4} /> lies inside this band, which is <Num of="m06.rrBandPips" /> pips wide.
+- Below <Num of="m06.rrPutK" /> the put is exercised and he has to buy at the strike. At <Num of="m06.stDown" /> he pays <Num of="m06.downRrChf" />.
+
+Look at the Greeks in the payoff builder. Delta is <Num of="m06.rrDelta" />: the collar acts like half a forward. Vega is almost zero at <Num of="m06.rrVegaChf" />. The long call alone has <Num of="m06.callVegaChf" /> per vol point, and the short put takes away almost as much. So a risk reversal hardly reacts to the overall level of vol. It does react to whether calls or puts become dearer. That is the subject of section 4.
+
+<Derivation title="Derivation: the bounds of a spread and the zero-cost condition">
+
+**1.** The payoff of the call spread per USD always lies between 0 and <i>K</i><sub>2</sub> − <i>K</i><sub>1</sub>:
+
+<Formula><span>0 ≤ max(<i>S</i><sub>T</sub> − <i>K</i><sub>1</sub>, 0) − max(<i>S</i><sub>T</sub> − <i>K</i><sub>2</sub>, 0) ≤ <i>K</i><sub>2</sub> − <i>K</i><sub>1</sub></span></Formula>
+
+**2.** Whatever always lies between two bounds at expiry must also lie between them today, otherwise there would be an arbitrage. With the discount factor <i>DF</i><sub>d</sub> = <i>e</i><sup>−<i>r</i><sub>d</sub><i>T</i></sup>:
+
+<Formula variant="accent"><span>0 ≤ <i>C</i>(<i>K</i><sub>1</sub>) − <i>C</i>(<i>K</i><sub>2</sub>) ≤ <i>DF</i><sub>d</sub> · (<i>K</i><sub>2</sub> − <i>K</i><sub>1</sub>)</span></Formula>
+
+In the example: <Num of="m06.csPips" /> pips lies between 0 and <Num of="m06.csWidthPips" /> pips (<i>DF</i><sub>d</sub> = <Num of="m06.discountRate" />).
+
+**3.** For the risk reversal the net premium is <i>C</i>(<i>K</i><sub>C</sub>) − <i>P</i>(<i>K</i><sub>P</sub>). Zero cost means <i>P</i>(<i>K</i><sub>P</sub>) = <i>C</i>(<i>K</i><sub>C</sub>). Because the put rises with its strike, exactly one put strike satisfies this.
+
+**4.** A limiting case links this to module 04. If both strikes equal <i>K</i>, a long call plus a short put is a forward at <i>K</i>. By put-call parity the net premium is then <i>DF</i><sub>d</sub> · (<i>F</i> − <i>K</i>), which is zero exactly at <i>K</i> = <i>F</i>. A collar therefore sits between two extremes: the forward (a band of zero) and the plain call (no put).
+
+</Derivation>
+
+<Desk title="The risk reversal as a market quote">
+
+In the options market, "25Δ risk reversal" is not only a structure but also a price. It is quoted in vol: the implied vol of the 25Δ call minus the implied vol of the 25Δ put. Traders deal it delta-hedged. Its sign shows which side the market pays more for. More on this in section 4.
+
+For companies: whoever sells the put needs a credit line. And the put spread is the counterpart for exporters who receive USD and fear a weak dollar.
+
+</Desk>
+
+<Takeaway>
+
+A spread sells the protection you hardly need and makes the hedge cheaper. A risk reversal pays for the call with a put: zero cost, but in return a fixed band within which you buy.
+
+</Takeaway>

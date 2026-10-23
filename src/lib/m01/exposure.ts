@@ -17,8 +17,8 @@ export const BIG_FIGURE = 1e-2;
 
 /** Slider range and step of the exposure figure (teaching choice, D-22). */
 export const EXPOSURE_RANGE = {
-  min: 0.72,
-  max: 0.88,
+  min: 0.74,
+  max: 0.86,
   step: 0.0005,
 } as const;
 

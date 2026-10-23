@@ -43,7 +43,7 @@ const SIGMA = sigmaRange();
 function layoutFor(w: number) {
   const width = Math.max(280, Math.round(w));
   const compact = width < 560;
-  const height = compact ? 310 : Math.round(clamp(width * 0.6, 330, 410));
+  const height = compact ? 330 : Math.round(clamp(width * 0.82, 360, 470));
   const rail = height - (compact ? 38 : 42);
   return {
     width,
@@ -55,7 +55,7 @@ function layoutFor(w: number) {
     top: 30,
     plotBottom: rail - 18,
     rail,
-    block: compact ? 12 : 16,
+    block: compact ? 18 : 22,
   };
 }
 
@@ -99,12 +99,12 @@ export default function SpotExposure({ lang }: SpotExposureProps): JSX.Element {
     today,
     bf,
     months,
-    pct: fmtPct(Math.abs(e.pct), lang, 1),
+    pct: fmtPct(Math.abs(e.pct), lang, 2),
     diff: chf(Math.abs(e.diff)),
   });
 
   const xTicks = useMemo(
-    () => niceTicks(R.min, R.max, L.compact ? 3 : 5).filter((v) => v >= R.min && v <= R.max),
+    () => niceTicks(R.min, R.max, L.compact ? 3 : 8).filter((v) => v >= R.min && v <= R.max),
     [L.compact],
   );
   const yTicks = niceTicks(Y_DOMAIN[0], Y_DOMAIN[1], L.compact ? 4 : 5).filter(
@@ -129,11 +129,7 @@ export default function SpotExposure({ lang }: SpotExposureProps): JSX.Element {
   const up = dirSign > 0;
   const blockFill = up ? 'var(--ff-exotics-soft)' : 'var(--ff-good-soft)';
   const blockStroke = up ? 'var(--ff-short)' : 'var(--ff-good)';
-  const labelRight = x + L.block / 2 + 8;
-  const labelText = up ? t('blockLabel', { bf }) : t('blockLabelDown', { bf });
-  const labelW = labelText.length * L.font * 0.56;
-  const labelLeft = labelRight + labelW > L.width - L.right;
-  const firstBlock = blockRects[0];
+  const blockText = up ? 'var(--ff-exotics-text)' : 'var(--ff-good-text)';
 
   const aria = t('aria', {
     notional,
@@ -155,7 +151,9 @@ export default function SpotExposure({ lang }: SpotExposureProps): JSX.Element {
             {t('sub', { notional, months, pair: PAIR, spot: fmtRate(S0, PAIR), today })}
           </div>
         </div>
-        <span class="ff-pill-note spx-chip">{t('chip', { bf })}</span>
+        <span class="ff-pill-note spx-chip" key={blocks.whole} data-pulse={blocks.whole !== 0}>
+          {t('chip', { bf })}
+        </span>
       </div>
       <div class="ff-lab">
         <div class="ff-lab-main">
@@ -242,40 +240,38 @@ export default function SpotExposure({ lang }: SpotExposureProps): JSX.Element {
               {/* big-figure blocks between today's cost and the current cost */}
               <g data-block-column>
                 {blockRects.map((b, i) => (
-                  <rect
-                    key={i}
-                    x={x - L.block / 2}
-                    y={b.y + 1}
-                    width={L.block}
-                    height={Math.max(0, b.h - 2)}
-                    rx={2.5}
-                    style={{
-                      fill: blockFill,
-                      stroke: blockStroke,
-                      strokeWidth: 1.25,
-                      strokeDasharray: b.part ? '3 2' : undefined,
-                    }}
-                  />
+                  <g key={i}>
+                    <rect
+                      x={x - L.block / 2}
+                      y={b.y + 1}
+                      width={L.block}
+                      height={Math.max(0, b.h - 2)}
+                      rx={3}
+                      style={{
+                        fill: blockFill,
+                        stroke: blockStroke,
+                        strokeWidth: 1.25,
+                        strokeDasharray: b.part ? '3 2' : undefined,
+                      }}
+                    />
+                    {!b.part && b.h >= 14 && (
+                      <text
+                        x={x}
+                        y={b.y + b.h / 2 + 4}
+                        style={{
+                          fontSize: '11px',
+                          fontWeight: 700,
+                          fill: blockText,
+                          textAnchor: 'middle',
+                          fontFamily: 'var(--ff-font-mono)',
+                        }}
+                      >
+                        {i + 1}
+                      </text>
+                    )}
+                  </g>
                 ))}
               </g>
-              {firstBlock && !firstBlock.part && (
-                <text
-                  x={labelLeft ? x - L.block / 2 - 8 : labelRight}
-                  y={firstBlock.y + firstBlock.h / 2 + L.font * 0.35}
-                  class="spx-block-label"
-                  style={{
-                    fontSize: fs,
-                    fontWeight: 700,
-                    fill: up ? 'var(--ff-exotics-text)' : 'var(--ff-good-text)',
-                    textAnchor: labelLeft ? 'end' : 'start',
-                    paintOrder: 'stroke',
-                    stroke: '#fff',
-                    strokeWidth: 4,
-                  }}
-                >
-                  {labelText}
-                </text>
-              )}
               <circle
                 cx={x}
                 cy={yCost}
@@ -334,6 +330,20 @@ export default function SpotExposure({ lang }: SpotExposureProps): JSX.Element {
               />
             </svg>
           </div>
+          <div class="spx-legend">
+            <span class="spx-legend-item">
+              <span aria-hidden="true" class="spx-swatch spx-swatch--line" />
+              {t('legendCost')}
+            </span>
+            <span class="spx-legend-item">
+              <span aria-hidden="true" class="spx-swatch spx-swatch--block" />
+              {t('legendBlock', { bf })}
+            </span>
+            <span class="spx-legend-item">
+              <span aria-hidden="true" class="spx-swatch spx-swatch--band" />
+              {t('legendBand', { months })}
+            </span>
+          </div>
           <p class="spx-hint">{t('drag')}</p>
         </div>
         <div class="ff-lab-side">
@@ -363,12 +373,14 @@ export default function SpotExposure({ lang }: SpotExposureProps): JSX.Element {
               highlight={e.dir !== 'flat'}
             />
             <StatRow
-              label={t('rowPct')}
-              sub={t('rowPctSub')}
-              value={t('pctPair', {
-                usd: fmtPct(e.pct, lang, 1, true),
-                chf: fmtPct(e.inversePct, lang, 1, true),
-              })}
+              label={t('rowUsdPct')}
+              sub={t('rowUsdPctSub')}
+              value={fmtPct(e.pct, lang, 2, true)}
+            />
+            <StatRow
+              label={t('rowChfPct')}
+              sub={t('rowChfPctSub')}
+              value={fmtPct(e.inversePct, lang, 2, true)}
             />
           </StatTable>
           <div class="panel">
@@ -396,9 +408,12 @@ export default function SpotExposure({ lang }: SpotExposureProps): JSX.Element {
               ))}
             </div>
           </div>
-          <p class={`spx-note spx-note--${e.dir}`} data-note aria-live="polite">
-            {dragging ? '' : note}
+          <p class={`spx-note spx-note--${e.dir}`} data-note>
+            {note}
           </p>
+          <div class="sr-only" aria-live="polite" aria-atomic="true">
+            {dragging ? '' : t(`status.${noteKey.slice(5)}` as 'status.flat')}
+          </div>
         </div>
       </div>
     </div>
