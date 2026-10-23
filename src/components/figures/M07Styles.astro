@@ -2,8 +2,10 @@
 /**
  * Shared styles of the module 07 figures (BarrierPaths, BarrierLab, TouchLab, GapReplay).
  * Every figure wrapper renders this component; Astro includes the styles once per page.
- * Colour semantics: option alive / long blue, barrier and gap events exotics orange, forward and
- * tangents black, reference lines grey dashed, knocked paths grey.
+ * Colour semantics: option alive / long blue (the knock-in leg of the parity bar a lighter blue),
+ * barrier and gap events exotics orange, forward, probability and tangents black, comparisons
+ * (vanilla, call spread, counterpart) grey dashed, payoff at expiry dark grey dashed, knocked
+ * paths grey. Orange is never used for a curve, so it cannot be read as "short".
  */
 ---
 
@@ -81,8 +83,9 @@
   .m7-sw-payoff {
     border-top: 1.5px dashed var(--ff-payoff);
   }
-  .m7-sw-short {
-    border-top-color: var(--ff-short);
+  /* Knock-in leg of the parity bar: a lighter blue, because it is a long option as well. */
+  .m7-sw-ki {
+    border-top-color: #9bb8f6;
   }
   .m7-sw-delta {
     border-top-color: var(--ff-delta-curve);
@@ -350,13 +353,6 @@
     stroke-linecap: round;
     stroke-linejoin: round;
   }
-  .m7-curve-short {
-    fill: none;
-    stroke: var(--ff-short);
-    stroke-width: 2.25;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
   .m7-compare {
     fill: none;
     stroke: var(--ff-ref);
@@ -601,7 +597,7 @@
     background: var(--ff-long);
   }
   .m7-bar .is-ki {
-    background: var(--ff-short);
+    background: #9bb8f6;
     color: var(--ff-ink);
   }
   .m7-bar .is-van {
@@ -711,10 +707,6 @@
     fill: none;
     stroke: var(--ff-forward);
     stroke-width: 1.5;
-  }
-  .tl-second {
-    stroke-width: 1.75;
-    opacity: 0.85;
   }
   .m7 .tl-sw-fwd {
     border-top: 1.5px solid var(--ff-forward);

@@ -1,0 +1,21 @@
+---
+/**
+ * CashCarryCalculator as an MDX figure (module 02, section 4): <CashCarryCalculatorFigure caption="…" />.
+ * Reads the page language and hydrates the island when it scrolls into view.
+ */
+import Figure from '@/components/content/Figure.astro';
+import CashCarryCalculator from '@/components/islands/CashCarryCalculator';
+import { pageLang } from '@/components/content/lang';
+import M02Styles from './M02Styles.astro';
+
+interface Props {
+  caption?: string;
+}
+const { caption } = Astro.props;
+const lang = pageLang(Astro.currentLocale);
+---
+
+<M02Styles />
+<Figure caption={caption}>
+  <CashCarryCalculator client:visible lang={lang} />
+</Figure>

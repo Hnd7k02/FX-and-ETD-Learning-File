@@ -31,7 +31,7 @@ export const barrierpaths = defineDict({
     'bp.row.discountSub': 'Preisunterschied in %',
     'bp.row.dearer': 'Teurer als Vanilla',
     'bp.row.prob': 'Berührwahrscheinlichkeit',
-    'bp.row.probSub': 'Modell, tägliche Beobachtung',
+    'bp.row.probSub': 'Modell, stetige Beobachtung',
     'bp.unit.pips': '{v} Pips',
     'bp.axis.today': 'Heute',
     'bp.axis.month': '{n}M',
@@ -50,7 +50,7 @@ export const barrierpaths = defineDict({
     'bp.legend.waiting': 'noch nicht aktiv',
     'bp.legend.touch': 'Berührung',
     'bp.note':
-      'Seed {seed}. Beispielwerte, keine Marktdaten. Preise mit stetiger Beobachtung (Garman-Kohlhagen, Reiner-Rubinstein).',
+      'Seed {seed}. Beispielwerte, keine Marktdaten. Preis und Wahrscheinlichkeit gelten für stetige Beobachtung (Garman-Kohlhagen, Reiner-Rubinstein), die Pfade sind täglich beobachtet.',
     'bp.summary':
       'Tag {d} von {n}: {hits} von {total} Pfaden haben die Barriere {barrier} berührt und sind {state}. Modell: {prob}. {kind} {price} Pips statt {vanilla} Pips für den Vanilla Call.',
     'bp.aria':
@@ -85,7 +85,7 @@ export const barrierpaths = defineDict({
     'bp.row.discountSub': 'price difference in %',
     'bp.row.dearer': 'Dearer than vanilla',
     'bp.row.prob': 'Touch probability',
-    'bp.row.probSub': 'model, daily observation',
+    'bp.row.probSub': 'model, continuous monitoring',
     'bp.unit.pips': '{v} pips',
     'bp.axis.today': 'Today',
     'bp.axis.month': '{n}M',
@@ -104,7 +104,7 @@ export const barrierpaths = defineDict({
     'bp.legend.waiting': 'not yet active',
     'bp.legend.touch': 'touch',
     'bp.note':
-      'Seed {seed}. Example values, not market data. Prices with continuous monitoring (Garman-Kohlhagen, Reiner-Rubinstein).',
+      'Seed {seed}. Example values, not market data. Price and probability assume continuous monitoring (Garman-Kohlhagen, Reiner-Rubinstein); the paths are observed daily.',
     'bp.summary':
       'Day {d} of {n}: {hits} of {total} paths have touched the barrier {barrier} and are {state}. Model: {prob}. {kind} {price} pips instead of {vanilla} pips for the vanilla call.',
     'bp.aria':

@@ -480,7 +480,12 @@
     outline-offset: 2px;
   }
   .m3 .m3-table {
+    display: table;
+    width: 100%;
     margin: 0;
+    border: 0;
+    border-radius: 0;
+    overflow: visible;
     font-size: 13px;
   }
   .m3 .m3-table th,
@@ -619,6 +624,29 @@
   .m3-eq-sub {
     font-size: 12px;
   }
+  .m3-eq-result {
+    font-weight: 700;
+  }
+  .m3-below {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .m3-below > .m3-table-wrap {
+    flex: 3 1 420px;
+    min-width: 0;
+  }
+  .m3-below > .m3-insight,
+  .m3-below > .m3-timeline {
+    flex: 2 1 300px;
+    min-width: 0;
+  }
+  @media (max-width: 640px) {
+    .m3-eq .math {
+      font-size: 15px;
+    }
+  }
   .m3-insight.is-aha .m3-eq {
     margin-top: 6px;
     padding-top: 8px;
@@ -653,6 +681,9 @@
     grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     align-items: center;
     gap: 8px;
+  }
+  .m3-legs.is-stack {
+    grid-template-columns: minmax(0, 1fr);
   }
   .m3-leg {
     display: flex;

@@ -137,8 +137,9 @@ export default function BarrierPaths({ lang }: BarrierPathsProps): JSX.Element {
   });
 
   /* ---------- annotation ---------- */
+  // On phones the note sits below the chart (inside it, it would hide half of the paths).
   let aha: JSX.Element | null = null;
-  if (firstHit) {
+  if (firstHit && !L.compact) {
     const [ax, ay] = pt(paths[firstHit.i]!, firstHit.d);
     const l1 = t(io === 'out' ? 'bp.aha.out.t' : 'bp.aha.in.t');
     const l2 = t(io === 'out' ? 'bp.aha.out.d' : 'bp.aha.in.d');
@@ -313,6 +314,17 @@ export default function BarrierPaths({ lang }: BarrierPathsProps): JSX.Element {
             </g>
             {aha}
           </svg>
+          {L.compact && (
+            <p
+              class="gr-aha"
+              data-aha={io}
+              style={{ visibility: firstHit ? 'visible' : 'hidden' }}
+              aria-hidden={firstHit ? undefined : 'true'}
+            >
+              <b>{t(io === 'out' ? 'bp.aha.out.t' : 'bp.aha.in.t')}</b>{' '}
+              {t(io === 'out' ? 'bp.aha.out.d' : 'bp.aha.in.d')}
+            </p>
+          )}
           <p class="m7-hint">{t('bp.hint')}</p>
           <p class="sr-only">{summary}</p>
         </div>

@@ -349,49 +349,6 @@ export default function HedgeRoll({ lang }: HedgeRollProps): JSX.Element {
             {aha && <b>{t('hr.aha.title')}</b>}
             <span>{insight}</span>
           </div>
-
-          <ol class="m3-timeline" data-timeline>
-            <li class="m3-tl-card">
-              <span class="m3-tl-head">{t('hr.tl.t1')}</span>
-              <span class="m3-tl-row">
-                <span>{t('hr.tl.fwd')}</span>
-                {flow(N, C.market.base)}
-                {flow(-N * OLD, C.market.quote)}
-              </span>
-              <span class="m3-tl-row">
-                <span>{t('hr.tl.near', { rate: r4(spot) })}</span>
-                {flow(-N, C.market.base)}
-                {flow(N * spot, C.market.quote)}
-              </span>
-              <span class="m3-tl-row is-net">
-                <span>{t('hr.tl.net')}</span>
-                {flow(0, C.market.base)}
-                {flow(v.settlement, C.market.quote)}
-              </span>
-            </li>
-            <li class="m3-tl-card">
-              <span class="m3-tl-head">{t('hr.tl.t2', { days: slip.days })}</span>
-              <span class="m3-tl-row">
-                <span>{t('hr.tl.far', { rate: r5(v.farRate) })}</span>
-                {flow(N, C.market.base)}
-                {flow(-v.farChf, C.market.quote)}
-              </span>
-              <span class="m3-tl-row">
-                <span>{t('hr.tl.supplier')}</span>
-                {flow(-N, C.market.base)}
-                <span />
-              </span>
-            </li>
-            <li class="m3-tl-card is-total">
-              <span class="m3-tl-head">{t('hr.tl.total')}</span>
-              <span class="m3-tl-big mono">
-                {t('hr.tl.totalText', { chf: chf(v.totalChf), notional })}
-              </span>
-              <span class="m3-tl-sub">
-                {t('hr.tl.totalRate', { rate: r5(v.allIn), old: r5(OLD), pips: pipsTxt })}
-              </span>
-            </li>
-          </ol>
         </div>
 
         <div class="ff-lab-side">
@@ -474,6 +431,48 @@ export default function HedgeRoll({ lang }: HedgeRollProps): JSX.Element {
           </div>
         </div>
       </div>
+      <ol class="m3-timeline" data-timeline>
+        <li class="m3-tl-card">
+          <span class="m3-tl-head">{t('hr.tl.t1')}</span>
+          <span class="m3-tl-row">
+            <span>{t('hr.tl.fwd')}</span>
+            {flow(N, C.market.base)}
+            {flow(-N * OLD, C.market.quote)}
+          </span>
+          <span class="m3-tl-row">
+            <span>{t('hr.tl.near', { rate: r4(spot) })}</span>
+            {flow(-N, C.market.base)}
+            {flow(N * spot, C.market.quote)}
+          </span>
+          <span class="m3-tl-row is-net">
+            <span>{t('hr.tl.net')}</span>
+            {flow(0, C.market.base)}
+            {flow(v.settlement, C.market.quote)}
+          </span>
+        </li>
+        <li class="m3-tl-card">
+          <span class="m3-tl-head">{t('hr.tl.t2', { days: slip.days })}</span>
+          <span class="m3-tl-row">
+            <span>{t('hr.tl.far', { rate: r5(v.farRate) })}</span>
+            {flow(N, C.market.base)}
+            {flow(-v.farChf, C.market.quote)}
+          </span>
+          <span class="m3-tl-row">
+            <span>{t('hr.tl.supplier')}</span>
+            {flow(-N, C.market.base)}
+            <span />
+          </span>
+        </li>
+        <li class="m3-tl-card is-total">
+          <span class="m3-tl-head">{t('hr.tl.total')}</span>
+          <span class="m3-tl-big mono">
+            {t('hr.tl.totalText', { chf: chf(v.totalChf), notional })}
+          </span>
+          <span class="m3-tl-sub">
+            {t('hr.tl.totalRate', { rate: r5(v.allIn), old: r5(OLD), pips: pipsTxt })}
+          </span>
+        </li>
+      </ol>
     </div>
   );
 }

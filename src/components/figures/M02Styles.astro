@@ -428,14 +428,233 @@
     }
   }
 
+  /* Shared controls */
+  .m2-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .m2-sliders {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .m2-icon-btn {
+    width: var(--ff-touch);
+    padding: 0;
+  }
+  .m2-progress {
+    height: 4px;
+    border-radius: 2px;
+    background: var(--ff-chip);
+    overflow: hidden;
+  }
+  .m2-progress span {
+    display: block;
+    height: 100%;
+    background: var(--ff-ink);
+    transform-origin: left center;
+  }
+  .m2-step-no {
+    font-size: 12px;
+    color: var(--ff-muted);
+    font-weight: 700;
+  }
+
+  /* ParityPaths */
+  .pp-transport {
+    flex-wrap: nowrap;
+  }
+  .pp-play {
+    flex: 1 1 auto;
+  }
+  .pp-lane-title {
+    font-weight: 800;
+    fill: var(--ff-ink);
+  }
+  .pp-lane-sub {
+    fill: var(--ff-muted);
+  }
+  .pp-spine {
+    fill: none;
+    stroke: var(--ff-line-strong);
+    stroke-width: 1;
+    stroke-dasharray: 2 4;
+  }
+  .pp-spine-run {
+    fill: none;
+    stroke: var(--ff-ink);
+    stroke-width: 2;
+  }
+  .pp-dot {
+    fill: var(--ff-ink);
+    stroke: #fff;
+    stroke-width: 2;
+  }
+  .pp-chip rect {
+    fill: var(--ff-surface);
+    stroke: var(--ff-line-strong);
+  }
+  .pp-chip text {
+    font-weight: 700;
+    fill: var(--ff-ink-2);
+    text-anchor: middle;
+    font-variant-numeric: tabular-nums;
+  }
+  .pp-card-box {
+    fill: var(--ff-surface);
+    stroke: var(--ff-line-strong);
+    stroke-width: 1;
+    transition: stroke 300ms ease;
+  }
+  .pp-card.is-todo .pp-card-box {
+    fill: var(--ff-surface-2);
+    stroke-dasharray: 4 4;
+  }
+  .pp-card.is-active .pp-card-box {
+    stroke-width: 2;
+  }
+  .pp-card.is-active {
+    animation: m2-rise 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+  .pp-card-title {
+    font-weight: 700;
+    fill: var(--ff-ink);
+  }
+  .pp-card.is-todo .pp-card-title {
+    font-weight: 600;
+    fill: var(--ff-muted);
+  }
+  .pp-card-amount {
+    font-family: var(--ff-font-mono);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .pp-conn-track {
+    fill: none;
+    stroke: var(--ff-line);
+    stroke-width: 2;
+  }
+  .pp-conn {
+    fill: none;
+    stroke: var(--ff-ink-2);
+    stroke-width: 2;
+    stroke-linecap: round;
+  }
+  .pp-wait {
+    fill: none;
+    stroke: var(--ff-forward);
+    stroke-width: 2;
+    stroke-dasharray: 5 5;
+  }
+  .pp-wait.is-todo {
+    stroke: var(--ff-line-strong);
+  }
+  .pp-note {
+    fill: var(--ff-muted);
+    text-anchor: middle;
+    font-style: italic;
+    paint-order: stroke;
+    stroke: #fff;
+    stroke-width: 6px;
+    stroke-linejoin: round;
+  }
+  .pp-lock rect {
+    fill: var(--ff-surface);
+    stroke: var(--ff-forward);
+    stroke-width: 1.5;
+  }
+  .pp-lock-label {
+    text-anchor: middle;
+    font-weight: 700;
+    fill: var(--ff-ink-2);
+  }
+  .pp-lock-value {
+    text-anchor: middle;
+    font-family: var(--ff-font-mono);
+    font-weight: 700;
+    fill: var(--ff-ink);
+  }
+  .pp-balance-label {
+    font-weight: 600;
+    fill: var(--ff-ink-2);
+  }
+  .pp-balance-value {
+    font-family: var(--ff-font-mono);
+    font-weight: 700;
+    text-anchor: end;
+    font-variant-numeric: tabular-nums;
+  }
+  .pp-track {
+    fill: var(--ff-chip);
+  }
+  .pp-fill {
+    transform-box: fill-box;
+    transform-origin: left center;
+  }
+  .pp-eq {
+    animation: pp-pop 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+  .pp-eq circle {
+    fill: var(--ff-good-soft);
+    stroke: var(--ff-good);
+    stroke-width: 1.5;
+  }
+  .pp-eq path {
+    fill: none;
+    stroke: var(--ff-good-text-strong);
+    stroke-width: 2;
+    stroke-linecap: round;
+  }
+  .pp-result rect {
+    fill: var(--ff-surface-2);
+    stroke: var(--ff-line-strong);
+    stroke-dasharray: 4 4;
+  }
+  .pp-result.is-on {
+    animation: m2-rise 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+  .pp-result.is-on rect {
+    fill: var(--ff-ink);
+    stroke: none;
+  }
+  .pp-result-todo {
+    text-anchor: middle;
+    font-weight: 600;
+    fill: var(--ff-muted);
+  }
+  .pp-result-title {
+    text-anchor: middle;
+    font-weight: 800;
+    fill: #fff;
+  }
+  .pp-result-formula {
+    text-anchor: middle;
+    font-family: var(--ff-font-mono);
+    font-weight: 700;
+    fill: var(--ff-on-dark-body);
+  }
+  @keyframes pp-pop {
+    from {
+      transform: scale(0.4);
+    }
+    to {
+      transform: none;
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .m2-aha,
     .m2-insight.is-aha,
     .ho-sdot.is-new,
-    .ho-stripdot.is-new {
+    .ho-stripdot.is-new,
+    .pp-card.is-active,
+    .pp-eq,
+    .pp-result.is-on {
       animation: none;
     }
-    .m2-chip {
+    .m2-chip,
+    .pp-card-box {
       transition: none;
     }
   }

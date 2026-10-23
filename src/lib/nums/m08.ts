@@ -17,8 +17,10 @@ import { digitalCash } from '@/lib/fx/exotics/digital';
 import { DCI_CONFIG, dciOutcome, dciView, defaultFixing } from '@/lib/dcicalc';
 import {
   PATHSIM_CONFIG,
+  earlyEndFixings,
   forwardToDay,
   playState,
+  simProduct,
   simulate,
   type ScenarioSettings,
   type SimKind,
@@ -30,7 +32,11 @@ const P = MC_PRODUCTS.products;
 const pips = (x: number): number => x / PIP;
 const year = MC_CONFIG.conventions.daysPerYear;
 
-/** End facts of one simulated scenario (the simulator shows the same numbers). */
+/**
+ * End facts of one simulated scenario (the simulator shows the same numbers). The difference
+ * product − benchmark is taken from the whole-franc amounts, as the simulator shows it, so the
+ * three numbers in the text add up on screen.
+ */
 function scenario(kind: SimKind, s: ScenarioSettings) {
   const sim = simulate(kind, s);
   const end = playState(sim, sim.days);
@@ -40,7 +46,7 @@ function scenario(kind: SimKind, s: ScenarioSettings) {
     firstLeveraged: sim.firstLeveraged + 1,
     pnl: end.cumPnl,
     bench: end.cumBench,
-    diff: end.diff,
+    diff: Math.round(end.cumPnl) - Math.round(end.cumBench),
     base: Math.abs(end.base),
     need: Math.abs(end.need),
     coupons: sim.rows.filter((r) => r.kind === 'coupon').length,
@@ -48,9 +54,12 @@ function scenario(kind: SimKind, s: ScenarioSettings) {
   };
 }
 
-/** Closed-form fair coupon of a coupon strip without target (Garman-Kohlhagen). */
-function couponWithoutTarget(kind: 'tpf' | 'rtpf'): number {
-  const { spot: S, vol, rd, rf } = MC_CONFIG.market;
+/**
+ * Closed-form fair coupon of a coupon strip without target (Garman-Kohlhagen). `rf` defaults to
+ * the USD rate of the example; rf = rd shows the coupon without the interest differential.
+ */
+function couponWithoutTarget(kind: 'tpf' | 'rtpf', rf: number = MC_CONFIG.market.rf): number {
+  const { spot: S, vol, rd } = MC_CONFIG.market;
   let sold = 0;
   let digital = 0;
   if (kind === 'tpf') {
@@ -79,8 +88,9 @@ const acc = fairProduct('accumulator');
 const dec = fairProduct('decumulator');
 const tarf = fairProduct('tarf');
 const piv = fairProduct('pivotTarf');
-const tpf = fairProduct('tpf');
-const rtpf = fairProduct('rtpf');
+/** Coupon products with the quoted fair coupon (0.1 pip, PATHSIM_CONFIG.couponQuoteStep). */
+const tpf = simProduct('tpf');
+const rtpf = simProduct('rtpf');
 const accStory = storyStages('accumulator');
 const tarfStory = storyStages('tarf');
 const decStory = storyStages('decumulator');
@@ -95,6 +105,13 @@ const pivShock = scenario('pivotTarf', presets.earlyShock);
 const tpfSide = scenario('tpf', { name: 'sideways' });
 const tpfDown = scenario('tpf', presets.strongDown);
 const rtpfUp = scenario('rtpf', { name: 'trendUp' });
+
+/** Mean number of fixings of the paths that end early (knock-out or target), from MC. */
+function earlyFix(kind: SimKind, pEarly: number): number {
+  const st = P[kind].stats;
+  const n = P[kind].product.fixingDays.length;
+  return earlyEndFixings(st.expectedFixings, st.pMaturity, pEarly, n) ?? Number.NaN;
+}
 
 const tpfLastDay = tpf.fixingDays[tpf.fixingDays.length - 1]!;
 const tpfForwardEnd = forwardToDay(tpfLastDay);
@@ -125,6 +142,8 @@ export const M08 = {
   accBreakLev: 2 * acc.strike - P.accumulator.forwardAvg,
   accPKo: P.accumulator.stats.pKnockOut,
   accExpFix: P.accumulator.stats.expectedFixings,
+  /** Mean fixing of the knock-out among the paths that are knocked out. */
+  accKoFix: earlyFix('accumulator', P.accumulator.stats.pKnockOut),
   accQ05: P.accumulator.stats.pvQuantile05,
   accWorst: P.accumulator.stats.pvMin,
   accUp,
@@ -136,7 +155,12 @@ export const M08 = {
   decBetterPips: pips(dec.strike - P.decumulator.forwardAvg),
   decBarrier: dec.barrier,
   decK2: decStory[1]!.strike,
+  decSePips: P.decumulator.stdErrPips,
   decPKo: P.decumulator.stats.pKnockOut,
+  decKoFix: earlyFix('decumulator', P.decumulator.stats.pKnockOut),
+  /** Distance spot → barrier and forward → barrier in pips (why the decumulator gains more). */
+  accFwdToBarrierPips: pips(acc.barrier - P.accumulator.forwardAvg),
+  decFwdToBarrierPips: pips(P.decumulator.forwardAvg - dec.barrier),
   // TARF
   tarfStrike: tarf.strike,
   tarfSePips: P.tarf.stdErrPips,
@@ -149,6 +173,8 @@ export const M08 = {
   tarfNotional: tarf.notional,
   tarfPTarget: P.tarf.stats.pTarget,
   tarfExpFix: P.tarf.stats.expectedFixings,
+  /** Mean fixing at which the target is reached, among the paths that reach it. */
+  tarfTargetFix: earlyFix('tarf', P.tarf.stats.pTarget),
   tarfQ05: P.tarf.stats.pvQuantile05,
   tarfWorst: P.tarf.stats.pvMin,
   /**
@@ -171,6 +197,7 @@ export const M08 = {
   pivTargetChf: piv.target * piv.notional,
   pivPTarget: P.pivotTarf.stats.pTarget,
   pivExpFix: P.pivotTarf.stats.expectedFixings,
+  pivTargetFix: earlyFix('pivotTarf', P.pivotTarf.stats.pTarget),
   pivQ05: P.pivotTarf.stats.pvQuantile05,
   pivWorst: P.pivotTarf.stats.pvMin,
   pivShock,
@@ -185,6 +212,8 @@ export const M08 = {
   tpfNotional: tpf.notional,
   tpfFixings: tpf.fixingDays.length,
   tpfCouponNoTargetPips: pips(couponWithoutTarget('tpf')),
+  /** Same strip if the USD rate equalled the CHF rate: no interest differential, flat forward. */
+  tpfCouponNoDriftPips: pips(couponWithoutTarget('tpf', MC_CONFIG.market.rd)),
   tpfFwdAvg: P.tpf.forwardAvg,
   tpfFwdEnd: tpfForwardEnd,
   tpfStrikeOverFwdEndPips: pips(tpf.strike - tpfForwardEnd),
@@ -244,7 +273,12 @@ export const nums: NumTable = {
   'm08.accStrike': { value: M.accStrike, kind: 'rate', note: 'Fair accumulator strike (MC)' },
   'm08.accSe': { value: M.accSePips, kind: 'pips', note: 'Standard error of the fair strike' },
   'm08.accFwd': { value: M.accFwd, kind: 'rate', note: 'Forward at the average fixing day' },
-  'm08.accBetter': { value: M.accBetterPips, kind: 'pips', note: 'Forward − fair strike' },
+  'm08.accBetter': {
+    value: M.accBetterPips,
+    kind: 'pips',
+    digits: 0,
+    note: 'Forward − fair strike, whole pips like the 4-decimal rates it compares',
+  },
   'm08.accBarrier': { value: M.accBarrier, kind: 'rate' },
   'm08.accFixings': { value: M.accFixings, kind: 'num', digits: 0 },
   'm08.accNotional': { value: M.accNotional, kind: 'money', ccy: 'USD' },
@@ -274,7 +308,13 @@ export const nums: NumTable = {
   },
   'm08.accBreakLev': { value: M.accBreakLev, kind: 'rate', note: '2K − F' },
   'm08.accPKo': { value: M.accPKo, kind: 'pct', note: 'P(knock-out), MC' },
-  'm08.accExpFix': { value: M.accExpFix, kind: 'num', digits: 1 },
+  'm08.accExpFix': { value: M.accExpFix, kind: 'num', digits: 1, note: 'Mean life, all paths' },
+  'm08.accKoFix': {
+    value: M.accKoFix,
+    kind: 'num',
+    digits: 1,
+    note: 'Mean knock-out fixing of the knocked-out paths',
+  },
   'm08.accQ05': { value: M.accQ05, kind: 'money', note: '5 % quantile of path PV' },
   'm08.accWorst': { value: M.accWorst, kind: 'money', note: 'Worst path PV' },
   'm08.accUpKo': {
@@ -310,7 +350,21 @@ export const nums: NumTable = {
 
   // Decumulator
   'm08.decStrike': { value: M.decStrike, kind: 'rate' },
-  'm08.decBetter': { value: M.decBetterPips, kind: 'pips' },
+  'm08.decBetter': { value: M.decBetterPips, kind: 'pips', digits: 0 },
+  'm08.decSe': { value: M.decSePips, kind: 'pips' },
+  'm08.decKoFix': { value: M.decKoFix, kind: 'num', digits: 1 },
+  'm08.accFwdToBarrier': {
+    value: M.accFwdToBarrierPips,
+    kind: 'pips',
+    digits: 0,
+    note: 'Barrier − forward at the average fixing day',
+  },
+  'm08.decFwdToBarrier': {
+    value: M.decFwdToBarrierPips,
+    kind: 'pips',
+    digits: 0,
+    note: 'Forward at the average fixing day − barrier',
+  },
   'm08.decBarrier': { value: M.decBarrier, kind: 'rate' },
   'm08.decPKo': { value: M.decPKo, kind: 'pct' },
 
@@ -318,7 +372,7 @@ export const nums: NumTable = {
   'm08.tarfStrike': { value: M.tarfStrike, kind: 'rate' },
   'm08.tarfSe': { value: M.tarfSePips, kind: 'pips' },
   'm08.tarfFwd': { value: M.tarfFwd, kind: 'rate' },
-  'm08.tarfBetter': { value: M.tarfBetterPips, kind: 'pips' },
+  'm08.tarfBetter': { value: M.tarfBetterPips, kind: 'pips', digits: 0 },
   'm08.tarfK2': { value: M.tarfK2, kind: 'rate', note: 'Strip without target (closed form)' },
   'm08.tarfTargetPips': { value: M.tarfTargetPips, kind: 'pips', digits: 0 },
   'm08.tarfTargetChf': { value: M.tarfTargetChf, kind: 'money' },
@@ -326,7 +380,13 @@ export const nums: NumTable = {
   'm08.tarfNotional': { value: M.tarfNotional, kind: 'money', ccy: 'USD' },
   'm08.tarfTotal': { value: M.tarfNotional * M.tarfFixings, kind: 'money', ccy: 'USD' },
   'm08.tarfPTarget': { value: M.tarfPTarget, kind: 'pct' },
-  'm08.tarfExpFix': { value: M.tarfExpFix, kind: 'num', digits: 1 },
+  'm08.tarfExpFix': { value: M.tarfExpFix, kind: 'num', digits: 1, note: 'Mean life, all paths' },
+  'm08.tarfTargetFix': {
+    value: M.tarfTargetFix,
+    kind: 'num',
+    digits: 1,
+    note: 'Mean fixing of the target among the paths that reach it',
+  },
   'm08.tarfQ05': { value: M.tarfQ05, kind: 'money' },
   'm08.tarfWorst': { value: M.tarfWorst, kind: 'money' },
   'm08.tarfPMaturity': { value: M.tarfPMaturity, kind: 'pct' },
@@ -352,17 +412,19 @@ export const nums: NumTable = {
   'm08.tarfShockLev': { value: M.tarfShock.leveraged, kind: 'num', digits: 0 },
   'm08.tarfShockPnl': { value: M.tarfShock.pnl, kind: 'money', sign: true },
   'm08.tarfShockFwd': { value: M.tarfShock.bench, kind: 'money', sign: true },
+  'm08.tarfShockDiff': { value: M.tarfShock.diff, kind: 'money', sign: true },
 
   // Pivot TARF
   'm08.pivPivot': { value: M.pivPivot, kind: 'rate' },
   'm08.pivK1': { value: M.pivK1, kind: 'rate' },
   'm08.pivK2': { value: M.pivK2, kind: 'rate' },
-  'm08.pivWidth': { value: M.pivWidthPips, kind: 'pips' },
+  'm08.pivWidth': { value: M.pivWidthPips, kind: 'pips', digits: 0 },
   'm08.pivSe': { value: M.pivSePips, kind: 'pips' },
   'm08.pivTargetPips': { value: M.pivTargetPips, kind: 'pips', digits: 0 },
   'm08.pivTargetChf': { value: M.pivTargetChf, kind: 'money' },
   'm08.pivPTarget': { value: M.pivPTarget, kind: 'pct' },
-  'm08.pivExpFix': { value: M.pivExpFix, kind: 'num', digits: 1 },
+  'm08.pivExpFix': { value: M.pivExpFix, kind: 'num', digits: 1, note: 'Mean life, all paths' },
+  'm08.pivTargetFix': { value: M.pivTargetFix, kind: 'num', digits: 1 },
   'm08.pivQ05': { value: M.pivQ05, kind: 'money', sign: true },
   'm08.pivWorst': { value: M.pivWorst, kind: 'money' },
   'm08.pivShockPnl': { value: M.pivShock.pnl, kind: 'money', sign: true },
@@ -370,6 +432,11 @@ export const nums: NumTable = {
   // TPF
   'm08.tpfStrike': { value: M.tpfStrike, kind: 'rate' },
   'm08.tpfStrikeVsSpot': { value: M.tpfStrikeVsSpot, kind: 'pct', note: 'K / S − 1' },
+  'm08.tpfBelowSpot': {
+    value: Math.abs(M.tpfStrikeVsSpot),
+    kind: 'pct',
+    note: 'Distance of the strike below spot',
+  },
   'm08.tpfCoupon': { value: M.tpfCouponPips, kind: 'pips' },
   'm08.tpfSe': { value: M.tpfSePips, kind: 'pips' },
   'm08.tpfCouponChf': { value: M.tpfCouponChf, kind: 'money' },
@@ -382,12 +449,18 @@ export const nums: NumTable = {
     kind: 'pips',
     note: 'Closed form without target',
   },
+  'm08.tpfCouponNoDrift': {
+    value: M.tpfCouponNoDriftPips,
+    kind: 'pips',
+    note: 'Closed form without target and without interest differential (rf = rd)',
+  },
   'm08.tpfFwdAvg': { value: M.tpfFwdAvg, kind: 'rate' },
   'm08.tpfFwdEnd': { value: M.tpfFwdEnd, kind: 'rate', note: 'Forward to the last fixing' },
   'm08.tpfStrikeOverFwdEnd': { value: M.tpfStrikeOverFwdEndPips, kind: 'pips' },
   'm08.tpfFwdDrop': {
     value: M.tpfFwdDropPips,
     kind: 'pips',
+    digits: 0,
     note: 'Spot − forward to the last fixing',
   },
   'm08.tpfCrossMonth': {
@@ -426,10 +499,11 @@ export const nums: NumTable = {
   'm08.dciStrike': { value: M.dciStrike, kind: 'rate' },
   'm08.dciDistance': { value: M.dciDistance, kind: 'pct', digits: 0 },
   'm08.dciForward': { value: M.dciForward, kind: 'rate' },
-  'm08.dciStrikeVsFwd': { value: M.dciStrikeVsFwdPips, kind: 'pips' },
+  'm08.dciStrikeVsFwd': { value: M.dciStrikeVsFwdPips, kind: 'pips', digits: 0 },
   'm08.dciStrikeVsFwdAbs': {
     value: Math.abs(M.dciStrikeVsFwdPips),
     kind: 'pips',
+    digits: 0,
     note: 'Distance strike to forward',
   },
   'm08.dciFixBelow': {

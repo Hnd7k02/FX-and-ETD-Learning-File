@@ -4,7 +4,7 @@ import { defineDict } from '../types';
 export const touchlab = defineDict({
   de: {
     'tl.title': 'Touch-Labor',
-    'tl.sub': 'Auszahlung {payout} · Spot USD/CHF {spot} · {months} · Zins USD {rf}',
+    'tl.sub': 'Auszahlung {payout} · Spot USD/CHF {spot} · {months} · Zins CHF {rd}, USD {rf}',
     'tl.months': '3 Monate',
     'tl.mode': 'Produkt',
     'tl.mode.digital': 'Digital',
@@ -80,6 +80,10 @@ export const touchlab = defineDict({
     'tl.check.expiry': 'Preis = e^(−r_CHF · T) · Wahrscheinlichkeit = {v}.',
     'tl.check.hit':
       'Bei Berührung bezahlt ist der One-Touch mehr wert als die abgezinste Wahrscheinlichkeit ({v}), weil das Geld früher kommt.',
+    'tl.check.hitZero':
+      'Bei 0 % CHF-Zins ist früheres Geld nicht mehr wert: Preis = Wahrscheinlichkeit = {v}, ob bei Berührung oder bei Verfall bezahlt.',
+    'tl.check.hitNeg':
+      'Mit negativem CHF-Zins ist früheres Geld weniger wert: Bei Berührung bezahlt kostet der One-Touch weniger als die abgezinste Wahrscheinlichkeit ({v}).',
     'tl.check.dnt':
       'Monte Carlo mit täglichen Fixings für {l}/{u}: {mc} ± {se}. Stetige Formel mit BGK-verschobenen Barrieren: {bgk}.',
     'tl.check.dntOff':
@@ -104,7 +108,7 @@ export const touchlab = defineDict({
   },
   en: {
     'tl.title': 'Touch lab',
-    'tl.sub': 'Payout {payout} · spot USD/CHF {spot} · {months} · USD rate {rf}',
+    'tl.sub': 'Payout {payout} · spot USD/CHF {spot} · {months} · rates CHF {rd}, USD {rf}',
     'tl.months': '3 months',
     'tl.mode': 'Product',
     'tl.mode.digital': 'Digital',
@@ -180,6 +184,10 @@ export const touchlab = defineDict({
     'tl.check.expiry': 'Price = e^(−r_CHF · T) · probability = {v}.',
     'tl.check.hit':
       'Paid at the hit, the one-touch is worth more than the discounted probability ({v}) because the money arrives earlier.',
+    'tl.check.hitZero':
+      'At a 0% CHF rate, earlier money is worth no more: price = probability = {v}, paid at the hit or at expiry.',
+    'tl.check.hitNeg':
+      'With a negative CHF rate, earlier money is worth less: paid at the hit, the one-touch costs less than the discounted probability ({v}).',
     'tl.check.dnt':
       'Monte Carlo with daily fixings for {l}/{u}: {mc} ± {se}. Continuous formula with BGK-shifted barriers: {bgk}.',
     'tl.check.dntOff':

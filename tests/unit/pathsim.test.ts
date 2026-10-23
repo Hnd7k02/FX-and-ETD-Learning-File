@@ -19,6 +19,8 @@ import {
   rateDomain,
   scenarioFor,
   simEvents,
+  earlyEndFixings,
+  quoteCoupon,
   simProduct,
   simulate,
   simulateEnsemble,
@@ -53,10 +55,20 @@ describe('pathsim: products and parameters', () => {
   it('uses the fair parameter from mc-products.json by default', () => {
     for (const k of KINDS) {
       const p = simProduct(k);
-      expect(paramOf(p)).toBeCloseTo(
-        k === 'pivotTarf' ? MC_PRODUCTS.products.pivotTarf.value : MC_PRODUCTS.products[k].value,
-        6,
-      );
+      const fair =
+        k === 'pivotTarf' ? MC_PRODUCTS.products.pivotTarf.value : MC_PRODUCTS.products[k].value;
+      // coupons are quoted to 0.1 pip (PATHSIM_CONFIG.couponQuoteStep), the rest is exact
+      if (k === 'tpf' || k === 'rtpf') {
+        expect(paramOf(p)).toBe(quoteCoupon(fair));
+        expect(Math.abs(paramOf(p) - fair)).toBeLessThanOrEqual(
+          PATHSIM_CONFIG.couponQuoteStep / 2 + 1e-12,
+        );
+        // a whole CHF per coupon on USD 100’000, so coupon × count adds up on screen
+        const chf = paramOf(p) * p.notional;
+        expect(Math.abs(chf - Math.round(chf))).toBeLessThan(1e-6);
+      } else {
+        expect(paramOf(p)).toBeCloseTo(fair, 6);
+      }
       expect(fairInfo(k).value).toBe(MC_PRODUCTS.products[k].value);
       expect(horizonDays(p)).toBe(p.fixingDays[p.fixingDays.length - 1]);
     }
@@ -136,7 +148,7 @@ describe('pathsim: one simulated path', () => {
     for (const k of KINDS) {
       for (const name of PATHSIM_CONFIG.scenarios) {
         const sim = simulate(k, { name });
-        const ref = productPayoff(sim.path, fairProduct(k), DEFAULT_MARKET);
+        const ref = productPayoff(sim.path, simProduct(k), DEFAULT_MARKET);
         expect(sim.rows.length).toBe(sim.product.fixingDays.length);
         expect(sim.rows[sim.rows.length - 1]!.cumPnl).toBeCloseTo(ref.totalPnlQuote, 6);
         expect(sim.reason).toBe(ref.reason);
@@ -315,21 +327,36 @@ describe('pathsim: 100 paths', () => {
     expect(empty.meanEarly).toBeNull();
     expect(empty.meanMaturity).toBeNull();
     expect(empty.meanLoss).toBeNull();
-    const mk = (pnl: number, reason: EnsemblePath['reason']): EnsemblePath => ({
+    expect(empty.meanFixingsEarly).toBeNull();
+    const mk = (pnl: number, reason: EnsemblePath['reason'], endIndex = 0): EnsemblePath => ({
       path: new Float64Array(2),
-      endIndex: 0,
+      endIndex,
       endDay: 1,
       reason,
       pnl,
       bench: 0,
     });
-    const paths = [mk(5, 'target'), mk(-20, 'maturity'), mk(1, 'knockout')];
+    const paths = [mk(5, 'target', 1), mk(-20, 'maturity', 11), mk(1, 'knockout', 3)];
     const s = summarizeEnsemble(paths);
     expect(s.meanEarly).toBe(3);
+    expect(s.meanFixings).toBe(6);
+    expect(s.meanFixingsEarly).toBe(3);
     expect(s.meanMaturity).toBe(-20);
     expect(s.losses).toBe(1);
     expect(s.meanLoss).toBe(-20);
     expect(sortedByPnl(paths)).toEqual([1, 2, 0]);
+  });
+});
+
+describe('pathsim: mean life of the paths that end early', () => {
+  it('recovers the conditional mean from the mean over all paths', () => {
+    // 3 early paths ending after 2, 3 and 4 fixings, 1 path running all 12 fixings
+    expect(earlyEndFixings((2 + 3 + 4 + 12) / 4, 0.25, 0.75, 12)).toBeCloseTo(3, 12);
+    expect(earlyEndFixings(12, 1, 0, 12)).toBeNull();
+    const s = MC_PRODUCTS.products.accumulator.stats;
+    const early = earlyEndFixings(s.expectedFixings, s.pMaturity, s.pKnockOut, 26)!;
+    expect(early).toBeGreaterThan(1);
+    expect(early).toBeLessThan(s.expectedFixings);
   });
 });
 

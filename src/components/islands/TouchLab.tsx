@@ -277,8 +277,8 @@ export default function TouchLab({ lang, mc, initialMode }: TouchLabProps): JSX.
       <g>
         <path d={areaPath(dpts, base)} class="m7-area" />
         {rTop.length > 1 && <path d={areaPath(rTop, rBase)} class="m7-area-strong" />}
-        <path d={linePath(ramp)} class="m7-curve-short" />
         <path d={linePath(step)} class="m7-curve" />
+        <path d={linePath(ramp)} class="m7-compare" />
         <text x={kx + 8} y={yTop(0.45)} class="m7-label">
           {t('tl.area', { p: pct(n.prob) })}
         </text>
@@ -422,9 +422,12 @@ export default function TouchLab({ lang, mc, initialMode }: TouchLabProps): JSX.
               se: fmtMoney(mc.stdErr, 'CHF', lang),
             });
       default:
-        return s.mode === 'oneTouch' && s.payAt === 'hit'
-          ? t('tl.check.hit', { v: chf(n.df * n.prob) })
-          : t('tl.check.expiry', { v: chf(n.df * n.prob) });
+        if (s.mode === 'oneTouch' && s.payAt === 'hit') {
+          const key =
+            s.rdPct > 0 ? 'tl.check.hit' : s.rdPct < 0 ? 'tl.check.hitNeg' : 'tl.check.hitZero';
+          return t(key, { v: chf(n.df * n.prob) });
+        }
+        return t('tl.check.expiry', { v: chf(n.df * n.prob) });
     }
   })();
 
@@ -461,6 +464,7 @@ export default function TouchLab({ lang, mc, initialMode }: TouchLabProps): JSX.
               payout: fmtMoney(C.payout, 'CHF', lang),
               spot: rate(S),
               months,
+              rd: fmtPct(m.rd, lang, Number.isInteger(s.rdPct) ? 0 : 2),
               rf: fmtPct(m.rf, lang, 1),
             })}
           </div>
@@ -487,7 +491,7 @@ export default function TouchLab({ lang, mc, initialMode }: TouchLabProps): JSX.
                     {t('tl.legend.digital')}
                   </li>
                   <li>
-                    <span class="m7-sw m7-sw-short" />
+                    <span class="m7-sw m7-sw-vanilla" />
                     {t('tl.legend.spread')}
                   </li>
                   <li>
@@ -604,7 +608,7 @@ export default function TouchLab({ lang, mc, initialMode }: TouchLabProps): JSX.
               </li>
               {curves.second && (
                 <li>
-                  <span class="m7-sw m7-sw-short" />
+                  <span class="m7-sw m7-sw-vanilla" />
                   {secondLabel}
                 </li>
               )}
@@ -651,14 +655,14 @@ export default function TouchLab({ lang, mc, initialMode }: TouchLabProps): JSX.
                   d={`M${xB(S).toFixed(1)},${LB.top}V${LB.height - LB.bottom}`}
                   class="m7-ref"
                 />
-                <text x={xB(S) + 6} y={LB.top + 12} class="m7-ref-label">
+                <text x={xB(S) + 6} y={yB(0.5) + 4} class="m7-ref-label">
                   {t('tl.ref.spot')}
                 </text>
               </g>
             )}
-            {curves.second && <path d={PB(curves.second)} class="m7-curve-short tl-second" />}
-            <path d={PB(curves.prob)} class="m7-prob" />
+            {curves.second && <path d={PB(curves.second)} class="m7-compare" />}
             <path d={PB(curves.price)} class="m7-curve" />
+            <path d={PB(curves.prob)} class="m7-prob" />
             <path d={`M${atX.toFixed(1)},${LB.top}V${LB.height - LB.bottom}`} class="bl-guide" />
             {dragBot.active && <circle cx={atX} cy={atY} r={16} class="m7-halo" />}
             <circle cx={atX} cy={atY} r={dragBot.active ? 8 : 6} class="m7-dot" />

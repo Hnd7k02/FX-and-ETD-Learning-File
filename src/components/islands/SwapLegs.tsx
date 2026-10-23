@@ -314,14 +314,16 @@ export default function SwapLegs({ lang, initial }: SwapLegsProps): JSX.Element 
               {legArrows(FL.xNear, 1, near.base, near.quote)}
               {legArrows(FL.xFar, -1, far.base, far.quote)}
               {/* station captions */}
-              <text
-                x={FL.xToday}
-                y={FL.axisY + FL.L + 40}
-                class="m3-cap"
-                style={{ fontSize: fs, textAnchor: 'start' }}
-              >
-                {t('sl.station.today')}
-              </text>
+              {!FL.compact && (
+                <text
+                  x={FL.xToday}
+                  y={FL.axisY + FL.L + 40}
+                  class="m3-cap"
+                  style={{ fontSize: fs, textAnchor: 'start' }}
+                >
+                  {t('sl.station.today')}
+                </text>
+              )}
               {[
                 {
                   x: FL.xNear,
@@ -448,93 +450,6 @@ export default function SwapLegs({ lang, initial }: SwapLegsProps): JSX.Element 
               </g>
             </svg>
           </div>
-
-          <div
-            class="ff-scroll-x m3-table-wrap"
-            tabIndex={0}
-            role="region"
-            aria-label={t('sl.table.caption')}
-          >
-            <table class="ff-table m3-table" data-table>
-              <caption class="sr-only">{t('sl.table.caption')}</caption>
-              <thead>
-                <tr>
-                  <th scope="col">{t('sl.table.leg')}</th>
-                  <th scope="col" class="num">
-                    {t('sl.table.rate')}
-                  </th>
-                  <th scope="col" class="num">
-                    {base}
-                  </th>
-                  <th scope="col" class="num">
-                    {quote}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {[
-                  {
-                    name: t('sl.table.near'),
-                    date: t('sl.table.nearDate'),
-                    row: near,
-                    rate: nearTxt,
-                  },
-                  {
-                    name: t('sl.table.far'),
-                    date: t('sl.table.farDate', { days: tenor.days }),
-                    row: far,
-                    rate: farTxt,
-                  },
-                ].map((r) => (
-                  <tr key={r.name}>
-                    <th scope="row">
-                      <span class="m3-cell-main">{r.name}</span>
-                      <span class="m3-cell-sub">{r.date}</span>
-                    </th>
-                    <td class="num">{r.rate}</td>
-                    <td class={`num ${r.row.base >= 0 ? 'is-in' : 'is-out'}`}>
-                      {fmtNumber(r.row.base, lang, { sign: true })}
-                    </td>
-                    <td class={`num ${r.row.quote >= 0 ? 'is-in' : 'is-out'}`}>
-                      {fmtNumber(r.row.quote, lang, { sign: true })}
-                    </td>
-                  </tr>
-                ))}
-                <tr class="is-net">
-                  <th scope="row">
-                    <span class="m3-cell-main">{t('sl.table.net')}</span>
-                    <span class="m3-cell-sub">{t('sl.table.netSub')}</span>
-                  </th>
-                  <td class="num">{pipsTxt}</td>
-                  <td class="num">{fmtNumber(v.net.base, lang)}</td>
-                  <td class="num" data-net>
-                    {fmtNumber(v.net.quote, lang, { sign: true })}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div class={`m3-insight${aha ? ' is-aha' : ''}`} data-insight>
-            {aha && <b>{ahaTitle}</b>}
-            {aha && <span>{ahaText}</span>}
-            <span class="m3-eq">
-              <b>{t('sl.eq.title')}</b>
-              <span class="math">
-                <i>F</i> − <i>S</i> = <i>S</i> · (<i>r</i>
-                <sub>CHF</sub> · <i>t</i> − <i>r</i>
-                <sub>USD</sub> · <i>t</i>) / (1 + <i>r</i>
-                <sub>USD</sub> · <i>t</i>) = <span class="mono">{pipsTxt}</span>
-              </span>
-              <span class="m3-eq-sub">
-                {t('sl.eq.approx')}:{' '}
-                <span class="mono">{fmtPips(v.approxPoints, lang, 1, true)}</span>
-              </span>
-              <span>
-                {t('sl.eq.text', { diff: fmtPct(v.diff, lang, 2, true), days: tenor.days })}
-              </span>
-            </span>
-          </div>
         </div>
 
         <div class="ff-lab-side">
@@ -626,6 +541,99 @@ export default function SwapLegs({ lang, initial }: SwapLegsProps): JSX.Element 
                 })
               : ''}
           </div>
+        </div>
+      </div>
+      <div class="m3-below">
+        <div
+          class="ff-scroll-x m3-table-wrap"
+          tabIndex={0}
+          role="region"
+          aria-label={t('sl.table.caption')}
+        >
+          <table class="ff-table m3-table" data-table>
+            <caption class="sr-only">{t('sl.table.caption')}</caption>
+            <thead>
+              <tr>
+                <th scope="col">{t('sl.table.leg')}</th>
+                <th scope="col" class="num">
+                  {t('sl.table.rate')}
+                </th>
+                <th scope="col" class="num">
+                  {base}
+                </th>
+                <th scope="col" class="num">
+                  {quote}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                {
+                  name: t('sl.table.near'),
+                  date: t('sl.table.nearDate'),
+                  row: near,
+                  rate: nearTxt,
+                },
+                {
+                  name: t('sl.table.far'),
+                  date: t('sl.table.farDate', { days: tenor.days }),
+                  row: far,
+                  rate: farTxt,
+                },
+              ].map((r) => (
+                <tr key={r.name}>
+                  <th scope="row">
+                    <span class="m3-cell-main">{r.name}</span>
+                    <span class="m3-cell-sub">{r.date}</span>
+                  </th>
+                  <td class="num">{r.rate}</td>
+                  <td class={`num ${r.row.base >= 0 ? 'is-in' : 'is-out'}`}>
+                    {fmtNumber(r.row.base, lang, { sign: true })}
+                  </td>
+                  <td class={`num ${r.row.quote >= 0 ? 'is-in' : 'is-out'}`}>
+                    {fmtNumber(r.row.quote, lang, { sign: true })}
+                  </td>
+                </tr>
+              ))}
+              <tr class="is-net">
+                <th scope="row">
+                  <span class="m3-cell-main">{t('sl.table.net')}</span>
+                  <span class="m3-cell-sub">{t('sl.table.netSub')}</span>
+                </th>
+                <td class="num">{t('sl.table.pips', { pips: pipsTxt })}</td>
+                <td class="num">{fmtNumber(v.net.base, lang)}</td>
+                <td class="num" data-net>
+                  {fmtNumber(v.net.quote, lang, { sign: true })}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class={`m3-insight${aha ? ' is-aha' : ''}`} data-insight>
+          {aha && <b>{ahaTitle}</b>}
+          {aha && <span>{ahaText}</span>}
+          <span class="m3-eq">
+            <b>{t('sl.eq.title')}</b>
+            <span class="math">
+              <i>F</i> − <i>S</i> = <i>S</i> · (<i>r</i>
+              <sub>CHF</sub> − <i>r</i>
+              <sub>USD</sub>) · <i>t</i> / (1 + <i>r</i>
+              <sub>USD</sub> · <i>t</i>)
+            </span>
+            <span class="m3-eq-result">
+              {t('sl.eq.exact')}: <span class="mono">{t('sl.table.pips', { pips: pipsTxt })}</span>
+            </span>
+            <span class="m3-eq-sub">
+              {t('sl.eq.approx')}:{' '}
+              <span class="mono">
+                {t('sl.table.pips', { pips: fmtPips(v.approxPoints, lang, 1, true) })}
+              </span>
+            </span>
+            <span>
+              {t('sl.eq.text', { diff: fmtPct(v.diff, lang, 2, true), days: tenor.days })}
+            </span>
+          </span>
         </div>
       </div>
     </div>

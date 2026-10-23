@@ -121,8 +121,11 @@ describe('m07 paths (figure a)', () => {
   it('touch frequency of many paths matches the BGK-adjusted model probability', () => {
     const paths = seededPaths(M07_MARKET, 4000, 91, 123);
     const share = hitDays(paths, 0.824, 'up').filter((h) => h !== null).length / paths.length;
-    const model = pathsSummary(0.824, 'out').touchProb;
-    expect(Math.abs(share - model)).toBeLessThan(0.025);
+    const sum = pathsSummary(0.824, 'out');
+    expect(Math.abs(share - sum.touchProbDaily)).toBeLessThan(0.025);
+    // The figure shows the continuous probability, the same as the table in section 1.
+    expect(sum.touchProb).toBeCloseTo(touchProbability({ S, H: 0.824, T, vol, rd, rf }), 14);
+    expect(sum.touchProbDaily).toBeLessThan(sum.touchProb);
   });
 
   it('prices the importer call with a barrier (KO + KI = vanilla)', () => {
@@ -137,6 +140,7 @@ describe('m07 paths (figure a)', () => {
     expect(down.discount).toBeLessThan(0.15);
     const atSpot = pathsSummary(S, 'out');
     expect(atSpot.touchProb).toBe(1);
+    expect(atSpot.touchProbDaily).toBe(1);
     expect(atSpot.price).toBe(0);
   });
 
@@ -266,6 +270,13 @@ describe('m07 barrier lab (figure b)', () => {
     expect(labAha(t, labNumbers(t))).toBe('touched');
     const ki = { ...s0, io: 'in' as const };
     expect(labAha(ki, labNumbers(ki))).toBeNull();
+    // A regular knock-out is cheap only because a touch is likely, not because it loses the best
+    // scenarios: the up-and-out put with the barrier 60 pips above spot.
+    const reg2 = { ...s0, type: 'put' as const, barrier: 0.806 };
+    const n2 = labNumbers(reg2);
+    expect(n2.reverse).toBe(false);
+    expect(n2.discount).toBeGreaterThan(0.5);
+    expect(labAha(reg2, n2)).toBe('likely');
   });
 
   it('decomposes the down-and-out call by the method of images', () => {

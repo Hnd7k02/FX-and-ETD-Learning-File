@@ -100,8 +100,13 @@ export interface PathsSummary {
   price: number;
   /** 1 − price / vanilla. */
   discount: number;
-  /** Model probability of a touch before expiry with daily observation (BGK). */
+  /**
+   * Model probability of a touch before expiry with continuous monitoring, the convention of the
+   * price next to it and of the table in section 1 (so figure and text show the same number).
+   */
   touchProb: number;
+  /** The same with daily observation (BGK shift), the convention of the paths on screen. */
+  touchProbDaily: number;
 }
 
 /** Prices of the importer's call with a barrier (K = ATMF, T = 3 months). */
@@ -118,16 +123,16 @@ export function pathsSummary(
   const kind = `${dir}-and-${io}` as BarrierKind;
   const vanilla = gkPrice(S, K, T, vol, rd, rf, type);
   const price = barrierPrice({ S, K, H: barrier, T, vol, rd, rf, type, kind });
-  const touchProb = isBarrierTouched(kind, S, barrier)
-    ? 1
-    : touchProbability({
-        S,
-        H: dailyEquivalentBarrier(barrier, dir, vol),
-        T,
-        vol,
-        rd,
-        rf,
-        direction: dir,
-      });
-  return { dir, kind, vanilla, price, discount: vanilla > 0 ? 1 - price / vanilla : 0, touchProb };
+  const touched = isBarrierTouched(kind, S, barrier);
+  const prob = (H: number) =>
+    touched ? 1 : touchProbability({ S, H, T, vol, rd, rf, direction: dir });
+  return {
+    dir,
+    kind,
+    vanilla,
+    price,
+    discount: vanilla > 0 ? 1 - price / vanilla : 0,
+    touchProb: prob(barrier),
+    touchProbDaily: prob(dailyEquivalentBarrier(barrier, dir, vol)),
+  };
 }

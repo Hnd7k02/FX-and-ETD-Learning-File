@@ -270,18 +270,19 @@ export function defaultLabState(): LabState {
 }
 
 /** Annotation keys of the lab ("aha" moments). */
-export type LabAha = 'touched' | 'reverseNear' | 'regularNear' | 'cheap' | null;
+export type LabAha = 'touched' | 'reverseNear' | 'regularNear' | 'cheap' | 'likely' | null;
 
 /**
  * Which annotation fits: spot beyond the barrier → touched; within `nearPips` of the barrier →
- * reverse (delta flips) or regular (little value left); discount above 50 % → cheap.
+ * reverse (delta flips) or regular (little value left); discount above 50 % → cheap because the
+ * barrier cuts off the best scenarios (reverse) or because a knock-out is likely (regular).
  */
 export function labAha(s: LabState, n: LabNumbers): LabAha {
   if (n.touched) return 'touched';
   const dist = Math.abs(s.barrier - s.spot) / PIP;
   if (s.io === 'out' && dist <= M07_CONFIG.lab.nearPips)
     return n.reverse ? 'reverseNear' : 'regularNear';
-  if (s.io === 'out' && n.discount > 0.5) return 'cheap';
+  if (s.io === 'out' && n.discount > 0.5) return n.reverse ? 'cheap' : 'likely';
   return null;
 }
 

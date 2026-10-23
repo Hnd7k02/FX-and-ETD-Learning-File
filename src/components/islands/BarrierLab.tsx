@@ -208,18 +208,13 @@ export default function BarrierLab({ lang, initial }: BarrierLabProps): JSX.Elem
   const vline = (L: ReturnType<typeof chartLayout>, v: number, cls: string) => (
     <path d={`M${x(v).toFixed(1)},${L.top}V${L.height - L.bottom}`} class={cls} />
   );
-  const xAxis = (L: ReturnType<typeof chartLayout>, title: boolean) => (
+  const xAxis = (L: ReturnType<typeof chartLayout>) => (
     <g>
       {xTicks.map((v) => (
         <text key={`x${v}`} x={x(v)} y={L.height - 10} class="m7-tick" text-anchor="middle">
           {fmtRate(v, PAIR, 2)}
         </text>
       ))}
-      {title && !compact && (
-        <text x={x1} y={L.height - L.bottom - 8} class="m7-axis-title" text-anchor="end">
-          {t('bl.axis.spot')}
-        </text>
-      )}
     </g>
   );
   const yGrid = (y: typeof yV, ticks: number[], fmt: (v: number) => string) => (
@@ -257,6 +252,13 @@ export default function BarrierLab({ lang, initial }: BarrierLabProps): JSX.Elem
   const effX = x(n.effectiveBarrier);
   const showEff = s.monitoring === 'daily' && Math.abs(n.effectiveBarrier - s.barrier) > 1e-9;
   const labelLeft = s.dir === 'down';
+  const zoneText = t(s.io === 'out' ? 'bl.zone.out' : 'bl.zone.in');
+  const zoneWidth = Math.abs(
+    x(Math.min(xb, curves.region[1])) - x(Math.max(xa, curves.region[0])),
+  );
+  const zoneFits = zoneWidth >= zoneText.length * 7 + 20;
+  const zoneY = LV.height - LV.bottom - 10;
+  const zoneX = labelLeft ? bx - 6 : bx + 17;
 
   // annotation on the value chart, next to the spot dot
   let ahaEl: JSX.Element | null = null;
@@ -353,6 +355,9 @@ export default function BarrierLab({ lang, initial }: BarrierLabProps): JSX.Elem
       <div class="ff-lab">
         <div class="ff-lab-main" ref={box}>
           <div class="m7-chart-head">
+            <span class="tl-subhead">{t('bl.head.value')}</span>
+          </div>
+          <div class="m7-chart-head">
             <ul class="m7-legend" aria-hidden="true">
               <li>
                 <span class="m7-sw" />
@@ -426,14 +431,23 @@ export default function BarrierLab({ lang, initial }: BarrierLabProps): JSX.Elem
                 {t('bl.ref.effective', { v: rate(n.effectiveBarrier) })}
               </text>
             )}
-            <text
-              x={labelLeft ? x0 + 8 : x1 - 8}
-              y={LV.height - LV.bottom - 10}
-              class="m7-zone-label"
-              text-anchor={labelLeft ? 'start' : 'end'}
-            >
-              {t(s.io === 'out' ? 'bl.zone.out' : 'bl.zone.in')}
-            </text>
+            {zoneFits ? (
+              <text
+                x={labelLeft ? x0 + 8 : x1 - 8}
+                y={zoneY}
+                class="m7-zone-label"
+                text-anchor={labelLeft ? 'start' : 'end'}
+              >
+                {zoneText}
+              </text>
+            ) : (
+              <text
+                transform={`translate(${zoneX.toFixed(1)},${zoneY}) rotate(-90)`}
+                class="m7-zone-label"
+              >
+                {zoneText}
+              </text>
+            )}
             <g class="m7-handle" transform={`translate(${bx.toFixed(1)},${LV.top - 2})`}>
               <circle r={22} class="m7-handle-hit" />
               <circle r={dragV.active === 'barrier' ? 11 : 9} class="m7-handle-dot" />
@@ -442,10 +456,13 @@ export default function BarrierLab({ lang, initial }: BarrierLabProps): JSX.Elem
             <path d={`M${sx.toFixed(1)},${LV.top}V${LV.height - LV.bottom}`} class="bl-guide" />
             {dragV.active === 'spot' && <circle cx={sx} cy={svY} r={16} class="m7-halo" />}
             <circle cx={sx} cy={svY} r={dragV.active === 'spot' ? 8 : 6} class="m7-dot" />
-            {xAxis(LV, false)}
+            {xAxis(LV)}
             {ahaEl}
           </svg>
 
+          <div class="m7-chart-head">
+            <span class="tl-subhead">{t('bl.head.delta')}</span>
+          </div>
           <div class="m7-chart-head">
             <ul class="m7-legend" aria-hidden="true">
               <li>
@@ -493,7 +510,7 @@ export default function BarrierLab({ lang, initial }: BarrierLabProps): JSX.Elem
             {vline(LD, s.barrier, 'm7-barrier')}
             <path d={`M${sx.toFixed(1)},${LD.top}V${LD.height - LD.bottom}`} class="bl-guide" />
             <circle cx={sx} cy={sdY} r={dragD.active === 'spot' ? 8 : 6} class="m7-dot" />
-            {xAxis(LD, true)}
+            {xAxis(LD)}
           </svg>
           <p class="m7-hint">{t('bl.hint')}</p>
 
@@ -535,7 +552,7 @@ export default function BarrierLab({ lang, initial }: BarrierLabProps): JSX.Elem
                 {t('bl.parity.ko')}
               </li>
               <li>
-                <span class="m7-sw m7-sw-short" />
+                <span class="m7-sw m7-sw-ki" />
                 {t('bl.parity.ki')}
               </li>
             </ul>

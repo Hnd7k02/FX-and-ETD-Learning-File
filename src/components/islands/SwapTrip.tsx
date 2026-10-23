@@ -236,47 +236,15 @@ export default function SwapTrip({ lang }: SwapTripProps): JSX.Element {
                 x={sx}
                 ticks={xTicks}
                 y={L.height - 6}
-                format={(v) => fmtNumber(v, lang)}
+                format={(v) => t('trip.day.value', { day: fmtNumber(v, lang) })}
                 fontSize={L.font}
               />
-              <text
-                x={L.right}
-                y={L.bottom - 8}
-                class="m3-axis-title"
-                style={{ fontSize: fs, textAnchor: 'end' }}
-              >
-                {t('trip.x')}
-              </text>
             </svg>
           </div>
           <div class={`m3-insight${aha ? ' is-aha' : ''}`} data-insight>
             {aha && <b>{t('trip.aha.title')}</b>}
             <span>{insight}</span>
           </div>
-          <div class="m3-legs" data-legs>
-            <div class="m3-leg">
-              <span class="m3-leg-head">{t('trip.legs.near')}</span>
-              <span class="m3-leg-rate">{t('trip.legs.buy', { rate: nearTxt })}</span>
-              <span class="m3-flow is-in mono">
-                {fmtMoney(TRIP.swap.near.base, C.market.base, lang, 0, true)}
-              </span>
-              <span class="m3-flow is-out mono">{chf(TRIP.swap.near.quote)}</span>
-            </div>
-            <div class="m3-leg-arrow" aria-hidden="true">
-              <svg width="28" height="14" viewBox="0 0 28 14">
-                <path d="M2 7H24M19 2L25 7L19 12" class="m3-icon-stroke" />
-              </svg>
-            </div>
-            <div class="m3-leg">
-              <span class="m3-leg-head">{t('trip.legs.far', { days: T.days })}</span>
-              <span class="m3-leg-rate">{t('trip.legs.sell', { rate: farTxt })}</span>
-              <span class="m3-flow is-out mono">
-                {fmtMoney(TRIP.swap.far.base, C.market.base, lang, 0)}
-              </span>
-              <span class="m3-flow is-in mono">{chf(TRIP.swap.far.quote, true)}</span>
-            </div>
-          </div>
-          <p class="m3-hint">{t('trip.legs.net', { chf: swapTxt, days: T.days })}</p>
         </div>
 
         <div class="ff-lab-side">
@@ -351,6 +319,25 @@ export default function SwapTrip({ lang }: SwapTripProps): JSX.Element {
               highlight
             />
           </StatTable>
+          <div class="m3-legs is-stack" data-legs>
+            <div class="m3-leg">
+              <span class="m3-leg-head">{t('trip.legs.near')}</span>
+              <span class="m3-leg-rate">{t('trip.legs.buy', { rate: nearTxt })}</span>
+              <span class="m3-flow is-in mono">
+                {fmtMoney(TRIP.swap.near.base, C.market.base, lang, 0, true)}
+              </span>
+              <span class="m3-flow is-out mono">{chf(TRIP.swap.near.quote)}</span>
+            </div>
+            <div class="m3-leg">
+              <span class="m3-leg-head">{t('trip.legs.far', { days: T.days })}</span>
+              <span class="m3-leg-rate">{t('trip.legs.sell', { rate: farTxt })}</span>
+              <span class="m3-flow is-out mono">
+                {fmtMoney(TRIP.swap.far.base, C.market.base, lang, 0)}
+              </span>
+              <span class="m3-flow is-in mono">{chf(TRIP.swap.far.quote, true)}</span>
+            </div>
+          </div>
+          <p class="m3-hint">{t('trip.legs.net', { chf: swapTxt, days: T.days })}</p>
           <p class="m3-hint">{t('trip.hint')}</p>
           <div class="sr-only" aria-live="polite" aria-atomic="true">
             {done ? t('trip.live.done', { days: T.days, open: openTxt, swap: swapTxt }) : ''}
