@@ -33,6 +33,10 @@ const lang = pageLang(Astro.currentLocale);
   .sb p {
     margin: 0;
   }
+  /* rows without a symbol: text and value only */
+  .sb .ff-stat-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
   .sb-head-text {
     display: flex;
     flex-direction: column;

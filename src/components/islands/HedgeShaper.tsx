@@ -369,8 +369,8 @@ export default function HedgeShaper({ lang }: HedgeShaperProps): JSX.Element {
                 <text
                   key={`end-${id}`}
                   class="hs-note"
-                  x={sx(f.protectionEndsAt) - 8}
-                  y={sy(f.capRate) + L.font + 10}
+                  x={sx(f.protectionEndsAt) - 6}
+                  y={L.top + 2 * L.font + 14}
                   style={{
                     fontSize: fs,
                     fontWeight: 700,
@@ -379,7 +379,7 @@ export default function HedgeShaper({ lang }: HedgeShaperProps): JSX.Element {
                     ...halo,
                   }}
                 >
-                  {t('hs.ends')}
+                  {t('hs.ends', { k: rate(f.protectionEndsAt) })}
                 </text>
               )}
               {f.floorRate !== null && floorX1 !== null && (
@@ -387,7 +387,7 @@ export default function HedgeShaper({ lang }: HedgeShaperProps): JSX.Element {
                   key={`floor-${id}`}
                   class="hs-note"
                   x={floorLabelX}
-                  y={sy(f.floorRate) - 10}
+                  y={sy(f.floorRate) + L.font + 8}
                   style={{
                     fontSize: fs,
                     fontWeight: 800,

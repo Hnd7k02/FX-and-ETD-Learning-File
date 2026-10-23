@@ -27,12 +27,14 @@ import {
   baseVolRange,
   dragPillar,
   higherWing,
+  pickLabelSpot,
   premiumEffect,
   sameQuotes,
   smileGeometry,
   smilePresets,
   smileShape,
   volDomain,
+  type LabelBox,
   type Pillar,
 } from '@/lib/smile-builder';
 
@@ -45,6 +47,7 @@ export interface SmileBuilderProps {
 type View = 'strike' | 'delta';
 type Preset = 'example' | 'symmetric' | 'flat';
 type Change = 'init' | 'slider' | 'preset' | 'drag';
+type Anchor = 'start' | 'middle' | 'end';
 
 const PAIR = EXAMPLE.pair;
 const PIP = pipSize(PAIR);
@@ -114,7 +117,8 @@ export default function SmileBuilder(props: SmileBuilderProps): JSX.Element {
     (v) => v >= dom[0]! - 1e-9 && v <= dom[1]! + 1e-9,
   );
   const yDigits = step >= 0.01 - 1e-12 ? 0 : 1;
-  const curvePath = linePath(geom.points.map((p): Point => [xOf(p.K, p.deltaFwd), sy(p.vol)]));
+  const screen = geom.points.map((p): Point => [xOf(p.K, p.deltaFwd), sy(p.vol)]);
+  const curvePath = linePath(screen);
   const P = geom.pillars;
   const px = (k: Pillar) => xOf(P[k].K, P[k].deltaFwd);
 
@@ -207,6 +211,66 @@ export default function SmileBuilder(props: SmileBuilderProps): JSX.Element {
     return d ? t(`sb.tick.${d.key}`) : '';
   };
   const pillarLabel = (k: Pillar) => `${t(`sb.pillar.${k}`)} ${pct(geom.pillars[k].vol)}`;
+
+  /* label placement: BF label first, then each pillar label on its clearest side */
+  const charW = L.font * 0.58;
+  const boxOf = (tx: number, ty: number, w: number, anchor: Anchor): LabelBox => {
+    const x0 = anchor === 'end' ? tx - w : anchor === 'middle' ? tx - w / 2 : tx;
+    return { x0, x1: x0 + w, y0: ty - L.font, y1: ty + 3 };
+  };
+  const bfText = t('sb.bfLabel', { v: pts(qv.bf25) });
+  const bfSpot = {
+    x: xAtm + (bfLabelLeft ? -10 : 10),
+    y: (atmY + midY) / 2 + L.font * 0.35,
+    anchor: (bfLabelLeft ? 'end' : 'start') as Anchor,
+  };
+  const placed: LabelBox[] = PILLARS.map((k) => {
+    const x = px(k);
+    const y = sy(geom.pillars[k].vol);
+    return { x0: x - 9, x1: x + 9, y0: y - 9, y1: y + 9 };
+  });
+  if (showBf) placed.push(boxOf(bfSpot.x, bfSpot.y, bfText.length * charW, bfSpot.anchor));
+  const labelSpots = {} as Record<Pillar, { x: number; y: number; anchor: Anchor }>;
+  for (const k of ['put25', 'call25', 'atm'] as const) {
+    const x = px(k);
+    const y = sy(geom.pillars[k].vol);
+    const w = pillarLabel(k).length * charW;
+    const out: Anchor = k === 'put25' ? 'end' : 'start';
+    const inn: Anchor = k === 'put25' ? 'start' : 'end';
+    const dOut = k === 'put25' ? -11 : 11;
+    const up = y - 12;
+    const down = y + L.font + 12;
+    const spots: Array<{ x: number; y: number; anchor: Anchor }> =
+      k === 'atm'
+        ? [
+            { x, y: down, anchor: 'middle' },
+            { x, y: up, anchor: 'middle' },
+            { x: x + 12, y: down, anchor: 'start' },
+            { x: x - 12, y: down, anchor: 'end' },
+          ]
+        : [
+            { x: x + dOut, y: up, anchor: out },
+            { x: x + dOut, y: down, anchor: out },
+            { x: x - dOut, y: up, anchor: inn },
+            { x: x - dOut, y: down, anchor: inn },
+          ];
+    const boxes = spots.map((sp) => boxOf(sp.x, sp.y, w, sp.anchor));
+    const inside = boxes
+      .map((b, i) => ({ b, i }))
+      .filter(({ b }) => b.x0 >= L.left && b.x1 <= L.width - L.right && b.y0 >= L.top);
+    const pool = inside.length ? inside : boxes.map((b, i) => ({ b, i }));
+    const pick =
+      pool[
+        pickLabelSpot(
+          pool.map((p) => p.b),
+          screen,
+          [atmY, midY],
+          placed,
+        )
+      ]!;
+    labelSpots[k] = spots[pick.i]!;
+    placed.push(pick.b);
+  }
 
   return (
     <div
@@ -344,17 +408,17 @@ export default function SmileBuilder(props: SmileBuilderProps): JSX.Element {
                     style={{ fill: 'none', stroke: 'var(--ff-forward)', strokeWidth: 2 }}
                   />
                   <text
-                    x={xAtm + (bfLabelLeft ? -10 : 10)}
-                    y={(atmY + midY) / 2 + L.font * 0.35}
+                    x={bfSpot.x}
+                    y={bfSpot.y}
                     style={{
                       fontSize: fs,
                       fontWeight: 800,
                       fill: 'var(--ff-ink)',
-                      textAnchor: bfLabelLeft ? 'end' : 'start',
+                      textAnchor: bfSpot.anchor,
                       ...halo,
                     }}
                   >
-                    {t('sb.bfLabel', { v: pts(qv.bf25) })}
+                    {bfText}
                   </text>
                 </g>
               )}
@@ -363,9 +427,7 @@ export default function SmileBuilder(props: SmileBuilderProps): JSX.Element {
               {PILLARS.map((k) => {
                 const x = px(k);
                 const y = sy(geom.pillars[k].vol);
-                const below = k === 'atm';
-                const anchor = k === 'put25' ? 'end' : k === 'call25' ? 'start' : 'middle';
-                const dx = k === 'put25' ? -10 : k === 'call25' ? 10 : 0;
+                const spot = labelSpots[k];
                 const active = drag === k;
                 return (
                   <g
@@ -395,13 +457,13 @@ export default function SmileBuilder(props: SmileBuilderProps): JSX.Element {
                       }}
                     />
                     <text
-                      x={clamp(x + dx, L.left + 4, L.width - L.right - 4)}
-                      y={below ? y + L.font + 14 : y - 14}
+                      x={spot.x}
+                      y={spot.y}
                       style={{
                         fontSize: fs,
                         fontWeight: 700,
                         fill: 'var(--ff-ink)',
-                        textAnchor: anchor,
+                        textAnchor: spot.anchor,
                         pointerEvents: 'none',
                         ...halo,
                       }}

@@ -527,6 +527,10 @@
   .m7 .ff-stat-value {
     font-variant-numeric: tabular-nums;
   }
+  /* Rows without a symbol: label column shrinks, the value keeps its width. */
+  .m7 .ff-stat-row:not(:has(.ff-stat-symbol)) {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
   .m7-check-body {
     display: flex;
     flex-direction: column;
@@ -786,6 +790,19 @@
   }
   .m7 .gr-sw-order {
     border-top: 1.5px dashed var(--ff-exotics);
+  }
+  .m7 p.gr-aha {
+    margin: 8px 0 0;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: var(--ff-exotics-soft);
+    border: 1px solid #fed7aa;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--ff-ink-2);
+  }
+  .m7 p.gr-aha b {
+    color: var(--ff-exotics-text);
   }
   .gr-controls {
     align-items: flex-end;

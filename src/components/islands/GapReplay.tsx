@@ -160,11 +160,15 @@ export default function GapReplay(p: GapReplayProps): JSX.Element {
   ];
 
   // annotation at the shock
+  // The annotation sits in the empty lower left, left of the shock day; if that corner is too
+  // narrow (phones) it is shown as a note below the chart instead.
+  const ahaRoom = (shock >= 0 ? x(shock) : x1) - x0 - 16;
+  const ahaInChart = ahaRoom >= 170;
   let aha: JSX.Element | null = null;
-  if (triggered) {
+  if (triggered && ahaInChart) {
     const l1 = t('gr.aha.t');
     const l2 = t('gr.aha.d', { n: G.knockOuts.length, v: rate(sum.shock) });
-    const b = annotationBox(l1, l2, Math.min(300, x1 - x0 - 16));
+    const b = annotationBox(l1, l2, Math.min(300, ahaRoom));
     // lower left: below the floor before the shock, where the chart is empty
     const ax = x0 + 6;
     const ay = L.height - L.bottom - b.h - 6;
@@ -272,9 +276,15 @@ export default function GapReplay(p: GapReplayProps): JSX.Element {
                   y={y(p.floor) - 8}
                   class={`m7-label${triggered ? ' gr-gone-label' : ''}`}
                 >
-                  {triggered
-                    ? t('gr.floorEnded', { v: p.floorText, since: p.floorSince, date: p.floorEnd })
-                    : t('gr.floor', { v: p.floorText, since: p.floorSince })}
+                  {L.compact
+                    ? t('gr.floorShort', { v: p.floorText })
+                    : triggered
+                      ? t('gr.floorEnded', {
+                          v: p.floorText,
+                          since: p.floorSince,
+                          date: p.floorEnd,
+                        })
+                      : t('gr.floor', { v: p.floorText, since: p.floorSince })}
                 </text>
               </>
             )}
@@ -295,6 +305,11 @@ export default function GapReplay(p: GapReplayProps): JSX.Element {
             <circle cx={tip[0]} cy={tip[1]} r={5} class="m7-dot" />
             {aha}
           </svg>
+          {triggered && !ahaInChart && (
+            <p class="gr-aha" data-aha="gap">
+              <b>{t('gr.aha.t')}</b> {t('gr.aha.d', { n: G.knockOuts.length, v: rate(sum.shock) })}
+            </p>
+          )}
           <div class="m7-buttons gr-controls">
             <button type="button" class="m7-btn m7-btn-dark" onClick={play.toggle} data-play>
               <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">

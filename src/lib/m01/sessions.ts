@@ -71,7 +71,7 @@ export const SESSION_CONFIG = {
       closeUtc: 17,
       summerShiftUtc: -1,
       weight: 1,
-      fade: 0.2,
+      fade: 0.15,
       tz: 'Europe/London',
     },
     {
@@ -79,8 +79,8 @@ export const SESSION_CONFIG = {
       openUtc: 13,
       closeUtc: 22,
       summerShiftUtc: -1,
-      weight: 0.8,
-      fade: 0.7,
+      weight: 0.7,
+      fade: 0.6,
       tz: 'America/New_York',
     },
   ] as const satisfies readonly SessionDef[],
@@ -89,7 +89,7 @@ export const SESSION_CONFIG = {
   /** Width of the soft ramp at an open or close, in hours. */
   rampHours: 0.75,
   /** Liquidity level thresholds on the normalised curve (0 … 1). */
-  levels: { thin: 0.3, moderate: 0.55, high: 0.8 } as const,
+  levels: { thin: 0.3, moderate: 0.56, high: 0.8 } as const,
 } as const;
 
 export const SESSION_IDS: readonly SessionId[] = SESSION_CONFIG.sessions.map((s) => s.id);

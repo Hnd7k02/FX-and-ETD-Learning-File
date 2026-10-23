@@ -43,7 +43,7 @@ async function hydrated(page: Page, selector: string, nth = 0): Promise<Locator>
 
 /** Sets a labelled range input (the accessible twin of a chart handle). */
 async function setRange(scope: Locator, label: string, value: number | string) {
-  await scope.getByLabel(label, { exact: true }).fill(String(value));
+  await scope.getByRole('slider', { name: label, exact: true }).fill(String(value));
 }
 
 test.describe('module 08 · structured products', () => {

@@ -208,3 +208,46 @@ export function smilePresets(
     flat: { atm: example.atm, rr25: 0, bf25: 0 },
   };
 }
+
+/** A label box in screen units: x0 ≤ x1, y0 ≤ y1 (SVG y grows downwards). */
+export interface LabelBox {
+  x0: number;
+  x1: number;
+  y0: number;
+  y1: number;
+}
+
+/** Distance between [a0, a1] and [b0, b1] (0 if they overlap). */
+const gap = (a0: number, a1: number, b0: number, b1: number) =>
+  Math.max(0, Math.max(a0, b0) - Math.min(a1, b1));
+
+/**
+ * Picks the label position that stays clearest of a curve, horizontal reference lines and
+ * boxes already placed. Score per candidate: the smallest vertical distance to the curve points
+ * under the box, to the lines (+4 px slack, they are thin and dashed) and to the boxes that
+ * overlap horizontally. Returns the index of the best candidate (first one wins ties).
+ */
+export function pickLabelSpot(
+  candidates: readonly LabelBox[],
+  curve: ReadonlyArray<readonly [number, number]>,
+  lines: readonly number[] = [],
+  placed: readonly LabelBox[] = [],
+): number {
+  let best = 0;
+  let bestScore = -Infinity;
+  candidates.forEach((c, i) => {
+    let score = Infinity;
+    for (const [x, y] of curve) {
+      if (x >= c.x0 - 4 && x <= c.x1 + 4) score = Math.min(score, gap(c.y0, c.y1, y, y));
+    }
+    for (const y of lines) score = Math.min(score, gap(c.y0, c.y1, y, y) + 4);
+    for (const b of placed) {
+      if (gap(c.x0, c.x1, b.x0, b.x1) === 0) score = Math.min(score, gap(c.y0, c.y1, b.y0, b.y1));
+    }
+    if (score > bestScore + 1e-9) {
+      bestScore = score;
+      best = i;
+    }
+  });
+  return best;
+}

@@ -16,6 +16,7 @@ import {
   smileShape,
   volDomain,
   baseVolRange,
+  pickLabelSpot,
 } from '@/lib/smile-builder';
 
 describe('grid and geometry', () => {
@@ -135,5 +136,22 @@ describe('premium effect', () => {
     // RR < 0: the USD put is dearer on the smile, the USD call cheaper
     expect(e.put25.smile).toBeGreaterThan(e.put25.flat);
     expect(e.call25.smile).toBeLessThan(e.call25.flat);
+  });
+});
+
+describe('label placement', () => {
+  const box = (x0: number, y0: number) => ({ x0, x1: x0 + 60, y0, y1: y0 + 12 });
+  it('avoids the curve', () => {
+    // a flat curve at y = 100: the box above (y 70–82) beats the box crossing it (y 95–107)
+    const curve = Array.from({ length: 21 }, (_, i) => [i * 10, 100] as const);
+    expect(pickLabelSpot([box(50, 95), box(50, 70)], curve)).toBe(1);
+  });
+
+  it('keeps clear of lines and placed boxes', () => {
+    const curve = [[0, 300] as const];
+    expect(pickLabelSpot([box(0, 95), box(0, 40)], curve, [100])).toBe(1);
+    expect(pickLabelSpot([box(0, 40), box(0, 140)], curve, [], [box(20, 38)])).toBe(1);
+    // a placed box elsewhere does not matter; ties keep the first candidate
+    expect(pickLabelSpot([box(0, 40), box(0, 140)], curve, [], [box(200, 38)])).toBe(0);
   });
 });
