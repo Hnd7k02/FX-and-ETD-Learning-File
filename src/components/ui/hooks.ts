@@ -26,13 +26,20 @@ export function useElementWidth<T extends Element>(ref: RefObject<T>, fallback =
   useEffect(() => {
     const el = ref.current;
     if (!el || typeof ResizeObserver === 'undefined') return;
+    // The new width is applied in the next frame (see RiskometerChart useBoxSize).
+    let raf = 0;
     const ro = new ResizeObserver((entries) => {
       const cw = entries[0]?.contentRect.width;
-      if (cw && Math.abs(cw - w) > 0.5) setW(cw);
+      if (!cw) return;
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => setW((prev) => (Math.abs(cw - prev) > 0.5 ? cw : prev)));
     });
     ro.observe(el);
     setW(el.getBoundingClientRect().width || fallback);
-    return () => ro.disconnect();
+    return () => {
+      cancelAnimationFrame(raf);
+      ro.disconnect();
+    };
   }, [ref.current]);
   return w;
 }

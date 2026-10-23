@@ -149,6 +149,9 @@ const last = MODULES.length - 1;
     font-size: 14px;
   }
   .path-card {
+    /* containing block for the visually hidden labels, so they scroll with the stations
+       instead of widening the page (iPad portrait) */
+    position: relative;
     padding: 28px 20px 20px;
     overflow-x: auto;
     box-shadow: none;

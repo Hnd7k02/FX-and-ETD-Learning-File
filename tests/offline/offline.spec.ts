@@ -182,6 +182,17 @@ test.describe('smoke', () => {
   });
 });
 
+test('no horizontal scroll at laptop window widths', async ({ page, open }) => {
+  for (const width of [1024, 1280]) {
+    await page.setViewportSize({ width, height: 800 });
+    for (const r of ['/', '/module/05-greeks/2/', '/riskometer/', '/glossar/', '/ueber/']) {
+      await open(r);
+      await expect(page.locator('#main')).toHaveAttribute('data-route', r);
+      await expectNoHorizontalScroll(page);
+    }
+  }
+});
+
 test.describe('hash routing', () => {
   test('station → module, pager, back button', async ({ page, open }) => {
     await open();
@@ -217,12 +228,45 @@ test.describe('hash routing', () => {
     await expect(page.locator('[data-greekslab]').first()).toBeVisible();
   });
 
+  test('a link to the open page adds no history entry; Back keeps the scroll position', async ({
+    page,
+    open,
+  }) => {
+    await open();
+    const station = page.locator('#lernpfad [data-station]').first();
+    await station.scrollIntoViewIfNeeded();
+    const y = await page.evaluate(() => Math.round(window.scrollY));
+    expect(y).toBeGreaterThan(100);
+    await station.click();
+    await expect(page.locator('#main')).toHaveAttribute('data-route', '/module/01-spot/1/');
+    await page.locator('[data-step="1"]').click(); // the step that is already open
+    await expect(page.locator('#main')).toHaveAttribute('data-route', '/module/01-spot/1/');
+    await page.goBack();
+    await expect(page.locator('#main')).toHaveAttribute('data-route', '/');
+    await expect
+      .poll(() => page.evaluate(() => Math.round(window.scrollY)))
+      .toBeGreaterThan(y - 40);
+  });
+
+  test('in-page anchors highlight the target and move focus to it', async ({ page, open }) => {
+    await open('/glossar/');
+    const link = page.locator('.gl-letter-link').nth(5);
+    const id = ((await link.getAttribute('href')) ?? '').slice(1);
+    await link.click();
+    await expect(page.locator(`[id="${id}"]`)).toHaveAttribute('data-target', '');
+    await expect.poll(() => page.evaluate(() => document.activeElement?.id)).toBe(id);
+    expect(await currentRoute(page)).toBe('/glossar/');
+  });
+
   test('short, redirect and unknown routes', async ({ page, open }) => {
     await open('/module/05-greeks/2');
     await expect(page.locator('#main')).toHaveAttribute('data-route', '/module/05-greeks/2/');
     await open('/module/05-greeks/');
     await expect(page.locator('#main')).toHaveAttribute('data-route', '/module/05-greeks/1/');
     await open('/gibt-es-nicht/');
+    await expect(page.locator('#main')).toHaveAttribute('data-route', '/404/');
+    await expect(page.locator('h1')).toBeVisible();
+    await open('/en/gibt-es-nicht/');
     await expect(page.locator('#main')).toHaveAttribute('data-route', '/404/');
     await expect(page.locator('h1')).toBeVisible();
   });
@@ -232,6 +276,40 @@ test.describe('hash routing', () => {
     const nav = page.getByRole('navigation', { name: 'Hauptnavigation' });
     await expect(nav.locator('[aria-current="page"]')).toHaveCount(1);
     await expect(nav.locator('[aria-current="page"]')).toHaveAttribute('href', '#/riskometer/');
+  });
+});
+
+test.describe('touch', () => {
+  test('a touch on a chart handle does not scroll the page, elsewhere it does', async ({
+    page,
+    open,
+  }) => {
+    await open('/module/07-barrier-binary/1/');
+    await expect(page.locator('.m7-hitband, .m7-handle').first()).toBeAttached();
+    const result = await page.evaluate(() => {
+      if (!('ontouchstart' in window) || typeof Touch === 'undefined') return 'no-touch';
+      const handle = [...document.querySelectorAll('svg *')].find(
+        (el) => (el as SVGElement).ownerSVGElement && getComputedStyle(el).touchAction === 'none',
+      );
+      const text = document.querySelector('#main p');
+      if (!handle || !text) return 'missing';
+      const fire = (target: Element) => {
+        const t = new Touch({ identifier: 1, target, clientX: 10, clientY: 10 });
+        const ev = new TouchEvent('touchstart', {
+          touches: [t],
+          targetTouches: [t],
+          changedTouches: [t],
+          bubbles: true,
+          cancelable: true,
+        });
+        target.dispatchEvent(ev);
+        target.dispatchEvent(new TouchEvent('touchend', { bubbles: true }));
+        return ev.defaultPrevented;
+      };
+      return `${fire(handle)}/${fire(text)}`;
+    });
+    test.skip(result === 'no-touch', 'project without touch input');
+    expect(result).toBe('true/false');
   });
 });
 
@@ -254,6 +332,21 @@ test.describe('fallbacks', () => {
     await open('/module/05-greeks/2/');
     await page.locator('[data-section-end]').scrollIntoViewIfNeeded();
     await expect(page.locator('[data-greekslab]').first()).toBeVisible();
+  });
+
+  test('the data block stays in the page (a saved copy keeps working)', async ({ page, open }) => {
+    await open();
+    const len = await page.evaluate(() => document.getElementById('ff-data')?.textContent?.length);
+    expect(len).toBeGreaterThan(100_000);
+  });
+
+  test('"Weiterlernen" moves on when a section is finished', async ({ page, open }) => {
+    await open('/module/01-spot/1/');
+    const cont = page.locator('a[data-continue]');
+    await expect(cont).toHaveAttribute('href', '#/module/01-spot/1/');
+    await page.locator('[data-section-end]').scrollIntoViewIfNeeded();
+    await expect(page.locator('[data-section-done]')).toBeVisible();
+    await expect(cont).toHaveAttribute('href', '#/module/01-spot/2/');
   });
 
   test('monte carlo prices on the main thread (no web worker)', async ({ page, open }) => {

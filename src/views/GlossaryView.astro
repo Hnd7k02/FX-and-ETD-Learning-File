@@ -353,7 +353,8 @@ const familyCounts = Object.fromEntries(
   .gl-item[hidden] {
     display: none;
   }
-  .gl-item:target {
+  .gl-item:target,
+  .gl-item[data-target] {
     background: var(--fam-soft);
     box-shadow: inset 4px 0 0 var(--fam);
   }

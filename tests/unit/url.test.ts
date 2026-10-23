@@ -1,5 +1,12 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { isHashRouted, parseHashRoute, readQuery, scrollToId, writeQuery } from '@/lib/url';
+import {
+  isHashRouted,
+  jumpToId,
+  parseHashRoute,
+  readQuery,
+  scrollToId,
+  writeQuery,
+} from '@/lib/url';
 
 type W = {
   location: { hash: string; search: string; href: string; pathname: string };
@@ -102,5 +109,34 @@ describe('query helpers', () => {
     };
     expect(scrollToId('term-pip', false)).toBe(true);
     expect(calls).toEqual(['#term-pip']);
+  });
+
+  it('jumpToId marks the target, makes it focusable and focuses it', () => {
+    fakeWindow('#/glossar/');
+    const attrs: Record<string, Record<string, string>> = { old: { 'data-target': '' }, t: {} };
+    let focused = '';
+    const el = (id: string, interactive = false) => ({
+      scrollIntoView: () => undefined,
+      hasAttribute: (a: string) => a in attrs[id]!,
+      setAttribute: (a: string, v: string) => (attrs[id]![a] = v),
+      removeAttribute: (a: string) => delete attrs[id]![a],
+      matches: () => interactive,
+      focus: () => (focused = id),
+    });
+    attrs.btn = {};
+    (globalThis as unknown as { document: unknown }).document = {
+      getElementById: (id: string) =>
+        id === 'term-pip' ? el('t') : id === 'b' ? el('btn', true) : null,
+      querySelectorAll: () => [el('old')],
+    };
+    expect(jumpToId('term-pip')).toBe(true);
+    expect(attrs.old).toEqual({});
+    expect(attrs.t).toEqual({ 'data-target': '', tabindex: '-1', 'data-jump-focus': '' });
+    expect(focused).toBe('t');
+    // interactive elements keep their own focus behaviour
+    expect(jumpToId('b')).toBe(true);
+    expect(attrs.btn).toEqual({ 'data-target': '' });
+    expect(focused).toBe('btn');
+    expect(jumpToId('nope')).toBe(false);
   });
 });

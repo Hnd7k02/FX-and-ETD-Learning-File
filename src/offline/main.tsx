@@ -19,8 +19,9 @@ import '@/client/stepper';
 import '@/client/section-end';
 import '@/client/about-toc';
 import '@/client/home';
+import '@/client/svg-touch';
 import { switchLangPath } from '@/i18n/routes';
-import { parseHashRoute, scrollToId } from '@/lib/url';
+import { jumpToId, parseHashRoute } from '@/lib/url';
 import { ISLANDS } from 'virtual:ff-islands';
 
 type Lang = 'de' | 'en';
@@ -70,8 +71,22 @@ function loadData(): OfflineData {
   const bin = atob(el.textContent.trim());
   const bytes = new Uint8Array(bin.length);
   for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-  el.textContent = ''; // free the base64 string
+  // The data block stays in the document: a copy saved with Ctrl+S ("Webpage, Complete") must
+  // still contain it.
   return JSON.parse(strFromU8(gunzipSync(bytes))) as OfflineData;
+}
+
+/** Replaces the loading text when the file cannot start (e.g. an incomplete copy). */
+function startupFailed(err: unknown): never {
+  const el = document.getElementById('main');
+  if (el) {
+    el.innerHTML =
+      '<p class="container" style="padding:48px 16px;font-family:system-ui,sans-serif">' +
+      'Forward First konnte nicht starten. Bitte die Originaldatei forward-first.html öffnen, ' +
+      'keine im Browser gespeicherte Kopie. / Forward First could not start. Please open the ' +
+      'original file forward-first.html, not a copy saved by the browser.</p>';
+  }
+  throw err;
 }
 
 /* ------------------------------------------------------------------------------------------ */
@@ -177,7 +192,12 @@ function rewriteLinks(root: ParentNode): void {
 /* Router                                                                                      */
 /* ------------------------------------------------------------------------------------------ */
 
-const data = loadData();
+let data: OfflineData;
+try {
+  data = loadData();
+} catch (err) {
+  startupFailed(err);
+}
 const main = document.getElementById('main')!;
 const top = document.getElementById('ff-top')!;
 const bottom = document.getElementById('ff-bottom')!;
@@ -196,11 +216,16 @@ function storedLang(): Lang {
   }
 }
 
+/** The page shown for a route: the page itself, its alias target or the 404 page. */
 function resolve(path: string): string {
   if (!path) return storedLang() === 'en' ? '/en/' : '/';
   if (data.pages[path]) return path;
-  if (data.aliases[path]) return data.aliases[path]!;
-  return path.startsWith('/en/') ? '/en/404/' : '/404/';
+  const alias = data.aliases[path];
+  if (alias && data.pages[alias]) return alias;
+  const notFound = path.startsWith('/en/') ? '/en/404/' : '/404/';
+  if (data.pages[notFound]) return notFound;
+  const notFoundAlias = data.aliases[notFound];
+  return notFoundAlias && data.pages[notFoundAlias] ? notFoundAlias : '/404/';
 }
 
 function navKeyOf(path: string): NavKey {
@@ -268,13 +293,14 @@ function swap(path: string, page: PageRec): void {
   mountIslands(main);
 }
 
-function show(): void {
+function show(force = false): void {
   const { path: raw, anchor } = parseHashRoute(window.location.hash);
   const path = resolve(raw);
-  const page = data.pages[path]!;
+  const page = data.pages[path] ?? data.pages['/404/']!;
   const sameRoute = path === current;
-  if (sameRoute && !first) {
-    if (anchor) scrollToId(anchor);
+  if (sameRoute && !first && !force) {
+    navByLink = false;
+    if (anchor) jumpToId(anchor);
     return;
   }
   if (current) scrollMemory.set(current, window.scrollY);
@@ -291,14 +317,15 @@ function show(): void {
   first = false;
   const run = () => {
     swap(path, page);
-    // scroll: anchor, else restored position (back/forward), else top
-    if (!(anchor && scrollToId(anchor, false))) {
+    // scroll: anchor (which also takes the focus), else restored position (back/forward), else top
+    const jumped = !!anchor && jumpToId(anchor, false);
+    if (!jumped) {
       const y = !byLink ? scrollMemory.get(path) : undefined;
       window.scrollTo(0, y ?? 0);
     }
     document.dispatchEvent(new Event('astro:page-load'));
     if (!wasFirst) {
-      main.focus({ preventScroll: true });
+      if (!jumped) main.focus({ preventScroll: true });
       if (announcer) announcer.textContent = page.t;
     }
   };
@@ -324,18 +351,25 @@ function show(): void {
  */
 function navigate(route: string): void {
   const target = `#${route}`;
-  navByLink = true;
-  if (window.location.hash === target) {
-    show();
+  const next = parseHashRoute(target);
+  const now = parseHashRoute(window.location.hash);
+  if (resolve(next.path) === current && next.query === now.query) {
+    // Link to the page that is already open: no history entry (it would drop an island's query
+    // and the scroll position for Back), only the anchor if there is one.
+    navByLink = false;
+    if (next.anchor) jumpToId(next.anchor);
     return;
   }
+  navByLink = true;
+  // Same page with another query (e.g. a Riskometer deep link on the Riskometer): mount again.
+  const force = resolve(next.path) === current;
   try {
     history.pushState(null, '', target);
   } catch {
     window.location.hash = target;
     return;
   }
-  show();
+  show(force);
 }
 
 /* ------------------------------------------------------------------------------------------ */
@@ -368,14 +402,14 @@ document.addEventListener('click', (e) => {
       main.focus();
       return;
     }
-    scrollToId(id);
+    jumpToId(id);
   }
 });
 
 // Back/forward after pushState fires 'popstate'; typed or programmatic hash changes fire
 // 'hashchange'. show() ignores the second call for the same route.
-window.addEventListener('popstate', show);
-window.addEventListener('hashchange', show);
+window.addEventListener('popstate', () => show());
+window.addEventListener('hashchange', () => show());
 
 // Links created later by islands or page scripts (e.g. "Weiterlernen") are rewritten as well.
 new MutationObserver((records) => {

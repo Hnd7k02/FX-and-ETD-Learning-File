@@ -58,6 +58,24 @@ export function writeQuery(params: URLSearchParams): void {
 }
 
 /** Scrolls to an element id on the current page without changing the route. */
+/**
+ * Jumps to an in-page target like a followed fragment link: scrolls to it, marks it with
+ * `data-target` (stands in for :target, which a hash route cannot set) and moves keyboard focus
+ * there, so the next Tab continues at the target (WCAG 2.4.3). Returns false if the id is absent.
+ */
+export function jumpToId(id: string, smooth = true): boolean {
+  if (!scrollToId(id, smooth)) return false;
+  const el = document.getElementById(id)!;
+  document.querySelectorAll('[data-target]').forEach((t) => t.removeAttribute('data-target'));
+  el.setAttribute('data-target', '');
+  if (!el.hasAttribute('tabindex') && !el.matches('a[href], button, input, select, textarea')) {
+    el.setAttribute('tabindex', '-1');
+    el.setAttribute('data-jump-focus', '');
+  }
+  el.focus({ preventScroll: true });
+  return true;
+}
+
 export function scrollToId(id: string, smooth = true): boolean {
   if (typeof document === 'undefined' || !id) return false;
   const el = document.getElementById(id);

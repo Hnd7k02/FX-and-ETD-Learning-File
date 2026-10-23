@@ -699,3 +699,8 @@ details.derivation > .derivation-body {
 #main:focus {
   outline: none;
 }
+/* Jump targets made focusable by jumpToId (headings, glossary entries): the highlight or the
+   scroll position shows where focus is; no extra outline on a whole section. */
+[data-jump-focus]:focus {
+  outline: none;
+}

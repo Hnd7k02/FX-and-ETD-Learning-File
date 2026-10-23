@@ -81,10 +81,19 @@ function useBoxSize(ref: { current: HTMLDivElement | null }): BoxSize {
           : s,
       );
     };
-    const ro = new ResizeObserver(read);
+    // Apply the new size in the next frame: re-rendering inside the observer callback changes
+    // the layout it just measured and raises "ResizeObserver loop completed" in the browsers.
+    let raf = 0;
+    const ro = new ResizeObserver(() => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(read);
+    });
     ro.observe(el);
     read();
-    return () => ro.disconnect();
+    return () => {
+      cancelAnimationFrame(raf);
+      ro.disconnect();
+    };
   }, [ref.current]);
   return size;
 }

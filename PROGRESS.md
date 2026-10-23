@@ -23,7 +23,7 @@ Dario tests `forward-first.html` on the work PC and the iPad, including module 0
 ## Current state
 
 - **Output:** one offline file `release/forward-first.html`, about 1.6 MB (CSS 475 KB, JS 740 KB, packed pages 446 KB). 99 pages, 19 route aliases, 38 islands, both languages. CSP `default-src 'none'`, no network request (tested).
-- **Tests:** `npm run check` green (Vitest 1’989 tests, coverage ≥ 90 % in `src/lib`). Offline file: 19 tests green in Chromium locally; WebKit iPad runs in CI. Web build component tests: 460 green.
+- **Tests:** `npm run check` green (Vitest 1’995 tests, coverage ≥ 90 % in `src/lib`). Offline file: 25 tests green in Chromium locally; WebKit iPad runs in CI. Web build component tests: 460 green.
 - **Calculation core:** forward, swap, roll, arbitrage, Garman-Kohlhagen, Black-76, implied vol, delta strikes, six Greeks, smile, digitals, 8 barriers, touch, double no-touch; all §6 reference values within tolerance; cross-checked against independent formulas (max diff 1.8e-13).
 - **Monte Carlo:** 8 products, fair strikes/coupons with standard errors in `src/data/fx/mc-products.json`, independently re-implemented and reproduced; interactive pricing in chunks on the main thread.
 - **Riskometer data:** ECB until 14.09.2026; EUR/CHF 3.9 % (Normal, percentile 45). Manual update via Actions → Release.
@@ -36,7 +36,7 @@ Dario tests `forward-first.html` on the work PC and the iPad, including module 0
 
 ## Open questions for Dario
 
-1. **Device test results:** anything that behaves differently on the iPad (Files app preview vs. Safari) or on the work PC (Edge policies, blocked storage) goes here. Playwright's WebKit on Linux is close to, but not the same as, iPadOS Safari.
+1. **Device test results:** please check on the iPad in particular: dragging the barrier lines in module 07 section 1 and the level handle in module 08 section 2 (must move the handle, not scroll the page), the franc-shock replay in module 07 section 4, and the learning path on the home page in portrait. Anything that behaves differently on the iPad (Files app preview vs. Safari) or on the work PC (Edge policies, blocked storage) goes here. Playwright's WebKit on Linux is close to, but not the same as, iPadOS Safari.
 2. **Data freshness:** the sandbox could not reach the ECB API; data ends 14.09.2026. Run Actions → Release with "Fetch new ECB reference rates first" to update. If `main` is protected, the workflow's push needs a rule exception.
 3. **2008 event wording (D-30):** the approved prototype named the failed US investment bank; currently neutral because of the no-bank-names rule. Name it as a historical fact?
 4. **Structured product parameters (D-29):** with the §8.7 values the TARF reaches its 500-pip target after ~2.4 fixings in 94 % of paths, TPF/RTPF coupons are ~775–810 pips per fixing. Keep (current: taught as the asymmetry lesson) or change, e.g. TARF target 1’500 pips, strikes relative to the forward? One edit in `MC_CONFIG` + `npm run data:mc`.
