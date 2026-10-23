@@ -1,0 +1,58 @@
+import ProductMatrixFigure from '@/components/figures/ProductMatrixFigure.astro';
+
+{/* 09 Hedge, alpha, yield · Section 1 · Intuition. Numbers only via <Num />, registry src/lib/nums/m09.ts. */}
+
+For eight modules you have been collecting building blocks: spot, forward, swap, options, Greeks, barriers and structured products. Now we turn the question round. Not ‘What can this product do?’ but ‘What do you need?’.
+
+Three people look at the same rate, USD/CHF <Num of="ex.spot" />:
+
+- **The importer** has to pay USD 1m in 3 months. He wants certainty. His need is a **hedge**.
+- **An investor with a market view** does not believe in a weak dollar. She wants to make money from that view: **alpha**.
+- **An investor with francs in his account** wants more than the CHF rate of <Num of="ex.rd" />. He is looking for **yield**.
+
+The need decides which risk is wanted at all. The importer already has a risk: he is short USD. He wants to get rid of it. The investor with a view wants to take a risk, but only the one she is betting on. The yield investor accepts some risk in return for more interest.
+
+### Same view, different risk
+
+Only then comes the market view. Take ‘USD will strengthen’. The importer can act on this view with a forward, a stop-loss order or a USD call. All three protect him, but each with a different worst case: a missed chance, a gap or the premium.
+
+<ProductMatrixFigure caption="Choose a need and a view. The chart puts every matching product on one axis; drag the rate at expiry or play it. The chips show leverage, path, worst case and complexity, always in words." />
+
+Click through the matrix. Under ‘Alpha’ the same view suddenly becomes a TARF or an accumulator: a strike far better than the forward, but twice the amount below the strike. Under ‘Yield’ and ‘Sideways’, dual currency and the discount certificate pay more interest as long as the dollar does not fall. And the two have exactly the same curve. [Section 4](/en/module/09-hedge-alpha-yield/4/) shows why.
+
+### Worked example: forward or call?
+
+The importer compares two hedges for the view ‘USD stronger’. He measures the result of the hedge at expiry in pips per USD. A plus offsets his extra cost.
+
+- **Dollar <Num of="m09.s1Move" /> stronger, USD/CHF <Num of="m09.s1Up" />:** the forward earns <Num of="m09.s1FwdUp" /> pips, so <Num of="m09.s1FwdUpChf" /> on USD 1m. The call earns only <Num of="m09.s1CallUp" /> pips, because the premium of <Num of="m09.callPremiumPips" /> pips is deducted.
+- **Dollar <Num of="m09.s1Move" /> weaker, USD/CHF <Num of="m09.s1Down" />:** now it turns round. The forward costs <Num of="m09.s1FwdDown" /> pips, because the importer could have bought more cheaply. The call costs only the premium, <Num of="m09.s1CallDown" /> pips.
+
+Neither is ‘better’. The forward is ideal if the view is right. The call is ideal if it is wrong. So the question is: which worst case can you bear? That is exactly what the chips in the matrix show.
+
+<Derivation title="Derivation: why no product beats the forward for free">
+
+**1.** In the model the rate grows on average exactly to the forward: the expected value under the risk-neutral measure is the forward ([module 02](/en/module/02-forward/2/)).
+
+<Formula>E[<i>S</i><sub><i>T</i></sub>] = <i>F</i> = <Num of="ex.forward" digits={4} /></Formula>
+
+**2.** The value of a product today is its discounted expected value. For a payoff <i>X</i>(<i>S</i><sub><i>T</i></sub>) at expiry:
+
+<Formula>value = <i>e</i><sup>−<i>r</i><sub>d</sub><i>T</i></sup> · E[<i>X</i>(<i>S</i><sub><i>T</i></sub>)]</Formula>
+
+**3.** A forward at the rate <i>F</i> has <i>X</i> = <i>S</i><sub><i>T</i></sub> − <i>F</i>, so its value is zero. A ‘zero cost’ product is worth zero as well. If it beats the forward in one scenario, it must lag behind it in another. Otherwise its expected value would be above zero.
+
+**4.** That is why every improvement costs something: a premium (call), part of the upside (collar) or an extra risk such as leverage and a knock-out (structured products). In practice the provider's margin comes on top.
+
+</Derivation>
+
+<Desk title="Three questions before any product">
+
+Anyone comparing products should not start with the product. Three questions structure every conversation: **What is the need?** Hedging, acting on a view or earning interest. **What is the view, and how sure is it?** A direction, a range or none at all. **Which worst case can be borne, in francs?** Only once all three are answered is it worth looking at strike, coupon or interest.
+
+</Desk>
+
+<Takeaway>
+
+Need first, then the view, then the product. The same view can be expressed with very different risk: always compare the worst case.
+
+</Takeaway>

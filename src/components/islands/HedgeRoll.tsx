@@ -159,8 +159,11 @@ export default function HedgeRoll({ lang }: HedgeRollProps): JSX.Element {
   const clW = textWidth(crossLabel, L.font) + 8;
   const clLeft = xCross + 14 + clW > L.right;
   // gap label: beside the gap, nudged away from the lines if it would hit another label
-  const yAllInLabel = sy(b.allIn) + L.font + 8;
   const awLabel = textWidth(allInLabel, L.font) + 8;
+  // all-in label below the line at the right end, or at the left end while the spot is there
+  const allInAtLeft = x > L.right - 4 - awLabel - 12;
+  const xAllInLabel = allInAtLeft ? L.left + 6 : L.right - 4 - awLabel;
+  const yAllInLabel = sy(allInAtLeft ? a.allIn : b.allIn) + L.font + 8;
   const textBox = (x0: number, w: number, baseline: number, font: number): Box => ({
     x0,
     x1: x0 + w,
@@ -169,7 +172,7 @@ export default function HedgeRoll({ lang }: HedgeRollProps): JSX.Element {
   });
   const obstacles: Box[] = [
     textBox(L.left + 6, textWidth(oldLabel, L.font) + 8, yOld - 7, L.font),
-    textBox(L.right - 4 - awLabel, awLabel, yAllInLabel, L.font),
+    textBox(xAllInLabel, awLabel, yAllInLabel, L.font),
   ];
   const gapX0 = glLeft ? x - 12 - glW : x + 12;
   const gapBase = (yFar + yAll) / 2 + L.font * 0.35;
@@ -269,10 +272,10 @@ export default function HedgeRoll({ lang }: HedgeRollProps): JSX.Element {
                 style={{ stroke: COLOR.allIn }}
               />
               <text
-                x={L.right - 4}
+                x={allInAtLeft ? xAllInLabel : L.right - 4}
                 y={yAllInLabel}
                 class="m3-line-label"
-                style={{ fontSize: fs, textAnchor: 'end' }}
+                style={{ fontSize: fs, textAnchor: allInAtLeft ? 'start' : 'end' }}
               >
                 {allInLabel}
               </text>

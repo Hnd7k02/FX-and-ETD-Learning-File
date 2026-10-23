@@ -89,6 +89,11 @@ function layoutFor(w: number) {
   };
 }
 
+/** Equal rates (ties share a rank): within 1e-9 CHF per USD. */
+function tied(a: number, b: number): boolean {
+  return Math.abs(a - b) < 1e-9;
+}
+
 const lineStyle = (color: string, width: number, dash?: string) => ({
   fill: 'none',
   stroke: color,
@@ -193,7 +198,7 @@ export default function HedgeCompare(props: HedgeCompareProps): JSX.Element {
   const best = cheapestAt(st, shown, setup);
   const minRate = Math.min(...shown.map((id) => rates[HEDGE_IDS.indexOf(id)]!));
   /* ties (e.g. collar and unhedged between the collar strikes) share the first place */
-  const bestIds = shown.filter((id) => rates[HEDGE_IDS.indexOf(id)]! - minRate < 1e-9);
+  const bestIds = shown.filter((id) => tied(rates[HEDGE_IDS.indexOf(id)]!, minRate));
   const rowH = L.compact ? 66 : ROW_H;
   const order = [...shown].sort((a, b) => {
     const d = rates[HEDGE_IDS.indexOf(a)]! - rates[HEDGE_IDS.indexOf(b)]!;

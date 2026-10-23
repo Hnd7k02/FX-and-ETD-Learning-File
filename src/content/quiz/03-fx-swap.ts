@@ -134,6 +134,9 @@ const q2: QuizQuestion = {
 };
 
 const up = M03.up;
+/** Sign error made with the numbers as shown (rounded old forward and swap points). */
+const shownRound = (x: number, d: number) => Math.round(x * 10 ** d) / 10 ** d;
+const allInSignFlipped = shownRound(M03.oldForward, RD) - shownRound(up.points, 1) * PIP;
 const q3: QuizQuestion = {
   id: 'm03-q3',
   prompt: {
@@ -159,8 +162,8 @@ const q3: QuizQuestion = {
     },
     {
       label: {
-        de: rate(M03.oldForward - up.points * PIP, RD),
-        en: rate(M03.oldForward - up.points * PIP, RD),
+        de: rate(allInSignFlipped, RD),
+        en: rate(allInSignFlipped, RD),
       },
       mono: true,
       explain: {

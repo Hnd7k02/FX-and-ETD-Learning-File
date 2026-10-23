@@ -275,11 +275,11 @@ export default function SwapTrip({ lang }: SwapTripProps): JSX.Element {
             <Slider
               id={`trip-day-${uid}`}
               label={t('trip.slider.day')}
-              value={Math.round(day)}
+              value={dayInt}
               min={0}
               max={T.days}
               step={1}
-              valueText={t('trip.day.value', { day: Math.round(day) })}
+              valueText={t('trip.day.value', { day: dayInt })}
               onInput={(v) => play.seek(v)}
             />
           </div>

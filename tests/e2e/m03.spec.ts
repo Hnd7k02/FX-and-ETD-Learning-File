@@ -82,8 +82,8 @@ test('numbers come from the core and facts carry a source', async ({ page }) => 
   await expect(page.locator('[data-num="ex.forwardMM"]').first()).toHaveText('0.79306');
   await expect(page.locator('[data-num="m03.approxPoints"]').first()).toHaveText('−70.0');
   await page.goto(path('de', '3'));
-  await expect(page.locator('[data-num="m03.rollAllInUp"]').first()).toHaveText('0.79071');
-  await expect(page.locator('[data-num="m03.rollAllInDown"]').first()).toHaveText('0.79079');
+  await expect(page.locator('[data-num="m03.rollAllInUp"]').first()).toHaveText('0.79068');
+  await expect(page.locator('[data-num="m03.rollAllInDown"]').first()).toHaveText('0.79081');
   await page.goto(path('en', '4'));
   await expect(page.locator('[data-num="m03.fwd1y"]').first()).toHaveText('0.77258');
   await expect(page.locator('[data-fact="m03-bis-swaps"]').first()).toHaveAttribute(

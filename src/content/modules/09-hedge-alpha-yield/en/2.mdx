@@ -1,0 +1,62 @@
+import HedgeCompareFigure from '@/components/figures/HedgeCompareFigure.astro';
+
+{/* 09 Hedge, alpha, yield · Section 2 · Hedging. Numbers only via <Num />, registry src/lib/nums/m09.ts. */}
+
+The importer is short USD: if the dollar rises, his invoice gets more expensive. A hedge is meant to prevent that. The aim is not the best rate in hindsight but a rate he can plan with. His toolbox ranges from a simple spot trade to a structured product.
+
+### The toolbox
+
+1. **Spot.** He buys the dollars today at <Num of="ex.spot" /> and deposits them at the USD rate until the payment date. That ties up francs today. Mathematically he ends up at the forward: buying and depositing is exactly the second route of interest rate parity from [module 02](/en/module/02-forward/2/).
+2. **Forward.** He fixes <Num of="ex.forward" digits={4} /> today for the payment in 3 months ([module 02](/en/module/02-forward/1/)). No premium, full certainty. If the dollar falls, he does not benefit.
+3. **Limit and stop-loss.** These are orders on the spot rate ([module 01](/en/module/01-spot/3/)). A limit buys at <Num of="m09.limit" /> if the dollar falls that far. A stop-loss buys at <Num of="m09.stop" /> if it rises that far. Until it is filled he is unhedged. If the rate jumps over the stop, it is filled at a worse rate: the gap risk from [module 07](/en/module/07-barrier-binary/4/).
+4. **USD call / CHF put.** A cap for a premium ([module 04](/en/module/04-vanilla-options/1/)). The strike <Num of="ex.strike" /> plus the premium of <Num of="m09.callPremiumPips" /> pips gives the worst rate, <Num of="m09.callCap" />.
+5. **Risk reversal.** The zero-cost collar from [module 06](/en/module/06-combos-smile/2/): a bought call at <Num of="m09.collarCall" />, paid for with a sold put at <Num of="m09.collarPut" />. The rate stays within this band.
+6. **Structured hedge.** A better rate than the forward, paid for with additional sold puts ([module 08](/en/module/08-structured-products/2/)). Here as a single fixing without a knock-out: strike <Num of="m09.levStrike" />, so <Num of="m09.levBetter" /> pips better than the forward. Below the strike the importer buys twice the amount.
+
+<HedgeCompareFigure caption="Five hedges on one axis. Drag the rate at expiry or play it: the ranking re-sorts itself, and at every landmark a strategy changes its character." />
+
+### Worked example: USD 1m at ±<Num of="m09.hMove" />
+
+This is what the importer pays for USD 1m if the dollar stands at <Num of="m09.hUp" /> or at <Num of="m09.hDown" /> at expiry. In brackets, the difference from the forward.
+
+| Hedge | Dollar stronger, <Num of="m09.hUp" /> | Dollar weaker, <Num of="m09.hDown" /> |
+| --- | --- | --- |
+| Unhedged | <Num of="m09.up.unhedged" /> (<Num of="m09.upVsFwd.unhedged" />) | <Num of="m09.down.unhedged" /> (<Num of="m09.downVsFwd.unhedged" />) |
+| Forward | <Num of="m09.up.forward" /> | <Num of="m09.down.forward" /> |
+| USD call | <Num of="m09.up.call" /> (<Num of="m09.upVsFwd.call" />) | <Num of="m09.down.call" /> (<Num of="m09.downVsFwd.call" />) |
+| Collar | <Num of="m09.up.collar" /> (<Num of="m09.upVsFwd.collar" />) | <Num of="m09.down.collar" /> (<Num of="m09.downVsFwd.collar" />) |
+| Structured 2× | <Num of="m09.up.leveraged" /> (<Num of="m09.upVsFwd.leveraged" />) | <Num of="m09.down.leveraged" /> (<Num of="m09.downVsFwd.leveraged" />) |
+
+With a strong dollar the structured hedge wins; with a weak one it is the most expensive. The call sits in the middle in both scenarios. It is most expensive just above the strike: there you pay the premium for almost nothing. Drag the rate in the chart to that spot.
+
+<Callout variant="bad" title="When it goes wrong: over-hedging">
+
+Below the strike the structured hedge buys twice the amount: USD 2m instead of USD 1m. The importer does not need the second million. He has to sell it again in the market, below the strike at a loss. From <Num of="m09.levWorse" /> he is worse off than with the forward, at <Num of="m09.hDown" /> by <Num of="m09.downVsFwd.leveraged" />. The hedge has turned into speculation.
+
+</Callout>
+
+<Derivation title="Derivation: the rate paid under each strategy">
+
+At expiry the importer pays the market rate <i>S</i><sub><i>T</i></sub> minus the payoff of his hedge plus the premium carried to expiry:
+
+<Formula><span>Unhedged: <i>S</i><sub><i>T</i></sub> · Forward: <i>F</i></span><span>Call: min(<i>S</i><sub><i>T</i></sub>, <i>K</i>) + <i>p</i> · <i>e</i><sup><i>r</i><sub>d</sub><i>T</i></sup></span><span>Collar: min(max(<i>S</i><sub><i>T</i></sub>, <i>K</i><sub>P</sub>), <i>K</i><sub>C</sub>), with <i>C</i>(<i>K</i><sub>C</sub>) = <i>P</i>(<i>K</i><sub>P</sub>)</span></Formula>
+
+The structured hedge is a bought call and two sold puts at the same strike <i>K</i><sub>L</sub>, without a premium:
+
+<Formula><span><i>C</i>(<i>K</i><sub>L</sub>) = 2 · <i>P</i>(<i>K</i><sub>L</sub>)</span><span>rate paid = <i>K</i><sub>L</sub> for <i>S</i><sub><i>T</i></sub> ≥ <i>K</i><sub>L</sub>, otherwise 2<i>K</i><sub>L</sub> − <i>S</i><sub><i>T</i></sub></span></Formula>
+
+Why is the strike exactly <Num of="m09.levBetter" /> pips better? With a single sold put, <i>C</i> − <i>P</i> = 0 would give the forward (put-call parity). Because the CHF rate is <Num of="ex.rd" /> here, <i>C</i>(<i>K</i>) − <i>P</i>(<i>K</i>) = <i>F</i> − <i>K</i>. With <i>C</i> = 2<i>P</i> it follows that <i>P</i>(<i>K</i><sub>L</sub>) = <i>F</i> − <i>K</i><sub>L</sub>: the improvement is exactly the value of the second put, <Num of="m09.levSecondPut" /> pips. It costs more than the forward below 2<i>K</i><sub>L</sub> − <i>F</i> = <Num of="m09.levWorse" />.
+
+</Derivation>
+
+<Desk title="A hedge is measured against the need">
+
+In hindsight a different tool always wins: with a strong dollar the structured hedge, with a weak one no hedge at all. Anyone who judges hedges by the best rate after the event will be disappointed every time. That is why tools can be combined: part of the payment with forwards, part with options. If the payment date is uncertain, an FX swap extends the forward ([module 03](/en/module/03-fx-swap/3/)). What counts is a rate at which the budget holds, even in the worst case.
+
+</Desk>
+
+<Takeaway>
+
+Every hedge gives something up: the forward the upside, the call the premium, the collar the best rate, the structured hedge certainty in exchange for leverage. Choose by the worst case, not by hindsight.
+
+</Takeaway>
