@@ -22,7 +22,8 @@ jobs:
   offline-file:
     name: Check, build and test forward-first.html
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    # the offline suite runs every slider in Chromium and two WebKit projects (16-20 min)
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
