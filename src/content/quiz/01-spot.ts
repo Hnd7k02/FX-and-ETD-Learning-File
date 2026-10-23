@@ -223,8 +223,8 @@ const wrongFormula = -up.pct / (1 - up.pct);
 const q1: QuizQuestion = {
   id: 'm01-q1',
   prompt: {
-    de: `USD/CHF steigt von ${spot} auf ${rate(SC.stUp)}, der Dollar gewinnt ${pct(up.pct, 1).de}. Um wie viel ändert sich CHF/USD, der Preis des Frankens in Dollar?`,
-    en: `USD/CHF rises from ${spot} to ${rate(SC.stUp)}; the dollar gains ${pct(up.pct, 1).en}. By how much does CHF/USD, the price of the franc in dollars, change?`,
+    de: `USD/CHF steigt von ${spot} auf ${rate(SC.stUp)}, der Dollar gewinnt ${pct(up.pct, 1, false).de}. Um wie viel ändert sich CHF/USD, der Preis des Frankens in Dollar?`,
+    en: `USD/CHF rises from ${spot} to ${rate(SC.stUp)}; the dollar gains ${pct(up.pct, 1, false).en}. By how much does CHF/USD, the price of the franc in dollars, change?`,
   },
   options: [
     {

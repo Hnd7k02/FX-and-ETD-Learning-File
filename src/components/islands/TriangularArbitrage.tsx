@@ -199,7 +199,18 @@ export default function TriangularArbitrage({ lang }: TriangularArbitrageProps):
                 val: string,
                 sub?: string,
               ) => (
-                <text x={x} y={y} style={{ fontSize: `${fs}px`, textAnchor: anchor }}>
+                <text
+                  x={x}
+                  y={y}
+                  style={{
+                    fontSize: `${fs}px`,
+                    textAnchor: anchor,
+                    paintOrder: 'stroke',
+                    stroke: 'var(--ff-surface)',
+                    strokeWidth: 4,
+                    strokeLinejoin: 'round',
+                  }}
+                >
                   <tspan x={x} style={{ fontWeight: 800, fill: 'var(--ff-ink)' }}>
                     {title}
                     {sub ? ` · ${sub}` : ''}

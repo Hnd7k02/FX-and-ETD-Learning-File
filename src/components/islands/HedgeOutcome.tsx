@@ -187,13 +187,7 @@ export default function HedgeOutcome({ lang }: HedgeOutcomeProps): JSX.Element {
   const newest = shown - 1;
 
   return (
-    <div
-      class="m2 ho"
-      data-ho
-      data-st={st.toFixed(4)}
-      data-verdict={verdict}
-      data-shown={shown}
-    >
+    <div class="m2 ho" data-ho data-st={st.toFixed(4)} data-verdict={verdict} data-shown={shown}>
       <div class="ff-lab-head">
         <div class="m2-titles">
           <div class="ff-lab-title">{t('ho.title')}</div>
@@ -279,12 +273,7 @@ export default function HedgeOutcome({ lang }: HedgeOutcomeProps): JSX.Element {
 
               {/* forward reference */}
               <path d={`M${xF.toFixed(1)},${L.top}V${L.plotBottom}`} class="m2-ref" />
-              <text
-                x={xF + 6}
-                y={L.top + L.font + 6}
-                class="m2-ref-label"
-                style={{ fontSize: fs }}
-              >
+              <text x={xF + 6} y={L.top + L.font + 6} class="m2-ref-label" style={{ fontSize: fs }}>
                 {t('ho.fLabel', { fwd: fwdTxt })}
               </text>
 
@@ -479,13 +468,17 @@ export default function HedgeOutcome({ lang }: HedgeOutcomeProps): JSX.Element {
 
           <StatTable>
             <StatRow
-              symbol={<span aria-hidden="true" class="m2-sw" style={{ borderTopColor: COLOR.unhedged }} />}
+              symbol={
+                <span aria-hidden="true" class="m2-sw" style={{ borderTopColor: COLOR.unhedged }} />
+              }
               label={t('ho.row.unhedged')}
               sub={t('ho.row.unhedgedSub', { notional, st: stTxt })}
               value={chf(shownUnhedged)}
             />
             <StatRow
-              symbol={<span aria-hidden="true" class="m2-sw" style={{ borderTopColor: COLOR.forward }} />}
+              symbol={
+                <span aria-hidden="true" class="m2-sw" style={{ borderTopColor: COLOR.forward }} />
+              }
               label={t('ho.row.forward')}
               sub={t('ho.row.forwardSub')}
               value={chf(o.hedged)}
@@ -507,7 +500,9 @@ export default function HedgeOutcome({ lang }: HedgeOutcomeProps): JSX.Element {
               <div>
                 <dt>{t('ho.scn.rangeUnhedged')}</dt>
                 <dd class="mono">
-                  {shown > 0 ? `${chf(stats.min)} – ${fmtNumber(stats.max, lang)}` : t('ho.scn.none')}
+                  {shown > 0
+                    ? `${chf(stats.min)} – ${fmtNumber(stats.max, lang)}`
+                    : t('ho.scn.none')}
                 </dd>
               </div>
               <div>

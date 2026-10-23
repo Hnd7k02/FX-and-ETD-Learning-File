@@ -21,8 +21,8 @@ Pfund und Schwedische Krone haben keine Sonderrolle. Ihre Kurse folgen vor allem
 
 Im Beispiel zahlt der Franken <Num of="ex.rd" /> Zins, der Dollar <Num of="ex.rf" />. Das lädt zu einem **Carry Trade** ein. Ein Anleger leiht sich <Num of="m01.costToday" />, tauscht sie zum Spot von <Num of="ex.spot" /> in USD 1 Mio. und legt die Dollars für <Num of="ex.mmDays" /> Tage am Geldmarkt an. Danach hat er <Num of="m01.carryUsdEnd" />, also <Num of="m01.carryInterestUsd" /> Zins. Zurückzahlen muss er <Num of="m01.carryChfDebt" />.
 
-- **USD/CHF bleibt bei <Num of="ex.spot" />.** Er tauscht die Dollars zurück und verdient <Num of="m01.carryPnlFlat" />.
-- **USD/CHF fällt auf <Num of="m01.stDown" />.** Er erhält zu wenig Franken und verliert <Num of="m01.carryPnlDown" />. Der Zinsvorteil ist weg, und noch viel mehr.
+- **USD/CHF bleibt bei <Num of="ex.spot" />.** Er tauscht die Dollars zurück. Sein Ergebnis: <Num of="m01.carryPnlFlat" />.
+- **USD/CHF fällt auf <Num of="m01.stDown" />.** Er erhält zu wenig Franken zurück. Sein Ergebnis: <Num of="m01.carryPnlDown" />. Der Zinsvorteil ist weg, und noch viel mehr.
 
 Die Gewinnschwelle liegt bei <Num of="m01.carryBreakEven" />. Das ist genau der Forward aus Modul 02. Sichert der Anleger die Dollars mit einem Forward ab, bleibt kein Gewinn übrig: Der Forward preist die Zinsdifferenz schon ein. Der Carry Trade verdient nur, wenn der Kurs weniger fällt, als der Forward es vorsieht.
 

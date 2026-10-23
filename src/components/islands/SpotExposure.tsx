@@ -109,8 +109,8 @@ export default function SpotExposure({ lang }: SpotExposureProps): JSX.Element {
     () => niceTicks(R.min, R.max, L.compact ? 3 : 8).filter((v) => inside(v, R.min, R.max)),
     [L.compact],
   );
-  const yTicks = niceTicks(Y_DOMAIN[0], Y_DOMAIN[1], L.compact ? 4 : 5).filter(
-    (v) => inside(v, Y_DOMAIN[0], Y_DOMAIN[1]),
+  const yTicks = niceTicks(Y_DOMAIN[0], Y_DOMAIN[1], L.compact ? 4 : 5).filter((v) =>
+    inside(v, Y_DOMAIN[0], Y_DOMAIN[1]),
   );
   const fs = `${L.font}px`;
   const x = sx(shownS ?? S);

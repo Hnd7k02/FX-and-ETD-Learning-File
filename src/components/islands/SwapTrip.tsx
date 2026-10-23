@@ -213,20 +213,18 @@ export default function SwapTrip({ lang }: SwapTripProps): JSX.Element {
                   </text>
                 </g>
               )}
-              {play.started && (
-                <circle cx={headX} cy={headY} r={5} class="m3-head" />
-              )}
+              {play.started && <circle cx={headX} cy={headY} r={5} class="m3-head" />}
               {/* legs */}
               <circle cx={sx(0)} cy={nearY} r={6} class="m3-dot" />
-              <text
-                x={sx(0) + 10}
-                y={nearY - 12}
-                class="m3-leg-label"
-                style={{ fontSize: fs }}
-              >
+              <text x={sx(0) + 10} y={nearY - 12} class="m3-leg-label" style={{ fontSize: fs }}>
                 {t('trip.near', { rate: nearTxt })}
               </text>
-              <circle cx={farX} cy={farY} r={done ? 9 : 6} class={`m3-dot${done ? ' is-lit' : ''}`} />
+              <circle
+                cx={farX}
+                cy={farY}
+                r={done ? 9 : 6}
+                class={`m3-dot${done ? ' is-lit' : ''}`}
+              />
               <text
                 x={farX - 10}
                 y={farY + (farY > nearY ? -14 : 22)}
@@ -329,13 +327,25 @@ export default function SwapTrip({ lang }: SwapTripProps): JSX.Element {
               value={rate4(spot)}
             />
             <StatRow
-              symbol={<span aria-hidden="true" class="m3-sw" style={{ borderTopColor: 'var(--ff-short)' }} />}
+              symbol={
+                <span
+                  aria-hidden="true"
+                  class="m3-sw"
+                  style={{ borderTopColor: 'var(--ff-short)' }}
+                />
+              }
               label={t('trip.row.open')}
               sub={t('trip.row.openSub')}
               value={openTxt}
             />
             <StatRow
-              symbol={<span aria-hidden="true" class="m3-sw" style={{ borderTopColor: 'var(--ff-forward)' }} />}
+              symbol={
+                <span
+                  aria-hidden="true"
+                  class="m3-sw"
+                  style={{ borderTopColor: 'var(--ff-forward)' }}
+                />
+              }
               label={t('trip.row.swap')}
               sub={t('trip.row.swapSub')}
               value={swapTxt}

@@ -65,7 +65,9 @@ export default function G10Profiles({ lang, initial = 'CHF' }: G10ProfilesProps)
     setSelected((cur) => selectionAfterFilter(cur, f));
   };
 
-  const drivers = t(`drivers.${selected}`).split('|');
+  const drivers = t(`drivers.${selected}`)
+    .split('|')
+    .map((d) => d.charAt(0).toUpperCase() + d.slice(1));
   const roleTexts = prof.roles.length
     ? prof.roles.map((r) => t(`roleLong.${r}`))
     : [t('roleLong.none')];

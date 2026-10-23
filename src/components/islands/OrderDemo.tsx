@@ -103,8 +103,8 @@ export default function OrderDemo({ lang }: OrderDemoProps): JSX.Element {
   const day = Math.floor(fill.index / C.perDay) + 1;
   const vsMarket = (fill.price - market.price) * N;
   const fs = `${L.font}px`;
-  const yTicks = niceTicks(Y_DOMAIN[0], Y_DOMAIN[1], L.compact ? 4 : 5).filter(
-    (v) => inside(v, Y_DOMAIN[0], Y_DOMAIN[1]),
+  const yTicks = niceTicks(Y_DOMAIN[0], Y_DOMAIN[1], L.compact ? 4 : 5).filter((v) =>
+    inside(v, Y_DOMAIN[0], Y_DOMAIN[1]),
   );
   const dayNames = t('days').split(',');
 

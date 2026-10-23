@@ -105,11 +105,16 @@ test('option vs forward: the saving in the note equals forward minus option as s
   await page.keyboard.press('Home');
   await expect(fig).toHaveAttribute('data-region', 'weakUsd');
   const chf = (t: string) => Number(t.replace(/[^0-9]/g, ''));
-  const values = await fig.locator('.ff-stat-value').allInnerTexts();
-  const note = await fig.locator('[data-note]').innerText();
-  const saving = chf(note.match(/save (CHF [0-9,]+)/)![1]!);
-  // rows: unhedged, forward, option
-  expect(saving).toBe(chf(values[1]!) - chf(values[2]!));
+  // the table counts to its new values in 300 ms; compare once it has settled
+  await expect
+    .poll(async () => {
+      const values = await fig.locator('.ff-stat-value').allInnerTexts();
+      const note = await fig.locator('[data-note]').innerText();
+      const saving = chf(note.match(/save CHF\s([0-9,]+)/)![1]!);
+      // rows: unhedged, forward, option
+      return saving - (chf(values[1]!) - chf(values[2]!));
+    })
+    .toBe(0);
 });
 
 test('four positions: a break-even dot per card and an aria-label with the values', async ({

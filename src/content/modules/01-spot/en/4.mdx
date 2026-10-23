@@ -21,8 +21,8 @@ Sterling and the Swedish krona have no special role. Their rates mainly follow i
 
 In the example the franc pays <Num of="ex.rd" /> interest and the dollar <Num of="ex.rf" />. That invites a **carry trade**. An investor borrows <Num of="m01.costToday" />, changes it into USD 1m at the spot rate of <Num of="ex.spot" /> and invests the dollars in the money market for <Num of="ex.mmDays" /> days. Afterwards he has <Num of="m01.carryUsdEnd" />, so <Num of="m01.carryInterestUsd" /> of interest. He has to repay <Num of="m01.carryChfDebt" />.
 
-- **USD/CHF stays at <Num of="ex.spot" />.** He changes the dollars back and earns <Num of="m01.carryPnlFlat" />.
-- **USD/CHF falls to <Num of="m01.stDown" />.** He gets too few francs back and loses <Num of="m01.carryPnlDown" />. The interest advantage is gone, and a great deal more.
+- **USD/CHF stays at <Num of="ex.spot" />.** He changes the dollars back. His result: <Num of="m01.carryPnlFlat" />.
+- **USD/CHF falls to <Num of="m01.stDown" />.** He gets too few francs back. His result: <Num of="m01.carryPnlDown" />. The interest advantage is gone, and a great deal more.
 
 The break-even rate is <Num of="m01.carryBreakEven" />. That is exactly the forward from module 02. If the investor hedges the dollars with a forward, no profit is left: the forward already prices in the interest rate differential. The carry trade only earns money if the rate falls by less than the forward implies.
 

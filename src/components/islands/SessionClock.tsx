@@ -106,7 +106,9 @@ export default function SessionClock({ lang }: SessionClockProps): JSX.Element {
   const box = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const L = layoutFor(useElementWidth(box, 640));
-  const inView = useInView(box);
+  // pause off-screen: watch the whole figure (on phones the controls sit below the chart)
+  const root = useRef<HTMLDivElement>(null);
+  const inView = useInView(root);
 
   // Client only: read the Zurich clock, follow it until the learner takes over.
   useEffect(() => {
@@ -241,6 +243,7 @@ export default function SessionClock({ lang }: SessionClockProps): JSX.Element {
 
   return (
     <div
+      ref={root}
       class="sc"
       data-sc
       data-day={day}
