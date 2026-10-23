@@ -163,7 +163,6 @@ export default function SmileBuilder(props: SmileBuilderProps): JSX.Element {
 
   /* ---------- texts ---------- */
   const pct = (v: number, digits = 2, sign = false) => fmtPct(v, lang, digits, sign);
-  const pts = (v: number) => fmtNumber(v * 100, lang, { digits: 2, sign: true });
   const shape = smileShape(q);
   const wing = higherWing(q);
   const preset = PRESET_IDS.find((id) => sameQuotes(PRESETS[id], q)) ?? null;
@@ -175,8 +174,8 @@ export default function SmileBuilder(props: SmileBuilderProps): JSX.Element {
     p: pct(tp.put25.vol),
     a: pct(tp.atm.vol),
     c: pct(tp.call25.vol),
-    rr: pts(q.rr25),
-    bf: pts(q.bf25),
+    rr: pct(q.rr25, 2, true),
+    bf: pct(q.bf25, 2, true),
   });
   const eff = useMemo(() => premiumEffect(q, EXAMPLE.spot, T, EXAMPLE.rd, EXAMPLE.rf), [q]);
   const effRow = (k: 'put25' | 'call25') => {
@@ -222,7 +221,7 @@ export default function SmileBuilder(props: SmileBuilderProps): JSX.Element {
     const x0 = anchor === 'end' ? tx - w : anchor === 'middle' ? tx - w / 2 : tx;
     return { x0, x1: x0 + w, y0: ty - L.font, y1: ty + 3 };
   };
-  const bfText = t('sb.bfLabel', { v: pts(qv.bf25) });
+  const bfText = t('sb.bfLabel', { v: pct(qv.bf25, 2, true) });
   const bfSpot = {
     x: xAtm + (bfLabelLeft ? -10 : 10),
     y: (atmY + midY) / 2 + L.font * 0.35,

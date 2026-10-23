@@ -69,18 +69,22 @@ const COLORS = {
 function layoutFor(w: number) {
   const width = Math.max(280, Math.round(w));
   const compact = width < 560;
-  const height = compact ? 320 : Math.round(clamp(width * 0.66, 340, 440));
-  const rail = height - (compact ? 38 : 42);
+  const font = compact ? 11 : 12;
+  /* bottom rows: rail with the handle, tick labels, axis title */
+  const titleRow = font + 8;
+  const height = (compact ? 320 : Math.round(clamp(width * 0.66, 340, 440))) + titleRow;
+  const rail = height - titleRow - (compact ? 38 : 42);
   return {
     width,
     height,
     compact,
-    font: compact ? 11 : 12,
+    font,
     left: compact ? 44 : 54,
     right: compact ? 10 : 16,
     top: 30,
     plotBottom: rail - 16,
     rail,
+    ticksY: height - titleRow - 6,
   };
 }
 
@@ -485,10 +489,22 @@ export default function HedgeShaper({ lang }: HedgeShaperProps): JSX.Element {
               <AxisX
                 x={sx}
                 ticks={ticks}
-                y={L.height - 6}
+                y={L.ticksY}
                 format={(v) => fmtRate(v, PAIR, 2)}
                 fontSize={L.font}
               />
+              <text
+                x={L.width - L.right}
+                y={L.height - 4}
+                style={{
+                  fontSize: fs,
+                  fontWeight: 600,
+                  fill: 'var(--ff-muted)',
+                  textAnchor: 'end',
+                }}
+              >
+                {t('hs.x')}
+              </text>
             </svg>
           </div>
           <p class="hs-hint">{t('hs.drag')}</p>
