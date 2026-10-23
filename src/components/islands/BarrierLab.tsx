@@ -29,6 +29,7 @@ import {
   labAha,
   labCurves,
   labNumbers,
+  maturityLabel,
   mirrorBarrier,
   type LabState,
 } from '@/lib/m07/barrierlab';
@@ -157,14 +158,11 @@ export default function BarrierLab({ lang, initial }: BarrierLabProps): JSX.Elem
     io: t(`bl.io.${s.io}`),
     type: t(`bl.type.${s.type}`),
   });
-  const time =
-    s.weeks === 1
-      ? t('bl.weeks.one')
-      : s.weeks === 52
-        ? t('bl.weeks.year')
-        : s.weeks === 13
-          ? t('bl.weeks.q', { n: 13 })
-          : t('bl.weeks.n', { n: s.weeks });
+  const ml = maturityLabel(s.days);
+  const time = t(`bl.t.${ml.unit}`, {
+    n: num(ml.value, Number.isInteger(ml.value) ? 0 : 1),
+    d: num(ml.days, 0),
+  });
   const notional = fmtMillions(M.notional, 'USD', lang);
   const summary = t('bl.summary', {
     kind,
@@ -521,14 +519,14 @@ export default function BarrierLab({ lang, initial }: BarrierLabProps): JSX.Elem
               <span>{t('bl.parity.sum')}</span>
               <div class="m7-bar">
                 <span
-                  class={`is-ko${s.io === 'out' ? ' is-selected' : ''}`}
+                  class={`is-ko${s.io === 'out' ? ' is-selected' : ''}${fits(koPips) ? ' has-label' : ''}`}
                   style={{ width: seg(koPips) }}
                   title={t('bl.parity.ko')}
                 >
                   {fits(koPips) ? num(koPips, 1) : ''}
                 </span>
                 <span
-                  class={`is-ki${s.io === 'in' ? ' is-selected' : ''}`}
+                  class={`is-ki${s.io === 'in' ? ' is-selected' : ''}${fits(kiPips) ? ' has-label' : ''}`}
                   style={{ width: seg(kiPips) }}
                   title={t('bl.parity.ki')}
                 >
@@ -539,7 +537,10 @@ export default function BarrierLab({ lang, initial }: BarrierLabProps): JSX.Elem
             <div class="m7-parity-row">
               <span>{t('bl.parity.vanilla')}</span>
               <div class="m7-bar">
-                <span class="is-van" style={{ width: seg(vanillaPips) }}>
+                <span
+                  class={`is-van${fits(vanillaPips) ? ' has-label' : ''}`}
+                  style={{ width: seg(vanillaPips) }}
+                >
                   {fits(vanillaPips) ? num(vanillaPips, 1) : ''}
                 </span>
               </div>
@@ -602,12 +603,12 @@ export default function BarrierLab({ lang, initial }: BarrierLabProps): JSX.Elem
               onInput={(v) => set({ rebatePips: v })}
             />
             <Slider
-              id="bl-weeks"
-              label={t('bl.slider.weeks')}
-              value={s.weeks}
-              {...R.weeks}
+              id="bl-days"
+              label={t('bl.slider.days')}
+              value={s.days}
+              {...R.days}
               valueText={time}
-              onInput={(v) => set({ weeks: v })}
+              onInput={(v) => set({ days: v })}
             />
             <div class="m7-seg-field">
               <span class="m7-seg-label" aria-hidden="true">

@@ -22,7 +22,7 @@ import {
 } from '@/components/ui/hooks';
 import { hedgecompare as dict } from '@/i18n/dict/hedgecompare';
 import { translator, type Lang } from '@/i18n/types';
-import { clamp, linePath, niceTicks, scaleLinear, type Point } from '@/lib/chart';
+import { clamp, linePath, niceTicks, polylineAt, scaleLinear, type Point } from '@/lib/chart';
 import { EXAMPLE } from '@/lib/fx/example';
 import { fmtMillions, fmtMoney, fmtNumber, fmtPips, fmtRate } from '@/lib/format';
 import { M09_CONFIG, PIP } from '@/lib/m09/config';
@@ -435,8 +435,9 @@ export default function HedgeCompare(props: HedgeCompareProps): JSX.Element {
               {HEDGE_IDS.filter((id) => shown.includes(id)).map((id) => (
                 <circle
                   key={`dot-${id}`}
+                  data-dot={id}
                   cx={x}
-                  cy={sy(clamp(tw[HEDGE_IDS.indexOf(id)]!, range[0], range[1]))}
+                  cy={sy(clamp(polylineAt(xs, curves[id], st), range[0], range[1]))}
                   r={bestIds.includes(id) ? 7 : 5}
                   style={{ fill: STYLE[id].color, stroke: '#fff', strokeWidth: 2.5 }}
                 />

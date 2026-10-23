@@ -99,8 +99,9 @@ export default function OptionVsForward({ lang }: OptionVsForwardProps): JSX.Ele
   const costs = hedgeCosts(st, SETUP, FACTS);
   const rank = rankCosts(costs);
   const region = hedgeRegion(st, FACTS);
-  const instant = rm || dragging || !moved;
-  const shown = useTween([costs.unhedged, costs.forward, costs.option], 300, instant);
+  // The three costs follow the slider directly: a tween would let the dots lag below their lines
+  // while the rate moves (D-42). Only the region band animates (a discrete change).
+  const shown = [costs.unhedged, costs.forward, costs.option];
   const band = useTween(bandOf(region), 300, rm);
 
   const sx = scaleLinear([ST_RANGE[0], ST_RANGE[1]], [L.left, L.width - L.right]);
@@ -275,9 +276,17 @@ export default function OptionVsForward({ lang }: OptionVsForwardProps): JSX.Ele
               >
                 K {fmtRate(SETUP.K, PAIR)}
               </text>
-              <path d={path(lines.unhedged)} style={lineStyle(COLORS.unhedged, 2.25)} />
-              <path d={path(lines.forward)} style={lineStyle(COLORS.forward, 2.25)} />
-              <path d={path(lines.option)} style={lineStyle(COLORS.option, 3)} />
+              <path
+                d={path(lines.unhedged)}
+                data-line="unhedged"
+                style={lineStyle(COLORS.unhedged, 2.25)}
+              />
+              <path
+                d={path(lines.forward)}
+                data-line="forward"
+                style={lineStyle(COLORS.forward, 2.25)}
+              />
+              <path d={path(lines.option)} data-line="option" style={lineStyle(COLORS.option, 3)} />
               {/* cap label left of the kink, above the line: free space there, and away from
                   the start marker at a strong dollar */}
               <text
@@ -304,6 +313,7 @@ export default function OptionVsForward({ lang }: OptionVsForwardProps): JSX.Ele
               {choices.map((c, i) => (
                 <circle
                   key={c}
+                  data-dot={c}
                   cx={x}
                   cy={yk(shown[i]!)}
                   r={c === 'option' ? 6 : 5}

@@ -28,7 +28,8 @@ export interface LabState {
   barrier: number;
   rebatePips: number;
   spot: number;
-  weeks: number;
+  /** Time to expiry in days (T = days / 365); the default 91.25 is the example's 0.25 years. */
+  days: number;
   monitoring: 'continuous' | 'daily';
 }
 
@@ -41,9 +42,29 @@ export function kindOf(s: Pick<LabState, 'dir' | 'io'>): BarrierKind {
   return `${s.dir}-and-${s.io}` as BarrierKind;
 }
 
-/** Option-model time: weeks / 52. */
-export function yearsOf(weeks: number): number {
-  return weeks / 52;
+/**
+ * How the lab names a time to expiry: days below one week, weeks below 60 days, then months,
+ * one year at 365 days. `value` is rounded to one decimal, `days` to whole days.
+ */
+export function maturityLabel(days: number): {
+  unit: 'day' | 'days' | 'week' | 'weeks' | 'months' | 'year';
+  value: number;
+  days: number;
+} {
+  const d = Math.round(days);
+  const r1 = (x: number) => Math.round(x * 10) / 10;
+  if (days >= 365) return { unit: 'year', value: 1, days: d };
+  if (days >= 60) return { unit: 'months', value: r1(days / (365 / 12)), days: d };
+  if (days >= 7) {
+    const w = r1(days / 7);
+    return { unit: w === 1 ? 'week' : 'weeks', value: w, days: d };
+  }
+  return { unit: d === 1 ? 'day' : 'days', value: d, days: d };
+}
+
+/** Option-model time: days / 365. */
+export function yearsOf(days: number): number {
+  return days / 365;
 }
 
 /** The barrier that enters the closed form: as set, or BGK-shifted for daily monitoring. */
@@ -69,7 +90,7 @@ export function priceAt(
     S,
     K: s.strike,
     H: effectiveBarrier(s),
-    T: yearsOf(s.weeks),
+    T: yearsOf(s.days),
     vol: M.vol,
     rd: M.rd,
     rf: M.rf,
@@ -81,7 +102,7 @@ export function priceAt(
 
 /** Vanilla of the state's type at spot S. */
 export function vanillaAt(s: LabState, S: number): number {
-  return gkPrice(S, s.strike, yearsOf(s.weeks), M.vol, M.rd, M.rf, s.type);
+  return gkPrice(S, s.strike, yearsOf(s.days), M.vol, M.rd, M.rf, s.type);
 }
 
 /**
@@ -139,7 +160,7 @@ export interface LabNumbers {
 export function labNumbers(s: LabState): LabNumbers {
   const kind = kindOf(s);
   const H = effectiveBarrier(s);
-  const T = yearsOf(s.weeks);
+  const T = yearsOf(s.days);
   const touched = isBarrierTouched(kind, s.spot, s.barrier);
   const price = priceAt(s, s.spot);
   const vanilla = vanillaAt(s, s.spot);

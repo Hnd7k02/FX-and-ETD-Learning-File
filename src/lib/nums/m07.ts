@@ -64,8 +64,9 @@ const lossSpot = Number((Hu + C.lossSpotPips * PIP).toFixed(4));
 const lab = labNumbers(defaultLabState());
 const nearSpot = Hu - C.nearBarrierPips * PIP;
 const labNear = labNumbers({ ...defaultLabState(), spot: nearSpot });
-const shortWeeks = 2;
-const labNearShort = labNumbers({ ...defaultLabState(), spot: nearSpot, weeks: shortWeeks });
+const shortDays = 14;
+const shortWeeks = shortDays / 7;
+const labNearShort = labNumbers({ ...defaultLabState(), spot: nearSpot, days: shortDays });
 const uocRebate = call('up-and-out', Hu, { rebate: C.rebatePips * PIP });
 const bgk = bgkFactor(vol);
 const hDaily = dailyEquivalentBarrier(Hu, 'up', vol);
@@ -207,13 +208,13 @@ export const nums: NumTable = {
   'm07.shortWeeks': { value: shortWeeks, kind: 'num', digits: 0 },
   'm07.uocNearShortPips': { value: pips(labNearShort.price), kind: 'pips', digits: 1 },
   'm07.uocDeltaNearShort': { value: labNearShort.delta, kind: 'num', digits: 3, sign: true },
-  // 1 decimal, as the lab shows them (−54.8 and 3.7 at spot 0.8200, 2 weeks).
+  // 1 decimal, as the lab shows them (−55.0 and 3.7 at spot 0.8200, 14 days = 2 weeks).
   'm07.uocGammaNearShort': { value: labNearShort.gamma, kind: 'num', digits: 1, sign: true },
   'm07.uocDeltaNearShortUsd': {
     value: (Math.round(-labNearShort.delta * 1000) / 1000) * N,
     kind: 'money',
     ccy: 'USD',
-    note: 'Short USD equivalent of the UOC delta as shown (3 decimals) at 0.8200, 2 weeks, USD 1 Mio.',
+    note: 'Short USD equivalent of the UOC delta as shown (3 decimals) at 0.8200, 14 days, USD 1 Mio.',
   },
   'm07.vanillaGammaNearShort': { value: labNearShort.vanillaGamma, kind: 'num', digits: 1 },
   'm07.mirrorSpot': { value: mirror.mirrorSpot, kind: 'rate', note: 'H²/S for H 0.7760' },

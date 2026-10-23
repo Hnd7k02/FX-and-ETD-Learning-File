@@ -89,7 +89,8 @@ export const M07_CONFIG = {
       barrier: onGrid(S * WINDOW.barrierFactor),
       rebatePips: 0,
       spot: S,
-      weeks: 13,
+      // 3 months as in the running example: T = 0.25 years = 91.25 days (D-43)
+      days: 365 / 4,
       monitoring: 'continuous' as 'continuous' | 'daily',
     },
     ranges: {
@@ -97,7 +98,8 @@ export const M07_CONFIG = {
       barrier: { min: 0.74, max: 0.86, step: 0.0005 },
       rebatePips: { min: 0, max: 100, step: 5 },
       spot: { min: 0.74, max: 0.86, step: 0.0005 },
-      weeks: { min: 1, max: 52, step: 1 },
+      // days, not weeks: one week step moved the parity bar by up to 95 px at short maturities
+      days: { min: 1, max: 365, step: 1 },
     },
     /** x-axis of both charts (spot USD/CHF). */
     xDomain: [0.74, 0.86] as [number, number],

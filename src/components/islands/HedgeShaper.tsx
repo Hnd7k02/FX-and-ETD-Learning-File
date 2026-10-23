@@ -16,7 +16,7 @@ import { StatHero, StatRow, StatTable } from '@/components/ui/Stat';
 import { useElementWidth, usePrefersReducedMotion, useTween } from '@/components/ui/hooks';
 import { hedgeshaper as dict } from '@/i18n/dict/hedgeshaper';
 import { translator, type Lang } from '@/i18n/types';
-import { clamp, linePath, niceTicks, scaleLinear, type Point } from '@/lib/chart';
+import { clamp, linePath, niceTicks, polylineAt, scaleLinear, type Point } from '@/lib/chart';
 import { EXAMPLE, EXAMPLE_FORWARD } from '@/lib/fx/example';
 import { fmtMillions, fmtMoney, fmtPips, fmtRate, pipSize } from '@/lib/format';
 import {
@@ -131,7 +131,6 @@ export default function HedgeShaper({ lang }: HedgeShaperProps): JSX.Element {
   const [blocks, setBlocks] = useState<ShaperBlocks>({ sellCall: false, sellPut: false });
   const [st, setSt] = useState(ST_START);
   const [dragging, setDragging] = useState(false);
-  const [moved, setMoved] = useState(false);
   const box = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const pointer = useRef<number | null>(null);
@@ -145,7 +144,9 @@ export default function HedgeShaper({ lang }: HedgeShaperProps): JSX.Element {
   const curve = useTween(pre.curves[id], 300, rm);
   const premTween = useTween(f.premiumPips, 300, rm);
   const rateAt = effectiveRate(pos.legs, MARKET, st);
-  const dots = useTween([rateAt], 300, rm || dragging || !moved);
+  // The dot sits on the drawn curve (same samples, also while a block toggle morphs it); it is not
+  // tweened itself, so it never lags behind the rate at expiry (D-42).
+  const dotRate = polylineAt(XS, curve, st);
 
   const sx = scaleLinear(RANGE, [L.left, L.width - L.right]);
   const sy = scaleLinear(RANGE, [L.plotBottom, L.top]);
@@ -170,7 +171,6 @@ export default function HedgeShaper({ lang }: HedgeShaperProps): JSX.Element {
   }, [curve, L.width, L.height]);
 
   const set = (v: number) => {
-    setMoved(true);
     setSt(clamp(Math.round(v / ST_STEP) * ST_STEP, RANGE[0], RANGE[1]));
   };
   const toRate = (clientX: number) => {
@@ -336,11 +336,13 @@ export default function HedgeShaper({ lang }: HedgeShaperProps): JSX.Element {
                 />
                 <path
                   d={linePath(XS.map((v): Point => [sx(v), sy(v)]))}
+                  data-line="unhedged"
                   style={lineStyle(COLORS.unhedged, 2)}
                 />
                 <path
                   d={linePath(XS.map((v, i): Point => [sx(v), sy(curve[i] ?? v)]))}
                   data-curve
+                  data-line="structure"
                   style={lineStyle(COLORS.structure, 3)}
                 />
               </g>
@@ -428,14 +430,16 @@ export default function HedgeShaper({ lang }: HedgeShaperProps): JSX.Element {
                 style={{ fill: 'none', stroke: 'var(--ff-ink)', strokeWidth: 1.5 }}
               />
               <circle
+                data-dot="unhedged"
                 cx={x}
                 cy={sy(st)}
                 r={5}
                 style={{ fill: COLORS.unhedged, stroke: '#fff', strokeWidth: 2.5 }}
               />
               <circle
+                data-dot="structure"
                 cx={x}
-                cy={sy(dots[0]!)}
+                cy={sy(dotRate)}
                 r={6.5}
                 style={{ fill: COLORS.structure, stroke: '#fff', strokeWidth: 2.5 }}
               />

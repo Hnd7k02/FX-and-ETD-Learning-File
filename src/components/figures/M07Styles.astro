@@ -579,19 +579,23 @@
     background: #fff;
     box-shadow: inset 0 0 0 1px var(--ff-line);
   }
+  /* The width follows the sliders frame by frame: no transition (a restarted transition lags and
+     runs in bursts, D-42); padding only with a label, so a zero share is really zero wide. */
   .m7-bar > span {
     display: flex;
     align-items: center;
     min-width: 0;
     height: 100%;
-    padding: 0 6px;
+    padding: 0;
     overflow: hidden;
     white-space: nowrap;
     font-family: var(--ff-font-mono);
     font-size: 11px;
     font-weight: 600;
     color: #fff;
-    transition: width 300ms ease;
+  }
+  .m7-bar > span.has-label {
+    padding: 0 6px;
   }
   .m7-bar .is-ko {
     background: var(--ff-long);
@@ -828,7 +832,6 @@
       animation: none;
     }
     .m7-chip,
-    .m7-bar > span,
     .m7-table tr,
     .m7-handle-dot,
     .m7-dot,

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { frameDelta, tweenProgress } from '@/lib/anim';
+import { frameDelta, tweenProgress, tweenShouldJump } from '@/lib/anim';
 
 describe('frameDelta', () => {
   it('is the time since the last frame', () => {
@@ -25,5 +25,22 @@ describe('tweenProgress', () => {
   it('is 0 before the start and 1 without a duration', () => {
     expect(tweenProgress(990, 1000, 400)).toBe(0);
     expect(tweenProgress(990, 1000, 0)).toBe(1);
+  });
+});
+
+describe('tweenShouldJump', () => {
+  const base = { instant: false, running: false, sinceLastChange: 1000, duration: 300 };
+  it('animates a single, isolated change', () => {
+    expect(tweenShouldJump(base)).toBe(false);
+  });
+  it('jumps on continuous input: while running or within the duration of the last change', () => {
+    expect(tweenShouldJump({ ...base, running: true })).toBe(true);
+    expect(tweenShouldJump({ ...base, sinceLastChange: 16 })).toBe(true);
+    expect(tweenShouldJump({ ...base, sinceLastChange: 299 })).toBe(true);
+    expect(tweenShouldJump({ ...base, sinceLastChange: 300 })).toBe(false);
+  });
+  it('jumps when instant or without a duration', () => {
+    expect(tweenShouldJump({ ...base, instant: true })).toBe(true);
+    expect(tweenShouldJump({ ...base, duration: 0 })).toBe(true);
   });
 });

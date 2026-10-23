@@ -2,7 +2,7 @@
  * Shared Preact hooks for islands: reduced motion, element width, in-view and tweening.
  */
 import { useEffect, useRef, useState } from 'preact/hooks';
-import { tweenProgress } from '@/lib/anim';
+import { tweenProgress, tweenShouldJump } from '@/lib/anim';
 import type { RefObject } from 'preact';
 import { easeInOutCubic } from '@/lib/chart';
 
@@ -60,8 +60,11 @@ export function useInView<T extends Element>(ref: RefObject<T>, rootMargin = '0p
 }
 
 /**
- * Smoothly animates towards `target` (number or number[]) over `duration` ms with easeInOutCubic.
- * Jumps immediately when `instant` is true (e.g. reduced motion or while dragging a slider).
+ * Animates towards `target` (number or number[]) over `duration` ms with easeInOutCubic, but only
+ * for a single, isolated change (toggle, preset, reset). A target that arrives while an animation
+ * runs or within `duration` ms of the previous change jumps (slider, drag, held arrow key,
+ * playback: mouse, touch and keyboard alike), and so does every change when `instant` is true
+ * (reduced motion, dragging). DECISIONS D-42.
  */
 export function useTween<T extends number | number[]>(
   target: T,
@@ -71,19 +74,31 @@ export function useTween<T extends number | number[]>(
   const [value, setValue] = useState<T>(target);
   const from = useRef<T>(target);
   const raf = useRef<number | null>(null);
+  const lastChange = useRef(Number.NEGATIVE_INFINITY);
+  // end time of the running animation (the effect cleanup cancels the frame before each run)
+  const animUntil = useRef(0);
   const current = useRef<T>(target);
   current.current = value;
 
   useEffect(() => {
+    const now = typeof performance !== 'undefined' ? performance.now() : 0;
+    const running = now < animUntil.current;
+    const sinceLastChange = now - lastChange.current;
+    lastChange.current = now;
     if (raf.current !== null) cancelAnimationFrame(raf.current);
-    if (instant || duration <= 0 || typeof requestAnimationFrame === 'undefined') {
+    raf.current = null;
+    if (
+      typeof requestAnimationFrame === 'undefined' ||
+      tweenShouldJump({ instant, running, sinceLastChange, duration })
+    ) {
       setValue(target);
       return;
     }
     from.current = current.current;
-    const t0 = performance.now();
-    const step = (now: number) => {
-      const k = tweenProgress(now, t0, duration);
+    const t0 = now;
+    animUntil.current = now + duration;
+    const step = (time: number) => {
+      const k = tweenProgress(time, t0, duration);
       const e = easeInOutCubic(k);
       const a = from.current;
       let next: T;
@@ -95,11 +110,12 @@ export function useTween<T extends number | number[]>(
         next = target;
       }
       setValue(next);
-      if (k < 1) raf.current = requestAnimationFrame(step);
+      raf.current = k < 1 ? requestAnimationFrame(step) : null;
     };
     raf.current = requestAnimationFrame(step);
     return () => {
       if (raf.current !== null) cancelAnimationFrame(raf.current);
+      raf.current = null;
     };
   }, [Array.isArray(target) ? target.join(',') : target, duration, instant]);
 

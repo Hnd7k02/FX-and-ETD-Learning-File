@@ -7,6 +7,7 @@ import {
   lerpPoints,
   linePath,
   nearestIndex,
+  polylineAt,
   niceStep,
   niceTicks,
   project,
@@ -130,5 +131,22 @@ describe('easing and morphing', () => {
     expect(nearestIndex([0, 1, 2, 3], 2.6)).toBe(3);
     expect(nearestIndex([0, 1, 2, 3], -1)).toBe(0);
     expect(nearestIndex([], 1)).toBe(-1);
+  });
+});
+
+describe('polylineAt', () => {
+  const xs = [0, 1, 2, 4];
+  const ys = [0, 10, 10, 30];
+  it('interpolates between samples and clamps at the ends', () => {
+    expect(polylineAt(xs, ys, 0.5)).toBe(5);
+    expect(polylineAt(xs, ys, 1)).toBe(10);
+    expect(polylineAt(xs, ys, 3)).toBe(20);
+    expect(polylineAt(xs, ys, -1)).toBe(0);
+    expect(polylineAt(xs, ys, 9)).toBe(30);
+  });
+  it('handles short inputs', () => {
+    expect(polylineAt([], [], 1)).toBeNaN();
+    expect(polylineAt([2], [7], 5)).toBe(7);
+    expect(polylineAt([1, 1], [3, 5], 1)).toBe(3);
   });
 });

@@ -130,6 +130,28 @@ export function lerpPoints(a: Point[], b: Point[], t: number): Point[] {
   return out;
 }
 
+/**
+ * y of the polyline through (xs[i], ys[i]) at x (xs ascending; clamped at the ends). A marker
+ * placed with it lies exactly on the drawn line, also between samples and during a morph.
+ */
+export function polylineAt(xs: readonly number[], ys: readonly number[], x: number): number {
+  const n = Math.min(xs.length, ys.length);
+  if (n === 0) return Number.NaN;
+  if (n === 1 || x <= xs[0]!) return ys[0]!;
+  if (x >= xs[n - 1]!) return ys[n - 1]!;
+  let lo = 0;
+  let hi = n - 1;
+  while (hi - lo > 1) {
+    const mid = (lo + hi) >> 1;
+    if (xs[mid]! <= x) lo = mid;
+    else hi = mid;
+  }
+  const x0 = xs[lo]!;
+  const x1 = xs[hi]!;
+  const t = x1 === x0 ? 0 : (x - x0) / (x1 - x0);
+  return ys[lo]! + (ys[hi]! - ys[lo]!) * t;
+}
+
 /** Index of the point whose x is closest to `x` (sorted by x). Binary search. */
 export function nearestIndex(xs: number[], x: number): number {
   if (!xs.length) return -1;

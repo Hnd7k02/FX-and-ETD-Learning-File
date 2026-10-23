@@ -31,6 +31,7 @@ import {
   numericGreeks,
   priceAt,
   spotGrid,
+  maturityLabel,
   yearsOf,
   type LabState,
 } from '@/lib/m07/barrierlab';
@@ -157,7 +158,8 @@ describe('m07 barrier lab (figure b)', () => {
 
   it('maps the state to the core', () => {
     expect(kindOf(s0)).toBe('up-and-out');
-    expect(yearsOf(13)).toBe(0.25);
+    expect(yearsOf(91.25)).toBe(0.25);
+    expect(yearsOf(365)).toBe(1);
     expect(effectiveBarrier(s0)).toBe(0.824);
     expect(effectiveBarrier({ ...s0, monitoring: 'daily' })).toBeCloseTo(
       0.824 * bgkFactor(vol),
@@ -462,5 +464,17 @@ describe('m07 numbers', () => {
     expect(M07.window.pv).toBeLessThan(M07.window.compare.vanilla ?? 0);
     expect(M07.labNearShort.gamma).toBeLessThan(-10 * Math.abs(M07.labNearShort.vanillaGamma));
     expect(Object.keys(nums).every((k) => k.startsWith('m07.'))).toBe(true);
+  });
+});
+
+describe('maturityLabel', () => {
+  it('names the time to expiry in days, weeks, months or one year', () => {
+    expect(maturityLabel(1)).toEqual({ unit: 'day', value: 1, days: 1 });
+    expect(maturityLabel(5)).toEqual({ unit: 'days', value: 5, days: 5 });
+    expect(maturityLabel(7)).toEqual({ unit: 'week', value: 1, days: 7 });
+    expect(maturityLabel(14)).toEqual({ unit: 'weeks', value: 2, days: 14 });
+    expect(maturityLabel(15)).toEqual({ unit: 'weeks', value: 2.1, days: 15 });
+    expect(maturityLabel(91.25)).toEqual({ unit: 'months', value: 3, days: 91 });
+    expect(maturityLabel(365)).toEqual({ unit: 'year', value: 1, days: 365 });
   });
 });
