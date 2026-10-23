@@ -362,6 +362,11 @@ p {
   text-decoration-thickness: 1px;
   text-underline-offset: 3px;
 }
+.prose i,
+.prose em {
+  /* italic variables (S, K, H …) otherwise look glued to the next word */
+  padding-right: 0.06em;
+}
 .prose code {
   font-family: var(--ff-font-mono);
   font-size: 0.9em;
@@ -395,6 +400,20 @@ p {
   font-size: 13px;
   font-weight: 800;
   color: var(--ff-ink-2);
+}
+
+.table-wrap {
+  max-width: var(--ff-measure);
+  overflow-x: auto;
+  border-radius: var(--ff-r-box);
+}
+.table-wrap:focus-visible {
+  outline: 2px solid var(--ff-long);
+  outline-offset: 2px;
+}
+.table-wrap > table {
+  display: table;
+  max-width: none;
 }
 
 /* ---------- Formula boxes ---------- */

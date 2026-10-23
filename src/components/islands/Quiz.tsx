@@ -39,6 +39,13 @@ function CrossIcon() {
   );
 }
 
+/** Explanations sometimes start with their own verdict ("Richtig. …"); the card already shows one. */
+const VERDICT =
+  /^\s*(?:richtig|correct|genau|exactly|falsch|wrong|incorrect|nicht ganz|not quite)\s*[.!:–—-]\s*/i;
+export function stripVerdict(text: string): string {
+  return text.replace(VERDICT, '');
+}
+
 export default function Quiz({ lang, mode, slug, questions }: QuizProps) {
   const t = translator(common, lang);
   const tm = translator(moduleui, lang);
@@ -236,12 +243,12 @@ export default function Quiz({ lang, mode, slug, questions }: QuizProps) {
           <div class="qz-feedback" data-ok={ok ? 'true' : 'false'}>
             <p>
               <strong>{ok ? t('quiz.correct') : t('quiz.wrong')}</strong>{' '}
-              {q.options[picked]!.explain}
+              {stripVerdict(q.options[picked]!.explain)}
             </p>
             {!ok ? (
               <p>
                 <strong>{tm('quiz.correctWas', { key: KEYS[q.correct] ?? '' })}</strong>{' '}
-                {q.options[q.correct]!.explain}
+                {stripVerdict(q.options[q.correct]!.explain)}
               </p>
             ) : null}
           </div>

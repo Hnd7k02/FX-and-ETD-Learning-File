@@ -19,16 +19,21 @@ import {
   endOf,
   nextTarget,
   parity,
+  parityFrame,
+  parityLayout,
   prevTarget,
   startOf,
   stepAt,
   stepState,
   timeline,
+  type ParityCard,
 } from '@/lib/m02/parity';
 import {
   curveDomain,
   curvePoint,
   forwardCurve,
+  matchPreset,
+  nearestTenor,
   pointsApprox,
   premiumWording,
   visibleLabels,
@@ -41,10 +46,14 @@ import {
   marketRange,
   netFlows,
   reactionAt,
+  revealOrder,
   snapMarket,
   startMarket,
+  stepRateKind,
 } from '@/lib/m02/carry';
 import { nums } from '@/lib/nums/m02';
+import { quiz } from '@/content/quiz/02-forward';
+import { facts } from '@/content/facts/m02';
 
 const M = M02_CONFIG.market;
 const N = M.notional;
@@ -331,5 +340,162 @@ describe('m02 text helpers', () => {
     expect(wrapText('  ', 5)).toEqual([]);
     expect(wrapText('averyveryverylongword x', 5)).toEqual(['averyveryverylongword', 'x']);
     expect(textWidth('abcd', 10)).toBeCloseTo(22.4, 9);
+  });
+});
+
+describe('m02 parity playback frame', () => {
+  const tl = timeline();
+  const P2 = { ...P, rd: 0.02 };
+  const r2 = parity(P2);
+
+  it('shows nothing before the start and everything after the end', () => {
+    const f0 = parityFrame(0, P2, r2, tl);
+    expect(PARITY_STEPS.every((id) => f0.steps[id].state === 'todo')).toBe(true);
+    expect(f0.day).toBe(0);
+    expect(f0.usd).toBeCloseTo(r2.usdToday, 6);
+    const fEnd = parityFrame(tl.total + 10, P2, r2, tl);
+    expect(PARITY_STEPS.every((id) => fEnd.steps[id].state === 'done')).toBe(true);
+    expect(PARITY_STEPS.every((id) => fEnd.steps[id].k === 1)).toBe(true);
+    expect(fEnd.day).toBe(P2.days);
+    expect(fEnd.usd).toBeCloseTo(N, 6);
+    expect(fEnd.chf).toBeCloseTo(r2.chfRepay, 6);
+  });
+
+  it('counts the amount of the active step and runs the days during the term', () => {
+    const i = PARITY_STEPS.indexOf('B1');
+    const mid = parityFrame(tl.starts[i]! + tl.durations[i]! * 0.3, P2, r2, tl);
+    expect(mid.steps.B1.state).toBe('active');
+    expect(mid.steps.B1.k).toBeGreaterThan(0);
+    expect(mid.steps.B1.k).toBeLessThan(1);
+    expect(mid.steps.A1.state).toBe('done');
+    const late = parityFrame(tl.starts[i]! + tl.durations[i]! * 0.8, P2, r2, tl);
+    expect(late.steps.B1.k).toBe(1);
+    const ti = PARITY_STEPS.indexOf('time');
+    const half = parityFrame(tl.starts[ti]! + tl.durations[ti]! / 2, P2, r2, tl);
+    expect(half.day).toBeCloseTo(P2.days / 2, 6);
+    expect(half.usd).toBeGreaterThan(r2.usdToday);
+    expect(half.usd).toBeLessThan(N);
+    expect(half.chf).toBeGreaterThan(r2.chfLoan);
+  });
+
+  it('lays out two lanes that fit the width and do not overlap', () => {
+    for (const w of [300, 326, 519, 520, 600, 1000]) {
+      const L = parityLayout(w);
+      expect(L.compact).toBe(w < 520);
+      expect(L.font).toBeGreaterThanOrEqual(11);
+      expect(L.laneA.x + L.laneA.w).toBeLessThan(L.laneB.x);
+      expect(L.laneB.x + L.laneB.w).toBeCloseTo(L.width, 6);
+      const ids = Object.keys(L.cards) as ParityCard[];
+      for (const id of ids) {
+        const c = L.cards[id];
+        expect(c.x).toBeGreaterThanOrEqual(0);
+        expect(c.x + c.w).toBeLessThanOrEqual(L.width + 1e-9);
+        expect(c.y + c.h).toBeLessThan(L.result.y);
+      }
+      // lane B cards stack without overlap; the term band sits between today and maturity
+      const b = ['B1', 'B2', 'B3', 'B4', 'B5'].map((id) => L.cards[id as ParityCard]);
+      for (let k = 1; k < b.length; k++) expect(b[k]!.y).toBeGreaterThan(b[k - 1]!.y + b[k - 1]!.h);
+      expect(L.termY).toBeGreaterThan(L.cards.B3.y + L.cards.B3.h);
+      expect(L.maturityY).toBeLessThan(L.cards.B4.y);
+      // route A's settlement card spans both maturity rows, so the "=" signs line up
+      expect(L.cards.A2.y).toBe(L.cards.B4.y);
+      expect(L.cards.A2.y + L.cards.A2.h).toBe(L.cards.B5.y + L.cards.B5.h);
+      expect(L.height).toBeGreaterThan(L.result.y + L.result.h);
+    }
+    expect(parityLayout(100).width).toBe(300);
+  });
+});
+
+describe('m02 curve presets and tenor picking', () => {
+  it('recognises the presets of the config', () => {
+    for (const p of M02_CONFIG.curve.presets) expect(matchPreset(p.rd, p.rf)).toBe(p.id);
+    expect(matchPreset(0.011, 0.022)).toBeNull();
+    const swapped = M02_CONFIG.curve.presets.find((p) => p.id === 'swapped')!;
+    const pt = curvePoint(
+      { spot: M.spot, rd: swapped.rd, rf: swapped.rf, basisQuote: 360, basisBase: 360 },
+      { id: '3M', days: 90 },
+    );
+    expect(pt.wording).toBe('premium');
+  });
+
+  it('picks the nearest tenor', () => {
+    expect(M02_CONFIG.curve.tenors[nearestTenor(0)]!.id).toBe('1W');
+    expect(M02_CONFIG.curve.tenors[nearestTenor(95)]!.id).toBe('3M');
+    expect(M02_CONFIG.curve.tenors[nearestTenor(400)]!.id).toBe('1Y');
+  });
+});
+
+describe('m02 cash and carry display helpers', () => {
+  const fair = forwardMoneyMarket(M.spot, M.rd, M.rf, M.days);
+
+  it('labels step rates as interest or FX rates', () => {
+    expect(stepRateKind('borrowQuote')).toBe('pct');
+    expect(stepRateKind('investBase')).toBe('pct');
+    expect(stepRateKind('withdrawQuote')).toBe('pct');
+    expect(stepRateKind('repayBase')).toBe('pct');
+    expect(stepRateKind('buyBaseSpot')).toBe('fx');
+    expect(stepRateKind('sellBaseForward')).toBe('fx');
+    expect(stepRateKind('profit')).toBe('none');
+  });
+
+  it('reveals today first, then maturity, then the profit', () => {
+    const order = revealOrder(carryFor(fair + 10 * PIP));
+    expect(order).toHaveLength(9);
+    expect(order[0]).toBe('borrowQuote');
+    expect(order[4]).toBe('withdrawBase');
+    expect(order[8]).toBe('profit');
+    expect(revealOrder(carryFor(fair))).toEqual([]);
+  });
+});
+
+describe('m02 quiz', () => {
+  const all = [...quiz.quiz, ...Object.values(quiz.checks)];
+
+  it('has four graded questions and one check per section', () => {
+    expect(quiz.slug).toBe('02-forward');
+    expect(quiz.quiz).toHaveLength(4);
+    expect(Object.keys(quiz.checks).sort()).toEqual(['1', '2', '3', '4']);
+  });
+
+  it('has 3–4 distinct options with explanations in both languages', () => {
+    const ids = new Set<string>();
+    for (const q of all) {
+      expect(ids.has(q.id)).toBe(false);
+      ids.add(q.id);
+      expect(q.options.length).toBeGreaterThanOrEqual(3);
+      expect(q.options.length).toBeLessThanOrEqual(4);
+      expect(q.correct).toBeGreaterThanOrEqual(0);
+      expect(q.correct).toBeLessThan(q.options.length);
+      for (const lang of ['de', 'en'] as const) {
+        expect(q.prompt[lang].trim()).not.toBe('');
+        const labels = q.options.map((o) => o.label[lang]);
+        expect(new Set(labels).size).toBe(labels.length);
+        for (const o of q.options) {
+          expect(o.label[lang].trim()).not.toBe('');
+          expect(o.explain[lang].trim()).not.toBe('');
+          expect(o.label[lang]).not.toMatch(/NaN|undefined|\{\w+\}/);
+          expect(o.explain[lang]).not.toMatch(/NaN|undefined|\{\w+\}/);
+        }
+      }
+    }
+  });
+
+  it('marks the computed values as correct', () => {
+    expect(quiz.checks['1'].options[quiz.checks['1'].correct]!.label.de).toBe('CHF\u00a0793’061');
+    expect(quiz.checks['2'].options[quiz.checks['2'].correct]!.label.en).toBe('USD\u00a0991,326');
+    expect(quiz.quiz[1].options[quiz.quiz[1].correct]!.label.de).toBe('0.79306');
+    expect(quiz.quiz[0].options[quiz.quiz[0].correct]!.label.de).toBe('CHF\u00a0+46’939');
+    expect(quiz.quiz[3].options[quiz.quiz[3].correct]!.label.de).toContain('1’000');
+  });
+});
+
+describe('m02 facts', () => {
+  it('have both languages and a source', () => {
+    for (const [id, f] of Object.entries(facts)) {
+      expect(id.startsWith('m02-')).toBe(true);
+      expect(f.de.trim()).not.toBe('');
+      expect(f.en.trim()).not.toBe('');
+      expect(f.source).toBe('bis-rpfx25-fx');
+    }
   });
 });

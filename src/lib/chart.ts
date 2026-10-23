@@ -28,7 +28,9 @@ export function niceStep(span: number, count = 5): number {
   const raw = span / Math.max(1, count);
   const mag = Math.pow(10, Math.floor(Math.log10(raw)));
   const norm = raw / mag;
-  const nice = norm <= 1 ? 1 : norm <= 2 ? 2 : norm <= 2.5 ? 2.5 : norm <= 5 ? 5 : 10;
+  const e = 1e-9; // tolerance: 0.6 / 3 = 0.19999999999999998 must still count as 2
+  const nice =
+    norm <= 1 + e ? 1 : norm <= 2 + e ? 2 : norm <= 2.5 + e ? 2.5 : norm <= 5 + e ? 5 : 10;
   return nice * mag;
 }
 

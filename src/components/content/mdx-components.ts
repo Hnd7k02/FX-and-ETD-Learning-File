@@ -10,5 +10,17 @@ import Derivation from './Derivation.astro';
 import Takeaway from './Takeaway.astro';
 import Figure from './Figure.astro';
 import Callout from './Callout.astro';
+import Table from './Table.astro';
 
-export const mdxComponents = { Num, Fact, Formula, Desk, Derivation, Takeaway, Figure, Callout };
+export const mdxComponents = {
+  Num,
+  Fact,
+  Formula,
+  Desk,
+  Derivation,
+  Takeaway,
+  Figure,
+  Callout,
+  // Markdown tables render through the focusable scroll wrapper.
+  table: Table,
+};
