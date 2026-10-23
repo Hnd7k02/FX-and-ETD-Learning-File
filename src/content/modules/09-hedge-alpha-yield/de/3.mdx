@@ -1,5 +1,88 @@
 import ProductMatrixFigure from '@/components/figures/ProductMatrixFigure.astro';
+import PathSimulatorFigure from '@/components/figures/PathSimulatorFigure.astro';
 
-Entwurf.
+{/* 09 Hedge, Alpha, Yield · Abschnitt 3 · Alpha. Zahlen nur über <Num />, Registry src/lib/nums/m09.ts. */}
 
-<ProductMatrixFigure need="alpha" view="strike-direct" caption="Entwurf" />
+Die Anlegerin hat eine Sicht: Der Dollar fällt in den nächsten Monaten nicht stark. Sie hat kein Risiko, das sie absichern müsste. Sie will aus ihrer Sicht Geld machen. Das nennt man **Alpha**: einen Ertrag, der aus einer Marktsicht kommt.
+
+Bevor sie ein Produkt wählt, beantwortet sie zwei Fragen.
+
+- **Wie will ich bezahlt werden?** Als **Coupon**, also Geld je Fixing, ohne Devisen zu tauschen. Oder als **Strike**, also ein besserer Kurs für Dollars, die sie kauft.
+- **Welche Sicht habe ich?** Eine Richtung (**direkt**: «Der Dollar fällt nicht unter X») oder ein Band (**Range**: «Der Dollar bleibt zwischen X und Y»).
+
+Zwei Fragen mit je zwei Antworten ergeben vier Felder und vier Produktfamilien:
+
+| | Direkt | Range |
+| --- | --- | --- |
+| **Coupon** | TPF | RTPF |
+| **Strike** | TARF und Accumulator | Pivot TARF |
+
+<ProductMatrixFigure need="alpha" view="coupon-direct" caption="Die Alpha-Matrix: Wähle ein Feld. Alle vier Kurven zeigen ein Fixing. Oben ein begrenzter Gewinn, unten ein gehebelter Verlust, der aus dem Chart läuft." />
+
+### Rechenbeispiel: vier Felder, ein Muster
+
+Alle Produkte stammen aus [Modul 08](/module/08-structured-products/1/), mit Strike oder Coupon so gelöst, dass sie beim Abschluss null wert sind (Monte Carlo mit <Num of="m09.paths" /> Pfaden). Sie laufen über <Num of="m09.fixings" /> Monats-Fixings auf je <Num of="m09.structNotional" />, der Accumulator über <Num of="m09.accFixings" /> Wochen auf je <Num of="m09.accNotional" />.
+
+- **Coupon direkt, TPF:** <Num of="m09.tpfCoupon" /> Pips je Fixing, also <Num of="m09.tpfCouponChf" />, solange das Fixing über <Num of="m09.tpfStrike" /> liegt. Nach <Num of="m09.tpfTargetCoupons" /> Coupons ist Schluss.
+- **Coupon Range, RTPF:** <Num of="m09.rtpfCoupon" /> Pips je Fixing, solange das Fixing zwischen <Num of="m09.rtpfLower" /> und <Num of="m09.rtpfUpper" /> liegt.
+- **Strike direkt, TARF:** Kauf zu <Num of="m09.tarfStrike" />, <Num of="m09.tarfBetter" /> Pips unter dem Forward am mittleren Fixing-Tag. Bei <Num of="m09.tarfTarget" /> Pips Gewinn endet er.
+- **Strike direkt, Accumulator:** Kauf zu <Num of="m09.accStrike" />, <Num of="m09.accBetter" /> Pips unter dem Forward, mit Knock-out bei <Num of="m09.accBarrier" />.
+- **Strike Range, Pivot TARF:** Kauf zu <Num of="m09.pivLower" /> unter dem Pivot <Num of="m09.pivPivot" />, Verkauf zu <Num of="m09.pivUpper" /> darüber, Target <Num of="m09.pivTarget" /> Pips.
+
+Das Muster ist überall gleich. Der Gewinn ist begrenzt: durch ein Target, einen Knock-out oder die Höhe des Coupons. Der Verlust ist gehebelt: Auf der falschen Seite zählt jedes Pip doppelt.
+
+<PathSimulatorFigure
+  products={['tpf', 'rtpf', 'tarf', 'pivotTarf', 'accumulator']}
+  scenario="sideways"
+  adjustable={false}
+  caption="Teste deine Sicht an einem Pfad. Seitwärts sammeln die Produkte ihre Gewinne und enden früh. Wechsle zu «Trend ab»: Dann zeigt sich die doppelte Menge."
+/>
+
+<Callout variant="bad" title="Wann geht es schief: Die Sicht ist falsch">
+
+Fällt der Dollar deutlich, liegen alle Fixings auf der falschen Seite. Die Produkte laufen dann bis zum Ende, mit doppelter Menge. Im schlechtesten der <Num of="m09.paths" /> simulierten Pfade endet der TPF bei <Num of="m09.tpfWorst" />, der RTPF bei <Num of="m09.rtpfWorst" />, der TARF bei <Num of="m09.tarfWorst" />, der Pivot TARF bei <Num of="m09.pivWorst" /> und der Accumulator bei <Num of="m09.accWorst" />. Gewinnen kann der TPF dagegen höchstens <Num of="m09.tpfMaxChf" />: <Num of="m09.tpfTargetCoupons" /> Coupons.
+
+</Callout>
+
+<Callout variant="warn" title="Risiko-Box: Alpha-Produkte">
+
+- **Maximalverlust:** nicht begrenzt. Der Gewinn ist begrenzt, durch Target, Knock-out oder Coupon.
+- **Hebel:** 2 auf der falschen Seite des Strikes oder der Range.
+- **Pfadabhängigkeit:** Target und Knock-out beenden die guten Szenarien früh. Die schlechten laufen bis zum Schluss.
+- **Generisch:** Vereinfachte Beispiele, Marktvarianten unterscheiden sich. Angebote enthalten zusätzlich eine Marge.
+
+</Callout>
+
+<Derivation title="Herleitung: Wohin fliesst die Prämie der verkauften Puts?">
+
+Alle vier Felder verkaufen Optionen und stecken deren Prämie in etwas anderes. Am klarsten ist das bei einem einzigen Fixing in 3 Monaten, ohne Target.
+
+**1. Strike direkt.** Die Prämie der zwei verkauften Puts bezahlt einen gekauften Call zum selben, tieferen Strike:
+
+<Formula><i>C</i>(<i>K</i>) = 2 · <i>P</i>(<i>K</i>) ⇒ <i>K</i> = <Num of="m09.levStrike" /></Formula>
+
+Das ist genau der strukturierte Hedge aus [Abschnitt 2](/module/09-hedge-alpha-yield/2/).
+
+**2. Coupon direkt.** Die Prämie bezahlt stattdessen ein Digital ([Modul 07](/module/07-barrier-binary/3/)). <i>D</i>(<i>K</i>) ist der Preis eines Digitals, das 1 CHF zahlt, wenn das Fixing über <i>K</i> liegt. Mit <i>K</i> = <Num of="m09.kCoupon" />:
+
+<Formula><i>c</i> · <i>D</i>(<i>K</i>) = 2 · <i>P</i>(<i>K</i>) ⇒ <i>c</i> = <Num of="m09.coupon1" /> Pips</Formula>
+
+**3. Coupon Range.** Verkauft werden zwei Puts an der unteren und zwei Calls an der oberen Grenze. Bezahlt wird ein Range-Digital zwischen <Num of="m09.lowR" /> und <Num of="m09.upR" />:
+
+<Formula><i>c</i> · [<i>D</i>(<i>L</i>) − <i>D</i>(<i>U</i>)] = 2 · [<i>P</i>(<i>L</i>) + <i>C</i>(<i>U</i>)] ⇒ <i>c</i> = <Num of="m09.couponRange1" /> Pips</Formula>
+
+**4.** Die echten Produkte haben <Num of="m09.fixings" /> Fixings über ein Jahr und ein Target. Die späten Fixings bringen mehr Zeitwert, und beim TPF fällt der Forward mit der Zinsdifferenz sogar unter den Strike. Darum sind ihre Coupons viel grösser als hier. Die Rechnung dazu steht in [Modul 08](/module/08-structured-products/4/).
+
+</Derivation>
+
+<Desk title="Strike oder Coupon: Wer braucht die Devisen?">
+
+Ein Strike-Produkt liefert Devisen. Es passt zu jemandem, der die Dollars ohnehin kauft, etwa zu einem Importeur mit einer klaren Sicht. Wer keine Dollars braucht, muss sie zum Marktkurs wieder verkaufen: Aus dem besseren Kurs wird eine Position. Ein Coupon-Produkt zahlt nur Franken aus. Es ist eine reine Wette auf die Sicht. Bei beiden gilt: Erst den Verlust bei einem Fixing weit auf der falschen Seite ausrechnen, dann über den Coupon oder den Strike reden.
+
+</Desk>
+
+<Takeaway>
+
+Alpha-Produkte verwandeln eine Sicht in einen Coupon oder einen besseren Strike. Bezahlt wird mit verkauften Optionen: Der Gewinn ist begrenzt, der Verlust nicht.
+
+</Takeaway>

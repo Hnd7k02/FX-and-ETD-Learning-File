@@ -12,17 +12,19 @@ Stell dir eine Schweizer Firma vor. Sie hat Franken auf dem Konto. Heute muss si
 
 Der dritte Weg ist ein **FX Swap**: zwei Devisengeschäfte in Gegenrichtung über denselben Betrag. Das frühere heisst **Near Leg**, das spätere **Far Leg**. Die Firma tauscht ihre Franken auf Zeit gegen Dollar und bekommt sie danach zurück.
 
+Das Far Leg kennst du schon: Es ist ein Forward aus Modul 02. Ein FX Swap ist also ein Spot-Geschäft plus ein Forward in Gegenrichtung, in einem einzigen Abschluss.
+
 <SwapTripFigure caption="Der Spot läuft einen Monat lang auf einem Modellpfad. Ohne Swap (orange) schwankt das Ergebnis mit dem Kurs. Mit Swap (schwarz) steht es seit Tag 0 fest. Mit «Neuer Kurspfad» spielst du einen anderen Monat durch." />
 
 ### Was der Swap kostet
 
 Im Near Leg zahlt die Firma <Num of="m03.nearChf" /> und erhält USD 1 Mio. zum Spot <Num of="ex.spot" />. Im Far Leg nach <Num of="m03.tripDays" /> Tagen gibt sie die Dollar zurück, zum Kurs <Num of="m03.tripFar" />. Dafür erhält sie <Num of="m03.tripFarChf" />.
 
-Sie bekommt also <Num of="m03.tripCostChf" /> weniger zurück, als sie bezahlt hat. Das ist kein Kursverlust. Es ist der Preis für einen Monat Dollar. Der Grund ist die Zinsdifferenz: Dollar bringen <Num of="ex.rf" /> Zins, Franken <Num of="ex.rd" />. Wer die höher verzinste Währung hält, zahlt die Differenz über den Kurs des Far Leg.
+Sie bekommt also <Num of="m03.tripCostChf" /> weniger zurück, als sie bezahlt hat. Das ist kein Kursverlust. Es ist der Preis für einen Monat Dollar. Der Grund ist die Zinsdifferenz: Dollar bringen <Num of="ex.rf" /> Zins, Franken <Num of="ex.rd" />. Wer im Swap die höher verzinste Währung bekommt, gibt den Zinsvorteil über den Kurs des Far Leg wieder ab.
 
 Rechne nach: USD 1 Mio. zu <Num of="ex.rf" /> für <Num of="m03.tripDays" /> Tage ergibt <Num of="m03.tripUsdInterest" /> Zins. Zum Far-Kurs umgerechnet sind das genau <Num of="m03.tripCostChf" />. Der Swap kostet also gleich viel wie ein Dollar-Kredit, für den die Franken als Sicherheit dienen.
 
-Und das Kursrisiko? Steigt der Dollar im Lauf des Monats auf <Num of="m03.tripUp" />, hätte die Firma mit «Spot hin, Spot zurück» <Num of="m03.tripUpGain" /> gewonnen. Fällt er auf <Num of="m03.tripDown" />, hätte sie <Num of="m03.tripDownLoss" /> verloren. Mit dem Swap bleibt es in beiden Fällen bei den <Num of="m03.tripCostChf" />.
+Und das Kursrisiko? Steht der Dollar nach dem Monat bei <Num of="m03.tripUp" />, hätte die Firma mit «Spot hin, Spot zurück» <Num of="m03.tripUpGain" /> gewonnen. Steht er bei <Num of="m03.tripDown" />, hätte sie <Num of="m03.tripDownLoss" /> verloren. Mit dem Swap bleibt es in beiden Fällen bei den <Num of="m03.tripCostChf" />.
 
 <Derivation title="Herleitung: Warum der Swap ein besicherter Kredit ist">
 

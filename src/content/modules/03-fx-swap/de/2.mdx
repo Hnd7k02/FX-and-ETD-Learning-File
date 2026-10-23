@@ -1,9 +1,11 @@
 import SwapLegsFigure from '@/components/figures/SwapLegsFigure.astro';
 
-Jetzt schauen wir genauer hin. Ein FX Swap besteht immer aus zwei Geschäften mit demselben Nominal, aber in Gegenrichtung:
+Jetzt schauen wir genauer hin. Ein FX Swap besteht aus zwei Geschäften in Gegenrichtung:
 
 - Das **Near Leg** ist das frühere Geschäft, meist zum Spot mit Valuta T+2.
 - Das **Far Leg** ist das spätere Geschäft, zum Forward-Kurs für das Enddatum.
+
+Gleich ist in beiden Legs das Nominal in der Base-Währung, hier USD 1 Mio. Die Franken-Beträge unterscheiden sich, weil die Kurse verschieden sind.
 
 Die Richtung benennt man nach dem Near Leg in der Base-Währung. **Buy/Sell USD** heisst: Du kaufst USD im Near Leg und verkaufst sie im Far Leg. So hat es die Firma aus Abschnitt 1 gemacht. **Sell/Buy USD** ist das Spiegelbild: Du gibst USD her und bekommst sie später zurück.
 
@@ -26,7 +28,7 @@ Die <Num of="m03.costChf" /> sind wieder der USD-Zins: <Num of="m03.usdInterest"
 
 Bei **Sell/Buy USD** kehren sich alle Pfeile um. Du gibst die höher verzinste Währung her und wirst dafür entschädigt: netto <Num of="m03.mirrorNetChf" />. Die Swap Points bleiben gleich, nur die Richtung wechselt.
 
-Je länger die Laufzeit, desto grösser die Swap Points. Über eine Woche sind es <Num of="m03.points1w" /> Pips, über ein Jahr <Num of="m03.points1y" /> Pips. Das ist fast proportional zur Zeit, denn die Zinsdifferenz läuft jeden Tag weiter.
+Je länger die Laufzeit, desto weiter liegt der Far-Kurs vom Spot weg. Über eine Woche betragen die Swap Points <Num of="m03.points1w" /> Pips, über ein Jahr <Num of="m03.points1y" /> Pips. Das ist fast proportional zur Zeit, denn die Zinsdifferenz läuft jeden Tag weiter.
 
 <Derivation title="Herleitung: Swap Points aus der Zinsdifferenz">
 
@@ -56,7 +58,7 @@ Umgekehrt kannst du aus Spot, Swap Points und dem USD-Zins den CHF-Zins zurückr
 
 <Desk title="Wie Swaps gehandelt werden">
 
-Am Desk quotiert man Swaps in Punkten, mit Bid und Ask für die Swap Points. Den Spot für das Near Leg legt man nur als Referenzkurs fest. Ein Outright-Forward ist dann einfach ein Spot-Geschäft plus ein Swap.
+Am Desk quotiert man Swaps in Punkten, mit Bid und Ask für die Swap Points. Den Spot für das Near Leg legt man nur als Referenzkurs fest. Ein Outright-Forward ist dann einfach ein Spot-Geschäft plus ein Swap. Darum kommen die Forward Points aus Modul 02 direkt aus dem Swap-Markt.
 
 Ein Swap-Händler hat darum kaum Kursrisiko, aber Zinsrisiko: Ändern sich die Zinsen in CHF oder USD, ändern sich die Swap Points. Ganz kurze Swaps haben eigene Namen: Overnight (heute gegen morgen), Tom/Next (morgen gegen Spot) und Spot/Next (Spot gegen den Tag danach).
 

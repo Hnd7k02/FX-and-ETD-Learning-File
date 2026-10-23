@@ -47,13 +47,13 @@ export const hedgeroll = defineDict({
     'hr.slip.2M': '2 Monate',
     'hr.slip.3M': '3 Monate',
     'hr.note.receive':
-      'Der Dollar ist gestiegen: Dein alter Forward ist im Geld. Du erhältst heute {chf}. Das Geld gehört zum Hedge, denn der neue Far-Kurs ist um genau so viel höher.',
+      'Der Dollar ist gestiegen: Dein alter Forward ist im Geld. Am Roll-Datum erhältst du {chf}. Das Geld gehört zum Hedge: Der neue Far-Kurs liegt pro USD genau um diesen Betrag über deinem All-in-Kurs.',
     'hr.note.pay':
-      'Der Dollar ist gefallen: Dein alter Forward ist aus dem Geld. Du musst heute {chf} zahlen, obwohl die Ware noch nicht bezahlt ist. Plane diese Liquidität ein.',
+      'Der Dollar ist gefallen: Dein alter Forward ist aus dem Geld. Am Roll-Datum zahlst du {chf}, obwohl die Ware noch nicht bezahlt ist. Plane diese Liquidität ein.',
     'hr.note.zero':
       'Der Spot steht genau auf dem alten Forward: kein Ausgleich. Der Far-Kurs ist gleich dem All-in-Kurs.',
     'hr.insight.idle':
-      'Zieh den Spot am Roll-Datum oder spiel die Szenarien ab. Achte auf zwei Dinge: den Ausgleich heute und den All-in-Kurs.',
+      'Zieh den Spot am Roll-Datum oder spiel die Szenarien ab. Achte auf zwei Dinge: den Ausgleich am Roll-Datum und den All-in-Kurs.',
     'hr.insight.running': 'Spot {spot}: Ausgleich {settle}, All-in {allIn}.',
     'hr.aha.title': 'Der Ausgleich schwankt, der Hedge bleibt.',
     'hr.aha.text':
@@ -109,13 +109,13 @@ export const hedgeroll = defineDict({
     'hr.slip.2M': '2 months',
     'hr.slip.3M': '3 months',
     'hr.note.receive':
-      'The dollar has risen: your old forward is in the money. You receive {chf} today. That money belongs to the hedge, because the new far rate is higher by exactly as much.',
+      'The dollar has risen: your old forward is in the money. On the roll date you receive {chf}. That money belongs to the hedge: per USD, the new far rate lies above your all-in rate by exactly this amount.',
     'hr.note.pay':
-      'The dollar has fallen: your old forward is out of the money. You have to pay {chf} today, although the goods are not paid for yet. Plan for this cash need.',
+      'The dollar has fallen: your old forward is out of the money. On the roll date you pay {chf}, although the goods are not paid for yet. Plan for this cash need.',
     'hr.note.zero':
       'The spot sits exactly on the old forward: no settlement. The far rate equals the all-in rate.',
     'hr.insight.idle':
-      'Drag the spot on the roll date or play the scenarios. Watch two things: the settlement today and the all-in rate.',
+      'Drag the spot on the roll date or play the scenarios. Watch two things: the settlement on the roll date and the all-in rate.',
     'hr.insight.running': 'Spot {spot}: settlement {settle}, all-in {allIn}.',
     'hr.aha.title': 'The settlement swings, the hedge holds.',
     'hr.aha.text':

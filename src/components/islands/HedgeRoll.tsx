@@ -27,7 +27,7 @@ import { clamp, scaleLinear } from '@/lib/chart';
 import { fmtMillions, fmtMoney, fmtNumber, fmtPct, fmtPips, fmtRate } from '@/lib/format';
 import { M03_CONFIG, tenorById } from '@/lib/m03/config';
 import { allInRange, rollView, snapSpot, tourAt } from '@/lib/m03/roll';
-import { innerTicks, textWidth } from '@/lib/m03/text';
+import { innerTicks, nudgeY, textWidth, type Box } from '@/lib/m03/text';
 import { EXAMPLE_MARKET as MK } from '@/lib/m03/trip';
 import { useDragX, usePlayback, useSliderDrag } from './m03-shared';
 
@@ -154,9 +154,31 @@ export default function HedgeRoll({ lang }: HedgeRollProps): JSX.Element {
   const glW = textWidth(gapLabel, L.font + 1) + 8;
   const glLeft = x + 12 + glW > L.right;
   const allInLabel = t('hr.allInLabel', { rate: r5(v.allIn) });
+  const oldLabel = t('hr.oldLabel', { rate: r5(OLD) });
   const crossLabel = t('hr.cross');
   const clW = textWidth(crossLabel, L.font) + 8;
   const clLeft = xCross + 14 + clW > L.right;
+  // gap label: beside the gap, nudged away from the lines if it would hit another label
+  const yAllInLabel = sy(b.allIn) + L.font + 8;
+  const awLabel = textWidth(allInLabel, L.font) + 8;
+  const textBox = (x0: number, w: number, baseline: number, font: number): Box => ({
+    x0,
+    x1: x0 + w,
+    y0: baseline - font,
+    y1: baseline + 4,
+  });
+  const obstacles: Box[] = [
+    textBox(L.left + 6, textWidth(oldLabel, L.font) + 8, yOld - 7, L.font),
+    textBox(L.right - 4 - awLabel, awLabel, yAllInLabel, L.font),
+  ];
+  const gapX0 = glLeft ? x - 12 - glW : x + 12;
+  const gapBase = (yFar + yAll) / 2 + L.font * 0.35;
+  const gapY = clamp(
+    gapBase +
+      nudgeY(textBox(gapX0, glW, gapBase, L.font + 1), obstacles, side === 'pay' ? 1 : -1),
+    L.top + L.font,
+    L.plotBottom - 4,
+  );
   const chipKey =
     side === 'receive' ? 'hr.chip.receive' : side === 'pay' ? 'hr.chip.pay' : 'hr.chip.zero';
   const chipClass = side === 'receive' ? 'is-good' : side === 'pay' ? 'is-warn' : '';
@@ -233,7 +255,7 @@ export default function HedgeRoll({ lang }: HedgeRollProps): JSX.Element {
               {/* old forward */}
               <path d={`M${L.left},${yOld.toFixed(1)}H${L.right}`} class="m3-ref" />
               <text x={L.left + 6} y={yOld - 7} class="m3-ref-label" style={{ fontSize: fs }}>
-                {t('hr.oldLabel', { rate: r5(OLD) })}
+                {oldLabel}
               </text>
               {/* lines */}
               <path
@@ -248,7 +270,7 @@ export default function HedgeRoll({ lang }: HedgeRollProps): JSX.Element {
               />
               <text
                 x={L.right - 4}
-                y={sy(b.allIn) + L.font + 8}
+                y={yAllInLabel}
                 class="m3-line-label"
                 style={{ fontSize: fs, textAnchor: 'end' }}
               >
@@ -283,7 +305,7 @@ export default function HedgeRoll({ lang }: HedgeRollProps): JSX.Element {
               {!L.compact && side !== 'zero' && Math.abs(yFar - yAll) > 14 && (
                 <text
                   x={glLeft ? x - 12 : x + 12}
-                  y={(yFar + yAll) / 2 + L.font * 0.35}
+                  y={gapY}
                   class="m3-gap-label"
                   style={{
                     fontSize: `${L.font + 1}px`,

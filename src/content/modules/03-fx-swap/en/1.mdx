@@ -12,17 +12,19 @@ Picture a Swiss company. It has francs in its account. Today it has to pay a sup
 
 The third way is an **FX swap**: two FX deals in opposite directions for the same amount. The earlier one is the **near leg**, the later one the **far leg**. The company exchanges its francs for dollars for a while and gets them back afterwards.
 
+You already know the far leg: it is a forward from module 02. So an FX swap is a spot deal plus a forward in the opposite direction, done as a single trade.
+
 <SwapTripFigure caption="The spot runs for a month along a model path. Without the swap (orange) the result moves with the rate. With the swap (black) it has been fixed since day 0. Use ‘New rate path’ to play through a different month." />
 
 ### What the swap costs
 
 In the near leg the company pays <Num of="m03.nearChf" /> and receives USD 1m at the spot rate of <Num of="ex.spot" />. In the far leg, after <Num of="m03.tripDays" /> days, it hands the dollars back at <Num of="m03.tripFar" /> and receives <Num of="m03.tripFarChf" />.
 
-So it gets back <Num of="m03.tripCostChf" /> less than it paid. That is not an FX loss. It is the price of a month in dollars. The reason is the interest differential: dollars earn <Num of="ex.rf" />, francs <Num of="ex.rd" />. Whoever holds the higher-yielding currency pays the difference through the far-leg rate.
+So it gets back <Num of="m03.tripCostChf" /> less than it paid. That is not an FX loss. It is the price of a month in dollars. The reason is the interest differential: dollars earn <Num of="ex.rf" />, francs <Num of="ex.rd" />. Whoever receives the higher-yielding currency in the swap gives the interest advantage back through the far-leg rate.
 
 Check it: USD 1m at <Num of="ex.rf" /> for <Num of="m03.tripDays" /> days gives <Num of="m03.tripUsdInterest" /> of interest. Converted at the far rate, that is exactly <Num of="m03.tripCostChf" />. So the swap costs the same as a dollar loan secured by the francs.
 
-And the FX risk? If the dollar rose to <Num of="m03.tripUp" /> during the month, ‘spot there, spot back’ would have made <Num of="m03.tripUpGain" />. If it fell to <Num of="m03.tripDown" />, it would have lost <Num of="m03.tripDownLoss" />. With the swap it stays at <Num of="m03.tripCostChf" /> either way.
+And the FX risk? If the dollar stood at <Num of="m03.tripUp" /> after the month, ‘spot there, spot back’ would have made <Num of="m03.tripUpGain" />. At <Num of="m03.tripDown" />, it would have lost <Num of="m03.tripDownLoss" />. With the swap it stays at <Num of="m03.tripCostChf" /> either way.
 
 <Derivation title="Derivation: why the swap is a secured loan">
 
@@ -52,7 +54,7 @@ That is the USD interest on <i>N</i>, converted at the far rate. The swap is the
 
 <Desk title="Who needs FX swaps">
 
-Banks use FX swaps every day to manage their liquidity in foreign currencies. If they are short of dollars and long of francs, they swap for a night or a week.
+Banks use FX swaps every day to manage their liquidity in foreign currencies. If they are short of dollars and have francs to spare, they swap for a night or a week.
 
 Companies use swaps when payments move in time. Investors holding securities in a foreign currency often hedge the FX risk with forwards and extend the hedge regularly with a swap. Section 3 shows how that works.
 

@@ -19,7 +19,8 @@ preliminary and the final figures.
 - Herausgeber: Bank für Internationalen Zahlungsausgleich (BIZ) / Bank for International Settlements (BIS)
 - Datum: 30.09.2025 (vorläufige Zahlen), Schlusszahlen im BIS Quarterly Review vom Dezember 2025
 - URL: https://www.bis.org/statistics/rpfx25_fx.htm
-- Belegt: Im April 2025 waren FX Swaps das meistgehandelte Instrument am Devisenmarkt mit einem durchschnittlichen Tagesumsatz von rund USD 4 Billionen; Gesamtumsatz USD 9.6 Billionen pro Tag (vorläufig) bzw. USD 9.5 Billionen (Schlusszahlen); Anteil daraus abgeleitet gut 40 %. Fakten `m03-bis-month`, `m03-bis-swaps`, `m03-bis-total`, `m03-bis-share`. Geprüft per Websuche (23.10.2026), Seite aus der Sandbox nicht erreichbar.
+- Pressemitteilung: https://www.bis.org/press/p250930.htm
+- Belegt: Im April 2025 waren FX Swaps das meistgehandelte Instrument am Devisenmarkt mit einem durchschnittlichen Tagesumsatz von rund USD 4 Billionen; Gesamtumsatz USD 9.6 Billionen pro Tag (vorläufig) bzw. USD 9.5 Billionen (Schlusszahlen); Anteil daraus abgeleitet gut 40 %. Die Umfrage findet alle drei Jahre statt; Zentralbanken und Behörden in 52 Ländern erheben die Daten bei den Händlern, die BIZ koordiniert. Fakten `m03-bis-month`, `m03-bis-swaps`, `m03-bis-total`, `m03-bis-share`. Geprüft per Websuche (23.10.2026), Seite aus der Sandbox nicht erreichbar.
 
 ## bis-qr-2025-12-fx
 

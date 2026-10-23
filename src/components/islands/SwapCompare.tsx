@@ -162,6 +162,8 @@ export default function SwapCompare({ lang, tenor: tenorProp }: SwapCompareProps
         ];
       }
       const len = segs.reduce((a, s) => a + (s.kind === 'ghost' ? 0 : s.len), 0);
+      // the label sits beyond the ghost too, so the missing part stays visible
+      const reach = segs.reduce((a, s) => a + s.len, 0);
       const isEnd = g.day === 0 || g.day === tenor.days;
       const showLabel =
         isEnd || (!L.compact && !couponLabelled && Math.abs(g.total) > 0.5 && g.ccy === 'base');
@@ -169,7 +171,7 @@ export default function SwapCompare({ lang, tenor: tenorProp }: SwapCompareProps
       const text = g.ccy === 'base' ? usd(g.total) : chf(g.total);
       const w = textWidth(text, L.font, 0.6) + 4;
       const cx = fitCentre(x, w, 2, L.width - 2);
-      const ly = up ? L.axisY - len - 7 : L.axisY + len + L.font + 5;
+      const ly = up ? L.axisY - reach - 7 : L.axisY + reach + L.font + 5;
       return (
         <g key={`${g.day}-${g.ccy}`}>
           {Math.abs(g.total) < 0.5 && !isEnd ? (

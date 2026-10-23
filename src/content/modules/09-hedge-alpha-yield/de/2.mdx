@@ -1,5 +1,62 @@
 import HedgeCompareFigure from '@/components/figures/HedgeCompareFigure.astro';
 
-Entwurf.
+{/* 09 Hedge, Alpha, Yield · Abschnitt 2 · Hedgen. Zahlen nur über <Num />, Registry src/lib/nums/m09.ts. */}
 
-<HedgeCompareFigure caption="Entwurf" />
+Der Importeur ist short USD: Steigt der Dollar, wird seine Rechnung teurer. Ein Hedge soll das verhindern. Ziel ist nicht der beste Kurs im Rückblick, sondern ein Kurs, mit dem er planen kann. Sein Werkzeugkasten reicht vom einfachen Spot-Geschäft bis zum strukturierten Produkt.
+
+### Der Werkzeugkasten
+
+1. **Spot.** Er kauft die Dollars heute zu <Num of="ex.spot" /> und legt sie bis zum Zahltag zum USD-Zins an. Das bindet schon heute Franken. Rechnerisch landet er beim Forward: Kaufen und Anlegen ist genau der zweite Weg der Zinsparität aus [Modul 02](/module/02-forward/2/).
+2. **Forward.** Er fixiert heute <Num of="ex.forward" digits={4} /> für die Zahlung in 3 Monaten ([Modul 02](/module/02-forward/1/)). Keine Prämie, volle Planbarkeit. Fällt der Dollar, profitiert er nicht.
+3. **Limit und Stop-Loss.** Das sind Orders auf den Spot ([Modul 01](/module/01-spot/3/)). Ein Limit kauft bei <Num of="m09.limit" />, falls der Dollar dorthin fällt. Ein Stop-Loss kauft bei <Num of="m09.stop" />, falls er dorthin steigt. Bis zur Ausführung ist er ungesichert. Springt der Kurs über den Stop, wird schlechter ausgeführt: das Gap-Risiko aus [Modul 07](/module/07-barrier-binary/4/).
+4. **USD Call / CHF Put.** Ein Deckel gegen Prämie ([Modul 04](/module/04-vanilla-options/1/)). Der Strike <Num of="ex.strike" /> plus die Prämie von <Num of="m09.callPremiumPips" /> Pips ergibt den schlechtesten Kurs, <Num of="m09.callCap" />.
+5. **Risk Reversal.** Der Zero-Cost-Collar aus [Modul 06](/module/06-combos-smile/2/): ein gekaufter Call bei <Num of="m09.collarCall" />, bezahlt mit einem verkauften Put bei <Num of="m09.collarPut" />. Der Kurs bleibt in diesem Band.
+6. **Strukturierter Hedge.** Ein besserer Kurs als der Forward, bezahlt mit zusätzlich verkauften Puts ([Modul 08](/module/08-structured-products/2/)). Hier als ein einziges Fixing ohne Knock-out: Strike <Num of="m09.levStrike" />, also <Num of="m09.levBetter" /> Pips besser als der Forward. Unter dem Strike kauft der Importeur die doppelte Menge.
+
+<HedgeCompareFigure caption="Fünf Hedges auf einer Achse. Zieh den Kurs bei Verfall oder spiel ihn ab: Die Rangliste sortiert sich neu, und an jeder Wegmarke wechselt eine Strategie ihren Charakter." />
+
+### Rechenbeispiel: USD 1 Mio. bei ±<Num of="m09.hMove" />
+
+So viel zahlt der Importeur für USD 1 Mio., wenn der Dollar bei Verfall bei <Num of="m09.hUp" /> oder bei <Num of="m09.hDown" /> steht. In Klammern der Unterschied zum Forward.
+
+| Hedge | Dollar stärker, <Num of="m09.hUp" /> | Dollar schwächer, <Num of="m09.hDown" /> |
+| --- | --- | --- |
+| Ohne Absicherung | <Num of="m09.up.unhedged" /> (<Num of="m09.upVsFwd.unhedged" />) | <Num of="m09.down.unhedged" /> (<Num of="m09.downVsFwd.unhedged" />) |
+| Forward | <Num of="m09.up.forward" /> | <Num of="m09.down.forward" /> |
+| USD Call | <Num of="m09.up.call" /> (<Num of="m09.upVsFwd.call" />) | <Num of="m09.down.call" /> (<Num of="m09.downVsFwd.call" />) |
+| Collar | <Num of="m09.up.collar" /> (<Num of="m09.upVsFwd.collar" />) | <Num of="m09.down.collar" /> (<Num of="m09.downVsFwd.collar" />) |
+| Strukturiert 2× | <Num of="m09.up.leveraged" /> (<Num of="m09.upVsFwd.leveraged" />) | <Num of="m09.down.leveraged" /> (<Num of="m09.downVsFwd.leveraged" />) |
+
+Bei einem starken Dollar gewinnt der strukturierte Hedge, bei einem schwachen ist er am teuersten. Der Call liegt in beiden Szenarien in der Mitte. Seine Prämie ist der Preis dafür, dass er nie der schlechteste ist.
+
+<Callout variant="bad" title="Wann geht es schief: Überabsicherung">
+
+Unter dem Strike kauft der strukturierte Hedge die doppelte Menge: USD 2 Mio. statt USD 1 Mio. Die zweite Million braucht der Importeur nicht. Er muss sie am Markt wieder verkaufen, unter dem Strike also mit Verlust. Ab <Num of="m09.levWorse" /> ist er schlechter dran als mit dem Forward, bei <Num of="m09.hDown" /> um <Num of="m09.downVsFwd.leveraged" />. Aus dem Hedge ist eine Spekulation geworden.
+
+</Callout>
+
+<Derivation title="Herleitung: der bezahlte Kurs jeder Strategie">
+
+Der Importeur zahlt bei Verfall den Marktkurs <i>S</i><sub><i>T</i></sub> minus die Auszahlung seines Hedges plus die Prämie, aufgezinst auf den Verfall:
+
+<Formula><span>Ohne Absicherung: <i>S</i><sub><i>T</i></sub> · Forward: <i>F</i></span><span>Call: min(<i>S</i><sub><i>T</i></sub>, <i>K</i>) + <i>p</i> · <i>e</i><sup><i>r</i><sub>d</sub><i>T</i></sup></span><span>Collar: min(max(<i>S</i><sub><i>T</i></sub>, <i>K</i><sub>P</sub>), <i>K</i><sub>C</sub>), mit <i>C</i>(<i>K</i><sub>C</sub>) = <i>P</i>(<i>K</i><sub>P</sub>)</span></Formula>
+
+Der strukturierte Hedge ist ein gekaufter Call und zwei verkaufte Puts zum selben Strike <i>K</i><sub>L</sub>, ohne Prämie:
+
+<Formula><span><i>C</i>(<i>K</i><sub>L</sub>) = 2 · <i>P</i>(<i>K</i><sub>L</sub>)</span><span>bezahlter Kurs = <i>K</i><sub>L</sub> für <i>S</i><sub><i>T</i></sub> ≥ <i>K</i><sub>L</sub>, sonst 2<i>K</i><sub>L</sub> − <i>S</i><sub><i>T</i></sub></span></Formula>
+
+Warum ist der Strike gerade <Num of="m09.levBetter" /> Pips besser? Mit einem einzigen verkauften Put wäre <i>C</i> − <i>P</i> = 0 der Forward (Put-Call-Parität). Weil der CHF-Zins hier <Num of="ex.rd" /> ist, gilt <i>C</i>(<i>K</i>) − <i>P</i>(<i>K</i>) = <i>F</i> − <i>K</i>. Mit <i>C</i> = 2<i>P</i> folgt <i>P</i>(<i>K</i><sub>L</sub>) = <i>F</i> − <i>K</i><sub>L</sub>: Die Verbesserung ist genau der Wert des zweiten Puts, <Num of="m09.levSecondPut" /> Pips. Teurer als der Forward wird es unter 2<i>K</i><sub>L</sub> − <i>F</i> = <Num of="m09.levWorse" />.
+
+</Derivation>
+
+<Desk title="Ein Hedge wird am Bedürfnis gemessen">
+
+Im Rückblick gewinnt immer ein anderes Werkzeug: bei einem starken Dollar der strukturierte Hedge, bei einem schwachen gar keine Absicherung. Wer Hedges nachträglich am besten Kurs misst, wird jedes Mal enttäuscht. Darum lassen sich Werkzeuge kombinieren: ein Teil der Zahlung mit Forwards, ein Teil mit Optionen. Ist das Zahlungsdatum unsicher, verlängert ein FX Swap den Forward ([Modul 03](/module/03-fx-swap/3/)). Entscheidend ist ein Kurs, mit dem das Budget hält, auch im schlechtesten Fall.
+
+</Desk>
+
+<Takeaway>
+
+Jeder Hedge tauscht etwas ein: der Forward die Chance, der Call die Prämie, der Collar den besten Kurs, der strukturierte Hedge die Sicherheit gegen Hebel. Gewählt wird nach dem Worst Case, nicht nach dem Rückblick.
+
+</Takeaway>

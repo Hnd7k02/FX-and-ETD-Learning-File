@@ -58,7 +58,7 @@ export const swaplegs = defineDict({
     'sl.aha.flat.title': 'Gleiche Zinsen, gleicher Kurs.',
     'sl.aha.flat':
       'Ohne Zinsdifferenz gibt es nichts auszugleichen: Near und Far Leg laufen zum selben Kurs.',
-    'sl.aha.premium.title': 'Jetzt kostet der Franken mehr Zins.',
+    'sl.aha.premium.title': 'Jetzt bringt der Franken mehr Zins.',
     'sl.aha.premium':
       'Der CHF-Zins liegt über dem USD-Zins. Darum liegt der Far-Kurs über dem Spot: Aufschlag statt Abschlag.',
     'sl.aria.flows':
@@ -67,7 +67,7 @@ export const swaplegs = defineDict({
       'Forward-Kurve über ein Jahr. Near {near}, Far {far} nach {days} Tagen, Swap Points {pips} Pips.',
     'sl.live': '{tenor}: Far-Kurs {far}, Swap Points {pips}, netto {net}.',
     'sl.hint':
-      'Wechsle die Richtung: Alle Pfeile kehren sich um, die Swap Points bleiben gleich. Ändere die Zinsen: Nur dann bewegen sich die Swap Points.',
+      'Wechsle die Richtung: Alle Pfeile kehren sich um, die Swap Points bleiben gleich. Ändere Laufzeit oder Zinsen: Erst dann bewegen sich die Swap Points.',
   },
   en: {
     'sl.title': 'Near leg and far leg',
@@ -134,6 +134,6 @@ export const swaplegs = defineDict({
       'Forward curve over one year. Near {near}, far {far} after {days} days, swap points {pips} pips.',
     'sl.live': '{tenor}: far rate {far}, swap points {pips}, net {net}.',
     'sl.hint':
-      'Switch the direction: every arrow flips, the swap points stay the same. Change the rates: only then do the swap points move.',
+      'Switch the direction: every arrow flips, the swap points stay the same. Change the tenor or the rates: only then do the swap points move.',
   },
 });

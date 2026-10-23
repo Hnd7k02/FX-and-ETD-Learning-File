@@ -29,7 +29,7 @@ export const swapcompare = defineDict({
     'sc.legend.coupon': 'Zinszahlung',
     'sc.check.title': 'Numerischer Check',
     'sc.check.text':
-      'Barwert der Zinsdifferenz: FX Swap {fx}, Cross-Currency Swap {ccs}. Gleich, weil beide dieselben zwei Zinsen bezahlen, nur verpackt anders.',
+      'Barwert der Zinsdifferenz: FX Swap {fx}, Cross-Currency Swap {ccs}. Gleich, weil in beiden dieselben zwei Zinsen stecken, nur anders verpackt.',
     'sc.table.caption': 'FX Swap und Cross-Currency Swap im Vergleich',
     'sc.table.aspect': 'Merkmal',
     'sc.t.tenor': 'Laufzeit',
@@ -83,7 +83,7 @@ export const swapcompare = defineDict({
     'sc.legend.coupon': 'Interest payment',
     'sc.check.title': 'Numerical check',
     'sc.check.text':
-      'Present value of the interest differential: FX swap {fx}, cross-currency swap {ccs}. Equal, because both pay the same two interest rates, just packaged differently.',
+      'Present value of the interest differential: FX swap {fx}, cross-currency swap {ccs}. Equal, because both contain the same two interest rates, just packaged differently.',
     'sc.table.caption': 'FX swap and cross-currency swap compared',
     'sc.table.aspect': 'Feature',
     'sc.t.tenor': 'Tenor',

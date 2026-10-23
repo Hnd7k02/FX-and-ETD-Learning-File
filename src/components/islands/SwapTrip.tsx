@@ -65,7 +65,9 @@ export default function SwapTrip({ lang }: SwapTripProps): JSX.Element {
   const play = usePlayback(T.days, T.msPerDay, { autoplay: true, reduced: rm, inView });
   const day = play.pos;
   const dayInt = Math.floor(day + 1e-9);
-  const spot = pathAt(path, day);
+  const spotRaw = pathAt(path, day);
+  // quoted on the pip grid like a real rate, so "−307 pips" and "CHF −30’700" agree
+  const spot = Math.round(spotRaw / PIP) * PIP;
   const open = roundTripChf(MK, spot);
 
   // y domain: config range, widened if the path leaves it (tweened for calm reseeds)
@@ -82,9 +84,9 @@ export default function SwapTrip({ lang }: SwapTripProps): JSX.Element {
   // path up to the playhead (interpolated head)
   const pts: Point[] = [];
   for (let i = 0; i <= dayInt && i < path.length; i++) pts.push([sx(i), sy(path[i]!)]);
-  if (dayInt + 1 < path.length && day > dayInt) pts.push([sx(day), sy(spot)]);
+  if (dayInt + 1 < path.length && day > dayInt) pts.push([sx(day), sy(spotRaw)]);
   const headX = sx(day);
-  const headY = sy(spot);
+  const headY = sy(spotRaw);
   const nearY = sy(NEAR);
   const farX = sx(T.days);
   const farY = sy(FAR);

@@ -21,7 +21,9 @@ Unter dem Strich zahlt er <Num of="m03.rollTotalUp" />. Das entspricht einem **A
 
 **Fall 2: Der Dollar ist gefallen,** der Spot steht bei <Num of="m03.rollDown" />. Jetzt muss der Importeur am Roll-Datum <Num of="m03.rollSettleDownAbs" /> **bezahlen**. Dafür kauft er die Dollar im Far Leg günstiger, zu <Num of="m03.rollFarDown" />. Sein All-in-Kurs: <Num of="m03.rollAllInDown" />.
 
-Die beiden All-in-Kurse liegen nur <Num of="m03.rollAllInGap" /> Pips auseinander. Der Hedge hält, egal wo der Spot steht. Was schwankt, ist die Zahlung am Roll-Datum. Sein Kurs wird sogar etwas besser als der alte Forward: Weil der Dollar höher verzinst ist, liegt jeder spätere Termin tiefer. Die Swap Points sind negativ.
+Die beiden All-in-Kurse liegen nur <Num of="m03.rollAllInGap" /> Pips auseinander. Der Hedge hält, egal wo der Spot steht. Was schwankt, ist die Zahlung am Roll-Datum.
+
+Beide All-in-Kurse liegen sogar etwas unter dem alten Forward, denn die Swap Points sind negativ: Weil der Dollar höher verzinst ist, liegt jeder spätere Termin tiefer. Geschenkt ist das nicht. Der Importeur bekommt die Dollar einen Monat später und verzichtet so auf einen Monat USD-Zins.
 
 <Callout variant="warn" title="Liquidität einplanen">
 
@@ -54,7 +56,7 @@ Eine Vereinfachung steckt drin: Der Ausgleich fällt einen Monat früher an als 
 
 Manche Kunden möchten den Ausgleich vermeiden. Dann setzt man das Near Leg nicht zum Spot, sondern zum alten Forward-Kurs. Am Roll-Datum fliesst kein Geld. Die Differenz wandert samt Zins in den neuen Far-Kurs.
 
-Das schont die Liquidität, verschiebt aber einen Gewinn oder Verlust in die Zukunft. Darum ist diese Variante heikel und oft nur eingeschränkt möglich. Kommt die Zahlung früher statt später, rollt man in die Gegenrichtung: USD früher kaufen, zum alten Termin zurückverkaufen.
+Das schont die Liquidität, verschiebt aber einen Gewinn oder Verlust in die Zukunft. Ist der alte Forward aus dem Geld, finanziert die Gegenpartei den Verlust bis zum neuen Termin. Das ist ein Kredit, und der Verlust bleibt so länger unsichtbar. Darum ist diese Variante heikel und oft nur eingeschränkt möglich. Kommt die Zahlung früher statt später, rollt man in die Gegenrichtung: USD früher kaufen, zum alten Termin zurückverkaufen.
 
 </Desk>
 

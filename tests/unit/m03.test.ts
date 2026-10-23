@@ -21,6 +21,7 @@ import {
   textWidth,
 } from '@/lib/m03/text';
 import { EXAMPLE_MARKET as M, pathAt, roundTripChf, spotPath, tripSwap } from '@/lib/m03/trip';
+import { M03 } from '@/lib/nums/m03';
 
 const N = E.notional;
 
@@ -287,5 +288,36 @@ describe('text helpers', () => {
     expect(stepTicks(0.76, 0.8, 0.02)).toEqual([0.76, 0.78, 0.8]);
     expect(stepTicks(1, 0.5, 0.1)).toEqual([]);
     expect(innerTicks(0.74, 0.86, 0.02)).toEqual([0.76, 0.78, 0.8, 0.82, 0.84]);
+  });
+});
+
+describe('numbers shown in the texts add up after rounding', () => {
+  const RD = M03_CONFIG.rateDigits;
+  const r = (x: number, d: number) => Math.round(x * 10 ** d) / 10 ** d;
+  const chf = (x: number) => Math.round(x);
+
+  it.each([
+    ['up', M03.up],
+    ['down', M03.down],
+  ] as const)('roll %s: shown old forward + shown swap points = shown all-in rate', (_k, v) => {
+    expect(r(r(M03.oldForward, RD) + r(v.points, 1) * PIP, RD)).toBeCloseTo(r(v.allIn, RD), 10);
+  });
+
+  it('roll up: near CHF − forward CHF = settlement, far CHF − settlement = total', () => {
+    const { up } = M03;
+    const near = chf(N * M03_CONFIG.roll.scenarioUp);
+    expect(near - chf(N * M03.oldForward)).toBe(chf(up.settlement));
+    expect(chf(up.farChf) - chf(up.settlement)).toBe(chf(up.totalChf));
+  });
+
+  it('roll: the gap between the two all-in rates matches the shown rates', () => {
+    const shown = (r(M03.down.allIn, RD) - r(M03.up.allIn, RD)) / PIP;
+    expect(r(shown, 1)).toBeCloseTo(r((M03.down.allIn - M03.up.allIn) / PIP, 1), 10);
+  });
+
+  it('sections 1, 2 and 4: CHF paid − CHF received = the cost shown', () => {
+    expect(chf(M03.trip.nearChf) - chf(M03.trip.farChf)).toBe(chf(M03.trip.costChf));
+    expect(chf(N * E.spot) - chf(M03.legs.rows[1].quote)).toBe(chf(-M03.legs.net.quote));
+    expect(chf(N * E.spot) - chf(N * M03.cmp1y.fxSwap.endRate)).toBe(chf(M03.cmp1y.fxCostChf));
   });
 });

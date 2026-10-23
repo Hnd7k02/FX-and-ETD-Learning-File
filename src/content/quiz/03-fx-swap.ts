@@ -68,8 +68,8 @@ const q1: QuizQuestion = {
       label: pips((MK.spot * (MK.rd - MK.rf)) / PIP),
       mono: true,
       explain: {
-        de: `Das ist die Zinsdifferenz über ein ganzes Jahr. Für ${days} Tage multiplizierst du noch mit ${days}/360.`,
-        en: `That is the interest differential over a whole year. For ${days} days you still multiply by ${days}/360.`,
+        de: `Das ist die Zinsdifferenz über ein ganzes Jahr. Für ${days} Tage multiplizierst du noch mit ${days}/360 und teilst durch (1 + r USD · t).`,
+        en: `That is the interest differential over a whole year. For ${days} days you still multiply by ${days}/360 and divide by (1 + r USD · t).`,
       },
     },
   ],
@@ -125,8 +125,8 @@ const q2: QuizQuestion = {
         en: `The swap points jump by ${BUMP_PIPS} pips.`,
       },
       explain: {
-        de: `Die Swap Points hängen an der Zinsdifferenz, nicht am Spot-Niveau. Hier ändern sie sich nur um ${dPoints.de} Pips.`,
-        en: `The swap points depend on the interest differential, not on the spot level. Here they change by only ${dPoints.en} pips.`,
+        de: `Die Swap Points hängen an der Zinsdifferenz. Der Spot wirkt nur als Massstab: ${BUMP_PIPS} Pips mehr Spot ändern sie hier um ${dPoints.de} Pips.`,
+        en: `The swap points depend on the interest differential. The spot only scales them: ${BUMP_PIPS} pips more spot change them here by ${dPoints.en} pips.`,
       },
     },
   ],

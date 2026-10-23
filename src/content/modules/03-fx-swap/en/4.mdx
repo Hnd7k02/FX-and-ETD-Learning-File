@@ -1,6 +1,6 @@
 import SwapCompareFigure from '@/components/figures/SwapCompareFigure.astro';
 
-FX swaps are the most traded instrument in the foreign exchange market. According to the central bank survey coordinated by the BIS, <Fact id="m03-bis-swaps" /> a day changed hands in FX swaps in <Fact id="m03-bis-month" />, out of total FX turnover of <Fact id="m03-bis-total" />. That is <Fact id="m03-bis-share" /> of the whole market.
+FX swaps are the most traded instrument in the foreign exchange market. That is what the Triennial Survey shows: every three years, central banks survey FX trading, coordinated by the BIS (Bank for International Settlements). In <Fact id="m03-bis-month" />, <Fact id="m03-bis-swaps" /> a day changed hands in FX swaps, out of total FX turnover of <Fact id="m03-bis-total" />. That is <Fact id="m03-bis-share" /> of the whole market.
 
 Next to the FX swap there is a relative with a similar name: the **cross-currency swap**, or CCS for short. It also exchanges two currencies at the start and exchanges them back at the end. But it usually runs much longer, and interest flows during its life.
 
@@ -24,6 +24,8 @@ Convert the <Num of="m03.ccsCoupon" /> into francs at the far rate: it is exactl
 The **FX swap** is the tool for short horizons: liquidity in a foreign currency for a few days or months, moving payments, rolling hedges as in section 3.
 
 The **cross-currency swap** is the tool for long-term funding. An example: a Swiss company issues a bond in USD but needs francs. With a CCS it exchanges the proceeds into CHF. During the term it receives USD interest, which pays the bond's coupons, and pays CHF interest in return. At the end it exchanges back at the starting rate and repays the bond. That way it carries a debt in francs, with no FX risk on the notional.
+
+With that you know the linear building blocks: spot, forward and swap. Each of them comes back to the forward. Module 04 adds the option, a right rather than an obligation. There, too, the forward stays the point of reference.
 
 <Derivation title="Derivation: why both cost the same">
 
@@ -53,7 +55,7 @@ The same present value. This holds in this simplified world without a basis, wit
 
 In practice the two routes are not always equally expensive. When many market participants need dollars at the same time, dollar borrowers pay more through swaps than the pure interest differential implies. This deviation from interest rate parity is called the **cross-currency basis**.
 
-In a CCS it is quoted as a spread in basis points on one of the floating rates. In an FX swap it hides inside the swap points. Compare the swap points with the pure interest differential and you see the basis.
+Between banks, CCS usually pay floating money-market rates in both currencies; the example uses fixed rates to keep the arithmetic simple. The basis is quoted as a spread in basis points on one of the two floating legs. In an FX swap it hides inside the swap points. Compare the swap points with the pure interest differential and you see the basis.
 
 </Desk>
 

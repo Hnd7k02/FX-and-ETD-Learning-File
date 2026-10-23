@@ -1,6 +1,6 @@
 import SwapCompareFigure from '@/components/figures/SwapCompareFigure.astro';
 
-FX Swaps sind das meistgehandelte Instrument am Devisenmarkt. Laut der Umfrage der Zentralbanken unter dem Dach der BIZ wurden im <Fact id="m03-bis-month" /> pro Tag <Fact id="m03-bis-swaps" /> in FX Swaps umgesetzt, bei einem gesamten Devisenumsatz von <Fact id="m03-bis-total" />. Das ist <Fact id="m03-bis-share" /> des ganzen Marktes.
+FX Swaps sind das meistgehandelte Instrument am Devisenmarkt. Das zeigt die Triennial Survey: Alle drei Jahre erheben die Zentralbanken den Devisenhandel, koordiniert von der BIZ (Bank für Internationalen Zahlungsausgleich). Im <Fact id="m03-bis-month" /> wurden pro Tag <Fact id="m03-bis-swaps" /> in FX Swaps umgesetzt, bei einem gesamten Devisenumsatz von <Fact id="m03-bis-total" />. Das ist <Fact id="m03-bis-share" /> des ganzen Marktes.
 
 Neben dem FX Swap gibt es einen Verwandten mit ähnlichem Namen: den **Cross-Currency Swap**, kurz CCS. Auch er tauscht zwei Währungen am Anfang und tauscht sie am Ende zurück. Aber er läuft meist viel länger, und während der Laufzeit fliessen Zinsen.
 
@@ -24,6 +24,8 @@ Rechne die <Num of="m03.ccsCoupon" /> zum Far-Kurs in Franken um: Es sind genau 
 Der **FX Swap** ist das Werkzeug für kurze Fristen: Liquidität in einer Fremdwährung für ein paar Tage oder Monate, Zahlungen verschieben, Absicherungen rollen wie in Abschnitt 3.
 
 Der **Cross-Currency Swap** ist das Werkzeug für lange Finanzierungen. Ein Beispiel: Eine Schweizer Firma gibt eine Anleihe in USD heraus, braucht aber Franken. Mit einem CCS tauscht sie den Erlös in CHF. Während der Laufzeit erhält sie USD-Zinsen, mit denen sie die Coupons der Anleihe bezahlt, und zahlt dafür CHF-Zinsen. Am Ende tauscht sie zum Anfangskurs zurück und zahlt die Anleihe zurück. So hat sie eine Schuld in Franken, ohne Kursrisiko auf dem Nominal.
+
+Damit kennst du die linearen Bausteine: Spot, Forward und Swap. Jeder lässt sich auf den Forward zurückführen. In Modul 04 kommt die Option dazu, ein Recht statt einer Pflicht. Auch dort bleibt der Forward der Bezugspunkt.
 
 <Derivation title="Herleitung: Warum beide gleich viel kosten">
 
@@ -53,7 +55,7 @@ Derselbe Barwert. Das gilt in dieser vereinfachten Welt ohne Basis, mit fixen Zi
 
 In der Praxis sind die beiden Wege nicht immer gleich teuer. Wenn viele Marktteilnehmer gleichzeitig Dollar brauchen, zahlen Dollar-Leiher über Swaps mehr, als die reine Zinsdifferenz sagt. Diese Abweichung von der Zinsparität heisst **Cross-Currency Basis**.
 
-Beim CCS wird sie als Aufschlag in Basispunkten auf einen der variablen Zinsen quotiert. Beim FX Swap steckt sie unsichtbar in den Swap Points. Wer die Swap Points mit der reinen Zinsdifferenz vergleicht, sieht die Basis.
+Unter Banken laufen CCS meist mit variablen Geldmarktsätzen in beiden Währungen; im Beispiel sind die Zinsen fix, damit die Rechnung einfach bleibt. Die Basis wird als Aufschlag in Basispunkten auf eines der beiden variablen Beine quotiert. Beim FX Swap steckt sie unsichtbar in den Swap Points. Wer die Swap Points mit der reinen Zinsdifferenz vergleicht, sieht die Basis.
 
 </Desk>
 

@@ -34,7 +34,7 @@ export const swaptrip = defineDict({
     'trip.legs.sell': 'Du verkaufst USD zu {rate}',
     'trip.legs.net': 'Netto {chf}: der Preis für {days} Tage Dollar.',
     'trip.insight.idle':
-      'Drück auf Abspielen: Der Spot läuft einen Monat lang. Achte rechts auf die zwei Ergebnisse.',
+      'Drück auf Abspielen: Der Spot läuft einen Monat lang. Achte auf die zwei Ergebnisse, ohne und mit Swap.',
     'trip.insight.running':
       'Tag {day}: Spot {spot}. Ohne Swap stündest du bei {open}. Mit Swap bleibt es bei {swap}.',
     'trip.aha.title': 'Das Kursrisiko ist weg. Der Preis bleibt.',
@@ -78,7 +78,7 @@ export const swaptrip = defineDict({
     'trip.legs.sell': 'You sell USD at {rate}',
     'trip.legs.net': 'Net {chf}: the price of {days} days in dollars.',
     'trip.insight.idle':
-      'Press play: the spot runs for a month. Watch the two results on the right.',
+      'Press play: the spot runs for a month. Watch the two results, without and with the swap.',
     'trip.insight.running':
       'Day {day}: spot {spot}. Without the swap you would be at {open}. With the swap it stays at {swap}.',
     'trip.aha.title': 'The FX risk is gone. The price remains.',

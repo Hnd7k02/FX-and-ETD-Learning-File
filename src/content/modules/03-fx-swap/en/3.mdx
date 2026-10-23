@@ -1,6 +1,6 @@
 import HedgeRollFigure from '@/components/figures/HedgeRollFigure.astro';
 
-Back to our importer. In module 02 he dealt a forward: in 3 months he buys USD 1m at <Num of="m03.oldFwd" />. Now he hears that the goods will arrive late. The supplier only wants paying <Num of="m03.slipDays" /> days after the original date.
+Back to our importer. In module 02 he took out a forward: in 3 months he buys USD 1m at <Num of="m03.oldFwd" />. Now he hears that the goods will arrive late. The supplier now wants to be paid <Num of="m03.slipDays" /> days after the original date.
 
 But the forward matures on the old date. If the importer lets it run, he receives the dollars a month too early. The solution is an FX swap that **rolls** the hedge, that is, extends it:
 
@@ -21,7 +21,9 @@ All in all he pays <Num of="m03.rollTotalUp" />. That corresponds to an **all-in
 
 **Case 2: the dollar has fallen,** spot is at <Num of="m03.rollDown" />. Now the importer has to **pay** <Num of="m03.rollSettleDownAbs" /> on the roll date. In return he buys the dollars more cheaply in the far leg, at <Num of="m03.rollFarDown" />. His all-in rate: <Num of="m03.rollAllInDown" />.
 
-The two all-in rates are only <Num of="m03.rollAllInGap" /> pips apart. The hedge holds wherever the spot is. What swings is the payment on the roll date. His rate even ends up slightly better than the old forward: because the dollar pays more interest, every later date trades lower. The swap points are negative.
+The two all-in rates are only <Num of="m03.rollAllInGap" /> pips apart. The hedge holds wherever the spot is. What swings is the payment on the roll date.
+
+Both all-in rates even lie slightly below the old forward, because the swap points are negative: the dollar pays more interest, so every later date trades lower. That is no gift. The importer receives the dollars a month later and so gives up a month of USD interest.
 
 <Callout variant="warn" title="Plan for the cash">
 
@@ -54,7 +56,7 @@ One simplification is built in: the settlement falls due a month before the paym
 
 Some clients want to avoid the settlement. Then the near leg is dealt not at spot but at the old forward rate. No money flows on the roll date. The difference, plus interest, moves into the new far rate.
 
-That spares liquidity, but it pushes a gain or loss into the future. This is why the variant is delicate and often only available with restrictions. If the payment comes earlier rather than later, you roll the other way: buy USD earlier and sell them back for the old date.
+That spares liquidity, but it pushes a gain or loss into the future. If the old forward is out of the money, the counterparty finances the loss until the new date. That is a loan, and the loss stays out of sight for longer. This is why the variant is delicate and often only available with restrictions. If the payment comes earlier rather than later, you roll the other way: buy USD earlier and sell them back for the old date.
 
 </Desk>
 

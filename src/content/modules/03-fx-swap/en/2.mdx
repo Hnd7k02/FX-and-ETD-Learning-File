@@ -1,9 +1,11 @@
 import SwapLegsFigure from '@/components/figures/SwapLegsFigure.astro';
 
-Now let us take a closer look. An FX swap always consists of two deals for the same notional, but in opposite directions:
+Now let us take a closer look. An FX swap consists of two deals in opposite directions:
 
 - The **near leg** is the earlier deal, usually at spot for value T+2.
 - The **far leg** is the later deal, at the forward rate for the end date.
+
+What both legs share is the notional in the base currency, here USD 1m. The franc amounts differ because the rates differ.
 
 The direction is named after the near leg in the base currency. **Buy/sell USD** means: you buy USD in the near leg and sell them in the far leg. That is what the company in section 1 did. **Sell/buy USD** is the mirror image: you hand over USD and get them back later.
 
@@ -26,7 +28,7 @@ The <Num of="m03.costChf" /> are once again the USD interest: <Num of="m03.usdIn
 
 With **sell/buy USD** every arrow flips. You hand over the higher-yielding currency and are compensated for it: net <Num of="m03.mirrorNetChf" />. The swap points stay the same; only the direction changes.
 
-The longer the tenor, the larger the swap points. Over one week they are <Num of="m03.points1w" /> pips, over one year <Num of="m03.points1y" /> pips. That is almost proportional to time, because the interest differential keeps running every day.
+The longer the tenor, the further the far rate moves away from spot. Over one week the swap points are <Num of="m03.points1w" /> pips, over one year <Num of="m03.points1y" /> pips. That is almost proportional to time, because the interest differential keeps running every day.
 
 <Derivation title="Derivation: swap points from the interest differential">
 
@@ -56,7 +58,7 @@ Conversely, from spot, swap points and the USD rate you can back out the CHF rat
 
 <Desk title="How swaps are traded">
 
-On the desk, swaps are quoted in points, with a bid and an ask for the swap points. The spot for the near leg is only fixed as a reference rate. An outright forward is then simply a spot deal plus a swap.
+On the desk, swaps are quoted in points, with a bid and an ask for the swap points. The spot for the near leg is only fixed as a reference rate. An outright forward is then simply a spot deal plus a swap. That is why the forward points of module 02 come straight from the swap market.
 
 A swap dealer therefore has hardly any FX risk, but interest rate risk: if CHF or USD rates change, the swap points change. Very short swaps have their own names: overnight (today against tomorrow), tom/next (tomorrow against spot) and spot/next (spot against the day after).
 
