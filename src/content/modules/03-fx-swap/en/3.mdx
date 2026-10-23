@@ -17,7 +17,7 @@ Two things happen on the old maturity date. The forward delivers USD 1m against 
 
 **Case 1: the dollar has risen,** spot is at <Num of="m03.rollUp" />. In the near leg the importer receives <Num of="m03.rollNearChfUp" />; for the forward he pays <Num of="m03.oldFwdChf" />. Net, he gets <Num of="m03.rollSettleUp" />. In the far leg he buys the dollars back at <Num of="m03.rollFarUp" />, that is for <Num of="m03.rollFarChfUp" />. The swap points over <Num of="m03.slipDays" /> days are <Num of="m03.rollPointsUp" /> pips.
 
-All in all he pays <Num of="m03.rollTotalUp" />. That corresponds to an **all-in rate** of <Num of="m03.rollAllInUp" />: old forward plus swap points.
+All in all he pays <Num of="m03.rollFarChfUp" /> − <Num of="m03.rollSettleUp" /> = <Num of="m03.rollTotalUp" />. That corresponds to an **all-in rate** of <Num of="m03.rollAllInUp" />: old forward plus swap points.
 
 **Case 2: the dollar has fallen,** spot is at <Num of="m03.rollDown" />. Now the importer has to **pay** <Num of="m03.rollSettleDownAbs" /> on the roll date. In return he buys the dollars more cheaply in the far leg, at <Num of="m03.rollFarDown" />. His all-in rate: <Num of="m03.rollAllInDown" />.
 

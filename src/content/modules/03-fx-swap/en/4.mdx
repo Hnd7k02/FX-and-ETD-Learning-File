@@ -15,7 +15,7 @@ In the **cross-currency swap** the re-exchange at the end happens at the same ra
 A worked example over one year:
 
 - **FX swap:** exchange today at <Num of="ex.spot" />, re-exchange at the far rate of <Num of="m03.fwd1y" />. At the end the company gets back <Num of="m03.fxCost1y" /> less.
-- **Cross-currency swap:** exchange and re-exchange at <Num of="ex.spot" />. In between, the company pays <Num of="m03.ccsCoupon" /> of interest and receives <Num of="m03.ccsCouponChf" />, because the CHF rate is <Num of="ex.rd" />.
+- **Cross-currency swap:** exchange and re-exchange at <Num of="ex.spot" />. On top, after one year the company pays <Num of="m03.ccsCoupon" /> of interest and receives <Num of="m03.ccsCouponChf" />, because the CHF rate is <Num of="ex.rd" />.
 
 Convert the <Num of="m03.ccsCoupon" /> into francs at the far rate: it is exactly <Num of="m03.fxCost1y" />. Both instruments cost the same. Over five years this also holds, measured in present value: <Num of="m03.pv5y" /> in both cases. But the far rate of a five-year FX swap would be <Num of="m03.fwd5y" />. FX swaps that long are rare. For terms of several years, people use the CCS.
 

@@ -396,6 +396,11 @@ export default function HedgeCompare(props: HedgeCompareProps): JSX.Element {
                 ))}
               </g>
 
+              {/* marker at S_T */}
+              <path
+                d={`M${x.toFixed(1)},${L.top}V${L.rail}`}
+                style={{ fill: 'none', stroke: 'var(--ff-ink)', strokeWidth: 1.25 }}
+              />
               {/* landmarks */}
               {events.map((e) => {
                 const ex = sx(e.level);
@@ -425,11 +430,7 @@ export default function HedgeCompare(props: HedgeCompareProps): JSX.Element {
                 );
               })}
 
-              {/* marker at S_T with one dot per strategy */}
-              <path
-                d={`M${x.toFixed(1)},${L.top}V${L.rail}`}
-                style={{ fill: 'none', stroke: 'var(--ff-ink)', strokeWidth: 1.25 }}
-              />
+              {/* one dot per strategy at S_T */}
               {HEDGE_IDS.filter((id) => shown.includes(id)).map((id) => (
                 <circle
                   key={`dot-${id}`}

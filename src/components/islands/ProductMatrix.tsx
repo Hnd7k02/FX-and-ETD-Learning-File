@@ -96,7 +96,7 @@ function layoutFor(w: number) {
     height,
     compact,
     font,
-    left: compact ? 44 : 52,
+    left: compact ? 50 : 56,
     right: compact ? 8 : 14,
     top,
     plotBottom,
@@ -578,6 +578,11 @@ export default function ProductMatrix(props: ProductMatrixProps): JSX.Element {
                 )}
               </g>
 
+              {/* marker at S_T */}
+              <path
+                d={`M${x.toFixed(1)},${L.top}V${L.rail}`}
+                style={{ fill: 'none', stroke: 'var(--ff-ink)', strokeWidth: 1.25 }}
+              />
               {/* direct label of the highlighted curve at the right end */}
               {groups[hlGroup] && (
                 <text
@@ -624,11 +629,6 @@ export default function ProductMatrix(props: ProductMatrixProps): JSX.Element {
                 );
               })}
 
-              {/* marker at S_T */}
-              <path
-                d={`M${x.toFixed(1)},${L.top}V${L.rail}`}
-                style={{ fill: 'none', stroke: 'var(--ff-ink)', strokeWidth: 1.25 }}
-              />
               {groups.map((_, gi) => (
                 <circle
                   key={`d${gi}`}

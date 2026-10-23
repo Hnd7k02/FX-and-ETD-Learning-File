@@ -17,7 +17,7 @@ Am alten Fälligkeitstag passiert zweierlei. Der Forward liefert USD 1 Mio. gege
 
 **Fall 1: Der Dollar ist gestiegen,** der Spot steht bei <Num of="m03.rollUp" />. Im Near Leg erhält der Importeur <Num of="m03.rollNearChfUp" />, für den Forward zahlt er <Num of="m03.oldFwdChf" />. Netto bekommt er <Num of="m03.rollSettleUp" />. Im Far Leg kauft er die Dollar zu <Num of="m03.rollFarUp" /> zurück, also für <Num of="m03.rollFarChfUp" />. Die Swap Points über <Num of="m03.slipDays" /> Tage betragen <Num of="m03.rollPointsUp" /> Pips.
 
-Unter dem Strich zahlt er <Num of="m03.rollTotalUp" />. Das entspricht einem **All-in-Kurs** von <Num of="m03.rollAllInUp" />: alter Forward plus Swap Points.
+Unter dem Strich zahlt er <Num of="m03.rollFarChfUp" /> − <Num of="m03.rollSettleUp" /> = <Num of="m03.rollTotalUp" />. Das entspricht einem **All-in-Kurs** von <Num of="m03.rollAllInUp" />: alter Forward plus Swap Points.
 
 **Fall 2: Der Dollar ist gefallen,** der Spot steht bei <Num of="m03.rollDown" />. Jetzt muss der Importeur am Roll-Datum <Num of="m03.rollSettleDownAbs" /> **bezahlen**. Dafür kauft er die Dollar im Far Leg günstiger, zu <Num of="m03.rollFarDown" />. Sein All-in-Kurs: <Num of="m03.rollAllInDown" />.
 
