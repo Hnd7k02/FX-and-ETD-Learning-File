@@ -1,0 +1,418 @@
+/**
+ * Numbers of module 08 (structured products) for <Num of="m08.…" /> and the quiz. Nothing is
+ * typed in:
+ * - fair strikes, coupons, the pivot width, standard errors and the Monte Carlo statistics come
+ *   from src/data/fx/mc-products.json (1’000’000 paths, `npm run data:mc`, D-28/D-29),
+ * - the closed-form steps of the "better rate" story from src/lib/structures.ts,
+ * - every scenario number from the path simulator logic (src/lib/pathsim.ts) with the same
+ *   settings the figures use (MC_CONFIG.scenarios and PATHSIM_CONFIG.presets),
+ * - the dual currency numbers from src/lib/dcicalc.ts (closed form, src/lib/fx/mc/dci.ts).
+ * Units: rates in CHF per USD, pips = 0.0001, money in CHF unless stated.
+ */
+import { EXAMPLE as E } from '@/lib/fx/example';
+import { MC_PRODUCTS, fairProduct } from '@/lib/fx/mc/fair';
+import { MC_CONFIG, PIP } from '@/lib/fx/mc/products';
+import { gkPrice } from '@/lib/fx/vanilla';
+import { digitalCash } from '@/lib/fx/exotics/digital';
+import { DCI_CONFIG, dciOutcome, dciView } from '@/lib/dcicalc';
+import {
+  PATHSIM_CONFIG,
+  forwardToDay,
+  playState,
+  simulate,
+  type ScenarioSettings,
+  type SimKind,
+} from '@/lib/pathsim';
+import { storyStages } from '@/lib/structures';
+import type { NumTable } from './types';
+
+const P = MC_PRODUCTS.products;
+const pips = (x: number): number => x / PIP;
+const year = MC_CONFIG.conventions.daysPerYear;
+
+/** End facts of one simulated scenario (the simulator shows the same numbers). */
+function scenario(kind: SimKind, s: ScenarioSettings) {
+  const sim = simulate(kind, s);
+  const end = playState(sim, sim.days);
+  return {
+    reason: sim.reason,
+    endedAt: sim.endIndex + 1,
+    firstLeveraged: sim.firstLeveraged + 1,
+    pnl: end.cumPnl,
+    bench: end.cumBench,
+    diff: end.diff,
+    base: Math.abs(end.base),
+    need: Math.abs(end.need),
+    coupons: sim.rows.filter((r) => r.kind === 'coupon').length,
+    leveraged: sim.rows.filter((r) => r.leveraged).length,
+  };
+}
+
+/** Closed-form fair coupon of a coupon strip without target (Garman-Kohlhagen). */
+function couponWithoutTarget(kind: 'tpf' | 'rtpf'): number {
+  const { spot: S, vol, rd, rf } = MC_CONFIG.market;
+  let sold = 0;
+  let digital = 0;
+  if (kind === 'tpf') {
+    const p = fairProduct('tpf');
+    for (const d of p.fixingDays) {
+      const T = d / year;
+      sold += p.leverage * gkPrice(S, p.strike, T, vol, rd, rf, 'put');
+      digital += digitalCash(S, p.strike, T, vol, rd, rf, 'call');
+    }
+  } else {
+    const p = fairProduct('rtpf');
+    for (const d of p.fixingDays) {
+      const T = d / year;
+      sold +=
+        p.leverage *
+        (gkPrice(S, p.lower, T, vol, rd, rf, 'put') + gkPrice(S, p.upper, T, vol, rd, rf, 'call'));
+      digital +=
+        digitalCash(S, p.lower, T, vol, rd, rf, 'call') -
+        digitalCash(S, p.upper, T, vol, rd, rf, 'call');
+    }
+  }
+  return sold / digital;
+}
+
+const acc = fairProduct('accumulator');
+const dec = fairProduct('decumulator');
+const tarf = fairProduct('tarf');
+const piv = fairProduct('pivotTarf');
+const tpf = fairProduct('tpf');
+const rtpf = fairProduct('rtpf');
+const accStory = storyStages('accumulator');
+const tarfStory = storyStages('tarf');
+const decStory = storyStages('decumulator');
+const presets = PATHSIM_CONFIG.presets;
+
+const accUp = scenario('accumulator', { name: 'trendUp' });
+const accSide = scenario('accumulator', { name: 'sideways' });
+const accDown = scenario('accumulator', presets.strongDown);
+const tarfUp = scenario('tarf', { name: 'trendUp' });
+const tarfShock = scenario('tarf', presets.earlyShock);
+const pivShock = scenario('pivotTarf', presets.earlyShock);
+const tpfSide = scenario('tpf', { name: 'sideways' });
+const tpfDown = scenario('tpf', presets.strongDown);
+const rtpfUp = scenario('rtpf', { name: 'trendUp' });
+
+const tpfLastDay = tpf.fixingDays[tpf.fixingDays.length - 1]!;
+const tpfForwardEnd = forwardToDay(tpfLastDay);
+/** Day on which the forward falls to the TPF strike: ln(S / K) / (rf − rd) · 365. */
+const tpfCrossDay = (Math.log(E.spot / tpf.strike) / (E.rf - E.rd)) * year;
+
+const dci = dciView(DCI_CONFIG.capital.initial, 1, DCI_CONFIG.distance.initial);
+const dciFixing = dci.product.strike * (1 - DCI_CONFIG.initialFixingBelowStrike);
+const dciOut = dciOutcome(dci, dciFixing);
+const dci3 = dciView(DCI_CONFIG.capital.initial, 3, DCI_CONFIG.distance.initial);
+
+/** Raw values for the quiz and tests (rates in CHF per USD, money in CHF unless noted). */
+export const M08 = {
+  paths: MC_PRODUCTS.engine.paths,
+  // accumulator
+  accStrike: acc.strike,
+  accSePips: P.accumulator.stdErrPips,
+  accFwd: P.accumulator.forwardAvg,
+  accBetterPips: -pips(acc.strike - P.accumulator.forwardAvg),
+  accBarrier: acc.barrier,
+  accFixings: acc.fixingDays.length,
+  accNotional: acc.notional,
+  accAvgDay: P.accumulator.avgFixingDay,
+  accK2: accStory[1]!.strike,
+  accK2Pips: -pips(accStory[1]!.strike - accStory[0]!.strike),
+  accKoPips: -pips(accStory[2]!.strike - accStory[1]!.strike),
+  /** Fixing below which a leveraged fixing loses more than the forward: 2K − F. */
+  accBreakLev: 2 * acc.strike - P.accumulator.forwardAvg,
+  accPKo: P.accumulator.stats.pKnockOut,
+  accExpFix: P.accumulator.stats.expectedFixings,
+  accQ05: P.accumulator.stats.pvQuantile05,
+  accWorst: P.accumulator.stats.pvMin,
+  accUp,
+  accSide,
+  accDown,
+  accDownMove: presets.strongDown.move,
+  // decumulator
+  decStrike: dec.strike,
+  decBetterPips: pips(dec.strike - P.decumulator.forwardAvg),
+  decBarrier: dec.barrier,
+  decK2: decStory[1]!.strike,
+  decPKo: P.decumulator.stats.pKnockOut,
+  // TARF
+  tarfStrike: tarf.strike,
+  tarfSePips: P.tarf.stdErrPips,
+  tarfFwd: P.tarf.forwardAvg,
+  tarfBetterPips: -pips(tarf.strike - P.tarf.forwardAvg),
+  tarfK2: tarfStory[1]!.strike,
+  tarfTargetPips: pips(tarf.target),
+  tarfTargetChf: tarf.target * tarf.notional,
+  tarfFixings: tarf.fixingDays.length,
+  tarfNotional: tarf.notional,
+  tarfPTarget: P.tarf.stats.pTarget,
+  tarfExpFix: P.tarf.stats.expectedFixings,
+  tarfQ05: P.tarf.stats.pvQuantile05,
+  tarfWorst: P.tarf.stats.pvMin,
+  tarfUp,
+  tarfShock,
+  shockGap: presets.earlyShock.gap,
+  shockDay: presets.earlyShock.gapDay,
+  // pivot TARF
+  pivPivot: piv.pivot,
+  pivK1: piv.lowerStrike,
+  pivK2: piv.upperStrike,
+  pivWidthPips: pips(P.pivotTarf.value),
+  pivSePips: P.pivotTarf.stdErrPips,
+  pivTargetPips: pips(piv.target),
+  pivTargetChf: piv.target * piv.notional,
+  pivPTarget: P.pivotTarf.stats.pTarget,
+  pivExpFix: P.pivotTarf.stats.expectedFixings,
+  pivQ05: P.pivotTarf.stats.pvQuantile05,
+  pivWorst: P.pivotTarf.stats.pvMin,
+  pivShock,
+  // TPF
+  tpfStrike: tpf.strike,
+  tpfStrikeVsSpot: tpf.strike / E.spot - 1,
+  tpfCouponPips: pips(tpf.coupon),
+  tpfSePips: P.tpf.stdErrPips,
+  tpfCouponChf: tpf.coupon * tpf.notional,
+  tpfMaxChf: tpf.coupon * tpf.notional * tpf.targetCoupons,
+  tpfTargetCoupons: tpf.targetCoupons,
+  tpfNotional: tpf.notional,
+  tpfFixings: tpf.fixingDays.length,
+  tpfCouponNoTargetPips: pips(couponWithoutTarget('tpf')),
+  tpfFwdAvg: P.tpf.forwardAvg,
+  tpfFwdEnd: tpfForwardEnd,
+  tpfStrikeOverFwdEndPips: pips(tpf.strike - tpfForwardEnd),
+  tpfCrossDay,
+  tpfCrossMonth: (tpfCrossDay * 12) / year,
+  tpfFwdDropPips: -pips(tpfForwardEnd - E.spot),
+  tpfPTarget: P.tpf.stats.pTarget,
+  tpfExpFix: P.tpf.stats.expectedFixings,
+  tpfQ05: P.tpf.stats.pvQuantile05,
+  tpfWorst: P.tpf.stats.pvMin,
+  tpfSide,
+  tpfDown,
+  // RTPF
+  rtpfLower: rtpf.lower,
+  rtpfUpper: rtpf.upper,
+  rtpfCouponPips: pips(rtpf.coupon),
+  rtpfSePips: P.rtpf.stdErrPips,
+  rtpfCouponChf: rtpf.coupon * rtpf.notional,
+  rtpfMaxChf: rtpf.coupon * rtpf.notional * rtpf.targetCoupons,
+  rtpfCouponNoTargetPips: pips(couponWithoutTarget('rtpf')),
+  rtpfPTarget: P.rtpf.stats.pTarget,
+  rtpfQ05: P.rtpf.stats.pvQuantile05,
+  rtpfWorst: P.rtpf.stats.pvMin,
+  rtpfUp,
+  // dual currency
+  dciCapital: dci.capital,
+  dciDays: dci.days,
+  dciStrike: dci.product.strike,
+  dciDistance: dci.distance,
+  dciForward: dci.forward,
+  dciStrikeVsFwdPips: dci.strikeVsForwardPips,
+  dciPremium: dci.quote.premium,
+  dciYield: dci.quote.yieldPa,
+  dciMm: dci.quote.moneyMarketRate,
+  dciInterest: dci.quote.interest,
+  dciBreakEven: dci.quote.breakEven,
+  dciUsd: dci.quote.conversionAmountBase,
+  dciPConv: dci.pConversion,
+  dciFixing,
+  dciOutValue: dciOut.valueQuote,
+  dciOutDiff: dciOut.vsDepositQuote,
+  dci3Yield: dci3.quote.yieldPa,
+  dci3Interest: dci3.quote.interest,
+} as const;
+
+const M = M08;
+
+export const nums: NumTable = {
+  'm08.paths': {
+    value: M.paths,
+    kind: 'num',
+    digits: 0,
+    note: 'Monte Carlo paths of the fair values',
+  },
+
+  // Accumulator
+  'm08.accStrike': { value: M.accStrike, kind: 'rate', note: 'Fair accumulator strike (MC)' },
+  'm08.accSe': { value: M.accSePips, kind: 'pips', note: 'Standard error of the fair strike' },
+  'm08.accFwd': { value: M.accFwd, kind: 'rate', note: 'Forward at the average fixing day' },
+  'm08.accBetter': { value: M.accBetterPips, kind: 'pips', note: 'Forward − fair strike' },
+  'm08.accBarrier': { value: M.accBarrier, kind: 'rate' },
+  'm08.accFixings': { value: M.accFixings, kind: 'num', digits: 0 },
+  'm08.accNotional': { value: M.accNotional, kind: 'money', ccy: 'USD' },
+  'm08.accTotal': {
+    value: M.accNotional * M.accFixings,
+    kind: 'money',
+    ccy: 'USD',
+    note: 'N × fixings',
+  },
+  'm08.accTotalMax': {
+    value: 2 * M.accNotional * M.accFixings,
+    kind: 'money',
+    ccy: 'USD',
+    note: '2N × fixings',
+  },
+  'm08.accAvgDay': { value: M.accAvgDay, kind: 'num', digits: 1, note: 'Average fixing day' },
+  'm08.accK2': {
+    value: M.accK2,
+    kind: 'rate',
+    note: 'Zero-cost strike of call + 2 puts, no KO (closed form)',
+  },
+  'm08.accK2Pips': { value: M.accK2Pips, kind: 'pips', note: 'Forward − K2' },
+  'm08.accKoPips': {
+    value: M.accKoPips,
+    kind: 'pips',
+    note: 'K2 − fair strike (effect of the KO)',
+  },
+  'm08.accBreakLev': { value: M.accBreakLev, kind: 'rate', note: '2K − F' },
+  'm08.accPKo': { value: M.accPKo, kind: 'pct', note: 'P(knock-out), MC' },
+  'm08.accExpFix': { value: M.accExpFix, kind: 'num', digits: 1 },
+  'm08.accQ05': { value: M.accQ05, kind: 'money', note: '5 % quantile of path PV' },
+  'm08.accWorst': { value: M.accWorst, kind: 'money', note: 'Worst path PV' },
+  'm08.accUpKo': {
+    value: M.accUp.endedAt,
+    kind: 'num',
+    digits: 0,
+    note: 'Knock-out fixing, trend up',
+  },
+  'm08.accUpUsd': { value: M.accUp.base, kind: 'money', ccy: 'USD' },
+  'm08.accUpPnl': { value: M.accUp.pnl, kind: 'money', sign: true },
+  'm08.accUpFwd': { value: M.accUp.bench, kind: 'money', sign: true },
+  'm08.accUpDiff': { value: M.accUp.diff, kind: 'money', sign: true },
+  'm08.accSidePnl': { value: M.accSide.pnl, kind: 'money', sign: true },
+  'm08.accSideFwd': { value: M.accSide.bench, kind: 'money', sign: true },
+  'm08.accSideDiff': { value: M.accSide.diff, kind: 'money', sign: true },
+  'm08.accDownMove': { value: M.accDownMove, kind: 'pct', digits: 0, note: 'Preset strongDown' },
+  'm08.accDownUsd': { value: M.accDown.base, kind: 'money', ccy: 'USD' },
+  'm08.accDownLev': {
+    value: M.accDown.leveraged,
+    kind: 'num',
+    digits: 0,
+    note: 'Leveraged fixings',
+  },
+  'm08.accDownPnl': { value: M.accDown.pnl, kind: 'money', sign: true },
+  'm08.accDownFwd': { value: M.accDown.bench, kind: 'money', sign: true },
+  'm08.accDownDiff': { value: M.accDown.diff, kind: 'money', sign: true },
+
+  // Decumulator
+  'm08.decStrike': { value: M.decStrike, kind: 'rate' },
+  'm08.decBetter': { value: M.decBetterPips, kind: 'pips' },
+  'm08.decBarrier': { value: M.decBarrier, kind: 'rate' },
+  'm08.decPKo': { value: M.decPKo, kind: 'pct' },
+
+  // TARF
+  'm08.tarfStrike': { value: M.tarfStrike, kind: 'rate' },
+  'm08.tarfSe': { value: M.tarfSePips, kind: 'pips' },
+  'm08.tarfFwd': { value: M.tarfFwd, kind: 'rate' },
+  'm08.tarfBetter': { value: M.tarfBetterPips, kind: 'pips' },
+  'm08.tarfK2': { value: M.tarfK2, kind: 'rate', note: 'Strip without target (closed form)' },
+  'm08.tarfTargetPips': { value: M.tarfTargetPips, kind: 'pips', digits: 0 },
+  'm08.tarfTargetChf': { value: M.tarfTargetChf, kind: 'money' },
+  'm08.tarfFixings': { value: M.tarfFixings, kind: 'num', digits: 0 },
+  'm08.tarfNotional': { value: M.tarfNotional, kind: 'money', ccy: 'USD' },
+  'm08.tarfTotal': { value: M.tarfNotional * M.tarfFixings, kind: 'money', ccy: 'USD' },
+  'm08.tarfPTarget': { value: M.tarfPTarget, kind: 'pct' },
+  'm08.tarfExpFix': { value: M.tarfExpFix, kind: 'num', digits: 1 },
+  'm08.tarfQ05': { value: M.tarfQ05, kind: 'money' },
+  'm08.tarfWorst': { value: M.tarfWorst, kind: 'money' },
+  'm08.tarfUpEnd': { value: M.tarfUp.endedAt, kind: 'num', digits: 0 },
+  'm08.tarfUpUsd': { value: M.tarfUp.base, kind: 'money', ccy: 'USD' },
+  'm08.tarfUpPnl': { value: M.tarfUp.pnl, kind: 'money', sign: true },
+  'm08.tarfUpFwd': { value: M.tarfUp.bench, kind: 'money', sign: true },
+  'm08.tarfUpDiff': { value: M.tarfUp.diff, kind: 'money', sign: true },
+  'm08.shockGap': { value: M.shockGap, kind: 'pct', digits: 0 },
+  'm08.shockDay': { value: M.shockDay, kind: 'num', digits: 0 },
+  'm08.tarfShockUsd': { value: M.tarfShock.base, kind: 'money', ccy: 'USD' },
+  'm08.tarfShockLev': { value: M.tarfShock.leveraged, kind: 'num', digits: 0 },
+  'm08.tarfShockPnl': { value: M.tarfShock.pnl, kind: 'money', sign: true },
+  'm08.tarfShockFwd': { value: M.tarfShock.bench, kind: 'money', sign: true },
+
+  // Pivot TARF
+  'm08.pivPivot': { value: M.pivPivot, kind: 'rate' },
+  'm08.pivK1': { value: M.pivK1, kind: 'rate' },
+  'm08.pivK2': { value: M.pivK2, kind: 'rate' },
+  'm08.pivWidth': { value: M.pivWidthPips, kind: 'pips' },
+  'm08.pivSe': { value: M.pivSePips, kind: 'pips' },
+  'm08.pivTargetPips': { value: M.pivTargetPips, kind: 'pips', digits: 0 },
+  'm08.pivTargetChf': { value: M.pivTargetChf, kind: 'money' },
+  'm08.pivPTarget': { value: M.pivPTarget, kind: 'pct' },
+  'm08.pivExpFix': { value: M.pivExpFix, kind: 'num', digits: 1 },
+  'm08.pivQ05': { value: M.pivQ05, kind: 'money', sign: true },
+  'm08.pivWorst': { value: M.pivWorst, kind: 'money' },
+  'm08.pivShockPnl': { value: M.pivShock.pnl, kind: 'money', sign: true },
+
+  // TPF
+  'm08.tpfStrike': { value: M.tpfStrike, kind: 'rate' },
+  'm08.tpfStrikeVsSpot': { value: M.tpfStrikeVsSpot, kind: 'pct', note: 'K / S − 1' },
+  'm08.tpfCoupon': { value: M.tpfCouponPips, kind: 'pips' },
+  'm08.tpfSe': { value: M.tpfSePips, kind: 'pips' },
+  'm08.tpfCouponChf': { value: M.tpfCouponChf, kind: 'money' },
+  'm08.tpfMaxChf': { value: M.tpfMaxChf, kind: 'money' },
+  'm08.tpfTargetCoupons': { value: M.tpfTargetCoupons, kind: 'num', digits: 0 },
+  'm08.tpfNotional': { value: M.tpfNotional, kind: 'money', ccy: 'USD' },
+  'm08.tpfFixings': { value: M.tpfFixings, kind: 'num', digits: 0 },
+  'm08.tpfCouponNoTarget': {
+    value: M.tpfCouponNoTargetPips,
+    kind: 'pips',
+    note: 'Closed form without target',
+  },
+  'm08.tpfFwdAvg': { value: M.tpfFwdAvg, kind: 'rate' },
+  'm08.tpfFwdEnd': { value: M.tpfFwdEnd, kind: 'rate', note: 'Forward to the last fixing' },
+  'm08.tpfStrikeOverFwdEnd': { value: M.tpfStrikeOverFwdEndPips, kind: 'pips' },
+  'm08.tpfFwdDrop': {
+    value: M.tpfFwdDropPips,
+    kind: 'pips',
+    note: 'Spot − forward to the last fixing',
+  },
+  'm08.tpfCrossMonth': {
+    value: M.tpfCrossMonth,
+    kind: 'num',
+    digits: 1,
+    note: 'Month in which F = K',
+  },
+  'm08.tpfPTarget': { value: M.tpfPTarget, kind: 'pct' },
+  'm08.tpfExpFix': { value: M.tpfExpFix, kind: 'num', digits: 1 },
+  'm08.tpfQ05': { value: M.tpfQ05, kind: 'money' },
+  'm08.tpfWorst': { value: M.tpfWorst, kind: 'money' },
+  'm08.tpfSidePnl': { value: M.tpfSide.pnl, kind: 'money', sign: true },
+  'm08.tpfDownCoupons': { value: M.tpfDown.coupons, kind: 'num', digits: 0 },
+  'm08.tpfDownReceived': { value: M.tpfDown.bench, kind: 'money' },
+  'm08.tpfDownPnl': { value: M.tpfDown.pnl, kind: 'money', sign: true },
+
+  // RTPF
+  'm08.rtpfLower': { value: M.rtpfLower, kind: 'rate' },
+  'm08.rtpfUpper': { value: M.rtpfUpper, kind: 'rate' },
+  'm08.rtpfCoupon': { value: M.rtpfCouponPips, kind: 'pips' },
+  'm08.rtpfSe': { value: M.rtpfSePips, kind: 'pips' },
+  'm08.rtpfCouponChf': { value: M.rtpfCouponChf, kind: 'money' },
+  'm08.rtpfMaxChf': { value: M.rtpfMaxChf, kind: 'money' },
+  'm08.rtpfCouponNoTarget': { value: M.rtpfCouponNoTargetPips, kind: 'pips' },
+  'm08.rtpfPTarget': { value: M.rtpfPTarget, kind: 'pct' },
+  'm08.rtpfQ05': { value: M.rtpfQ05, kind: 'money' },
+  'm08.rtpfWorst': { value: M.rtpfWorst, kind: 'money' },
+  'm08.rtpfUpCoupons': { value: M.rtpfUp.coupons, kind: 'num', digits: 0 },
+  'm08.rtpfUpReceived': { value: M.rtpfUp.bench, kind: 'money' },
+  'm08.rtpfUpPnl': { value: M.rtpfUp.pnl, kind: 'money', sign: true },
+
+  // Dual currency
+  'm08.dciCapital': { value: M.dciCapital, kind: 'money' },
+  'm08.dciDays': { value: M.dciDays, kind: 'num', digits: 0 },
+  'm08.dciStrike': { value: M.dciStrike, kind: 'rate' },
+  'm08.dciDistance': { value: M.dciDistance, kind: 'pct', digits: 0 },
+  'm08.dciForward': { value: M.dciForward, kind: 'rate' },
+  'm08.dciStrikeVsFwd': { value: M.dciStrikeVsFwdPips, kind: 'pips' },
+  'm08.dciPremium': { value: M.dciPremium, kind: 'money' },
+  'm08.dciYield': { value: M.dciYield, kind: 'pct', digits: 2 },
+  'm08.dciMm': { value: M.dciMm, kind: 'pct', digits: 2 },
+  'm08.dciInterest': { value: M.dciInterest, kind: 'money' },
+  'm08.dciBreakEven': { value: M.dciBreakEven, kind: 'rate' },
+  'm08.dciUsd': { value: M.dciUsd, kind: 'money', ccy: 'USD' },
+  'm08.dciPConv': { value: M.dciPConv, kind: 'pct' },
+  'm08.dciFixing': { value: M.dciFixing, kind: 'rate' },
+  'm08.dciOutValue': { value: M.dciOutValue, kind: 'money' },
+  'm08.dciOutDiff': { value: M.dciOutDiff, kind: 'money', sign: true },
+  'm08.dci3Yield': { value: M.dci3Yield, kind: 'pct', digits: 2 },
+  'm08.dci3Interest': { value: M.dci3Interest, kind: 'money' },
+};

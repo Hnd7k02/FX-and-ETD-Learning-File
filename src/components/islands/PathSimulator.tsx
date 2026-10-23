@@ -13,6 +13,8 @@
  *   default all six. Unknown kinds are ignored.
  * - initial?: product shown first (default the first of `products`).
  * - scenario?: 'trendUp' | 'trendDown' | 'sideways' | 'shock' | 'random' (default 'trendDown').
+ * - preset?: a named start scenario from PATHSIM_CONFIG.presets ('strongDown', 'earlyShock');
+ *   scenario, move, gap and gapDay given explicitly override it.
  * - move?: total move of the trend scenarios over the horizon (fraction, e.g. −0.12).
  * - gap?: one-day gap of the shock (fraction, e.g. −0.10); gapDay?: day of the gap.
  * - view?: 'path' | 'ensemble' (default 'path'); ensemble?: false hides the 100-path view.
@@ -53,6 +55,7 @@ import {
   fairInfo,
   forwardToDay,
   horizonDays,
+  isPreset,
   isScenario,
   isSimKind,
   monthTicks,
@@ -73,6 +76,7 @@ import {
   summarizeEnsemble,
   type FixingRow,
   type LevelKey,
+  type ScenarioSettings,
   type SimEvent,
   type SimKind,
   type Simulation,
@@ -83,6 +87,7 @@ export interface PathSimulatorProps {
   products?: string[];
   initial?: string;
   scenario?: string;
+  preset?: string;
   move?: number;
   gap?: number;
   gapDay?: number;
@@ -115,15 +120,17 @@ function resolveProducts(ids?: string[]): SimKind[] {
 }
 
 function initialScen(p: PathSimulatorProps, kind: SimKind): Scen {
-  const name: ScenarioName = isScenario(p.scenario) ? p.scenario : 'trendDown';
+  const preset: ScenarioSettings = isPreset(p.preset) ? CFG.presets[p.preset] : { name: 'trendDown' };
+  const name: ScenarioName = isScenario(p.scenario) ? p.scenario : preset.name;
   const days = horizonDays(simProduct(kind));
   const d = defaultScenario(name, days);
   const shock = defaultScenario('shock', days);
+  const gapDay = p.gapDay ?? preset.gapDay;
   return {
     name,
-    move: p.move ?? d.move,
-    gap: p.gap ?? shock.gap,
-    gapFrac: p.gapDay !== undefined ? p.gapDay / days : shock.gapDay / days,
+    move: p.move ?? (name === preset.name ? preset.move : undefined) ?? d.move,
+    gap: p.gap ?? preset.gap ?? shock.gap,
+    gapFrac: gapDay !== undefined ? gapDay / days : shock.gapDay / days,
     seed: CFG.random.seed,
   };
 }

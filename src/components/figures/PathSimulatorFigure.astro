@@ -8,6 +8,8 @@
  * - initial?: string      Product shown first (default: the first of `products`).
  * - scenario?: string     Scenario template shown first: trendUp, trendDown, sideways, shock,
  *                         random (default trendDown).
+ * - preset?: string       Named start scenario of PATHSIM_CONFIG.presets (src/lib/pathsim.ts):
+ *                         'strongDown' (trend down −15 %), 'earlyShock' (−10 % gap on day 20).
  * - move?: number         Start move of a trend over the horizon (fraction, e.g. -0.12).
  * - gap?: number          Start size of the shock gap (fraction, e.g. -0.1).
  * - gapDay?: number       Start day of the shock gap.
@@ -28,6 +30,7 @@ interface Props {
   products?: string[];
   initial?: string;
   scenario?: string;
+  preset?: string;
   move?: number;
   gap?: number;
   gapDay?: number;

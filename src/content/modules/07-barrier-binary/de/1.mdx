@@ -1,5 +1,66 @@
 import BarrierPathsFigure from '@/components/figures/BarrierPathsFigure.astro';
 
-Entwurf.
+{/* 07 Barrier & Binary · Abschnitt 1 · Intuition. Zahlen nur über <Num />, Registry src/lib/nums/ex.ts und m07.ts. */}
 
-<BarrierPathsFigure caption="Test" />
+Der Importeur kennt seinen Schutz: einen USD Call mit Strike <Num of="ex.strike" /> über <Num of="ex.notional" />. Er kostet <Num of="ex.callChf" />. Das ist ihm zu viel. Er fragt nach einer günstigeren Variante und bekommt einen Vorschlag: denselben Call, aber mit einer **Barriere**.
+
+Eine Barriere ist ein Kursniveau, das während der ganzen Laufzeit beobachtet wird. Berührt USD/CHF dieses Niveau, passiert etwas Endgültiges:
+
+- **Knock-out:** Die Option verschwindet. Was der Kurs danach macht, spielt keine Rolle mehr.
+- **Knock-in:** Die Option entsteht erst jetzt. Vorher existiert sie nicht, danach ist sie ein ganz normaler Vanilla.
+
+Beides macht die Option billiger. Du kaufst nicht mehr alle Szenarien, sondern nur einen Teil davon. Je mehr Szenarien die Barriere wegschneidet und je wertvoller diese Szenarien wären, desto grösser der Rabatt.
+
+<BarrierPathsFigure caption="Zehn Zufallspfade für USD/CHF über drei Monate. Beim Knock-out verblasst ein Pfad, sobald er die Barriere berührt; beim Knock-in leuchtet er erst dann auf. Zieh die Barriere näher an den Spot und schau, wie der Preis fällt." />
+
+### Oben oder unten: Das macht den Unterschied
+
+Liegt die Barriere <Num of="m07.barrierPct" /> über dem Spot, also bei <Num of="m07.barrierUp" />, kostet der **Up-and-out Call** nur <Num of="m07.uocPips" /> Pips statt <Num of="m07.vanillaPips" />. Er ist rund <Num of="m07.uocDiscount" /> billiger. Liegt die Barriere gleich weit darunter, bei <Num of="m07.barrierDown" />, kostet der **Down-and-out Call** <Num of="m07.docPips" /> Pips. Das ist nur <Num of="m07.docDiscount" /> weniger.
+
+| Option, Strike <Num of="ex.strike" /> | Barriere | Preis | Auf USD 1 Mio. | Barriere berührt mit |
+| --- | --- | --- | --- | --- |
+| Vanilla Call | keine | <Num of="m07.vanillaPips" /> Pips | <Num of="ex.callChf" /> | – |
+| Up-and-out Call | <Num of="m07.barrierUp" /> | <Num of="m07.uocPips" /> Pips | <Num of="m07.uocChf" /> | <Num of="m07.touchUp" /> |
+| Down-and-out Call | <Num of="m07.barrierDown" /> | <Num of="m07.docPips" /> Pips | <Num of="m07.docChf" /> | <Num of="m07.touchDown" /> |
+
+Warum dieser Unterschied? Unten wird die Barriere sogar öfter berührt als oben. Entscheidend ist aber, *welche* Szenarien wegfallen. Der Down-and-out Call verschwindet, wenn der Dollar fällt. Dann wäre er ohnehin wenig wert, und der Importeur kauft seine Dollar billiger am Markt. Der Up-and-out Call verschwindet genau dann, wenn der Dollar stark steigt. Das sind die Szenarien, für die der Importeur den Schutz überhaupt kauft.
+
+<Callout variant="bad" title="Verlustszenario">
+
+Der Importeur wählt den Up-and-out Call und spart <Num of="m07.uocSavingChf" /> Prämie. Nach einem Monat steigt USD/CHF über <Num of="m07.barrierUp" />: Der Call ist weg, auch wenn der Kurs später zurückkommt. Bei Verfall steht USD/CHF auf <Num of="m07.lossSpot" />. Der Importeur zahlt für seine Dollar <Num of="m07.lossChf" /> mehr als zum Strike. Der gesparte Betrag ist ein Bruchteil davon.
+
+</Callout>
+
+<Derivation title="Herleitung: Warum Berühren wahrscheinlicher ist als oben Enden">
+
+**1.** Ein Pfad, der bei Verfall über der Barriere <i>H</i> steht, hat <i>H</i> unterwegs sicher berührt. Umgekehrt gilt das nicht: Viele Pfade berühren <i>H</i> und fallen danach wieder zurück.
+
+**2.** Spiegelungsprinzip: Ohne Drift gehört zu jedem Pfad, der <i>H</i> berührt und unten endet, ein gespiegelter Pfad, der oben endet. Beide sind gleich wahrscheinlich. Darum gilt ohne Drift:
+
+<Formula variant="accent">P(Barriere berührt) = 2 · P(<i>S</i><sub><i>T</i></sub> ≥ <i>H</i>)</Formula>
+
+**3.** Mit Drift ν = <i>r</i><sub>d</sub> − <i>r</i><sub>f</sub> − ½σ² von ln <i>S</i> (im Beispiel <Num of="m07.driftLog" /> pro Jahr) und <i>h</i> = ln(<i>H</i>/<i>S</i>) gilt für eine obere Barriere:
+
+<Formula>
+  <span>P(berührt) = <i>N</i>((−<i>h</i> + ν<i>T</i>) / σ√<i>T</i>) + <i>e</i><sup>2ν<i>h</i>/σ²</sup> · <i>N</i>((−<i>h</i> − ν<i>T</i>) / σ√<i>T</i>)</span>
+</Formula>
+
+Der erste Term ist P(<i>S</i><sub><i>T</i></sub> ≥ <i>H</i>), der zweite zählt die Pfade, die berühren und unten enden. Ohne Drift sind beide gleich.
+
+**4.** Im Beispiel: <Num of="m07.endAboveUp" /> + <Num of="m07.touchMirrorTerm" /> = <Num of="m07.touchUp1" />. Das Doppelte des ersten Terms wären nur <Num of="m07.endAboveUp2" />. Die negative Drift (der Forward liegt unter dem Spot) senkt die Chance, oben zu enden, stärker als die Chance, die Barriere unterwegs zu streifen.
+
+</Derivation>
+
+<Desk title="Amerikanisch oder europäisch beobachtet">
+
+Die Barrieren in diesem Modul gelten während der ganzen Laufzeit. Im Handel heissen sie «amerikanisch». Es gibt auch «europäische» Barrieren: Sie werden nur bei Verfall geprüft. Dann ist die Option nicht mehr pfadabhängig. Ein europäischer Up-and-out Call ist einfach ein Call Spread zwischen Strike und Barriere minus Digitals an der Barriere (Abschnitt 3).
+
+Darum steht in jedem Term Sheet, wann und gegen welchen Kurs die Barriere geprüft wird. Ein Wort im Vertrag verändert den Preis stark.
+
+</Desk>
+
+<Takeaway>
+
+Eine Barrier-Option ist ein Vanilla mit einer Bedingung. Sie ist billiger, weil sie in manchen Szenarien nicht existiert. Prüf immer, welche Szenarien das sind.
+
+</Takeaway>

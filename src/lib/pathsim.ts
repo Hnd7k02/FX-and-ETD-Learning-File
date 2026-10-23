@@ -78,6 +78,16 @@ export const PATHSIM_CONFIG = {
   /** Random single path: first seed (MC_CONFIG) and the step of the "new path" button. */
   random: { seed: MC_CONFIG.scenarios.random.seed, step: 1 },
   /**
+   * Named start scenarios used by the module texts and figures (prop `preset`), so a number in
+   * the text and the figure that shows it come from the same settings. Choice.
+   * - strongDown: the strongest down-trend the slider offers (double amounts, over-hedged).
+   * - earlyShock: a −10 % gap after 20 days, before a TARF can reach its target.
+   */
+  presets: {
+    strongDown: { name: 'trendDown', move: -0.15 },
+    earlyShock: { name: 'shock', gap: -0.1, gapDay: 20 },
+  } as const satisfies Record<string, ScenarioSettings>,
+  /**
    * Range of the adjustable solved parameter (strike, coupon, pivot half-width). Strikes run
    * from 200 pips on the "better" side of the fair strike to 100 pips beyond the forward.
    * Choice.
@@ -103,6 +113,13 @@ export function isSimKind(x: unknown): x is SimKind {
 /** Type guard for the scenario names. */
 export function isScenario(x: unknown): x is ScenarioName {
   return typeof x === 'string' && (PATHSIM_CONFIG.scenarios as readonly string[]).includes(x);
+}
+
+export type PresetName = keyof typeof PATHSIM_CONFIG.presets;
+
+/** Type guard for the named scenario presets. */
+export function isPreset(x: unknown): x is PresetName {
+  return typeof x === 'string' && Object.prototype.hasOwnProperty.call(PATHSIM_CONFIG.presets, x);
 }
 
 /** Last fixing day of a product (the simulated horizon in days). */

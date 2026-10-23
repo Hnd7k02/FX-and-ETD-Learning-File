@@ -1,5 +1,64 @@
 import TouchLabFigure from '@/components/figures/TouchLabFigure.astro';
 
-Entwurf.
+{/* 07 Barrier & Binary · Abschnitt 3 · Digital und Touch. Zahlen nur über <Num />, Registry src/lib/nums/m07.ts. */}
 
-<TouchLabFigure caption="Test" />
+Ein Digital zahlt alles oder nichts: einen festen Betrag, wenn eine Bedingung erfüllt ist. Für den Importeur ist das kein Schutz. Der Betrag hängt nicht davon ab, wie weit der Dollar steigt. Trotzdem lohnt sich der Blick: Digitals sind Bausteine vieler Strukturen (Modul 08), und ihr Preis verrät, welche Wahrscheinlichkeit der Markt einpreist.
+
+Alle Beispiele zahlen <Num of="m07.payout" /> und laufen drei Monate. Die Wette ist immer dieselbe Frage an USD/CHF, nur anders gestellt:
+
+| Produkt | Zahlt, wenn … | Preis |
+| --- | --- | --- |
+| Digital Call, Strike <Num of="ex.strike" /> | USD/CHF bei Verfall über dem Strike liegt | <Num of="m07.digitalChf" /> |
+| One-Touch <Num of="m07.barrierUp" /> | die Barriere irgendwann berührt wird | <Num of="m07.otChf" /> |
+| No-Touch <Num of="m07.barrierUp" /> | die Barriere nie berührt wird | <Num of="m07.ntChf" /> |
+| Double No-Touch <Num of="m07.dntLower" /> / <Num of="m07.dntUpper" /> | der Kurs immer im Korridor bleibt | <Num of="m07.dntChf" /> |
+
+### Preis gleich abgezinste Wahrscheinlichkeit
+
+Der Digital Call kostet <Num of="m07.digitalChf" />. Das ist kein Zufall: Die risikoneutrale Wahrscheinlichkeit, über dem Strike zu enden, ist <i>N</i>(<i>d</i><sub>2</sub>) = <Num of="m07.digitalProb" />. Der Preis ist Auszahlung mal Wahrscheinlichkeit, abgezinst mit dem CHF-Zins. Bei einem CHF-Zins von <Num of="ex.rd" digits={0} /> fällt die Abzinsung weg.
+
+Dasselbe gilt für Touch-Produkte. Der One-Touch auf <Num of="m07.barrierUp" /> kostet <Num of="m07.otChf" />, der No-Touch <Num of="m07.ntChf" />. Zusammen ergeben sie <Num of="m07.otNtSumChf" />: Auf jedem Pfad zahlt genau einer von beiden. Kennst du den einen Preis, kennst du den anderen.
+
+Eine Faustregel vom Desk: Ein One-Touch kostet etwa doppelt so viel wie ein Digital mit Strike an der Barriere. Das ist das Spiegelungsprinzip aus Abschnitt 1. Im Beispiel ist es das <Num of="m07.otVsDigitalH" />-Fache, weil der Forward unter dem Spot liegt.
+
+<TouchLabFigure caption="Wähl ein Produkt und zieh an den orangen Griffen. Oben siehst du, welche Pfade zahlen; unten liegt der Preis (blau) fast auf der Wahrscheinlichkeit (gestrichelt). Beim Digital wird der Call Spread mit kleiner Breite zur Stufe." />
+
+### Bei Berührung oder bei Verfall?
+
+Ein One-Touch kann sofort bei der Berührung zahlen oder erst bei Verfall. Im Interbankenhandel ist die Zahlung bei Verfall üblich. Mit einem CHF-Zins von null ist beides gleich viel wert. Bei einem CHF-Zins von <Num of="m07.rdExample" /> kostet der One-Touch mit Zahlung bei Berührung <Num of="m07.otHitRdChf" />, mit Zahlung bei Verfall <Num of="m07.otExpRdChf" />. Früheres Geld ist mehr wert.
+
+### Double No-Touch: eine Wette auf Ruhe
+
+Der Double No-Touch zahlt, wenn USD/CHF drei Monate lang im Korridor <Num of="m07.dntWidth" /> um den Spot bleibt. Er kostet <Num of="m07.dntChf" />. Wer ihn kauft, setzt auf einen ruhigen Markt. Darum hängt er stark an der Vola: Steigt sie von <Num of="ex.vol" /> auf <Num of="m07.volUp" />, fällt der Preis auf <Num of="m07.dntVolUpChf" />. Sinkt sie auf <Num of="m07.volDown" />, steigt er auf <Num of="m07.dntVolDownChf" />. Der Käufer ist short Vega.
+
+<Derivation title="Herleitung: das Digital als Grenzwert eines Call Spreads">
+
+**1.** Ein Call zahlt (<i>S</i><sub><i>T</i></sub> − <i>K</i>)<sup>+</sup>. Erhöhst du den Strike um ein kleines ε, zahlt er in allen Szenarien über dem Strike ε weniger. Darum misst die Ableitung nach dem Strike die Wahrscheinlichkeit, über dem Strike zu enden:
+
+<Formula>
+  <span>∂<i>C</i> / ∂<i>K</i> = −<i>e</i><sup>−<i>r</i><sub>d</sub><i>T</i></sup> · P(<i>S</i><sub><i>T</i></sub> &gt; <i>K</i>) = −<i>e</i><sup>−<i>r</i><sub>d</sub><i>T</i></sup> · <i>N</i>(<i>d</i><sub>2</sub>)</span>
+</Formula>
+
+**2.** Ein Digital, das 1 zahlt, ist also das Negative dieser Ableitung:
+
+<Formula variant="accent">Digital = −∂<i>C</i> / ∂<i>K</i> = <i>e</i><sup>−<i>r</i><sub>d</sub><i>T</i></sup> · <i>N</i>(<i>d</i><sub>2</sub>)</Formula>
+
+**3.** Ein Call Spread, gekauft bei <i>K</i> − ε/2, verkauft bei <i>K</i> + ε/2, in der Menge 1/ε, ist der Differenzenquotient dieser Ableitung. Seine Auszahlung ist eine Rampe von 0 auf 1. Mit ε = <Num of="m07.spreadPips" /> Pips kostet er <Num of="m07.spreadChf" />, nur <Num of="m07.spreadDiffChf" /> mehr als das Digital.
+
+**4.** Für One-Touch und No-Touch gilt die Parität bei Zahlung bei Verfall: One-Touch + No-Touch = Auszahlung · <i>e</i><sup>−<i>r</i><sub>d</sub><i>T</i></sup>. Die Berührwahrscheinlichkeit stammt aus Abschnitt 1. Für den Double No-Touch gibt es keine kurze Formel: Er wird mit einer unendlichen Reihe gerechnet (Hui, 1996), die das Tool automatisch genau genug abbricht.
+
+</Derivation>
+
+<Desk title="Digitals am Desk: der enge Call Spread">
+
+Kurz vor Verfall und nahe am Strike ist ein Digital kaum zu hedgen. Ein Pip entscheidet über alles oder nichts, Delta wird riesig. Darum bewerten und hedgen Händler Digitals als engen Call Spread. Die Breite wählen sie bewusst etwas zu ihren Gunsten: ein Sicherheitspolster, das der Kunde im Preis mitbezahlt.
+
+Für Touch-Produkte gilt dasselbe an der Barriere. Auch die Beobachtung ist ein Thema: Der Monte-Carlo-Check im Labor beobachtet den Double No-Touch einmal täglich. Dann ist er mehr wert (<Num of="m07.dntMcChf" />) als bei stetiger Beobachtung, weil zwischen zwei Fixings keine Berührung zählt.
+
+</Desk>
+
+<Takeaway>
+
+Digital, One-Touch und No-Touch kosten fast genau die abgezinste Wahrscheinlichkeit, dass sie zahlen. Wer den Preis sieht, sieht die Wahrscheinlichkeit, die der Markt einpreist.
+
+</Takeaway>

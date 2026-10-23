@@ -153,6 +153,18 @@ export const nums: NumTable = {
   'm07.touchUp': { value: touchUp, kind: 'pct', digits: 0, note: 'P(touch 0.8240) continuous' },
   'm07.touchDown': { value: touchDown, kind: 'pct', digits: 0 },
   'm07.endAboveUp': { value: endAboveUp, kind: 'pct', digits: 1, note: 'P(S_T ≥ 0.8240)' },
+  'm07.touchMirrorTerm': {
+    value: touchUp - endAboveUp,
+    kind: 'pct',
+    digits: 1,
+    note: 'Reflection term of the touch probability: paths that touch and end below',
+  },
+  'm07.driftLog': {
+    value: rd - rf - 0.5 * vol * vol,
+    kind: 'pct',
+    digits: 2,
+    note: 'Drift of ln S p.a.: rd − rf − σ²/2',
+  },
   'm07.endAboveUp2': { value: 2 * endAboveUp, kind: 'pct', digits: 1, note: '2 · P(S_T ≥ H)' },
   'm07.touchUp1': { value: touchUp, kind: 'pct', digits: 1 },
   'm07.lossSpot': { value: lossSpot, kind: 'rate', note: 'Loss scenario: spot at expiry' },
@@ -164,7 +176,7 @@ export const nums: NumTable = {
   'm07.uocSavingChf': { value: (vanilla - uoc) * N, kind: 'money', note: 'Premium saved' },
 
   // Section 2: parity, rebate, monitoring, Greeks near the barrier, method of images
-  'm07.paritySumPips': { value: pips(uoc + uic), kind: 'pips', digits: 2, note: 'UOC + UIC' },
+  'm07.paritySumPips': { value: pips(uoc + uic), kind: 'pips', digits: 1, note: 'UOC + UIC' },
   'm07.vanillaPips2': { value: pips(vanilla), kind: 'pips', digits: 2 },
   'm07.rebatePips': { value: C.rebatePips, kind: 'pips', digits: 0 },
   'm07.uocRebatePips': { value: pips(uocRebate), kind: 'pips', digits: 1 },
@@ -211,6 +223,7 @@ export const nums: NumTable = {
   'm07.otExpRdChf': { value: otExpRd * P, kind: 'money' },
   'm07.dntLower': { value: L, kind: 'rate' },
   'm07.dntUpper': { value: U, kind: 'rate' },
+  'm07.dntWidth': { value: U / S - 1, kind: 'pct', digits: 0, note: 'Corridor ± around spot' },
   'm07.dntChf': { value: dnt * P, kind: 'money' },
   'm07.dntProb': { value: dnt / dfd, kind: 'pct', digits: 0 },
   'm07.volBump': { value: dbump, kind: 'pct', digits: 0, note: 'Vol bump (points)' },

@@ -126,7 +126,10 @@ test.describe('riskometer page', () => {
       await page.locator('[data-table-toggle]').click();
       await expect(page.locator('#rk-table')).toBeVisible();
       await expectNoHorizontalScroll(page);
-      const results = await new AxeBuilder({ page }).analyze();
+      const results = await new AxeBuilder({
+        // playwright-core is hoisted in a newer version than @playwright/test bundles
+        page: page as unknown as ConstructorParameters<typeof AxeBuilder>[0]['page'],
+      }).analyze();
       const serious = results.violations.filter(
         (v) => v.impact === 'serious' || v.impact === 'critical',
       );
