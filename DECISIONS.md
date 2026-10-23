@@ -297,3 +297,100 @@ Format: `D-xx · date · origin`, then question, decision, reasoning. Origin is 
 - Device hardening after a review round (three reviewers for iPad WebKit, PC `file://` browsers and router state; every finding checked by a skeptic): touches that start on an SVG chart handle with `touch-action: none` cancel page panning in JS, and handles that drag only sideways (`touch-action: pan-y`) do so once the first move is clearly sideways (`src/client/svg-touch.ts`), because iPadOS before WebKit bug 309293 (fixed March 2026) ignores touch-action on SVG child elements; animation loops clamp the frame step (`src/lib/anim.ts`; a negative first step crashed the franc-shock replay); ResizeObserver updates are applied in the next frame; unknown English routes fall back to the 404 page; the data block stays in the document so a copy saved with Ctrl+S still starts (an incomplete copy shows a message instead of hanging); in-page anchors mark the target (`data-target`, stands in for `:target`) and move focus there; a link to the open page adds no history entry and keeps the island's state (a remount for another query replaces the entry); "Weiterlernen" follows progress changes on the page; the learning path card is the containing block of its hidden labels (they widened the page to 998 px between 640 and 1000 px).
 
 **Reasoning:** Reuses the whole Astro pipeline (MDX, `<Num>`, i18n, components) instead of rebuilding the site as a client-only app; the only new runtime code is the router and the island mount. All settings are in the build script (D-22).
+
+## D-41 · 2026-10-23 · Review 23.10.2026
+
+**Transport-Regel: die Datei übersteht den Mailversand**
+
+**Question:** The file reaches the work PC by e-mail. On the way, backslash + n turned into a real line break; in Version 1 one such escape (the word-split regex `/[ \t\r\n]+/`) was a SyntaxError and the page stayed at "loading". How do we make sure that cannot happen again?
+**Decision:** The rule is built into `scripts/build-offline.ts` (helpers in `scripts/lib/transport.ts`):
+
+- esbuild with `charset: 'ascii'`; afterwards a left-to-right scanner rewrites every escape in each inline script: `\n \r \t \v \f` → `\u000a \u000d \u0009 \u000b \u000c`, `\xHH` → `\u00HH`, `\u{…}` → `\uXXXX` or a surrogate pair, an escaped backslash directly before n, r or t → `\`, every other escaped punctuation except `\\ \/ \. \{ \}` → `\u00XX`, a raw non-ASCII character → `\uXXXX`, `\0` (not before a digit) → `\u0000`. Letter escapes `\d \s \w \B` stay. Every rewrite means the same in strings, templates, regular expressions and character classes (tested by evaluating fixtures before and after).
+- The whole file is plain ASCII (0x0A, 0x20–0x7E): HTML text as `&#N;`, CSS as escapes that start with `\d` (e.g. `content:"\d7"` for ×; the glossary separator dot is drawn in CSS because `\b7` is not a tested escape).
+- The build fails on any other character, on a backslash directly before n, r or t (also as the second half of `\\`), on any escape outside `\uXXXX`, `\\`, `\/`, `\.`, `\{`, `\}`, `\d`, `\s`, `\w`, `\B` (CSS included), on `String.raw`, on a script that does not compile after the rewrite, and if the mail simulation (also the worst case `\r` → CR, `\t` → TAB) changes a byte. Version 5 needed no new escape kinds and none of `\b \S \D \W`, back-references or `\k<`.
+- CSP `script-src 'unsafe-inline'` instead of a sha256 hash: a character changed in transport must not block the script silently. `default-src 'none'`, `connect-src 'none'` and all other locks stay.
+- A small start-diagnostics script (`src/offline/diagnose.ts`, before the data block) shows a yellow box after 4 s if the app has not started: version, whether the main script started, the lengths of data block and main script against the build, location (local or network share), browser, CSP violations and JS errors (text only).
+- Version in one config object `OFFLINE_VERSION { number: 5 }`, date = build date in Zurich; visible in the loading text, on the About page and in the name of the copy `release/forward-first-v5.html`. `release/forward-first.html` stays for tests, CI and the release.
+
+**Reasoning:** The mail test showed exactly which escapes arrive intact; everything else is rewritten into those forms or fails the build, so a broken file can no longer be produced. The diagnostics box makes a future transport problem visible on the device instead of a silent "loading".
+
+## D-42 · 2026-10-23 · Review 23.10.2026
+
+**Tween-Regel: Werte, die einem Regler folgen, laufen nicht hinterher**
+
+**Question:** Two device reports: in "Option oder Forward?" (04.1) the dots jumped off their lines while the slider moved, and in the barrier lab (07.2) the parity bar ran in bursts. Measured cause: animations on values that follow a slider (a 300 ms ease-in-out restarted on every input starts at speed zero; a CSS width transition restarted on every change).
+**Decision:**
+
+- `useTween`: a target that arrives while an animation runs or within its duration after the last change jumps; only a single, isolated change (toggle, preset, reset) animates (`tweenShouldJump`, `src/lib/anim.ts`). Covers mouse, touch and keyboard, also where no drag flag is set.
+- Dots that sit on a line are never tweened: OptionVsForward uses the costs directly; HedgeShaper and HedgeCompare take the dot height from the same samples as the drawn curve (`polylineAt`), so the dot stays on the line also while a block toggle morphs the curve.
+- No CSS transition on a property that follows a slider: the barrier lab's parity bars and the CarryCushion meter lost theirs. Audited and kept (discrete changes only): button and hover effects, toggle switches, the PriceDrivers arrows, the HedgeCompare row reordering, the path simulator's ensemble bars, the derivation icon.
+- Parity bar: padding only when a label is shown, so a zero KO share is zero pixels wide (was a 12 px stripe).
+- Barrier lab time to expiry in days 1–365 (T = days/365, shown in days, weeks or months): one week step moved the bar by up to 95 px at short maturities. The start value is 91.25 days, i.e. exactly the example's T = 0.25, so every number of the running example is unchanged; the "2 weeks" example of 07.2 is now 14 days (T = 14/365 instead of 2/52; the values move by 0.1 pip and 0.2 gamma and come via `<Num>`).
+- Frame-by-frame tests over `file://` (`tests/offline/smooth.spec.ts`): small mouse steps and a held arrow key; every dot within 1 px of its line, every bar within 1 px of its width, nothing moves after release, KO share = KO/(KO + KI). The tests fail on the Version 4 code.
+
+**Reasoning:** The maths was right; the animations were wrong. The rule lives in one hook and one pure function, so every island follows it.
+
+## D-43 · 2026-10-23 · Review 23.10.2026
+
+**Maximalverlust-Klassen statt «nicht begrenzt»**
+
+**Question:** The texts said the loss of the leveraged structures was "not limited". USD/CHF cannot fall below zero, so for a dollar buyer the loss is finite. How do we describe the worst case correctly?
+**Decision:** Three terms, computed in `src/lib/fx/mc/maxloss.ts` from the product parameters:
+
+- «kein eingebauter Verluststopp» / "no built-in stop on losses": every one of these structures.
+- «sehr hoch, aber endlich» / "very high, but finite": accumulator, TARF, TPF, structured hedge. Bound = fixings × leverage × N × strike (all fixings at S = 0). Check values: accumulator CHF 1’609’922, TARF 1’804’296, TPF 1’872’000; pivot TARF below 1’800’595, RTPF below 1’852’800.
+- «theoretisch unbegrenzt» / "theoretically unlimited": decumulator, and pivot TARF and RTPF upwards (they sell or pay with leverage above a level).
+- The payoff kernels on a path with every fixing at S = 0 give exactly −bound; for decumulator, pivot TARF and RTPF the loss grows linearly with S without limit (tests).
+- Matrix `LossKind` 'unlimited' → 'noStop' (structured, accumulator, tarf, tpf) and 'unbounded' (pivotTarf, rtpf), both severity 3; chips «hoch, ohne Stopp» / «theoretisch unbegrenzt»; `pm.clip` «Verlust geht weiter» (the curve only leaves the chart). Takeaways: «Der Gewinn ist gedeckelt, für den Verlust gibt es keinen eingebauten Stopp.» Quiz m09-q3 names the theoretical TARF maximum next to the worst simulated path.
+- The risk boxes explain the bound in words (e.g. "USD 2’080’000 bought at the strike, worth nothing") rather than as a product with the rounded strike, which would not add up on screen.
+- Content lint: in modules 08/09 (MDX, quiz) and the product matrix, structure blocks and path simulator texts no «nicht begrenzt» / «not limited», no «ohne Boden/Grenze» / «no floor», no "gain capped, loss not" formula; «unbegrenzt» / «unlimited» only together with «theoretisch» / «theoretically». The 09/4 carry sentence now says "no further cushion and no stop; in the extreme the whole amount is lost".
+
+**Reasoning:** "Not limited" was wrong for the buyer and blurred the real point: there is no stop, and the bound, while finite, is several times the notional at stake in any normal scenario.
+
+## D-44 · 2026-10-23 · Review 23.10.2026
+
+**Forward-Konvention: T = 0.25 gegen 90/360 offen trennen**
+
+**Question:** 02.2 said "T = days/365" but used T = 0.25 (91.25 days) against 90/360 in the money market. Which comparison is right?
+**Decision:** The tool keeps T = 0.25 as a stylised convention for "3 months" in both worlds and says so (money market 90/360, option model 0.25 years = 91.25 days). Then 02.2 shows the like-for-like case: for exactly 90 days (T = 90/365) the continuous formula gives 0.79313, 0.65 pips above the money market (0.7930607); the shorter term outweighs continuous compounding. Merksatz: compare forwards only with the same end date and the same convention. The derivation "Woher die 0.3 Pips kommen" says it holds at equal T; the cross references in 04/1 and 09/2 say «bei gleichem T = 0.25». Both 90-day forwards are shown with 6 decimals so the gap adds up on screen (D-26 rule). New nums `m02.fwdCont90`, `m02.fwdCont90DiffPips`, `m02.daysT`. Convention labels (90/360, 90/365) stay typed, as elsewhere.
+
+**Reasoning:** The 0.3-pip gap was correct but only under equal T; without saying so, a reader could think continuous compounding always gives a lower forward.
+
+## D-45 · 2026-10-23 · Review 23.10.2026
+
+**Risk Reversal und Zero-Cost-Collar trennen**
+
+**Question:** 06.2 treated the 25Δ risk reversal as zero cost. At a flat 8 % vol the 25Δ call 0.8150 costs 47.27 pips and the 25Δ put 0.7730 brings 49.50 pips: the importer receives 2.24 pips net (CHF 224).
+**Decision:** Two cases: the 25Δ risk reversal (strikes fixed by the delta convention, net premium rarely zero) and the zero-cost collar (one strike chosen, the other solved for zero net premium: put 0.77215, shown 0.7722, 8.5 pips below the 25Δ put). The rest of 06.2 works with the zero-cost collar («Der Zero-Cost-Collar des Importeurs»); takeaway and derivation step 3 separate the two. The zero-cost put strike is shown once with 5 decimals so 0.7730 − 0.77215 = 8.5 pips adds up; the risk reversal is quoted only as its net amount (leg premiums at 2 decimals would not add up). Payoff builder: «Zero-Cost-Collar» only while the net premium is zero, otherwise «Collar (Risk Reversal)» (template id unchanged); the seagull description no longer claims zero cost in every state. Product matrix, 09/2 point 5 and the glossary follow (alias «Collar» only on zero-cost-collar). New nums `m06.rr25PutK`, `m06.rr25NetPips`, `m06.rr25NetChf`, `m06.rrPutGapPips`.
+
+**Reasoning:** Market convention: a risk reversal is quoted by delta; zero cost is a separate choice of strikes.
+
+## D-46 · 2026-10-23 · Review 23.10.2026
+
+**Wahrscheinlichkeiten sind risikoneutral, keine Prognose**
+
+**Question:** The tool shows probabilities (knock-out, touch, target, conversion, "chance in the money") without saying in which model.
+**Decision:** Every model probability carries «risikoneutral, keine Prognose» / «risk-neutral, not a forecast» (MDX in brackets, calculators as part of the sub-label); the first note of a section links the new glossary entry «Risikoneutral» (drift rd − rf, the rate ends on average at the forward; in this tool with constant vol and no jumps, Garman-Kohlhagen; probabilities belong to the price and are not a forecast — "in this tool" keeps it consistent with the smile of module 06). A content-lint rule (`RISK_NEUTRAL_NUMS`) fails when a listed probability num appears without the note in its block. Module 01's rise/fall probabilities were driftless before; they now come from the risk-neutral model (N(d2) with drift), which moves them from 11 % to 7 % (rise to 0.84) and from 10 % to 15 % (fall to 0.76); otherwise the label would be false. The ±1σ band stays driftless around spot; 01/1 shows that with drift the same band holds 67 % (`m01.bandProb`) against 68 % without (`m01.bandProbNoDrift`).
+
+**Reasoning:** A learner must not read a pricing probability as a forecast; the same label everywhere makes the model visible.
+
+## D-47 · 2026-10-23 · Review 23.10.2026
+
+**Moneyness und innerer Wert: gegen Forward und gegen Spot**
+
+**Question:** 04.3 presented forward moneyness and the intrinsic value against the forward as the only definitions; the quiz called the spot answer a "typical mistake".
+**Decision:** 04.3 names both conventions: spot moneyness (strike vs spot) and forward moneyness (strike vs forward); the tool uses forward moneyness because a European option is only exercised at expiry. Example: call 0.7990 is 10 pips below spot (spot moneyness: ITM) and 59.7 pips above the forward (forward moneyness: OTM). DF · max(F − K, 0) is the «innerer Wert gegen den Forward»; one sentence names the classic max(S − K, 0), the value of immediate exercise that a European option does not have. ITM call K = 0.7730: premium 249.8 pips, intrinsic value against the forward 200.3, time value 49.5; against the spot it would be 270.0 and −20.2 pips — which is why the tool measures at the forward. Quiz m04-q3 asks «in Forward-Moneyness, wie in diesem Tool»; the spot answer "holds in spot moneyness; the question asked for forward moneyness". Check m04-c3 and the glossary (moneyness, itm, otm, atm, intrinsic-value, time-value) follow. New nums `m04.itmSpotIntrinsicPips`, `m04.itmSpotTimePips`.
+
+**Reasoning:** Both conventions are used in practice; teaching one as the only truth would mislead.
+
+## D-48 · 2026-10-23 · Review 23.10.2026
+
+**EZB-Fixings im Replay und Valuta beim Swap (C4, C5) – Umsetzungsentscheide**
+
+**Decision:**
+
+- 07.4: the franc-shock replay is «ein hypothetisches Szenario mit täglichen EZB-Referenzkursen» everywhere (caption, title, aha, status, note, quiz). ECB reference rates are published for information and are not tradable prices (source `ecb-reference-rates-method`, its "Belegt" line extended; no new fact because the statement carries no value). A stop-loss is filled at the next tradable price (where depended on minute and liquidity; the replay simplifies to the next fixing); a knock-out is not a trade, the option simply expires; with daily observation against a fixing all four barriers go with the same fixing, with continuous observation the first price beyond the barrier counts under the term sheet. The table columns read «Typ» and «Fixing» (a knock-out is not an order); the chart's aha title is shortened to «Hypothetisches Szenario» because annotation titles do not wrap.
+- 03.1: a spot deal settles T+2, so the firm pays the supplier on the spot value date, not "today"; a shorter near leg (value today or tomorrow) exists at a slightly different rate. 03.3: the roll swap is dealt two business days before the old maturity, so its near leg has the old forward's value date; «Spot beim Abschluss des Rolls» replaces «Spot am Roll-Datum» in text, caption, slider and quiz. T+2 and "two business days" are market conventions written as text.
+- Barrier lab maturity in days: see D-42.
+
+**Reasoning:** Precision on what a reference rate is and when money moves; both points are textbook market practice.
