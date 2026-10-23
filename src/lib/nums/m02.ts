@@ -7,6 +7,7 @@
  * USD 1 Mio. The forward the importer deals is the money-market forward (M02_CONFIG).
  * `M02` holds the raw values for the quiz file and the tests.
  */
+import { dayBasis, yearFraction } from '@/lib/fx/daycount';
 import { forwardContinuous } from '@/lib/fx/forward';
 import { M02_CONFIG, PIP } from '@/lib/m02/config';
 import { carryFor, startMarket } from '@/lib/m02/carry';
@@ -32,6 +33,12 @@ const par = parity({
   basisBase: M.basisBase,
 });
 const fCont = forwardContinuous(M.spot, M.rd, M.rf, M.T);
+/**
+ * "3 months" is stylised: the money market counts 90/360, the option model T = 0.25 years
+ * (= 91.25 days at Act/365). For the exact same 90 days the option model has T = 90/365.
+ */
+const daysT = M.T * dayBasis('ACT/365');
+const fCont90 = forwardContinuous(M.spot, M.rd, M.rf, yearFraction(M.days, 'ACT/365'));
 const scn = scenarioStats(defaultScenarios(F), F, N);
 const curveMarket = {
   spot: M.spot,
@@ -55,6 +62,8 @@ const arbLow = carryFor(F - M02_CONFIG.arbitrage.mispricingPips * PIP);
 export const M02 = {
   F,
   fCont,
+  fCont90,
+  daysT,
   fwdChf: N * F,
   spotChf: N * M.spot,
   upChf: N * H.stUp,
@@ -142,7 +151,25 @@ export const nums: NumTable = {
   'm02.fwdDiffChf': {
     value: N * Math.abs(F - fCont),
     kind: 'money',
-    note: 'Gap money market vs continuous on USD 1 Mio.',
+    note: 'Gap money market vs continuous on USD 1 Mio. (same T = 0.25 in both)',
+  },
+  'm02.daysT': {
+    value: daysT,
+    kind: 'num',
+    digits: 2,
+    note: 'Days behind the option model T = 0.25 at Act/365 (stylised "3 months")',
+  },
+  'm02.fwdCont90': {
+    value: fCont90,
+    kind: 'rate',
+    digits: FD,
+    note: 'Continuous forward for the exact 90 days, T = 90/365',
+  },
+  'm02.fwdCont90DiffPips': {
+    value: (fCont90 - F) / PIP,
+    kind: 'pips',
+    digits: 2,
+    note: 'Continuous forward at T = 90/365 minus money-market forward 90/360 (above it)',
   },
 
   // Section 3: forward points and carry

@@ -443,12 +443,15 @@ export default function PayoffBuilder(props: PayoffBuilderProps): JSX.Element {
   };
 
   /* ---------- texts ---------- */
-  const name = t(`pb.t.${templateNow ?? 'custom'}`);
+  const prem = calc.prem;
+  /** Long call + short put is only a zero-cost collar while the net premium is zero (C3). */
+  const nameId =
+    templateNow === 'risk-reversal' && !prem.zeroCost ? 'collar' : (templateNow ?? 'custom');
+  const name = t(`pb.t.${nameId}`);
   const pipsText = (v: number) => t('pb.pips', { v: fmtPips(v, lang) });
   const chf = (v: number, sign = false) => fmtMoney(v, EXAMPLE.quote, lang, 0, sign);
   const millions = (x: number) =>
     fmtMillions(x, EXAMPLE.base, lang, Number.isInteger(x / 1e6) ? 0 : 1);
-  const prem = calc.prem;
   const premAbsChf = chf(Math.abs(premTween) * N * PIP);
   const premSub = prem.zeroCost
     ? t('pb.zero')
@@ -624,7 +627,7 @@ export default function PayoffBuilder(props: PayoffBuilderProps): JSX.Element {
         </div>
       )}
       <p class="pb-desc" data-desc>
-        {t(`pb.d.${templateNow ?? 'custom'}`)}
+        {t(`pb.d.${nameId}`)}
       </p>
 
       <div class="ff-lab">

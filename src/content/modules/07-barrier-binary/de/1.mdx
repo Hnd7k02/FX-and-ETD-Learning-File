@@ -23,6 +23,8 @@ Liegt die Barriere <Num of="m07.barrierPct" /> über dem Spot, also bei <Num of=
 | Up-and-out Call | <Num of="m07.barrierUp" /> | <Num of="m07.uocPips" /> Pips · <Num of="m07.uocChf" /> | <Num of="m07.touchUp" /> |
 | Down-and-out Call | <Num of="m07.barrierDown" /> | <Num of="m07.docPips" /> Pips · <Num of="m07.docChf" /> | <Num of="m07.touchDown" /> |
 
+Die Spalte «Berührt mit» zeigt, wie wahrscheinlich der Kurs die Barriere bis zum Verfall berührt ([risikoneutral](/glossar/#term-risk-neutral), keine Prognose).
+
 Warum dieser Unterschied? Unten wird die Barriere sogar öfter berührt als oben. Entscheidend ist aber, *welche* Szenarien wegfallen. Der Down-and-out Call verschwindet, wenn der Dollar fällt. Dann wäre er ohnehin wenig wert, und der Importeur kauft seine Dollar billiger am Markt. Der Up-and-out Call verschwindet genau dann, wenn der Dollar stark steigt. Das sind die Szenarien, für die der Importeur den Schutz überhaupt kauft.
 
 <Callout variant="bad" title="Verlustszenario">
@@ -48,7 +50,7 @@ Der Importeur wählt den Up-and-out Call und spart <Num of="m07.uocSavingChf" />
 
 Der erste Term ist P(<i>S</i><sub><i>T</i></sub> ≥ <i>H</i>), der zweite zählt die Pfade, die berühren und unten enden. Ohne Drift sind beide gleich.
 
-**4.** Im Beispiel: <Num of="m07.endAboveUp" /> + <Num of="m07.touchMirrorTerm" /> = <Num of="m07.touchUp1" />. Das Doppelte des ersten Terms wären nur <Num of="m07.endAboveUp2" />. Die negative Drift (der Forward liegt unter dem Spot) zieht die Pfade mit der Zeit nach unten. Wer oben enden will, muss gegen die Drift der ganzen Laufzeit ankommen. Für eine Berührung reicht ein früher Ausschlag, bevor die Drift viel bewirkt hat. Darum ist das Verhältnis hier grösser als 2.
+**4.** Im Beispiel (risikoneutral, keine Prognose): <Num of="m07.endAboveUp" /> + <Num of="m07.touchMirrorTerm" /> = <Num of="m07.touchUp1" />. Das Doppelte des ersten Terms wären nur <Num of="m07.endAboveUp2" />. Die negative Drift (der Forward liegt unter dem Spot) zieht die Pfade mit der Zeit nach unten. Wer oben enden will, muss gegen die Drift der ganzen Laufzeit ankommen. Für eine Berührung reicht ein früher Ausschlag, bevor die Drift viel bewirkt hat. Darum ist das Verhältnis hier grösser als 2.
 
 </Derivation>
 

@@ -1,9 +1,10 @@
 /**
- * GapReplay (module 07, section 4): the franc shock in real ECB reference rates, replayed day
- * by day. The minimum rate (sourced fact) holds the series up; a stop-loss and four knock-out
- * barriers sit below it. On the decision day the fixing jumps over all of them at once: every
- * order is triggered and filled at the same fixing (gap risk). Rows of the order table light up
- * at that moment, the extra loss counts up.
+ * GapReplay (module 07, section 4): the franc shock as a hypothetical scenario with daily ECB
+ * reference rates (information only, not tradable prices), replayed day by day. The minimum rate
+ * (sourced fact) holds the series up; a stop-loss and four knock-out barriers sit below it. On
+ * the decision day the fixing jumps over all of them at once: the stop is filled at that fixing
+ * (simplification), the knock-outs, observed daily against the fixing, are extinguished on it
+ * (gap risk). Rows of the table light up at that moment, the extra loss counts up.
  *
  * The series comes from the figure wrapper (read from data/raw/ecb-eur-reference.csv at build
  * time); the maths is in src/lib/m07/gap.ts. Play/pause plus a day slider; under reduced motion

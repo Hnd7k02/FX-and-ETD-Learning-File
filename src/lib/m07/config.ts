@@ -89,7 +89,7 @@ export const M07_CONFIG = {
       barrier: onGrid(S * WINDOW.barrierFactor),
       rebatePips: 0,
       spot: S,
-      // 3 months as in the running example: T = 0.25 years = 91.25 days (D-43)
+      // 3 months as in the running example: T = 0.25 years = 91.25 days (D-42)
       days: 365 / 4,
       monitoring: 'continuous' as 'continuous' | 'daily',
     },

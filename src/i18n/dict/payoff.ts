@@ -18,7 +18,8 @@ export const payoff = defineDict({
     'pb.t.long-forward': 'Forward',
     'pb.t.call-spread': 'Call-Spread',
     'pb.t.put-spread': 'Put-Spread',
-    'pb.t.risk-reversal': 'Risk Reversal',
+    'pb.t.risk-reversal': 'Zero-Cost-Collar',
+    'pb.t.collar': 'Collar (Risk Reversal)',
     'pb.t.straddle': 'Straddle',
     'pb.t.strangle': 'Strangle',
     'pb.t.butterfly': 'Butterfly',
@@ -42,6 +43,8 @@ export const payoff = defineDict({
       'Long Put, dazu ein Short Put mit tieferem Strike: billiger als der Put allein, der Schutz endet beim tieferen Strike.',
     'pb.d.risk-reversal':
       'Zero-Cost-Collar des Importeurs: Long USD Call als Schutz, finanziert mit einem Short USD Put. Der Put-Strike ist so gelöst, dass die Nettoprämie null ist.',
+    'pb.d.collar':
+      'Long USD Call plus Short USD Put mit verschiedenen Strikes. Die Nettoprämie ist hier nicht null. Mit «Zero Cost halten» löst du einen Strike so, dass sie null wird.',
     'pb.d.straddle':
       'Long Call und Long Put mit gleichem Strike: Du gewinnst bei grossen Bewegungen in jede Richtung. Am Desk liegt der ATM-Strike beim delta-neutralen Straddle.',
     'pb.d.strangle':
@@ -49,7 +52,7 @@ export const payoff = defineDict({
     'pb.d.butterfly':
       'Long Call tief, zwei Short Calls in der Mitte, Long Call hoch: Gewinn, wenn der Kurs bei Verfall nahe der Mitte liegt.',
     'pb.d.seagull':
-      'Call-Spread als Schutz, finanziert mit einem Short Put: Zero Cost, aber über dem oberen Strike endet der Schutz.',
+      'Call-Spread als Schutz, finanziert mit einem Short Put, oft so gewählt, dass er nichts kostet. Über dem oberen Strike endet der Schutz.',
     'pb.d.custom': 'Deine eigene Kombination aus Beinen.',
     'pb.view': 'Ansicht',
     'pb.view.value': 'Wert',
@@ -137,7 +140,8 @@ export const payoff = defineDict({
     'pb.t.long-forward': 'Forward',
     'pb.t.call-spread': 'Call spread',
     'pb.t.put-spread': 'Put spread',
-    'pb.t.risk-reversal': 'Risk reversal',
+    'pb.t.risk-reversal': 'Zero-cost collar',
+    'pb.t.collar': 'Collar (risk reversal)',
     'pb.t.straddle': 'Straddle',
     'pb.t.strangle': 'Strangle',
     'pb.t.butterfly': 'Butterfly',
@@ -161,6 +165,8 @@ export const payoff = defineDict({
       'A long put plus a short put with a lower strike: cheaper than the put alone; the protection stops at the lower strike.',
     'pb.d.risk-reversal':
       "The importer's zero-cost collar: a long USD call as protection, financed by a short USD put. The put strike is solved so that the net premium is zero.",
+    'pb.d.collar':
+      'A long USD call plus a short USD put with different strikes. Here the net premium is not zero. With "Keep zero cost" you solve one strike so that it becomes zero.',
     'pb.d.straddle':
       'A long call and a long put with the same strike: you gain from large moves either way. On the desk the ATM strike is the delta-neutral straddle.',
     'pb.d.strangle':
@@ -168,7 +174,7 @@ export const payoff = defineDict({
     'pb.d.butterfly':
       'Long a low call, short two calls in the middle, long a high call: you gain if the rate ends near the middle.',
     'pb.d.seagull':
-      'A call spread as protection, financed by a short put: zero cost, but above the upper strike the protection ends.',
+      'A call spread as protection, financed by a short put, often chosen so that it costs nothing. Above the upper strike the protection ends.',
     'pb.d.custom': 'Your own combination of legs.',
     'pb.view': 'View',
     'pb.view.value': 'Value',

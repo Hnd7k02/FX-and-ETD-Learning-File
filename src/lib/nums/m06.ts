@@ -95,6 +95,13 @@ const ks = templateStrikes(MARKET);
 const cs = tpl('call-spread');
 const ps = tpl('put-spread');
 const rr = tpl('risk-reversal');
+/**
+ * The 25Δ risk reversal itself: both strikes fixed by the delta convention (call25, put25),
+ * nothing solved. Its net premium is rarely zero; in the example the importer receives a
+ * little. The template 'risk-reversal' (zero-cost collar) keeps the call and solves the put.
+ */
+const rr25Legs: Leg[] = [rr.legs[0]!, { ...rr.legs[1]!, strike: ks.put25 }];
+const rr25 = netPremium(rr25Legs, MARKET);
 const straddle = tpl('straddle');
 const strangle = tpl('strangle');
 const fly = tpl('butterfly');
@@ -134,6 +141,9 @@ export const M06 = {
   rrCallK: rr.legs[0]!.strike,
   rrPutK: rr.legs[1]!.strike,
   rrCallPips: legPips(rr.legs[0]!),
+  rr25PutK: ks.put25,
+  rr25PutPips: legPips(rr25Legs[1]!),
+  rr25NetPips: -rr25.pips,
   rrPutSmile,
   forward: F,
   stUp: SC.stUp,
@@ -229,6 +239,24 @@ export const nums: NumTable = {
   'm06.psMaxGainChf': { value: maxGain(ps.ext.maxGain), kind: 'money' },
   'm06.rrCallK': { value: rr.legs[0]!.strike, kind: 'rate', note: '25Δ USD call' },
   'm06.rrPutK': { value: rr.legs[1]!.strike, kind: 'rate', note: 'Solved for zero cost' },
+  'm06.rr25PutK': { value: ks.put25, kind: 'rate', note: '25Δ USD put, 5-pip grid' },
+  'm06.rr25NetPips': {
+    value: -rr25.pips,
+    kind: 'pips',
+    digits: 2,
+    note: '25Δ risk reversal (call25 long, put25 short): net premium received, positive',
+  },
+  'm06.rr25NetChf': {
+    value: -rr25.quote,
+    kind: 'money',
+    note: '25Δ risk reversal: net premium received on USD 1 Mio.',
+  },
+  'm06.rrPutGapPips': {
+    value: pips(ks.put25 - rr.legs[1]!.strike),
+    kind: 'pips',
+    digits: 1,
+    note: 'Zero-cost put strike below the 25Δ put strike',
+  },
   'm06.rrCallPips': { value: legPips(rr.legs[0]!), kind: 'pips', digits: 1 },
   'm06.rrCallChf': { value: legPips(rr.legs[0]!) * PIP * N, kind: 'money' },
   'm06.rrBandPips': {

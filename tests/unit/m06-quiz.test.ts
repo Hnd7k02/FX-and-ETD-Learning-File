@@ -97,6 +97,31 @@ describe('m06 numbers', () => {
     expect(v('m06.straddleBeHi')).toBeGreaterThan(E.spot);
   });
 
+  it('separates the 25Δ risk reversal from the zero-cost collar (flat vol)', () => {
+    const v = (k: string) => nums[k]!.value;
+    // 25Δ risk reversal: both strikes fixed by the delta convention, net premium not zero
+    expect(M06.rrCallK).toBeCloseTo(0.815, 12);
+    expect(M06.rrCallPips).toBeCloseTo(47.27, 2);
+    expect(v('m06.rr25PutK')).toBeCloseTo(0.773, 12);
+    expect(M06.rr25PutPips).toBeCloseTo(49.5, 2);
+    expect(v('m06.rr25NetPips')).toBeCloseTo(2.24, 2);
+    expect(v('m06.rr25NetPips')).toBeCloseTo(M06.rr25PutPips - M06.rrCallPips, 9);
+    expect(v('m06.rr25NetChf')).toBeCloseTo(223.6, 1);
+    expect(formatNum(nums['m06.rr25NetPips']!, 'de')).toBe('2.24');
+    expect(formatNum(nums['m06.rr25NetChf']!, 'de')).toMatch(/^CHF.224$/);
+    // zero-cost collar: call kept, put solved lower
+    expect(M06.rrPutK).toBeCloseTo(0.77215, 5);
+    expect(formatNum(nums['m06.rrPutK']!, 'de')).toBe('0.7722');
+    expect(v('m06.rrPutGapPips')).toBeCloseTo(8.5, 1);
+    expect(formatNum(nums['m06.rrPutGapPips']!, 'de')).toBe('8.5');
+    // the gap adds up with the strikes as the text shows them (25Δ put 4, solved put 5 digits)
+    const k5 = Number(formatNum({ ...nums['m06.rrPutK']!, digits: 5 }, 'en'));
+    expect((v('m06.rr25PutK') - k5) / 1e-4).toBeCloseTo(
+      Number(formatNum(nums['m06.rrPutGapPips']!, 'en')),
+      6,
+    );
+  });
+
   it('matches the reference structure of the example', () => {
     // zero-cost puts: seagull below collar; smile helps the importer's collar
     expect(M06.shSeagull.putStrike!).toBeLessThan(M06.shCollar.putStrike!);

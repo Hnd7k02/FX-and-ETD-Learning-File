@@ -59,8 +59,8 @@ const check1: QuizQuestion = {
           en: 'The barrier is hardly ever touched, so it costs little',
         },
         explain: {
-          de: `Nein. Die Barriere wird mit einer Wahrscheinlichkeit von rund ${pct(M07.touchUp, 0).de} berührt. Die untere Barriere ${Hd} wird sogar öfter berührt (${pct(M07.touchDown, 0).de}), und doch ist der Down-and-out Call nur ${pct(1 - M07.doc / M07.vanilla, 0).de} billiger. Es zählt, welche Szenarien wegfallen, nicht nur wie viele.`,
-          en: `No. The barrier is touched with a probability of about ${pct(M07.touchUp, 0).en}. The lower barrier ${Hd} is touched even more often (${pct(M07.touchDown, 0).en}), yet the down-and-out call is only ${pct(1 - M07.doc / M07.vanilla, 0).en} cheaper. What matters is which scenarios are lost, not just how many.`,
+          de: `Nein. Die Barriere wird mit einer Wahrscheinlichkeit von rund ${pct(M07.touchUp, 0).de} berührt (risikoneutral, keine Prognose). Die untere Barriere ${Hd} wird sogar öfter berührt (${pct(M07.touchDown, 0).de}), und doch ist der Down-and-out Call nur ${pct(1 - M07.doc / M07.vanilla, 0).de} billiger. Es zählt, welche Szenarien wegfallen, nicht nur wie viele.`,
+          en: `No. The barrier is touched with a probability of about ${pct(M07.touchUp, 0).en} (risk-neutral, not a forecast). The lower barrier ${Hd} is touched even more often (${pct(M07.touchDown, 0).en}), yet the down-and-out call is only ${pct(1 - M07.doc / M07.vanilla, 0).en} cheaper. What matters is which scenarios are lost, not just how many.`,
         },
       },
       {
@@ -176,19 +176,19 @@ const shock = fmtRate(g.shock, 'EUR/CHF');
 const check4: QuizQuestion = {
   id: 'm07-c4',
   prompt: {
-    de: `Ein Stop-Loss soll EUR bei ${stop} verkaufen. Im Replay mit den EZB-Fixings wird er erst zu ${shock} ausgeführt. Warum so tief?`,
-    en: `A stop-loss is meant to sell EUR at ${stop}. In the replay with the ECB fixings it is only filled at ${shock}. Why so low?`,
+    de: `Ein Stop-Loss soll EUR bei ${stop} verkaufen. Im hypothetischen Szenario mit täglichen EZB-Referenzkursen wird er erst zu ${shock} ausgeführt. Warum so tief?`,
+    en: `A stop-loss is meant to sell EUR at ${stop}. In the hypothetical scenario with daily ECB reference rates it is only filled at ${shock}. Why so low?`,
   },
   ...place(
     [
       {
         label: {
-          de: 'Der Kurs sprang über das Niveau, dazwischen gab es keinen handelbaren Kurs',
-          en: 'The rate jumped over the level; there was no tradable price in between',
+          de: 'Der Kurs sprang über das Niveau, am Stop-Niveau gab es keinen handelbaren Kurs',
+          en: 'The rate jumped over the level; there was no tradable price at the stop level',
         },
         explain: {
-          de: 'Richtig. Ein Stop wird zum nächsten verfügbaren Kurs ausgeführt. Bei einem Gap liegt dieser weit hinter dem Stop-Niveau. Barrieren trifft es genauso.',
-          en: 'Correct. A stop is filled at the next available price. In a gap, that price lies far beyond the stop level. Barriers are hit in the same way.',
+          de: 'Richtig. Ein Stop wird zum nächsten handelbaren Kurs ausgeführt. Bei einem Gap liegt dieser weit hinter dem Stop-Niveau. Das Szenario nimmt vereinfacht das nächste Fixing. Auch Barrieren werden übersprungen, aber ein Knock-out ist keine Transaktion: Die Option erlischt.',
+          en: 'Correct. A stop is filled at the next tradable price. In a gap, that price lies far beyond the stop level. As a simplification, the scenario takes the next fixing. Barriers are jumped over too, but a knock-out is not a transaction: the option is extinguished.',
         },
       },
       {
@@ -207,8 +207,8 @@ const check4: QuizQuestion = {
           en: 'The stop was set too close to the minimum rate',
         },
         explain: {
-          de: 'Auch ein tieferer Stop hätte nichts genützt: Alle Niveaus bis hinunter zum Fixing nach dem Schock werden zum selben Kurs ausgelöst.',
-          en: 'A lower stop would not have helped either: every level down to the fixing after the shock is triggered at the same rate.',
+          de: 'Auch ein tieferer Stop hätte nichts genützt: Im Szenario wird jeder Stop bis hinunter zum Fixing nach dem Schock zu diesem Fixing ausgeführt.',
+          en: 'A lower stop would not have helped either: in the scenario every stop down to the fixing after the shock is filled at that fixing.',
         },
       },
     ],

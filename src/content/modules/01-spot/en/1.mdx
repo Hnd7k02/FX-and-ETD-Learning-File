@@ -22,9 +22,9 @@ Three scenarios for payment day:
 
 ### How far can the rate move?
 
-How much a rate swings is measured by its **volatility** (vol for short), stated per year. With a volatility of <Num of="ex.vol" />, the model puts the rate in 3 months between <Num of="m01.rangeLo" /> and <Num of="m01.rangeHi" /> in roughly two cases out of three. That is the grey band in the chart. For the importer it means: his bill can come out <Num of="m01.rangeLoSave" /> lower or <Num of="m01.rangeHiChf" sign={false} /> higher than today. And that is in a perfectly ordinary quarter.
+How much a rate swings is measured by its **volatility** (vol for short), stated per year. With a volatility of <Num of="ex.vol" />, the model puts the rate in 3 months between <Num of="m01.rangeLo" /> and <Num of="m01.rangeHi" /> in roughly two cases out of three ([risk-neutral](/en/glossary/#term-risk-neutral), not a forecast). That is the grey band in the chart. For the importer it means: his bill can come out <Num of="m01.rangeLoSave" /> lower or <Num of="m01.rangeHiChf" sign={false} /> higher than today. And that is in a perfectly ordinary quarter.
 
-And a rise to <Num of="m01.stUp" /> or higher? The model gives it a probability of about <Num of="m01.probUp" />. Unlikely, but no freak event. These are exactly the cases the importer wants protection against. Module 02 shows how, with the forward.
+And a rise to <Num of="m01.stUp" /> or higher? The model gives it a probability of about <Num of="m01.probUp" /> (risk-neutral, not a forecast). Unlikely, but no freak event. These are exactly the cases the importer wants protection against. Module 02 shows how, with the forward.
 
 ### The same rate, the other way round
 
@@ -46,17 +46,20 @@ So one pip (Δ<i>S</i> = 0.0001) costs <Num of="m01.pipChf" />, one big figure (
 
 With <i>x</i> = <Num of="m01.pctUp" /> this gives <Num of="m01.inversePctUp" />. The larger the move, the larger the gap between the two percentages.
 
-**Range.** In the option model (module 04) the log return of the rate over the term <i>T</i> is normally distributed with standard deviation σ√<i>T</i> = <Num of="ex.vol" /> · √<Num of="ex.T" /> = <Num of="m01.sigmaSqrtT" />. Here we work without drift, so the centre is today's spot. The option model puts the expected rate at the forward, <Num of="m01.fwdBelowPips" /> pips below the spot (module 02). For a feel of the range that changes little. Without drift the rate lies in the band below with a probability of about 68%:
+**Range.** In the option model (module 04) the log return of the rate over the term <i>T</i> is normally distributed with standard deviation σ√<i>T</i> = <Num of="ex.vol" /> · √<Num of="ex.T" /> = <Num of="m01.sigmaSqrtT" />. For the band we work without drift, so the centre is today's spot. The option model puts the expected rate at the forward, <Num of="m01.fwdBelowPips" /> pips below the spot (module 02). Without drift the rate would lie in the band below with a probability of about <Num of="m01.bandProbNoDrift" />:
 
 <Formula><i>S</i> · e<sup>−σ√<i>T</i></sup> ≤ <i>S</i><sub>T</sub> ≤ <i>S</i> · e<sup>+σ√<i>T</i></sup></Formula>
 
-That gives <Num of="m01.rangeLo" /> to <Num of="m01.rangeHi" />. The band is symmetric on the log scale, so it reaches a little further above the spot than below.
+That gives <Num of="m01.rangeLo" /> to <Num of="m01.rangeHi" />. The band is symmetric on the log scale, so it reaches a little further above the spot than below. With the drift of the option model the rate ends in the same band in <Num of="m01.bandProb" /> of cases (risk-neutral, not a forecast). So for the band the drift changes little.
 
-**Probability.** In the same model, the chance that the rate rises to at least <i>K</i> by <i>T</i> is
+**Probability.** This tool computes probabilities risk-neutrally, like the option models: the rate drifts at <i>r</i><sub>d</sub> − <i>r</i><sub>f</sub> and ends on average at the forward <i>F</i>. The chance that the rate ends at or above <i>K</i> at <i>T</i> is then
 
-<Formula>P(<i>S</i><sub>T</sub> ≥ <i>K</i>) = N(−ln(<i>K</i> / <i>S</i>) / (σ√<i>T</i>))</Formula>
+<Formula>
+  <span>P(<i>S</i><sub>T</sub> ≥ <i>K</i>) = N(<i>d</i><sub>2</sub>)</span>
+  <span><i>d</i><sub>2</sub> = [ln(<i>F</i>/<i>K</i>) − ½σ²<i>T</i>] / (σ√<i>T</i>)</span>
+</Formula>
 
-N is the cumulative distribution function of the standard normal distribution. For <i>K</i> = <Num of="m01.stUp" /> this gives <Num of="m01.probUp" />; for a fall to <Num of="m01.stDown" /> or lower, <Num of="m01.probDown" />.
+N is the cumulative distribution function of the standard normal distribution. For <i>K</i> = <Num of="m01.stUp" /> this gives <Num of="m01.probUp" />; for a fall to <Num of="m01.stDown" /> or lower, N(−<i>d</i><sub>2</sub>) = <Num of="m01.probDown" /> (risk-neutral, not a forecast). Here the drift matters: the forward lies below spot, so the fall to <Num of="m01.stDown" /> is more likely than the equally large rise to <Num of="m01.stUp" />.
 
 </Derivation>
 

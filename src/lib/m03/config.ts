@@ -115,7 +115,7 @@ export const M03_CONFIG = {
       { id: '3M', days: 90 },
     ] as Tenor[],
     defaultSlip: '1M',
-    /** Spot at the roll date: slider / handle range and step. */
+    /** Spot when the roll is dealt: slider / handle range and step. */
     spotRange: [0.74, 0.86] as [number, number],
     spotStep: 0.0005,
     /**

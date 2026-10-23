@@ -35,7 +35,7 @@ For the hedger this means: near the barrier delta swings wildly, and at the barr
 
 ### Rebate: a consolation prize
 
-Some knock-outs pay a fixed compensation when they are knocked out, the rebate. A rebate of <Num of="m07.rebatePips" /> pips lifts the price of the up-and-out call from <Num of="m07.uocPips2" /> to <Num of="m07.uocRebatePips" /> pips. The rebate is worth only <Num of="m07.rebateValuePips" /> pips because it is paid only if the barrier is actually touched. That happens with a probability of <Num of="m07.touchUp" /> (section 1). For knock-ins the rebate is paid at expiry if the option never came to life.
+Some knock-outs pay a fixed compensation when they are knocked out, the rebate. A rebate of <Num of="m07.rebatePips" /> pips lifts the price of the up-and-out call from <Num of="m07.uocPips2" /> to <Num of="m07.uocRebatePips" /> pips. The rebate is worth only <Num of="m07.rebateValuePips" /> pips because it is paid only if the barrier is actually touched. That happens with a probability of <Num of="m07.touchUp" /> (section 1; [risk-neutral](/en/glossary/#term-risk-neutral), not a forecast). For knock-ins the rebate is paid at expiry if the option never came to life.
 
 <Derivation title="Derivation: the method of images">
 

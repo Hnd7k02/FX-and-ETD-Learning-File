@@ -1,9 +1,11 @@
 /**
  * HedgeRoll (module 03, section 3): the importer's forward matures, but the payment slips. A
  * sell/buy USD swap closes the old forward at today's spot (near leg) and opens a new forward
- * (far leg). Chart: x = spot on the roll date, blue = new far rate, black = all-in rate (old
- * forward + swap points, D-25), grey dashed = old forward. The vertical gap between blue and
- * black is the cash settlement per USD on the roll date (+ receive, − pay). Drag the spot on the
+ * (far leg). The swap is dealt two business days before the old maturity, so the near leg
+ * (spot, T+2) settles on it (the roll date). Chart: x = spot when the roll is dealt, blue = new
+ * far rate, black = all-in rate (old forward + swap points, D-25), grey dashed = old forward.
+ * The vertical gap between blue and black is the cash settlement per USD on the roll date
+ * (+ receive, − pay). Drag the spot on the
  * rail (slider as accessible twin) or play a tour of spot scenarios: the settlement swings, the
  * all-in rate hardly moves. Below: the cash-flow timeline (roll date, new date, bottom line).
  * Maths in src/lib/m03/roll.ts, strings in src/i18n/dict/hedgeroll.ts.

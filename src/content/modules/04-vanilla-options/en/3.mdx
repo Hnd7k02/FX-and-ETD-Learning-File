@@ -2,7 +2,11 @@ import MoneynessExplorerFigure from '@/components/figures/MoneynessExplorerFigur
 
 The importer is free to choose the strike. A higher strike only starts protecting at a higher rate, but it is cheaper. A lower strike protects sooner and costs more. How far a strike is "in the money" is called **moneyness**.
 
-It is measured against the **forward**, not against spot. The option is only exercised in 3 months, and the fair rate for that day is the forward. An example: a USD call with a strike of <Num of="m04.kMid" /> sits <Num of="m04.kMidSpotPips" /> pips below spot and looks in the money. Against the forward of <Num of="ex.forward" />, however, it sits <Num of="m04.kMidOtmPips" /> pips above. It is out of the money.
+There are two conventions. **Spot moneyness** measures the strike against spot. **Forward moneyness** measures it against the forward. This tool uses forward moneyness. A European option is only exercised at expiry, and the fair rate for that day is the forward.
+
+An example: a USD call with a strike of <Num of="m04.kMid" /> sits <Num of="m04.kMidSpotPips" /> pips below spot. In spot moneyness it is in the money (ITM). Against the forward of <Num of="ex.forward" />, however, it sits <Num of="m04.kMidOtmPips" /> pips above. In forward moneyness it is out of the money (OTM). Same strike, two answers. So always say which rate you measure against.
+
+In forward moneyness, as in this tool:
 
 - **ATMF** (at the money forward): strike equal to the forward.
 - **ITM** (in the money): for a call the strike is below the forward, for a put above it.
@@ -12,13 +16,15 @@ It is measured against the **forward**, not against spot. The option is only exe
 
 ### Premium = intrinsic value + time value
 
-The **intrinsic value** is what you can already lock in today: you sell the dollars forward and exercise the call at expiry. That makes at least F − K per USD certain. So for a call the intrinsic value is max(F − K, 0), discounted to today. The **time value** is the rest. It pays for the chance that the rate still moves in your favour before expiry.
+The **intrinsic value against the forward** is what you can already lock in today: you sell the dollars forward and exercise the call at expiry. That makes at least F − K per USD certain. So for a call the intrinsic value is DF · max(F − K, 0). DF is the discount factor that brings it back to today. The classic definition max(S − K, 0) measures the value of immediate exercise, but you cannot exercise a European option immediately. The **time value** is the rest. It pays for the chance that the rate still moves in your favour before expiry.
 
 Three USD calls with 3 months to expiry:
 
 - **ATMF**, strike exactly at the forward (<Num of="ex.forward" />): <Num of="m04.atmfPips" /> pips. That is pure time value.
-- **ITM**, strike <Num of="m04.kItm" />: <Num of="m04.itmPips" /> pips. Of this, <Num of="m04.itmIntrinsicPips" /> pips are intrinsic value and <Num of="m04.itmTimePips" /> pips time value.
+- **ITM**, strike <Num of="m04.kItm" />: <Num of="m04.itmPips" /> pips. Of this, <Num of="m04.itmIntrinsicPips" /> pips are intrinsic value against the forward and <Num of="m04.itmTimePips" /> pips time value.
 - **OTM**, strike <Num of="m04.kOtm" />: <Num of="m04.otmPips" /> pips, or <Num of="m04.otmChf" />. Again pure time value.
+
+Against spot, the ITM call would have <Num of="m04.itmSpotIntrinsicPips" /> pips of intrinsic value and a negative time value of <Num of="m04.itmSpotTimePips" /> pips. That is exactly why the tool measures against the forward: there the time value is never negative.
 
 Our call from section 1 has the rounded strike <Num of="ex.strike" />. That sits <Num of="m04.fwdVsStrikePips" /> pips below the forward, so it costs a touch more: <Num of="ex.callPips" /> pips.
 
@@ -26,7 +32,7 @@ Time value is largest at the forward and shrinks towards both wings. Deep in the
 
 ### Delta instead of a rate: 25Δ and 10Δ
 
-On the desk strikes are often named by their **delta** rather than by a rate. Delta tells you how strongly the option value reacts to spot. Roughly, it is also the chance that the option ends in the money. A 25Δ call therefore has about a one-in-four chance.
+On the desk strikes are often named by their **delta** rather than by a rate. Delta tells you how strongly the option value reacts to spot. Roughly, it is also the chance that the option ends in the money ([risk-neutral](/en/glossary/#term-risk-neutral), not a forecast). A 25Δ call therefore has about a one-in-four chance.
 
 In the example the 25Δ call sits at <Num of="m04.call25" />, the 25Δ put at <Num of="m04.put25" />. Further out are the 10Δ strikes, <Num of="m04.call10" /> and <Num of="m04.put10" />. The advantage: "25Δ" means a comparable moneyness in every pair, at every tenor and every vol.
 
@@ -79,6 +85,6 @@ If the premium is paid in USD, as is usual in USD/CHF, the desk works with a pre
 
 <Takeaway>
 
-Moneyness measures the strike against the forward, not against spot. The premium is intrinsic value plus time value; at the forward it is pure time value.
+Moneyness exists against spot and against the forward. This tool measures against the forward, because a European option is only exercised at expiry. The premium is intrinsic value against the forward plus time value; with the strike at the forward it is pure time value.
 
 </Takeaway>

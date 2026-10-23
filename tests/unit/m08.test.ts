@@ -5,6 +5,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import { M08 as M, nums } from '@/lib/nums/m08';
+import { formatNum } from '@/lib/nums';
 import { quiz } from '@/content/quiz/08-structured-products';
 import { EXAMPLE } from '@/lib/fx/example';
 
@@ -37,6 +38,9 @@ describe('module 08 numbers back the texts', () => {
   it('section 3: good scenarios end early, an early shock runs to maturity', () => {
     expect(M.tarfStrike).toBeLessThan(EXAMPLE.spot - 0.04);
     expect(M.tarfPTarget).toBeGreaterThan(0.9);
+    // risk-neutral share of paths that reach the target (C6), check value 94.4 %
+    expect(formatNum(nums['m08.tarfPTarget']!, 'de')).toBe('94.4 %');
+    expect(M.tarfPTarget + M.tarfPMaturity).toBeCloseTo(1, 12);
     expect(M.tarfUp.reason).toBe('target');
     expect(M.tarfUp.pnl).toBeCloseTo(M.tarfTargetChf, 6);
     expect(M.tarfUp.diff).toBeLessThan(0);

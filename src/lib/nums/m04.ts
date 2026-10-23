@@ -56,6 +56,8 @@ const kOtm = roundStrike(call25);
 const atmf = gkPrice(S, F, T, vol, rd, rf, 'call');
 const itm = gkPrice(S, kItm, T, vol, rd, rf, 'call');
 const itmIntrinsic = dfd * Math.max(F - kItm, 0);
+/** Classic intrinsic value max(S − K, 0): the value of immediate exercise (C8). */
+const itmSpotIntrinsic = Math.max(S - kItm, 0);
 const otm = gkPrice(S, kOtm, T, vol, rd, rf, 'call');
 
 /**
@@ -94,8 +96,10 @@ export const M04 = {
   itmPips: pips(itm),
   itmIntrinsicPips: pips(itmIntrinsic),
   itmTimePips: pips(itm - itmIntrinsic),
-  /** Intrinsic value of the ITM call measured (wrongly) against spot, for the check question. */
-  itmVsSpotPips: pips(Math.max(S - kItm, 0)),
+  /** Classic intrinsic value of the ITM call against spot, max(S − K, 0) (immediate exercise). */
+  itmVsSpotPips: pips(itmSpotIntrinsic),
+  /** Time value if the intrinsic value were measured against spot: negative. */
+  itmSpotTimePips: pips(itm - itmSpotIntrinsic),
   deltaCall: greeks(S, K, T, vol, rd, rf, 'call').delta,
   deltaPut: greeks(S, K, T, vol, rd, rf, 'put').delta,
   dff: Math.exp(-rf * T),
@@ -181,7 +185,7 @@ export const nums: NumTable = {
     value: pips(S - SC.kMid),
     kind: 'pips',
     digits: 0,
-    note: 'How far kMid sits below spot',
+    note: 'How far kMid sits below spot (in the money in spot moneyness)',
   },
   'm04.atmfPips': { value: pips(atmf), kind: 'pips', note: 'Call at K = F: pure time value' },
   'm04.atmfApproxPips': {
@@ -198,6 +202,16 @@ export const nums: NumTable = {
   'm04.itmPips': { value: pips(itm), kind: 'pips' },
   'm04.itmIntrinsicPips': { value: pips(itmIntrinsic), kind: 'pips' },
   'm04.itmTimePips': { value: pips(itm - itmIntrinsic), kind: 'pips' },
+  'm04.itmSpotIntrinsicPips': {
+    value: pips(itmSpotIntrinsic),
+    kind: 'pips',
+    note: 'Classic intrinsic value of the ITM call against spot, max(S − K, 0): immediate exercise',
+  },
+  'm04.itmSpotTimePips': {
+    value: pips(itm - itmSpotIntrinsic),
+    kind: 'pips',
+    note: 'Time value of the ITM call if measured against spot: negative, hence the forward',
+  },
   'm04.kOtm': {
     value: kOtm,
     kind: 'rate',

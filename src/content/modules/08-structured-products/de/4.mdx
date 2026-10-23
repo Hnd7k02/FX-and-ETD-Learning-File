@@ -13,7 +13,7 @@ In Bausteinen: Der TPF ist ein gekaufter Digital-Call, der den Coupon zahlt, bez
 
 <StructureBlocksFigure
   products={['tpf', 'rtpf']}
-  caption="Ein Fixing des TPF und des RTPF: oben ein flacher Coupon, unten gehebelte Verluste ohne Boden."
+  caption="Ein Fixing des TPF und des RTPF: oben ein flacher Coupon, unten gehebelte Verluste ohne eingebauten Stopp."
 />
 
 ### Warum der Coupon so gross aussieht
@@ -39,9 +39,9 @@ Wähle «Trend ab» und zieh das Pfadende auf <Num of="m08.accDownMove" />. Der 
 
 <Callout variant="warn" title="Risiko-Box: TPF und RTPF">
 
-- **Maximalverlust:** nicht begrenzt. Der Gewinn ist auf <Num of="m08.tpfMaxChf" /> (TPF) bzw. <Num of="m08.rtpfMaxChf" /> (RTPF) begrenzt, der Verlust wächst mit jedem Pip doppelt. Monte Carlo: Jeder 20. Pfad endet bei <Num of="m08.tpfQ05" /> (TPF) bzw. <Num of="m08.rtpfQ05" /> (RTPF) oder schlechter, der schlechteste bei <Num of="m08.tpfWorst" /> bzw. <Num of="m08.rtpfWorst" />.
+- **Maximalverlust:** kein eingebauter Verluststopp. Der Gewinn ist auf <Num of="m08.tpfMaxChf" /> (TPF) bzw. <Num of="m08.rtpfMaxChf" /> (RTPF) gedeckelt, der Verlust wächst mit jedem Pip doppelt. Beim TPF ist er sehr hoch, aber endlich: Liegen alle <Num of="m08.tpfFixings" /> Fixings bei null, zahlst du jedes Mal die doppelte Distanz zum Strike, theoretisch <Num of="m08.tpfMaxLoss" />. Der RTPF verliert nach unten höchstens <Num of="m08.rtpfMaxLossDown" />. Über <Num of="m08.rtpfUpper" /> zahlt er die doppelte Distanz: zwei verkaufte Calls ohne Deckel. Nach oben ist sein Verlust darum theoretisch unbegrenzt. Monte Carlo: Jeder 20. Pfad endet bei <Num of="m08.tpfQ05" /> (TPF) bzw. <Num of="m08.rtpfQ05" /> (RTPF) oder schlechter, der schlechteste bei <Num of="m08.tpfWorst" /> bzw. <Num of="m08.rtpfWorst" />.
 - **Hebel:** 2 auf jede Distanz zum Strike oder zur Range.
-- **Pfadabhängigkeit:** Nach <Num of="m08.tpfTargetCoupons" /> Coupons endet das Produkt, beim TPF in <Num of="m08.tpfPTarget" /> der Pfade, beim RTPF in <Num of="m08.rtpfPTarget" />. Alle anderen laufen bis zum Schluss.
+- **Pfadabhängigkeit:** Nach <Num of="m08.tpfTargetCoupons" /> Coupons endet das Produkt, beim TPF in <Num of="m08.tpfPTarget" /> der Pfade, beim RTPF in <Num of="m08.rtpfPTarget" /> ([risikoneutral](/glossar/#term-risk-neutral), keine Prognose). Alle anderen laufen bis zum Schluss.
 
 </Callout>
 
@@ -53,7 +53,7 @@ Bei Verfall entscheidet ein einziges Fixing. Liegt es auf oder über dem Strike,
 
 <DciCalculatorFigure caption="Zieh den Kurs bei Verfall: Unter dem Strike tauschst du, unter dem Break-even fährst du schlechter als mit Festgeld. Verkürz den Abstand zum Spot: mehr Zins, mehr Umtausch." />
 
-Im Beispiel liegt der Break-even bei <Num of="m08.dciBreakEven" />. Bei einem Fixing von <Num of="m08.dciFixing" /> sind die Dollars plus Zins <Num of="m08.dciOutValue" /> wert, <Num of="m08.dciOutDiff" /> gegenüber dem Festgeld. Der Strike liegt nur <Num of="m08.dciStrikeVsFwdAbs" /> Pips unter dem Forward von <Num of="m08.dciForward" />. Im Modell wird in <Num of="m08.dciPConv" /> der Fälle umgetauscht: keine Prognose, sondern der Preis des Risikos.
+Im Beispiel liegt der Break-even bei <Num of="m08.dciBreakEven" />. Bei einem Fixing von <Num of="m08.dciFixing" /> sind die Dollars plus Zins <Num of="m08.dciOutValue" /> wert, <Num of="m08.dciOutDiff" /> gegenüber dem Festgeld. Der Strike liegt nur <Num of="m08.dciStrikeVsFwdAbs" /> Pips unter dem Forward von <Num of="m08.dciForward" />. Im Modell wird in <Num of="m08.dciPConv" /> der Fälle umgetauscht: risikoneutral, keine Prognose, sondern der Preis des Risikos.
 
 <Callout variant="bad" title="Wann geht es schief: Dual Currency">
 
@@ -85,6 +85,6 @@ Drei Zahlen gehören auf jedes Termsheet: der maximale Gewinn (Coupon mal Target
 
 <Takeaway>
 
-Ein Coupon ist die Prämie für verkaufte Optionen: Er ist begrenzt, der Verlust nicht. Bei Dual Currency bezahlst du den Mehrzins mit dem Risiko, in der schwächeren Währung zu landen.
+Ein Coupon ist die Prämie für verkaufte Optionen. Der Gewinn ist gedeckelt, für den Verlust gibt es keinen eingebauten Stopp. Bei Dual Currency bezahlst du den Mehrzins mit dem Risiko, in der schwächeren Währung zu landen.
 
 </Takeaway>

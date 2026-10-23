@@ -292,7 +292,7 @@ Jeder Greek: Definition als Ableitung, Intuition, Formel, Herleitung (aufklappba
 ### 08 · Strukturierte Produkte
 1. **Intuition:** ein besserer Kurs als der Forward, finanziert durch verkaufte Optionen; dazu Hebel und Pfadabhängigkeit.
 2. **Accumulator und Decumulator:** Strike, Knock-out, doppelte Menge im Verlustfall; Pfad-Simulator.
-3. **TARF und Pivot TARF:** Fixings, Target, gehebelte und nicht begrenzte Verluste; Pivot mit zwei Strikes.
+3. **TARF und Pivot TARF:** Fixings, Target, gehebelte Verluste ohne eingebauten Stopp (TARF sehr hoch, aber endlich; Pivot TARF nach oben theoretisch unbegrenzt); Pivot mit zwei Strikes.
 4. **TPF, RTPF und Dual Currency:** Der TPF zahlt einen Coupon, solange das Fixing auf der richtigen Seite des Strikes liegt (direktional), der RTPF, solange es in der Range liegt. Ausserhalb entstehen gehebelte Verluste, potenziell weit über den erhaltenen Coupons. Dual Currency (1 bis 3 Monate): Festgeld plus verkaufte Option, Konversionsrisiko. Definitionen in 8.7.
 
 Jedes Produkt: Bausteine, fairer Strike bzw. Coupon im Vergleich zum Forward (Monte Carlo, mit Standardfehler), "Wann geht es schief" als Szenario, Risiko-Box (Maximalverlust, Hebel, Pfadabhängigkeit).

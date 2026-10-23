@@ -4,22 +4,22 @@ Zurück zu unserem Importeur. In Modul 02 hat er einen Forward abgeschlossen: Er
 
 Der Forward wird aber am alten Datum fällig. Lässt der Importeur ihn laufen, bekommt er die Dollar einen Monat zu früh. Die Lösung ist ein FX Swap, der den Hedge **rollt**, also verlängert:
 
-- **Near Leg:** Am alten Fälligkeitstag verkauft er die USD 1 Mio. zum aktuellen Spot. Das gleicht die Dollar aus dem Forward aus.
-- **Far Leg:** Gleichzeitig kauft er USD 1 Mio. für das neue Datum, zum neuen Forward-Kurs.
+- **Near Leg:** Er verkauft die USD 1 Mio. zum aktuellen Spot. Das gleicht die Dollar aus dem Forward aus.
+- **Far Leg:** Im selben Geschäft kauft er USD 1 Mio. für das neue Datum, zum neuen Forward-Kurs.
 
-Aus seiner Sicht ist das ein Sell/Buy USD. Die Dollar kommen nun genau dann, wenn er zahlen muss.
+Aus seiner Sicht ist das ein Sell/Buy USD. Er schliesst den Swap zwei Bankarbeitstage vor dem alten Fälligkeitstag ab. So hat das Near Leg (Spot, T+2) genau die Valuta des alten Forwards und das Far Leg die neue Valuta. Die Dollar kommen nun genau dann, wenn er zahlen muss.
 
-<HedgeRollFigure caption="Zieh den Spot am Roll-Datum. Blau ist der neue Far-Kurs, schwarz dein All-in-Kurs. Der Abstand dazwischen ist der Ausgleich am Roll-Datum. Mit «Spot-Szenarien abspielen» siehst du, was schwankt und was bleibt." />
+<HedgeRollFigure caption="Zieh den Spot beim Abschluss des Rolls. Blau ist der neue Far-Kurs, schwarz dein All-in-Kurs. Der Abstand dazwischen ist der Ausgleich am Roll-Datum. Mit «Spot-Szenarien abspielen» siehst du, was schwankt und was bleibt." />
 
 ### Der Ausgleich am Roll-Datum
 
-Am alten Fälligkeitstag passiert zweierlei. Der Forward liefert USD 1 Mio. gegen <Num of="m03.oldFwdChf" />. Gleichzeitig verkauft der Importeur die Dollar im Near Leg zum Spot. Die Dollar heben sich auf. Übrig bleibt eine Zahlung in Franken: die Differenz zwischen Spot und altem Forward.
+Roll-Datum heisst hier der alte Fälligkeitstag, also die Valuta des Near Leg. An diesem Tag passiert zweierlei. Der Forward liefert USD 1 Mio. gegen <Num of="m03.oldFwdChf" />. Gleichzeitig wird das Near Leg fällig: Der Importeur liefert die Dollar zum Spot, der beim Abschluss des Rolls galt. Die Dollar heben sich auf. Übrig bleibt eine Zahlung in Franken: die Differenz zwischen Spot und altem Forward.
 
-**Fall 1: Der Dollar ist gestiegen,** der Spot steht bei <Num of="m03.rollUp" />. Im Near Leg erhält der Importeur <Num of="m03.rollNearChfUp" />, für den Forward zahlt er <Num of="m03.oldFwdChf" />. Netto bekommt er <Num of="m03.rollSettleUp" />. Im Far Leg kauft er die Dollar zu <Num of="m03.rollFarUp" /> zurück, also für <Num of="m03.rollFarChfUp" />. Die Swap Points über <Num of="m03.slipDays" /> Tage betragen <Num of="m03.rollPointsUp" /> Pips.
+**Fall 1: Der Dollar ist gestiegen,** der Spot beim Abschluss des Rolls steht bei <Num of="m03.rollUp" />. Im Near Leg erhält der Importeur <Num of="m03.rollNearChfUp" />, für den Forward zahlt er <Num of="m03.oldFwdChf" />. Netto bekommt er <Num of="m03.rollSettleUp" />. Im Far Leg kauft er die Dollar zu <Num of="m03.rollFarUp" /> zurück, also für <Num of="m03.rollFarChfUp" />. Die Swap Points über <Num of="m03.slipDays" /> Tage betragen <Num of="m03.rollPointsUp" /> Pips.
 
 Unter dem Strich zahlt er <Num of="m03.rollFarChfUp" /> − <Num of="m03.rollSettleUp" /> = <Num of="m03.rollTotalUp" />. Das entspricht einem **All-in-Kurs** von <Num of="m03.rollAllInUp" />: alter Forward plus Swap Points.
 
-**Fall 2: Der Dollar ist gefallen,** der Spot steht bei <Num of="m03.rollDown" />. Jetzt muss der Importeur am Roll-Datum <Num of="m03.rollSettleDownAbs" /> **bezahlen**. Dafür kauft er die Dollar im Far Leg günstiger, zu <Num of="m03.rollFarDown" />. Sein All-in-Kurs: <Num of="m03.rollAllInDown" />.
+**Fall 2: Der Dollar ist gefallen,** der Spot beim Abschluss des Rolls steht bei <Num of="m03.rollDown" />. Jetzt muss der Importeur am Roll-Datum <Num of="m03.rollSettleDownAbs" /> **bezahlen**. Dafür kauft er die Dollar im Far Leg günstiger, zu <Num of="m03.rollFarDown" />. Sein All-in-Kurs: <Num of="m03.rollAllInDown" />.
 
 Die beiden All-in-Kurse liegen nur <Num of="m03.rollAllInGap" /> Pips auseinander. Der Hedge hält, egal wo der Spot steht. Was schwankt, ist die Zahlung am Roll-Datum.
 
@@ -33,7 +33,7 @@ Ein Roll kann Geld kosten, bevor die Ware bezahlt ist. Im Fall 2 fliessen am Rol
 
 <Derivation title="Herleitung: All-in-Kurs nach dem Roll">
 
-Sei <i>F</i><sub>alt</sub> der alte Forward, <i>S</i><sub>1</sub> der Spot am Roll-Datum und <i>F</i><sub>2</sub> der neue Far-Kurs. Die Zahlungen in Franken pro USD:
+Sei <i>F</i><sub>alt</sub> der alte Forward, <i>S</i><sub>1</sub> der Spot beim Abschluss des Rolls und <i>F</i><sub>2</sub> der neue Far-Kurs. Die Zahlungen in Franken pro USD:
 
 <Formula>
   <span>Roll-Datum: −<i>F</i><sub>alt</sub> + <i>S</i><sub>1</sub> (Forward und Near Leg)</span>

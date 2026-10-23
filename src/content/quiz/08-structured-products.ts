@@ -258,8 +258,8 @@ const q1: QuizQuestion = {
 const q2: QuizQuestion = {
   id: 'm08-q2',
   prompt: {
-    de: `Der TARF erreicht in ${tarfP.de} der Pfade das Target und bringt dann rund ${tarfTarget.de}. Sein Barwert ist trotzdem null. Was folgt daraus?`,
-    en: `The TARF reaches its target in ${tarfP.en} of the paths and then brings about ${tarfTarget.en}. Yet its present value is zero. What follows?`,
+    de: `Der TARF erreicht in ${tarfP.de} der Pfade (risikoneutral, keine Prognose) das Target und bringt dann rund ${tarfTarget.de}. Sein Barwert ist trotzdem null. Was folgt daraus?`,
+    en: `The TARF reaches its target in ${tarfP.en} of the paths (risk-neutral, not a forecast) and then brings about ${tarfTarget.en}. Yet its present value is zero. What follows?`,
   },
   options: [
     {

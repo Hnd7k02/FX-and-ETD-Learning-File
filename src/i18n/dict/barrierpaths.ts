@@ -31,7 +31,7 @@ export const barrierpaths = defineDict({
     'bp.row.discountSub': 'Preisunterschied in %',
     'bp.row.dearer': 'Teurer als Vanilla',
     'bp.row.prob': 'Berührwahrscheinlichkeit',
-    'bp.row.probSub': 'Modell, stetige Beobachtung',
+    'bp.row.probSub': 'stetige Beobachtung · risikoneutral, keine Prognose',
     'bp.unit.pips': '{v} Pips',
     'bp.axis.today': 'Heute',
     'bp.axis.month': '{n}M',
@@ -52,7 +52,7 @@ export const barrierpaths = defineDict({
     'bp.note':
       'Seed {seed}. Beispielwerte, keine Marktdaten. Preis und Wahrscheinlichkeit gelten für stetige Beobachtung (Garman-Kohlhagen, Reiner-Rubinstein), die Pfade sind täglich beobachtet.',
     'bp.summary':
-      'Tag {d} von {n}: {hits} von {total} Pfaden haben die Barriere {barrier} berührt und sind {state}. Modell: {prob}. {kind} {price} Pips statt {vanilla} Pips für den Vanilla Call.',
+      'Tag {d} von {n}: {hits} von {total} Pfaden haben die Barriere {barrier} berührt und sind {state}. Modell: {prob} (risikoneutral, keine Prognose). {kind} {price} Pips statt {vanilla} Pips für den Vanilla Call.',
     'bp.aria':
       'Zufallspfade USD/CHF über {months} mit Barriere {barrier} und Strike {strike}. {summary}',
   },
@@ -85,7 +85,7 @@ export const barrierpaths = defineDict({
     'bp.row.discountSub': 'price difference in %',
     'bp.row.dearer': 'Dearer than vanilla',
     'bp.row.prob': 'Touch probability',
-    'bp.row.probSub': 'model, continuous monitoring',
+    'bp.row.probSub': 'continuous monitoring · risk-neutral, not a forecast',
     'bp.unit.pips': '{v} pips',
     'bp.axis.today': 'Today',
     'bp.axis.month': '{n}M',
@@ -106,7 +106,7 @@ export const barrierpaths = defineDict({
     'bp.note':
       'Seed {seed}. Example values, not market data. Price and probability assume continuous monitoring (Garman-Kohlhagen, Reiner-Rubinstein); the paths are observed daily.',
     'bp.summary':
-      'Day {d} of {n}: {hits} of {total} paths have touched the barrier {barrier} and are {state}. Model: {prob}. {kind} {price} pips instead of {vanilla} pips for the vanilla call.',
+      'Day {d} of {n}: {hits} of {total} paths have touched the barrier {barrier} and are {state}. Model: {prob} (risk-neutral, not a forecast). {kind} {price} pips instead of {vanilla} pips for the vanilla call.',
     'bp.aria':
       'Random USD/CHF paths over {months} with barrier {barrier} and strike {strike}. {summary}',
   },

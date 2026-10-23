@@ -35,13 +35,13 @@ export const structureblocks = defineDict({
     'sb.text.full.ko':
       'Dazu ein Knock-out bei {b}: Erreicht der Kurs die Barriere, endet alles. Du verzichtest auf die besten Szenarien, der Strike wird nochmals besser: {k} (Monte Carlo, ± {se} Pips).',
     'sb.text.full.target':
-      'Dazu ein Target von {target} Pips: Sind die Gewinne so gross, endet alles. Der Gewinn ist begrenzt, der Verlust nicht. Der Strike wird nochmals besser: {k} (Monte Carlo, ± {se} Pips).',
+      'Dazu ein Target von {target} Pips: Sind die Gewinne so gross, endet alles. Der Gewinn ist gedeckelt, für den Verlust gibt es keinen eingebauten Stopp. Der Strike wird nochmals besser: {k} (Monte Carlo, ± {se} Pips).',
     'sb.text.pivotTarf':
-      'Gekaufter Call {k1}, zwei verkaufte Calls zum Pivot {p}, ein verkaufter Call {k2} und zwei verkaufte Puts {k1}. Zwischen den Strikes ein Zelt aus Gewinnen, oben gekappt beim Target von {target} Pips. Ausserhalb doppelte Verluste.',
+      'Gekaufter Call {k1}, zwei verkaufte Calls zum Pivot {p}, ein verkaufter Call {k2} und zwei verkaufte Puts {k1}. Zwischen den Strikes ein Zelt aus Gewinnen, oben gekappt beim Target von {target} Pips. Ausserhalb doppelte Verluste: unten sehr hoch, aber endlich, über {k2} theoretisch unbegrenzt.',
     'sb.text.tpf':
       'Ein gekaufter Digital-Call zahlt den Coupon von {c} Pips, solange das Fixing auf oder über {k} liegt. Bezahlt wird er mit zwei verkauften Puts zum selben Strike: darunter doppelte Verluste.',
     'sb.text.rtpf':
-      'Ein gekauftes Range-Digital zahlt den Coupon von {c} Pips in der Range {l} bis {u}. Bezahlt wird es mit zwei verkauften Puts zu {l} und zwei verkauften Calls zu {u}: ausserhalb doppelte Verluste.',
+      'Ein gekauftes Range-Digital zahlt den Coupon von {c} Pips in der Range {l} bis {u}. Bezahlt wird es mit zwei verkauften Puts zu {l} und zwei verkauften Calls zu {u}: ausserhalb doppelte Verluste, über {u} theoretisch unbegrenzt.',
     'sb.ladder': 'Strike im Vergleich',
     'sb.ladder.forward': 'Forward',
     'sb.ladder.leveraged': '+ 2. Option',
@@ -102,13 +102,13 @@ export const structureblocks = defineDict({
     'sb.text.full.ko':
       'Add a knock-out at {b}: if the rate reaches the barrier, everything ends. You give up the best scenarios and the strike improves again: {k} (Monte Carlo, ± {se} pips).',
     'sb.text.full.target':
-      'Add a target of {target} pips: once the gains are that large, everything ends. The gain is capped, the loss is not. The strike improves again: {k} (Monte Carlo, ± {se} pips).',
+      'Add a target of {target} pips: once the gains are that large, everything ends. The gain is capped; there is no built-in stop for the loss. The strike improves again: {k} (Monte Carlo, ± {se} pips).',
     'sb.text.pivotTarf':
-      'A bought call at {k1}, two sold calls at the pivot {p}, a sold call at {k2} and two sold puts at {k1}. Between the strikes a tent of gains, capped at the target of {target} pips. Outside, double losses.',
+      'A bought call at {k1}, two sold calls at the pivot {p}, a sold call at {k2} and two sold puts at {k1}. Between the strikes a tent of gains, capped at the target of {target} pips. Outside, double losses: very high but finite below, theoretically unlimited above {k2}.',
     'sb.text.tpf':
       'A bought digital call pays the coupon of {c} pips as long as the fixing is at or above {k}. It is paid for with two sold puts at the same strike: below it, double losses.',
     'sb.text.rtpf':
-      'A bought range digital pays the coupon of {c} pips in the range {l} to {u}. It is paid for with two sold puts at {l} and two sold calls at {u}: outside, double losses.',
+      'A bought range digital pays the coupon of {c} pips in the range {l} to {u}. It is paid for with two sold puts at {l} and two sold calls at {u}: outside, double losses, theoretically unlimited above {u}.',
     'sb.ladder': 'Strike compared',
     'sb.ladder.forward': 'Forward',
     'sb.ladder.leveraged': '+ 2nd option',

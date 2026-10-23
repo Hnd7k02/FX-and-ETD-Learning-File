@@ -110,7 +110,7 @@ export interface RollHedgeInput {
   oldForward: number;
   /** Base notional of the hedge (positive). */
   notionalBase: number;
-  /** Spot at the roll date T1; the near leg of the roll swap is dealt at this rate. */
+  /** Spot when the roll is dealt (two business days before T1); the near leg (value T1) uses it. */
   spotAtRoll: number;
   /** Quote-currency rate, simple p.a. */
   rd: number;
@@ -139,7 +139,7 @@ export interface RollHedgeResult {
   pair: string;
   /** The roll swap itself (sell base near, buy base far). */
   swap: FxSwapResult;
-  /** Near rate = spot at the roll date. */
+  /** Near rate = spot when the roll is dealt (near leg value date = old maturity T1). */
   nearRate: number;
   /** Far rate = new forward for T2. */
   farRate: number;

@@ -10,6 +10,7 @@ import { join, relative } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { NUMS } from '@/lib/nums';
 import { FACTS } from '@/content/facts';
+import { GLOSSARY } from '@/content/glossary';
 
 const ROOT = process.cwd();
 const CONTENT = join(ROOT, 'src/content');
@@ -34,6 +35,71 @@ const textFiles = [
   ...walk(join(ROOT, 'src/data'), ['.ts', '.json']),
   ...(existsSync(join(CONTENT, 'glossary.ts')) ? [join(CONTENT, 'glossary.ts')] : []),
 ];
+
+/**
+ * Maximum-loss wording (C1): the texts and quizzes of modules 08 and 09 and the dictionaries of
+ * the product matrix, the building blocks and the path simulator use three terms: no built-in
+ * stop, very high but finite, theoretically unlimited (src/lib/fx/mc/maxloss.ts).
+ */
+const MAX_LOSS_FILES = [
+  ...mdxFiles.filter((f) => /[\\/]0[89]-[^\\/]+[\\/]/.test(relative(ROOT, f))),
+  ...walk(join(CONTENT, 'quiz'), ['.ts']).filter((f) => /[\\/]0[89]-[^\\/]*\.ts$/.test(f)),
+  ...['productmatrix', 'structureblocks', 'pathsimulator'].map((n) =>
+    join(ROOT, 'src/i18n/dict', `${n}.ts`),
+  ),
+];
+/** «Gewinn begrenzt, Verlust nicht» and its variants, in both languages. */
+const GAIN_CAPPED_LOSS_NOT =
+  /(begrenzt|gedeckelt|gekappt),?\s+(der\s+|dein\s+)?Verlust\s+nicht|Gewinn,\s+nicht\s+den\s+Verlust|(capped|limited),\s+(the\s+|your\s+)?loss\s+(is\s+)?not|gain,\s+not\s+the\s+loss/i;
+/** «Verluste ohne Boden» and its variants: downwards every loss here has a floor (S = 0). */
+const NO_FLOOR = /ohne\s+(Boden|Grenze)|no\s+floor|without\s+a\s+floor/i;
+
+/**
+ * Risk-neutral probabilities (C6): every block (paragraph, list, table) of a section text that
+ * shows one of these numbers says «risikoneutral, keine Prognose» («risk-neutral, not a
+ * forecast»), as the calculators do. A table may say it in the paragraph right after it; formula
+ * blocks only repeat a number from the text around them.
+ */
+const RISK_NEUTRAL_NUMS = [
+  'm01.probUp',
+  'm01.probDown',
+  'm01.bandProb',
+  'm07.touchUp',
+  'm07.touchDown',
+  'm07.touchUp1',
+  'm07.digitalProb',
+  'm07.windowKo',
+  'm08.accPKo',
+  'm08.decPKo',
+  'm08.tarfPTarget',
+  'm08.tarfPMaturity',
+  'm08.pivPTarget',
+  'm08.tpfPTarget',
+  'm08.rtpfPTarget',
+  'm08.dciPConv',
+  'm09.carryPLoss',
+  'm09.yPLoss',
+];
+const RISK_NEUTRAL_NOTE = {
+  de: /risikoneutral(e Wahrscheinlichkeit)?, keine Prognose/,
+  en: /risk-neutral( probability)?, not a forecast/,
+} as const;
+/** Dictionary strings that show a model probability (besides every string with {prob}). */
+const RISK_NEUTRAL_DICT_KEYS: Record<string, string[]> = {
+  spotexposure: ['note.up', 'note.upFar', 'note.down', 'note.downFar'],
+  barrierlab: ['bl.row.probSub', 'bl.summary'],
+  barrierpaths: ['bp.row.probSub', 'bp.summary'],
+  touchlab: ['tl.row.probSub', 'tl.summary'],
+  pathsimulator: ['ps.st.pEndSub', 'ps.st.pEndNote'],
+  dcicalculator: ['dci.pConvSub'],
+  carrycushion: ['cc.row.pSub', 'cc.summary'],
+};
+const dictFiles = import.meta.glob<Record<string, unknown>>('/src/i18n/dict/*.ts', {
+  eager: true,
+});
+const langOf = (f: string): 'de' | 'en' => (/[\\/]en[\\/]/.test(relative(ROOT, f)) ? 'en' : 'de');
+/** Markdown links reduced to their text, so a linked term still reads as the note. */
+const unlink = (src: string) => src.replace(/\[([^\]]+)\]\([^)]*\)/g, '$1');
 
 function sourceIds(): Set<string> {
   const ids = new Set<string>();
@@ -156,6 +222,96 @@ describe('content lint', () => {
         'vol 8 % must come from <Num>',
       ).toBe(false);
       expect(/\b3\.5\s?%/.test(src), 'USD rate 3.5 % must come from <Num>').toBe(false);
+    },
+  );
+
+  it('checks the maximum-loss wording of modules 08 and 09', () => {
+    expect(MAX_LOSS_FILES.filter((f) => f.endsWith('.mdx')).length).toBeGreaterThanOrEqual(16);
+    expect(MAX_LOSS_FILES.filter((f) => f.includes('quiz')).length).toBe(2);
+    for (const f of MAX_LOSS_FILES) expect(existsSync(f), f).toBe(true);
+    expect(NO_FLOOR.test('gehebelte Verluste ohne Boden')).toBe(true);
+    expect(NO_FLOOR.test('with no floor')).toBe(true);
+    expect(NO_FLOOR.test('Nach oben hat der Kurs keine Grenze')).toBe(false);
+  });
+
+  it.each(MAX_LOSS_FILES.map((f) => [relative(ROOT, f), f]))(
+    '%s words the maximum loss precisely (no stop, finite, theoretically unlimited)',
+    (_r, f) => {
+      const src = readFileSync(f, 'utf8');
+      expect(src.match(/nicht\s+begrenzt|not\s+limited/i)?.[0], 'say what the loss is').toBe(
+        undefined,
+      );
+      expect(src.match(GAIN_CAPPED_LOSS_NOT)?.[0], 'use «no built-in stop»').toBe(undefined);
+      expect(src.match(NO_FLOOR)?.[0], 'USD/CHF cannot fall below zero').toBe(undefined);
+      for (const sentence of src.split(/\n|[.!?](?=\s)/)) {
+        if (/unbegrenzt|unlimited/i.test(sentence)) {
+          expect(/theoretisch|theoretically/i.test(sentence), sentence.trim()).toBe(true);
+        }
+      }
+    },
+  );
+
+  it('knows every risk-neutral probability it checks', () => {
+    const all = mdxFiles.map((f) => readFileSync(f, 'utf8')).join('\n');
+    for (const k of RISK_NEUTRAL_NUMS) {
+      expect(NUMS[k], k).toBeDefined();
+      expect(all.includes(`of="${k}"`), `${k} is not used in any section text`).toBe(true);
+    }
+    expect(RISK_NEUTRAL_NOTE.de.test('risikoneutral, keine Prognose')).toBe(true);
+    expect(RISK_NEUTRAL_NOTE.en.test('risk-neutral probability, not a forecast')).toBe(true);
+    expect(unlink('([risikoneutral](/glossar/#term-risk-neutral), keine Prognose)')).toBe(
+      '(risikoneutral, keine Prognose)',
+    );
+  });
+
+  it.each(mdxFiles.map((f) => [relative(ROOT, f), f]))(
+    '%s marks risk-neutral probabilities as such (C6)',
+    (_r, f) => {
+      const note = RISK_NEUTRAL_NOTE[langOf(f)];
+      const blocks = unlink(readFileSync(f, 'utf8')).split(/\n[ \t]*\n/);
+      blocks.forEach((block, i) => {
+        const keys = [...block.matchAll(/<Num\b[^>]*\bof="([^"]+)"/g)]
+          .map((m) => m[1]!)
+          .filter((k) => RISK_NEUTRAL_NUMS.includes(k));
+        const head = block.trimStart();
+        if (keys.length === 0 || head.startsWith('<Formula')) return;
+        const ok = note.test(block) || (head.startsWith('|') && note.test(blocks[i + 1] ?? ''));
+        expect(ok, `${keys.join(', ')} without the note: ${head.slice(0, 100)}`).toBe(true);
+      });
+    },
+  );
+
+  it('marks risk-neutral probabilities in the dictionaries (C6)', () => {
+    const seen = new Set<string>();
+    for (const [path, mod] of Object.entries(dictFiles)) {
+      const name = path.replace(/^.*\/([^/]+)\.ts$/, '$1');
+      const dict = mod[name] as { de: Record<string, string>; en: Record<string, string> };
+      if (!dict?.de || !dict?.en) continue;
+      const listed = RISK_NEUTRAL_DICT_KEYS[name] ?? [];
+      for (const lang of ['de', 'en'] as const) {
+        for (const [k, v] of Object.entries(dict[lang])) {
+          if (!listed.includes(k) && !v.includes('{prob}')) continue;
+          seen.add(`${name}:${k}`);
+          expect(RISK_NEUTRAL_NOTE[lang].test(v), `${name} ${lang}:${k} «${v}»`).toBe(true);
+        }
+      }
+    }
+    for (const [name, keys] of Object.entries(RISK_NEUTRAL_DICT_KEYS)) {
+      for (const k of keys) expect(seen.has(`${name}:${k}`), `${name}:${k}`).toBe(true);
+    }
+  });
+
+  it.each(mdxFiles.map((f) => [relative(ROOT, f), f]))(
+    '%s links only existing glossary terms, in its own language',
+    (_r, f) => {
+      const ids = new Set(GLOSSARY.map((e) => e.id));
+      const src = readFileSync(f, 'utf8');
+      for (const m of src.matchAll(/\]\((\/(?:en\/)?glossa(?:r|ry)\/)#term-([a-z0-9-]+)\)/g)) {
+        expect(m[1], `glossary path in ${langOf(f)}`).toBe(
+          langOf(f) === 'en' ? '/en/glossary/' : '/glossar/',
+        );
+        expect(ids.has(m[2]!), `unknown glossary term "${m[2]}"`).toBe(true);
+      }
     },
   );
 

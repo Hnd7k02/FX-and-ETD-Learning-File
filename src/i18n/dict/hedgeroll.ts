@@ -13,13 +13,13 @@ export const hedgeroll = defineDict({
     'hr.legend.allIn': 'All-in-Kurs',
     'hr.legend.old': 'Alter Forward',
     'hr.y': 'Kurs USD/CHF',
-    'hr.x': 'Spot am Roll-Datum',
+    'hr.x': 'Spot beim Abschluss des Rolls',
     'hr.oldLabel': 'alter Forward {rate}',
     'hr.gap.receive': '+{chf} am Roll-Datum',
     'hr.gap.pay': '−{chf} am Roll-Datum',
     'hr.cross': 'Spot = alter Forward: kein Ausgleich',
     'hr.allInLabel': 'All-in {rate}',
-    'hr.slider': 'Spot am Roll-Datum',
+    'hr.slider': 'Spot beim Abschluss des Rolls',
     'hr.seg.slip': 'Zahlung verschiebt sich um',
     'hr.play': 'Spot-Szenarien abspielen',
     'hr.pause': 'Pause',
@@ -53,13 +53,13 @@ export const hedgeroll = defineDict({
     'hr.note.zero':
       'Der Spot steht genau auf dem alten Forward: kein Ausgleich. Der Far-Kurs ist gleich dem All-in-Kurs.',
     'hr.insight.idle':
-      'Zieh den Spot am Roll-Datum oder spiel die Szenarien ab. Achte auf zwei Dinge: den Ausgleich am Roll-Datum und den All-in-Kurs.',
+      'Zieh den Spot beim Abschluss des Rolls oder spiel die Szenarien ab. Achte auf zwei Dinge: den Ausgleich am Roll-Datum und den All-in-Kurs.',
     'hr.insight.running': 'Spot {spot}: Ausgleich {settle}, All-in {allIn}.',
     'hr.aha.title': 'Der Ausgleich schwankt, der Hedge bleibt.',
     'hr.aha.text':
       'Der Spot lief zwischen {lo} und {hi}. Der Ausgleich reichte von {payMax} bis {getMax}. Dein All-in-Kurs blieb zwischen {aLo} und {aHi}: nur {spread} Pips Unterschied.',
     'hr.aria':
-      'Roll-Chart: Spot am Roll-Datum {spot}. Far-Kurs {far}, All-in-Kurs {allIn}, alter Forward {old}. Ausgleich am Roll-Datum {settle}.',
+      'Roll-Chart: Spot beim Abschluss des Rolls {spot}. Far-Kurs {far}, All-in-Kurs {allIn}, alter Forward {old}. Ausgleich am Roll-Datum {settle}.',
     'hr.live': 'Spot {spot}: Ausgleich {settle}, All-in {allIn}.',
     'hr.hint':
       'Der Abstand zwischen blauer und schwarzer Linie ist der Ausgleich pro USD. Die schwarze Linie ist fast flach: Dein Kurs bleibt gesichert.',
@@ -75,13 +75,13 @@ export const hedgeroll = defineDict({
     'hr.legend.allIn': 'All-in rate',
     'hr.legend.old': 'Old forward',
     'hr.y': 'Rate USD/CHF',
-    'hr.x': 'Spot on the roll date',
+    'hr.x': 'Spot when the roll is dealt',
     'hr.oldLabel': 'old forward {rate}',
     'hr.gap.receive': '+{chf} on the roll date',
     'hr.gap.pay': '−{chf} on the roll date',
     'hr.cross': 'Spot = old forward: no settlement',
     'hr.allInLabel': 'All-in {rate}',
-    'hr.slider': 'Spot on the roll date',
+    'hr.slider': 'Spot when the roll is dealt',
     'hr.seg.slip': 'Payment slips by',
     'hr.play': 'Play spot scenarios',
     'hr.pause': 'Pause',
@@ -115,13 +115,13 @@ export const hedgeroll = defineDict({
     'hr.note.zero':
       'The spot sits exactly on the old forward: no settlement. The far rate equals the all-in rate.',
     'hr.insight.idle':
-      'Drag the spot on the roll date or play the scenarios. Watch two things: the settlement on the roll date and the all-in rate.',
+      'Drag the spot when the roll is dealt or play the scenarios. Watch two things: the settlement on the roll date and the all-in rate.',
     'hr.insight.running': 'Spot {spot}: settlement {settle}, all-in {allIn}.',
     'hr.aha.title': 'The settlement swings, the hedge holds.',
     'hr.aha.text':
       'The spot moved between {lo} and {hi}. The settlement ranged from {payMax} to {getMax}. Your all-in rate stayed between {aLo} and {aHi}: a difference of only {spread} pips.',
     'hr.aria':
-      'Roll chart: spot on the roll date {spot}. Far rate {far}, all-in rate {allIn}, old forward {old}. Settlement on the roll date {settle}.',
+      'Roll chart: spot when the roll is dealt {spot}. Far rate {far}, all-in rate {allIn}, old forward {old}. Settlement on the roll date {settle}.',
     'hr.live': 'Spot {spot}: settlement {settle}, all-in {allIn}.',
     'hr.hint':
       'The gap between the blue and the black line is the settlement per USD. The black line is almost flat: your rate stays hedged.',

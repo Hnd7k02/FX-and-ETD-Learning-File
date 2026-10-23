@@ -10,6 +10,7 @@ import rawCsv from '../../../data/raw/ecb-eur-reference.csv?raw';
 import { parseRawCsv } from '@/lib/data/csv';
 import { pairSeries } from '@/lib/data/series';
 import { EXAMPLE as E, EXAMPLE_FORWARD } from '@/lib/fx/example';
+import { normCdf } from '@/lib/fx/normal';
 import {
   BIG_FIGURE,
   M01_SCENARIOS,
@@ -18,6 +19,7 @@ import {
   exposure,
   inverseRate,
   probBeyond,
+  probBetween,
   sigmaRange,
 } from '@/lib/m01/exposure';
 import { pairConvention } from '@/lib/m01/g10';
@@ -94,6 +96,7 @@ export const M01 = {
   carry: { usdEnd, chfDebt, breakEven, interestUsd: usdEnd - N },
   probUp: probBeyond(SC.stUp),
   probDown: probBeyond(SC.stDown),
+  bandProb: probBetween(lo, hi),
   april2025: { usdchf: aprUsdChf, eurusd: aprEurUsd },
 } as const;
 
@@ -133,8 +136,30 @@ export const nums: NumTable = {
     kind: 'pips',
     note: 'Option-model forward below spot, in pips (positive)',
   },
-  'm01.probUp': { value: probBeyond(SC.stUp), kind: 'pct', digits: 0, note: 'P(S_T ≥ stUp)' },
-  'm01.probDown': { value: probBeyond(SC.stDown), kind: 'pct', digits: 0, note: 'P(S_T ≤ stDown)' },
+  'm01.probUp': {
+    value: probBeyond(SC.stUp),
+    kind: 'pct',
+    digits: 0,
+    note: 'Risk-neutral P(S_T ≥ stUp) = N(d2), not a forecast',
+  },
+  'm01.probDown': {
+    value: probBeyond(SC.stDown),
+    kind: 'pct',
+    digits: 0,
+    note: 'Risk-neutral P(S_T ≤ stDown) = N(−d2), not a forecast',
+  },
+  'm01.bandProb': {
+    value: probBetween(lo, hi),
+    kind: 'pct',
+    digits: 0,
+    note: 'Risk-neutral P(rangeLo ≤ S_T ≤ rangeHi), not a forecast',
+  },
+  'm01.bandProbNoDrift': {
+    value: normCdf(1) - normCdf(-1),
+    kind: 'pct',
+    digits: 0,
+    note: 'Same ±1σ band without drift (log return centred on 0): N(1) − N(−1)',
+  },
 
   // Section 2 (link to section 3): spread at a quiet hour
   'm01.spreadBase': { value: SPREAD_MODEL.basePips, kind: 'pips', digits: 0 },

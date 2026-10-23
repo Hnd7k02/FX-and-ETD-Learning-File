@@ -10,14 +10,14 @@ The importer is short USD: if the dollar rises, his invoice gets more expensive.
 2. **Forward.** He fixes <Num of="ex.forward" digits={4} /> today for the payment in 3 months ([module 02](/en/module/02-forward/1/)). No premium, full certainty. If the dollar falls, he does not benefit.
 3. **Limit and stop-loss.** These are orders on the spot rate ([module 01](/en/module/01-spot/3/)). A limit buys at <Num of="m09.limit" /> if the dollar falls that far. A stop-loss buys at <Num of="m09.stop" /> if it rises that far. Until it is filled he is unhedged. If the rate jumps over the stop, it is filled at a worse rate: the gap risk from [module 07](/en/module/07-barrier-binary/4/).
 4. **USD call / CHF put.** A cap for a premium ([module 04](/en/module/04-vanilla-options/1/)). If the dollar falls, he buys in the market and keeps the upside. The strike <Num of="ex.strike" /> plus the premium of <Num of="m09.callPremiumPips" /> pips gives the worst rate, <Num of="m09.callCap" />. An exporter who has to sell dollars uses the mirror image, a USD put.
-5. **Risk reversal.** The zero-cost collar from [module 06](/en/module/06-combos-smile/2/): a bought call at <Num of="m09.collarCall" />, paid for with a sold put at <Num of="m09.collarPut" />. His rate stays within this band: never above the call strike, never below the put strike.
+5. **Zero-cost collar.** A bought call at <Num of="m09.collarCall" />, paid for with a sold put at <Num of="m09.collarPut" /> ([module 06](/en/module/06-combos-smile/2/)). His rate stays within this band: never above the call strike, never below the put strike.
 6. **Structured hedge.** A better rate than the forward, paid for with additional sold puts ([module 08](/en/module/08-structured-products/2/)). Here as a single fixing without a knock-out: strike <Num of="m09.levStrike" />, so <Num of="m09.levBetter" /> pips better than the forward. Below the strike the importer buys twice the amount.
 
 <HedgeCompareFigure caption="Five strategies on one axis. Drag the rate at expiry or play it: the ranking re-sorts itself, and at every landmark a strategy changes its character." />
 
 ### Worked example: USD 1m at ±<Num of="m09.hMove" />
 
-This is what the importer pays for USD 1m if the dollar stands at <Num of="m09.hUp" /> or at <Num of="m09.hDown" /> at expiry. In brackets, the difference from the forward: plus means dearer, minus cheaper. As in [module 04](/en/module/04-vanilla-options/1/), the comparison uses the continuous forward <Num of="ex.forward" /> so that the forward and the options stand on the same basis. The money-market forward from module 02, <Num of="ex.forwardMM" />, is only <Num of="ex.fwdDiffPips" /> pips higher.
+This is what the importer pays for USD 1m if the dollar stands at <Num of="m09.hUp" /> or at <Num of="m09.hDown" /> at expiry. In brackets, the difference from the forward: plus means dearer, minus cheaper. As in [module 04](/en/module/04-vanilla-options/1/), the comparison uses the continuous forward <Num of="ex.forward" /> so that the forward and the options stand on the same basis. The money-market forward from module 02, <Num of="ex.forwardMM" />, is only <Num of="ex.fwdDiffPips" /> pips higher at the same <i>T</i> = <Num of="ex.T" />.
 
 | Hedge | Dollar stronger, <Num of="m09.hUp" /> | Dollar weaker, <Num of="m09.hDown" /> |
 | --- | --- | --- |

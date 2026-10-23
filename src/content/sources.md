@@ -197,7 +197,7 @@ Format per entry: title, publisher, date, URL, what it supports.
 - Herausgeber: Europäische Zentralbank (EZB) / European Central Bank
 - Datum: laufend / ongoing
 - URL: https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html
-- Belegt: Die Referenzkurse beruhen auf einem täglichen Abstimmungsverfahren zwischen Zentralbanken, das normalerweise um ca. 14:10 MEZ stattfindet; Veröffentlichung um ca. 16:00 MEZ an jedem Arbeitstag; nur zu Informationszwecken. Fakt `m07-ecb-time`. Geprüft per Websuche (22.10.2026, erneut 23.10.2026: «normally takes place around 14:10 CET»), Seite aus der Sandbox nicht erreichbar.
+- Belegt: Die Referenzkurse beruhen auf einem täglichen Abstimmungsverfahren zwischen Zentralbanken, das normalerweise um ca. 14:10 MEZ stattfindet; Veröffentlichung um ca. 16:00 MEZ an jedem Arbeitstag; nur zu Informationszwecken, die Nutzung für Transaktionen wird ausdrücklich nicht empfohlen («published for information purposes only», «using the rates for transaction purposes is strongly discouraged»). Darum nennt das Tool sie keine handelbaren Preise und das Replay in 07.4 ein hypothetisches Szenario mit täglichen EZB-Referenzkursen (Text, Caption, GapReplay). Fakt `m07-ecb-time`. Geprüft per Websuche (22.10.2026, erneut 23.10.2026: «normally takes place around 14:10 CET»; 23.10.2026: Informationszweck und Transaktionshinweis), Seite aus der Sandbox nicht erreichbar.
 
 ---
 

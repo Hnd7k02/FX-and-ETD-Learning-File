@@ -46,7 +46,7 @@ Fällt der Dollar deutlich, liegen alle Fixings auf der falschen Seite. Die Prod
 
 <Callout variant="warn" title="Risiko-Box: Alpha-Produkte">
 
-- **Maximalverlust:** nicht begrenzt. Der Gewinn ist begrenzt, durch Target, Knock-out oder Coupon.
+- **Maximalverlust:** kein eingebauter Verluststopp. Der Gewinn ist gedeckelt, durch Target, Knock-out oder Coupon. Nach unten ist der Verlust sehr hoch, aber endlich, weil USD/CHF nicht unter null fällt: theoretisch höchstens <Num of="m09.tpfMaxLoss" /> beim TPF, <Num of="m09.tarfMaxLoss" /> beim TARF und <Num of="m09.accMaxLoss" /> beim Accumulator. RTPF und Pivot TARF verlieren auch über dem oberen Rand gehebelt. Nach oben ist ihr Verlust theoretisch unbegrenzt.
 - **Hebel:** 2 auf der falschen Seite des Strikes oder der Range.
 - **Pfadabhängigkeit:** Target und Knock-out beenden die guten Szenarien früh. Die schlechten laufen bis zum Schluss.
 - **Generisch:** Vereinfachte Beispiele, Marktvarianten unterscheiden sich. Angebote enthalten zusätzlich eine Marge.
@@ -63,7 +63,7 @@ Alle vier Felder verkaufen Optionen und stecken deren Prämie in etwas anderes. 
 
 Das ist genau der strukturierte Hedge aus [Abschnitt 2](/module/09-hedge-alpha-yield/2/).
 
-**2. Coupon direkt.** Die Prämie bezahlt stattdessen ein Digital ([Modul 07](/module/07-barrier-binary/3/)). <i>D</i>(<i>K</i>) ist der Preis eines Digitals, das 1 CHF zahlt, wenn das Fixing über <i>K</i> liegt. Mit <i>K</i> = <Num of="m09.kCoupon" />:
+**2. Coupon direkt.** Die Prämie bezahlt stattdessen ein Digital ([Modul 07](/module/07-barrier-binary/3/)). <i>D</i>(<i>K</i>) ist der Preis eines Digitals, das 1 CHF zahlt, wenn das Fixing über <i>K</i> liegt. Das ist die abgezinste Wahrscheinlichkeit, dass es zahlt ([risikoneutral](/glossar/#term-risk-neutral), keine Prognose). Mit <i>K</i> = <Num of="m09.kCoupon" />:
 
 <Formula><i>c</i> · <i>D</i>(<i>K</i>) = 2 · <i>P</i>(<i>K</i>) ⇒ <i>c</i> = <Num of="m09.coupon1" /> Pips</Formula>
 
@@ -83,6 +83,6 @@ Ein Strike-Produkt liefert Devisen. Es passt zu jemandem, der die Dollars ohnehi
 
 <Takeaway>
 
-Alpha-Produkte verwandeln eine Sicht in einen Coupon oder einen besseren Strike. Bezahlt wird mit verkauften Optionen: Der Gewinn ist begrenzt, der Verlust nicht.
+Alpha-Produkte verwandeln eine Sicht in einen Coupon oder einen besseren Strike. Bezahlt wird mit verkauften Optionen. Der Gewinn ist gedeckelt, für den Verlust gibt es keinen eingebauten Stopp.
 
 </Takeaway>

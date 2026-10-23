@@ -143,7 +143,7 @@ test('TouchLab: modes, payment toggle and vol', async ({ page }) => {
   await expect(fig.locator('[data-aha="digital"]')).toBeVisible();
 });
 
-test('GapReplay: the shock triggers every order at once and links to the Riskometer', async ({
+test('GapReplay: the shock fills the stop and knocks out every barrier at once', async ({
   page,
 }) => {
   await page.goto(path('de', '4'));

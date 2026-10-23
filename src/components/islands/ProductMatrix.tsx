@@ -69,6 +69,8 @@ export interface ProductMatrixProps {
 const PAIR = EXAMPLE.pair;
 const CLIP = M09_CONFIG.matrix.clipPips;
 const Y_RANGE: [number, number] = [-CLIP, CLIP];
+/** Upper estimate of the average glyph width of the bold clip label, in em (for its anchor). */
+const CLIP_LABEL_EM = 0.62;
 /** Playback tour relative to spot and timing (normal motion / reduced motion stops). */
 const TOUR = { waypoints: [0, 0.1, -0.1, 0] as const, ms: 9000, stepMs: 1100 };
 
@@ -625,9 +627,14 @@ export default function ProductMatrix(props: ProductMatrixProps): JSX.Element {
                 </text>
               )}
 
-              {/* "not limited" where the highlighted curve leaves the chart */}
+              {/* "loss continues" where the highlighted curve leaves the chart */}
               {clipMarks.map((cx, i) => {
                 const px = clamp(sx(cx), L.left + 40, L.width - L.right - 40);
+                /* centred label, unless it would run past the plot: then it ends (or starts) at the arrow */
+                const half = (t('pm.clip').length * L.font * CLIP_LABEL_EM) / 2;
+                const anchor =
+                  px + half > L.width - L.right ? 'end' : px - half < L.left ? 'start' : 'middle';
+                const tx = anchor === 'end' ? px + 4 : anchor === 'start' ? px - 4 : px;
                 return (
                   <g key={`clip-${cellKey}-${i}`} class="pm-clipmark" data-clip>
                     <path
@@ -635,13 +642,13 @@ export default function ProductMatrix(props: ProductMatrixProps): JSX.Element {
                       style={lineStyle('var(--ff-bad-text)', 1.75)}
                     />
                     <text
-                      x={px}
+                      x={tx}
                       y={L.plotBottom - 27}
                       style={{
                         fontSize: fs,
                         fontWeight: 800,
                         fill: 'var(--ff-bad-text)',
-                        textAnchor: 'middle',
+                        textAnchor: anchor,
                         ...halo,
                       }}
                     >

@@ -99,7 +99,7 @@ test.describe('module 09 · hedge, alpha, yield', () => {
     await pm.locator('[data-need-btn="alpha"]').click();
     await expect(pm).toHaveAttribute('data-need', 'alpha');
     await expect(pm).toHaveAttribute('data-view', 'coupon-direct');
-    // the TPF's leveraged loss runs off the chart: marked "not limited"
+    // the TPF's leveraged loss runs off the chart: marked "loss continues"
     await expect(pm.locator('[data-clip]')).not.toHaveCount(0);
     await pm.locator('[data-view-btn="strike-range"]').click();
     await expect(pm).toHaveAttribute('data-view', 'strike-range');

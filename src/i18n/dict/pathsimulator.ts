@@ -110,7 +110,7 @@ export const pathsimulator = defineDict({
     'ps.ev.maturity': 'Laufzeitende: Alle {n} Fixings sind gelaufen.',
     'ps.ens.running': '{ended} von {n} Pfaden sind schon beendet, {open} laufen weiter.',
     'ps.ens.done.target':
-      '{early} von {n} Pfaden enden früh am Target, {maturity} laufen bis zum Ende und tragen die grossen Verluste. Gewinn begrenzt, Verlust nicht.',
+      '{early} von {n} Pfaden enden früh am Target, {maturity} laufen bis zum Ende und tragen die grossen Verluste. Der Gewinn ist gedeckelt, für den Verlust gibt es keinen eingebauten Stopp.',
     'ps.ens.done.ko':
       '{early} von {n} Pfaden enden mit Knock-out, {maturity} laufen bis zum Ende. Die grössten Verluste liegen bei den Pfaden, die nie die Barriere erreichen.',
     'ps.ens.done.none': 'Alle {n} Pfade sind gelaufen.',
@@ -146,7 +146,8 @@ export const pathsimulator = defineDict({
     'ps.st.widthSub': 'K1 {k1} · K2 {k2}',
     'ps.st.pEnd.target': 'Ende am Target',
     'ps.st.pEnd.ko': 'Ende mit Knock-out',
-    'ps.st.pEndSub': 'dann im Schnitt nach {f} Fixings',
+    'ps.st.pEndSub': 'dann im Schnitt nach {f} Fixings · risikoneutral, keine Prognose',
+    'ps.st.pEndNote': 'risikoneutral, keine Prognose',
     'ps.st.q05': '5 %-Quantil',
     'ps.st.q05Sub': 'jeder 20. Pfad ist schlechter',
     'ps.st.worst': 'Schlechtester Pfad',
@@ -316,7 +317,7 @@ export const pathsimulator = defineDict({
     'ps.ev.maturity': 'Maturity: all {n} fixings have run.',
     'ps.ens.running': '{ended} of {n} paths have already ended, {open} are still running.',
     'ps.ens.done.target':
-      '{early} of {n} paths end early at the target, {maturity} run to maturity and carry the big losses. The gain is capped, the loss is not.',
+      '{early} of {n} paths end early at the target, {maturity} run to maturity and carry the big losses. The gain is capped; there is no built-in stop for the loss.',
     'ps.ens.done.ko':
       '{early} of {n} paths end with a knock-out, {maturity} run to maturity. The largest losses come from the paths that never reach the barrier.',
     'ps.ens.done.none': 'All {n} paths have run.',
@@ -352,7 +353,8 @@ export const pathsimulator = defineDict({
     'ps.st.widthSub': 'K1 {k1} · K2 {k2}',
     'ps.st.pEnd.target': 'Ends at the target',
     'ps.st.pEnd.ko': 'Ends with a knock-out',
-    'ps.st.pEndSub': 'then on average after {f} fixings',
+    'ps.st.pEndSub': 'then on average after {f} fixings · risk-neutral, not a forecast',
+    'ps.st.pEndNote': 'risk-neutral, not a forecast',
     'ps.st.q05': '5% quantile',
     'ps.st.q05Sub': 'one path in 20 is worse',
     'ps.st.worst': 'Worst path',

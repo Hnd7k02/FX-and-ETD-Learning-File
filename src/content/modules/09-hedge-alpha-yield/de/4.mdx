@@ -34,13 +34,13 @@ Wegen der Put-Call-Parität ist das je Dollar Engagement dieselbe Kurve wie beim
 | Puffer ab Spot | <Num of="m09.carryPips" /> Pips | <Num of="m09.yCushion" /> Pips |
 | Grösster Mehrertrag | offen | <Num of="m09.yMaxChf" /> |
 | Dollar <Num of="m09.yDownMove" />, <Num of="m09.yDown" /> | <Num of="m09.carryDownChf" /> | <Num of="m09.dciDownChf" /> |
-| Wahrscheinlichkeit eines Verlusts gegenüber Festgeld (Modell) | <Num of="m09.carryPLoss" /> | <Num of="m09.yPLoss" /> |
+| Wahrscheinlichkeit eines Verlusts gegenüber Festgeld ([risikoneutral](/glossar/#term-risk-neutral), keine Prognose) | <Num of="m09.carryPLoss" /> | <Num of="m09.yPLoss" /> |
 
 Die verkaufte Option kauft dir Puffer: <Num of="m09.yCushion" /> statt <Num of="m09.carryPips" /> Pips. Dafür gibst du alles über dem Cap ab. Und selbst der grössere Puffer ist kleiner als eine typische Bewegung über <Num of="m09.yMonths" /> Monate, <Num of="m09.sigmaPips" /> Pips (eine Standardabweichung im Modell).
 
 <Callout variant="bad" title="Wann geht es schief: Der Dollar fällt">
 
-Beim Carry verlierst du ab dem Forward jeden Pip, ohne Grenze nach unten. Bei Dual Currency und Discount-Zertifikat erhältst du unter dem Strike Dollars, die weniger wert sind als dein Einsatz. Der Puffer dämpft den Verlust nur. Wie schnell Carry-Trades kippen können, zeigte der August 2024. Carry-Trades, vor allem in Yen finanziert, wurden aufgelöst. Der Stress erreichte am <Fact id="m09-carry-peak" /> seinen Höhepunkt, und das Auflösen gehebelter Positionen verstärkte die Bewegung. Im [Riskometer](/riskometer/?pair=USDJPY&event=carry-2024) siehst du, wie die Vola dabei sprang.
+Beim Carry verlierst du ab dem Forward jeden Pip, ohne weiteren Puffer und ohne Stopp. Im Extremfall ist dein ganzer Einsatz weg. Bei Dual Currency und Discount-Zertifikat erhältst du unter dem Strike Dollars, die weniger wert sind als dein Einsatz. Der Puffer dämpft den Verlust nur. Wie schnell Carry-Trades kippen können, zeigte der August 2024. Carry-Trades, vor allem in Yen finanziert, wurden aufgelöst. Der Stress erreichte am <Fact id="m09-carry-peak" /> seinen Höhepunkt, und das Auflösen gehebelter Positionen verstärkte die Bewegung. Im [Riskometer](/riskometer/?pair=USDJPY&event=carry-2024) siehst du, wie die Vola dabei sprang.
 
 </Callout>
 

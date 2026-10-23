@@ -16,7 +16,7 @@ Eine geschlossene Formel gibt es dafür im Tool nicht. Der Rechenkern bewertet d
 | Window Barrier, Tage <Num of="m07.windowStart" /> bis <Num of="m07.windowEnd" /> | <Num of="m07.windowPvChf" /> (± <Num of="m07.windowSeChf" />) |
 | Vanilla Call | <Num of="m07.windowVanillaChf" /> |
 
-Das Fenster ist ein Kompromiss. Es kostet <Num of="m07.windowExtraChf" /> mehr als die Barriere über die ganze Laufzeit und spart <Num of="m07.windowSavingChf" /> gegenüber dem Vanilla. In <Num of="m07.windowKo" /> der Pfade wird die Option im ersten Monat ausgeknockt. Übersteht sie das Fenster, ist sie ab dann ein ganz normaler Call. Für den Importeur heisst das: Ein starker Dollar im ersten Monat kostet ihn den Schutz, ein starker Dollar danach nicht.
+Das Fenster ist ein Kompromiss. Es kostet <Num of="m07.windowExtraChf" /> mehr als die Barriere über die ganze Laufzeit und spart <Num of="m07.windowSavingChf" /> gegenüber dem Vanilla. In <Num of="m07.windowKo" /> der Pfade wird die Option im ersten Monat ausgeknockt ([risikoneutral](/glossar/#term-risk-neutral), keine Prognose). Übersteht sie das Fenster, ist sie ab dann ein ganz normaler Call. Für den Importeur heisst das: Ein starker Dollar im ersten Monat kostet ihn den Schutz, ein starker Dollar danach nicht.
 
 <Derivation title="Herleitung: wie der Rechenkern die Window Barrier bewertet">
 
@@ -41,15 +41,15 @@ Das Fenster ist ein Kompromiss. Es kostet <Num of="m07.windowExtraChf" /> mehr a
 
 Alle Formeln dieses Moduls gehen davon aus, dass der Kurs stetig läuft. Um eine Barriere zu durchqueren, muss er jeden Kurs dazwischen einmal erreichen, und dort kann jemand handeln. Am <Fact id="m07-floor-end" /> galt das nicht. Die Schweizerische Nationalbank hatte seit dem <Fact id="m07-floor-start" /> einen Mindestkurs von <Fact id="m07-floor" /> Franken pro Euro durchgesetzt. An diesem Tag hob sie ihn auf und senkte den Zins auf Sichtguthaben auf <Fact id="m05-snb-2015-rate" />.
 
-Das EZB-Fixing für EUR/CHF lag am Vortag bei <Num of="m07.gapBefore" />, an diesem Tag bei <Num of="m07.gapShock" />: <Num of="m07.gapDayMove" /> von einem Fixing zum nächsten. Dazwischen liegt in dieser Reihe kein einziger Kurs. Wo genau ein Auftrag im Handel ausgeführt wurde, hing von Minute und Liquidität ab. Die Tagesreihe zeigt die Grössenordnung.
+Das EZB-Fixing für EUR/CHF lag am Vortag bei <Num of="m07.gapBefore" />, an diesem Tag bei <Num of="m07.gapShock" />: <Num of="m07.gapDayMove" /> von einem Fixing zum nächsten. Dazwischen liegt in dieser Reihe kein einziger Kurs. Die EZB veröffentlicht ihre Referenzkurse nur zu Informationszwecken. Sie sind keine handelbaren Preise. Das Replay unten ist darum ein hypothetisches Szenario mit täglichen EZB-Referenzkursen. Es zeigt die Grössenordnung, nicht die Kurse, zu denen an diesem Tag gehandelt wurde.
 
-<GapReplayFigure caption="EZB-Referenzkurse EUR/CHF, Tag für Tag. Unter dem Mindestkurs liegen ein Stop-Loss und vier Knock-out-Barrieren. Am Tag der Aufhebung werden alle zum selben Kurs ausgelöst." />
+<GapReplayFigure caption="Hypothetisches Szenario mit täglichen EZB-Referenzkursen für EUR/CHF. Unter dem Mindestkurs liegen ein Stop-Loss und Knock-out-Barrieren. Am Tag der Aufhebung springt das Fixing unter alle Niveaus: Der Stop wird vereinfacht zu diesem Fixing ausgeführt, die Knock-outs erlöschen." />
 
-Ein Stop-Loss, der EUR bei <Num of="m07.gapStop" /> verkaufen soll, wird zum nächsten Kurs ausgeführt, den es gibt. Im Replay mit den EZB-Fixings ist das <Num of="m07.gapShock" />, also <Num of="m07.gapStopPips" /> Pips tiefer. Auf <Num of="m07.gapNotionalEur" /> sind das <Num of="m07.gapStopChf" /> weniger als geplant. Ein Stop begrenzt den Verlust nur, wenn es am Stop-Niveau einen Markt gibt.
+Ein Stop-Loss, der EUR bei <Num of="m07.gapStop" /> verkaufen soll, wird zum nächsten handelbaren Kurs ausgeführt. Wo dieser Kurs an diesem Tag lag, hing von Minute und Liquidität ab. Das Replay nimmt vereinfacht das nächste Fixing: <Num of="m07.gapShock" />, also <Num of="m07.gapStopPips" /> Pips tiefer. Auf <Num of="m07.gapNotionalEur" /> sind das <Num of="m07.gapStopChf" /> weniger als geplant. Ein Stop begrenzt den Verlust nur, wenn es am Stop-Niveau einen Markt gibt.
 
 <Callout variant="bad" title="Verlustszenario: der Reverse Knock-out">
 
-Ein Exporteur mit Euro-Einnahmen, das Spiegelbild unseres Importeurs, fürchtet einen starken Franken. Er kauft einen EUR Put mit Strike <Num of="m07.gapPutStrike" />. Um Prämie zu sparen, versieht er ihn mit einem Knock-out unter dem Mindestkurs. Das ist ein Reverse Knock-out (Abschnitt 2): Die Barriere liegt im Geld. Ob sie bei <Num of="m07.gapKoHigh" /> oder bei <Num of="m07.gapKoLow" /> liegt, spielt keine Rolle. Alle <Num of="m07.gapKoCount" /> Varianten werden am selben Tag zum selben Kurs ausgeknockt. Mit dem Knock-out verschwindet ein innerer Wert von <Num of="m07.gapPutLostChf" />, genau in dem Moment, für den der Schutz gedacht war.
+Ein Exporteur mit Euro-Einnahmen, das Spiegelbild unseres Importeurs, fürchtet einen starken Franken. Er kauft einen EUR Put mit Strike <Num of="m07.gapPutStrike" />. Um Prämie zu sparen, versieht er ihn mit einem Knock-out unter dem Mindestkurs. Das ist ein Reverse Knock-out (Abschnitt 2): Die Barriere liegt im Geld. Ob sie bei <Num of="m07.gapKoHigh" /> oder bei <Num of="m07.gapKoLow" /> liegt, spielt keine Rolle. Ein Knock-out ist keine Transaktion zum Barrierenkurs: Die Option erlischt einfach. Im Szenario wird jede Barriere täglich gegen das Fixing beobachtet. Dann knocken alle <Num of="m07.gapKoCount" /> Varianten mit demselben Fixing aus. Bei stetiger Beobachtung zählt der erste Kurs jenseits der Barriere, nach den Regeln im Term Sheet. Gemessen am Fixing verschwindet mit dem Knock-out ein innerer Wert von <Num of="m07.gapPutLostChf" />, genau in dem Moment, für den der Schutz gedacht war.
 
 </Callout>
 
@@ -57,7 +57,7 @@ Ein Exporteur mit Euro-Einnahmen, das Spiegelbild unseres Importeurs, fürchtet 
 
 - Eine Barriere ist eine Bedingung, keine Absicherung. Prüf, welche Szenarien sie wegschneidet.
 - Reverse Knock-outs verschwinden dort, wo die Option am meisten wert wäre.
-- Stops und Barrieren setzen einen handelbaren Markt voraus. Bei einem Gap werden alle Niveaus auf einmal ausgelöst, zum nächsten verfügbaren Kurs.
+- Stops setzen einen handelbaren Markt voraus, Barrieren einen stetigen Kursverlauf. Bei einem Gap springt der Kurs über alle Niveaus auf einmal: Der Stop wird zum nächsten handelbaren Kurs ausgeführt, die Knock-outs erlöschen.
 - Lies im Term Sheet: Beobachtungszeitraum, Beobachtungsart, Referenzkurs und wer das Barrieren-Ereignis feststellt.
 
 </Callout>
@@ -74,6 +74,6 @@ Strukturierte Produkte bauen genau diese Bausteine ein. Im Accumulator aus Modul
 
 <Takeaway>
 
-Barrieren und Stops sind nur so gut wie der Markt, in dem man handeln kann. Springt der Kurs, werden alle Niveaus auf einmal ausgelöst, zum nächsten verfügbaren Kurs.
+Stops und Barrieren setzen voraus, dass der Kurs stetig läuft. Springt er, durchbricht er alle Niveaus auf einmal. Der Stop wird zum nächsten handelbaren Kurs ausgeführt, der Knock-out erlischt einfach.
 
 </Takeaway>

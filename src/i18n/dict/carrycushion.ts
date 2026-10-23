@@ -51,7 +51,7 @@ export const carrycushion = defineDict({
     'cc.row.maxOpenSub': 'steigt mit dem Dollar, ohne Cap',
     'cc.row.maxSub': 'ab {k}, mehr gibt es nicht',
     'cc.row.p': 'Verlustwahrscheinlichkeit',
-    'cc.row.pSub': 'gegenüber Festgeld, im Modell, keine Prognose',
+    'cc.row.pSub': 'gegenüber Festgeld · risikoneutral, keine Prognose',
     'cc.months': 'Laufzeit',
     'cc.monthsVal': '{m} Monate',
     'cc.monthVal': '1 Monat',
@@ -68,7 +68,7 @@ export const carrycushion = defineDict({
     'cc.aria':
       '{name}: Ergebnis gegenüber CHF-Festgeld nach {m} Monaten. Break-even {be}, Puffer {p} Pips, typische Bewegung {s} Pips. Bei {st}: {res}.',
     'cc.summary':
-      '{name}, {m} Monate: Break-even {be}, Puffer {p} Pips ab Spot, grösster Mehrertrag {max}. Bei {st} {res} gegenüber Festgeld. Verlust im Modell in {pl} der Fälle.',
+      '{name}, {m} Monate: Break-even {be}, Puffer {p} Pips ab Spot, grösster Mehrertrag {max}. Bei {st} {res} gegenüber Festgeld. Verlust im Modell in {pl} der Fälle (risikoneutral, keine Prognose).',
   },
   en: {
     'cc.title': 'Carry, cap and cushion',
@@ -114,7 +114,7 @@ export const carrycushion = defineDict({
     'cc.row.maxOpenSub': 'rises with the dollar, no cap',
     'cc.row.maxSub': 'from {k}, there is no more',
     'cc.row.p': 'Probability of a loss',
-    'cc.row.pSub': 'against the deposit, in the model, not a forecast',
+    'cc.row.pSub': 'against the deposit · risk-neutral, not a forecast',
     'cc.months': 'Tenor',
     'cc.monthsVal': '{m} months',
     'cc.monthVal': '1 month',
@@ -131,6 +131,6 @@ export const carrycushion = defineDict({
     'cc.aria':
       '{name}: result against a CHF deposit after {m} months. Break-even {be}, cushion {p} pips, typical move {s} pips. At {st}: {res}.',
     'cc.summary':
-      '{name}, {m} months: break-even {be}, cushion {p} pips from spot, largest extra return {max}. At {st} {res} against the deposit. Loss in the model in {pl} of cases.',
+      '{name}, {m} months: break-even {be}, cushion {p} pips from spot, largest extra return {max}. At {st} {res} against the deposit. Loss in the model in {pl} of cases (risk-neutral, not a forecast).',
   },
 });

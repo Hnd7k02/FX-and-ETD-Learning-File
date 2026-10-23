@@ -119,6 +119,12 @@ export const FAMILY_IDS: readonly Family[] = [
   'deposit',
 ];
 export type PathKind = 'none' | 'trigger' | 'knockout' | 'target';
+/**
+ * Worst case from the holder's point of view. The leveraged structures have no built-in stop
+ * on the loss, in two classes (src/lib/fx/mc/maxloss.ts): 'noStop' = very high, but finite
+ * (they buy dollars or pay below a strike, and USD/CHF cannot fall below zero); 'unbounded' =
+ * theoretically unlimited (they also sell dollars or pay with leverage above a level).
+ */
 export type LossKind =
   | 'none'
   | 'opportunity'
@@ -128,7 +134,8 @@ export type LossKind =
   | 'gap'
   | 'conversion'
   | 'market'
-  | 'unlimited';
+  | 'noStop'
+  | 'unbounded';
 
 export interface ProductDef {
   family: Family;
@@ -196,7 +203,7 @@ export const PRODUCTS: Record<ProductId, ProductDef> = {
     family: 'structured',
     leverage: 2,
     path: 'knockout',
-    loss: 'unlimited',
+    loss: 'noStop',
     complexity: 3,
     link: { slug: '08-structured-products', section: '2' },
   },
@@ -204,7 +211,7 @@ export const PRODUCTS: Record<ProductId, ProductDef> = {
     family: 'structured',
     leverage: 2,
     path: 'knockout',
-    loss: 'unlimited',
+    loss: 'noStop',
     complexity: 3,
     link: { slug: '08-structured-products', section: '2' },
   },
@@ -212,15 +219,16 @@ export const PRODUCTS: Record<ProductId, ProductDef> = {
     family: 'structured',
     leverage: 2,
     path: 'target',
-    loss: 'unlimited',
+    loss: 'noStop',
     complexity: 3,
     link: { slug: '08-structured-products', section: '3' },
   },
+  /** Sells 2N at K2 above K2: upwards theoretically unlimited. */
   pivotTarf: {
     family: 'structured',
     leverage: 2,
     path: 'target',
-    loss: 'unlimited',
+    loss: 'unbounded',
     complexity: 3,
     link: { slug: '08-structured-products', section: '3' },
   },
@@ -228,15 +236,16 @@ export const PRODUCTS: Record<ProductId, ProductDef> = {
     family: 'structured',
     leverage: 2,
     path: 'target',
-    loss: 'unlimited',
+    loss: 'noStop',
     complexity: 3,
     link: { slug: '08-structured-products', section: '4' },
   },
+  /** 2 × short call at the upper edge: upwards theoretically unlimited. */
   rtpf: {
     family: 'structured',
     leverage: 2,
     path: 'target',
-    loss: 'unlimited',
+    loss: 'unbounded',
     complexity: 3,
     link: { slug: '08-structured-products', section: '4' },
   },
@@ -284,7 +293,7 @@ export const CHIP_KINDS: readonly ChipKind[] = ['leverage', 'path', 'loss', 'com
 
 export interface RiskChip {
   kind: ChipKind;
-  /** Dictionary key suffix of the value, e.g. 'loss.unlimited'. */
+  /** Dictionary key suffix of the value, e.g. 'loss.unbounded'. */
   value: string;
   severity: Severity;
 }
@@ -298,7 +307,8 @@ const LOSS_SEVERITY: Record<LossKind, Severity> = {
   gap: 2,
   conversion: 2,
   market: 2,
-  unlimited: 3,
+  noStop: 3,
+  unbounded: 3,
 };
 const PATH_SEVERITY: Record<PathKind, Severity> = {
   none: 1,
@@ -653,7 +663,10 @@ export function productCurve(
   });
 }
 
-/** True if the unclipped profile leaves the chart below −clipPips (loss not limited). */
+/**
+ * True if the unclipped profile leaves the chart below −clipPips. The curve only leaves the
+ * chart, the loss continues ("Verlust geht weiter"); the bound is in src/lib/fx/mc/maxloss.ts.
+ */
 export function clippedBelow(
   id: ProductId,
   xs: readonly number[],

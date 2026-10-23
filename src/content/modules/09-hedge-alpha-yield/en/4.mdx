@@ -34,13 +34,13 @@ Because of put-call parity this is, per dollar of exposure, the same curve as th
 | Cushion from spot | <Num of="m09.carryPips" /> pips | <Num of="m09.yCushion" /> pips |
 | Largest extra return | open | <Num of="m09.yMaxChf" /> |
 | Dollar <Num of="m09.yDownMove" />, <Num of="m09.yDown" /> | <Num of="m09.carryDownChf" /> | <Num of="m09.dciDownChf" /> |
-| Probability of a loss against the deposit (model) | <Num of="m09.carryPLoss" /> | <Num of="m09.yPLoss" /> |
+| Probability of a loss against the deposit ([risk-neutral](/en/glossary/#term-risk-neutral), not a forecast) | <Num of="m09.carryPLoss" /> | <Num of="m09.yPLoss" /> |
 
 The sold option buys you cushion: <Num of="m09.yCushion" /> instead of <Num of="m09.carryPips" /> pips. In return you give up everything above the cap. And even the larger cushion is smaller than a typical move over <Num of="m09.yMonths" /> months, <Num of="m09.sigmaPips" /> pips (one standard deviation in the model).
 
 <Callout variant="bad" title="When it goes wrong: the dollar falls">
 
-With carry you lose every pip below the forward, with no floor. With dual currency and the discount certificate you receive dollars below the strike that are worth less than what you put in. The cushion only softens the loss. August 2024 showed how quickly carry trades can turn. Carry trades, funded mainly in yen, were unwound. Market stress peaked on <Fact id="m09-carry-peak" />, and the unwinding of leveraged positions amplified the move. The [Riskometer](/en/riskometer/?pair=USDJPY&event=carry-2024) shows how volatility jumped.
+With carry you lose every pip below the forward, with no further cushion and no stop. In the extreme case you lose everything you put in. With dual currency and the discount certificate you receive dollars below the strike that are worth less than what you put in. The cushion only softens the loss. August 2024 showed how quickly carry trades can turn. Carry trades, funded mainly in yen, were unwound. Market stress peaked on <Fact id="m09-carry-peak" />, and the unwinding of leveraged positions amplified the move. The [Riskometer](/en/riskometer/?pair=USDJPY&event=carry-2024) shows how volatility jumped.
 
 </Callout>
 

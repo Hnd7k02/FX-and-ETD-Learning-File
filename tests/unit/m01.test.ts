@@ -15,8 +15,10 @@ import {
   moveIn,
   pctChange,
   probBeyond,
+  probBetween,
   sigmaRange,
 } from '@/lib/m01/exposure';
+import { digitalCash } from '@/lib/fx/exotics/digital';
 import {
   SESSION_CONFIG,
   dayTypeOf,
@@ -102,16 +104,41 @@ describe('exposure (section 1)', () => {
     expect(hi).toBeGreaterThan(S0);
   });
 
-  it('gives the model probability of ending beyond a rate', () => {
-    const k = EXAMPLE.vol * Math.sqrt(EXAMPLE.T);
-    expect(probBeyond(S0)).toBeCloseTo(0.5, 12);
-    // one sigma up or down: about 15.9 % each, symmetric in log terms
-    expect(probBeyond(S0 * Math.exp(k))).toBeCloseTo(0.158655, 5);
-    expect(probBeyond(S0 * Math.exp(-k))).toBeCloseTo(0.158655, 5);
+  it('gives the risk-neutral probability of ending beyond a rate (C6)', () => {
+    const { vol, T, rd, rf } = EXAMPLE;
+    const df = Math.exp(-rd * T);
+    // = undiscounted digital: N(d2) above, N(−d2) below (drift rd − rf, mean at the forward)
+    for (const K of [0.76, 0.78, 0.82, 0.84]) {
+      const type = K > S0 ? 'call' : 'put';
+      expect(probBeyond(K)).toBeCloseTo(digitalCash(S0, K, T, vol, rd, rf, type) / df, 12);
+    }
+    // check values (Prüfwerte): 0.84 → 7.235 %, 0.76 → 14.834 %
+    expect(probBeyond(0.84)).toBeCloseTo(0.0723508, 6);
+    expect(probBeyond(0.76)).toBeCloseTo(0.1483393, 6);
+    // the forward is below spot: a fall of four big figures is likelier than a rise of four
+    expect(probBeyond(0.76)).toBeGreaterThan(probBeyond(0.84));
     // monotone: further away is less likely
     expect(probBeyond(0.84)).toBeLessThan(probBeyond(0.82));
-    expect(probBeyond(0.84)).toBeGreaterThan(0.05);
+    expect(probBeyond(0.76)).toBeLessThan(probBeyond(0.78));
+    // with zero drift of ln S (rf = rd − σ²/2) it is the symmetric ±1σ value of the band
+    const k = vol * Math.sqrt(T);
+    const flat = rd - 0.5 * vol * vol;
+    expect(probBeyond(S0 * Math.exp(k), S0, vol, T, rd, flat)).toBeCloseTo(0.158655, 5);
+    expect(probBeyond(S0 * Math.exp(-k), S0, vol, T, rd, flat)).toBeCloseTo(0.158655, 5);
+    expect(probBeyond(S0, S0, vol, T, rd, flat)).toBeCloseTo(0.5, 12);
     expect(() => probBeyond(0)).toThrow(RangeError);
+    expect(() => probBeyond(0.8, S0, 0)).toThrow(RangeError);
+    expect(() => probBeyond(0.8, S0, vol, 0)).toThrow(RangeError);
+  });
+
+  it('gives the risk-neutral probability of ending inside the ±1σ band (C6)', () => {
+    const [lo, hi] = sigmaRange();
+    // check value (Prüfwert): 66.90 %, still about two in three
+    expect(probBetween(lo, hi)).toBeCloseTo(0.669027, 5);
+    expect(probBetween(lo, hi)).toBeCloseTo(1 - probBeyond(hi) - probBeyond(lo), 12);
+    expect(() => probBetween(0.8, 0.8)).toThrow(RangeError);
+    expect(() => probBetween(0, 0.8)).toThrow(RangeError);
+    expect(() => probBetween(0.78, 0.82, S0, -0.1)).toThrow(RangeError);
   });
 
   it('splits a move into whole big-figure blocks and a rest', () => {
@@ -471,6 +498,15 @@ describe('number registry m01', () => {
     expect(nums['m01.probUp']!.value).toBeCloseTo(M01.probUp, 12);
     expect(M01.probUp).toBeGreaterThan(0.05);
     expect(M01.probUp).toBeLessThan(0.2);
+    // risk-neutral probabilities (C6), check values: 7 %, 15 %, 67 %
+    expect(formatNum(nums['m01.probUp']!, 'de')).toBe('7\u00a0%');
+    expect(formatNum(nums['m01.probDown']!, 'de')).toBe('15\u00a0%');
+    expect(nums['m01.bandProb']!.value).toBeCloseTo(M01.bandProb, 12);
+    expect(formatNum(nums['m01.bandProb']!, 'de')).toBe('67\u00a0%');
+    // the same \u00b11\u03c3 band without drift (log return centred on 0), check value 0.682689 (68 %)
+    expect(nums['m01.bandProbNoDrift']!.value).toBeCloseTo(0.682689, 6);
+    expect(formatNum(nums['m01.bandProbNoDrift']!, 'de')).toBe('68\u00a0%');
+    expect(nums['m01.bandProbNoDrift']!.value).toBeGreaterThan(M01.bandProb);
     expect(formatNum(nums['m01.pipJpy']!, 'de')).toMatch(/^JPY\s10’000$/);
     expect(nums['m01.carryPnlDown']!.value).toBeLessThan(0);
     expect(M01.stopGap.slippagePips).toBeGreaterThan(100);

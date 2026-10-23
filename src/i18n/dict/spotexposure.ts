@@ -38,13 +38,13 @@ export const spotexposure = defineDict({
     'note.flat':
       'Heute kosten die Dollars {today}. Zieh am Kurs: Jede Big Figure (0.0100) kostet den Importeur {bf}.',
     'note.up':
-      'Der Dollar ist {pct} teurer geworden. Der Importeur zahlt {diff} mehr für genau dieselbe Lieferung. So hoch oder höher endet der Kurs im Modell in rund {prob} der Fälle.',
+      'Der Dollar ist {pct} teurer geworden. Der Importeur zahlt {diff} mehr für genau dieselbe Lieferung. So hoch oder höher endet der Kurs im Modell in rund {prob} der Fälle (risikoneutral, keine Prognose).',
     'note.upFar':
-      'Das liegt ausserhalb der typischen Bandbreite für {months} Monate. Im Modell endet der Kurs nur in rund {prob} der Fälle so hoch oder höher: unwahrscheinlich, aber kein Ausnahmefall. Der Importeur zahlt {diff} mehr.',
+      'Das liegt ausserhalb der typischen Bandbreite für {months} Monate. Im Modell endet der Kurs nur in rund {prob} der Fälle so hoch oder höher (risikoneutral, keine Prognose): unwahrscheinlich, aber kein Ausnahmefall. Der Importeur zahlt {diff} mehr.',
     'note.down':
-      'Der Dollar ist billiger geworden: Der Importeur spart {diff}. So tief oder tiefer endet der Kurs im Modell in rund {prob} der Fälle. Darauf wetten will er nicht.',
+      'Der Dollar ist billiger geworden: Der Importeur spart {diff}. So tief oder tiefer endet der Kurs im Modell in rund {prob} der Fälle (risikoneutral, keine Prognose). Darauf wetten will er nicht.',
     'note.downFar':
-      'Ein starker Franken: Der Importeur spart {diff}. Im Modell passiert das nur in rund {prob} der Fälle: ein Glücksfall, auf den er sich nicht verlassen kann.',
+      'Ein starker Franken: Der Importeur spart {diff}. Im Modell passiert das nur in rund {prob} der Fälle (risikoneutral, keine Prognose): ein Glücksfall, auf den er sich nicht verlassen kann.',
     'status.flat': 'Kurs wie heute.',
     'status.up': 'Dollar teurer: Mehrkosten.',
     'status.upFar': 'Dollar viel teurer: ausserhalb der typischen Bandbreite.',
@@ -85,13 +85,13 @@ export const spotexposure = defineDict({
     'note.flat':
       'Today the dollars cost {today}. Drag the rate: every big figure (0.0100) costs the importer {bf}.',
     'note.up':
-      'The dollar has become {pct} dearer. The importer pays {diff} more for exactly the same delivery. In the model the rate ends this high or higher in about {prob} of cases.',
+      'The dollar has become {pct} dearer. The importer pays {diff} more for exactly the same delivery. In the model the rate ends this high or higher in about {prob} of cases (risk-neutral, not a forecast).',
     'note.upFar':
-      'That is outside the typical range for {months} months. In the model the rate ends this high or higher in only about {prob} of cases: unlikely, but no freak event. The importer pays {diff} more.',
+      'That is outside the typical range for {months} months. In the model the rate ends this high or higher in only about {prob} of cases (risk-neutral, not a forecast): unlikely, but no freak event. The importer pays {diff} more.',
     'note.down':
-      'The dollar has become cheaper: the importer saves {diff}. In the model the rate ends this low or lower in about {prob} of cases. He does not want to bet on it.',
+      'The dollar has become cheaper: the importer saves {diff}. In the model the rate ends this low or lower in about {prob} of cases (risk-neutral, not a forecast). He does not want to bet on it.',
     'note.downFar':
-      'A strong franc: the importer saves {diff}. In the model this happens in only about {prob} of cases: a windfall he cannot rely on.',
+      'A strong franc: the importer saves {diff}. In the model this happens in only about {prob} of cases (risk-neutral, not a forecast): a windfall he cannot rely on.',
     'status.flat': 'Rate as today.',
     'status.up': 'Dollar dearer: extra cost.',
     'status.upFar': 'Dollar much dearer: outside the typical range.',

@@ -20,7 +20,7 @@ In building blocks: per fixing, a bought call and two sold puts at the strike, p
 
 ### Worked example: the asymmetry
 
-With these example values the first fixing is almost always far above the strike. The target is therefore reached quickly: in <Num of="m08.tarfPTarget" /> of the Monte Carlo paths, on average after only <Num of="m08.tarfTargetFix" /> fixings. Three scenarios in the simulator:
+With these example values the first fixing is almost always far above the strike. The target is therefore reached quickly: in <Num of="m08.tarfPTarget" /> of the Monte Carlo paths ([risk-neutral](/en/glossary/#term-risk-neutral), not a forecast), on average after only <Num of="m08.tarfTargetFix" /> fixings. Three scenarios in the simulator:
 
 - **Trend up.** Target after <Num of="m08.tarfUpEnd" /> fixings. The TARF brings <Num of="m08.tarfUpPnl" />, and that is the maximum. The importer has bought only <Num of="m08.tarfUpUsd" />. He buys the rest in the market, at rising rates. The forward hedge brought <Num of="m08.tarfUpFwd" />; the difference is <Num of="m08.tarfUpDiff" />.
 - **Shock before the target.** The rate falls by <Num of="m08.shockGapAbs" /> on day <Num of="m08.shockDay" />. The very first fixing is below the strike and the target never comes. All <Num of="m08.tarfShockLev" /> fixings buy double, <Num of="m08.tarfShockUsd" /> in total: twice what the importer needs. Against the market: <Num of="m08.tarfShockPnl" />. The forward hedge loses almost as much (<Num of="m08.tarfShockFwd" />), because it also buys above the market rate. The difference is the amount: if the rate keeps falling, the TARF loses twice as fast.
@@ -28,7 +28,7 @@ With these example values the first fixing is almost always far above the strike
 
 <Callout variant="bad" title="When it goes wrong: good scenarios end early">
 
-If things go well, the TARF ends after a few fixings with a capped gain. Precisely when the dollar rises, the importer is then left without a hedge. If things go badly, there is no target to release you: the product runs on to the last fixing, every time with twice the amount. The losses are leveraged and not limited.
+If things go well, the TARF ends after a few fixings with a capped gain. Precisely when the dollar rises, the importer is then left without a hedge. If things go badly, there is no target to release you: the product runs on to the last fixing, every time with twice the amount. The losses are leveraged, and no built-in stop ends them.
 
 </Callout>
 
@@ -41,11 +41,11 @@ The pivot TARF bets that the rate stays within a band. Around the pivot <Num of=
   caption="The building blocks of the pivot TARF: a tent of gains between the strikes, capped by the target at the top, double losses outside them."
 />
 
-The pattern is even more extreme than with the TARF. In <Num of="m08.pivPTarget" /> of the paths the target is reached, on average after <Num of="m08.pivTargetFix" /> fixings. Even the 5% quantile is a gain: <Num of="m08.pivQ05" />. The worst path ends at <Num of="m08.pivWorst" />. Switch the simulator above to the pivot TARF: with the shock it ends at <Num of="m08.pivShockPnl" />.
+The pattern is even more extreme than with the TARF. In <Num of="m08.pivPTarget" /> of the paths the target is reached (risk-neutral, not a forecast), on average after <Num of="m08.pivTargetFix" /> fixings. Even the 5% quantile is a gain: <Num of="m08.pivQ05" />. The worst path ends at <Num of="m08.pivWorst" />. Switch the simulator above to the pivot TARF: with the shock it ends at <Num of="m08.pivShockPnl" />.
 
 <Callout variant="warn" title="Risk box: TARF and pivot TARF">
 
-- **Maximum loss:** not limited. In the extreme case all <Num of="m08.tarfFixings" /> fixings run with twice the amount, at an arbitrarily bad rate. Monte Carlo: worst path TARF <Num of="m08.tarfWorst" />, pivot TARF <Num of="m08.pivWorst" />.
+- **Maximum loss:** no built-in stop on losses. For the TARF the loss is very high, but finite, because USD/CHF cannot fall below zero. In the extreme case all <Num of="m08.tarfFixings" /> fixings are at zero and you buy twice the amount at the strike each time: <Num of="m08.tarfMaxLoss" /> in theory. Downwards the pivot TARF loses at most <Num of="m08.pivMaxLossDown" />. Above <Num of="m08.pivK2" />, however, it sells twice the amount at that strike. The rate has no upper limit, so there its loss is theoretically unlimited. Monte Carlo: worst path TARF <Num of="m08.tarfWorst" />, pivot TARF <Num of="m08.pivWorst" />.
 - **Leverage:** 2 on the loss side. Gains are capped by the target (<Num of="m08.tarfTargetChf" /> and <Num of="m08.pivTargetChf" />).
 - **Path dependence:** the first fixings decide whether the target comes. A shock before it hits in full, a shock after it not at all.
 
@@ -57,7 +57,7 @@ The pattern is even more extreme than with the TARF. In <Num of="m08.pivPTarget"
 
 **2.** The target takes away your best scenarios: you never get gains above <Num of="m08.tarfTargetPips" /> pips. The sold puts end with the target too, but in those scenarios they are worth little, because the rate is high. On balance you lose value. For the present value to stay zero, the strike has to fall: to <Num of="m08.tarfStrike" /> (Monte Carlo).
 
-**3.** A back-of-the-envelope check shows how skewed the distribution is. The present value is zero, and with the CHF rate of <Num of="ex.rd" /> there is no discounting. If <Num of="m08.tarfPTarget" digits={2} /> of the paths bring about <Num of="m08.tarfTargetChf" /> each, the remaining <Num of="m08.tarfPMaturity" digits={2} /> must lose on average:
+**3.** A back-of-the-envelope check shows how skewed the distribution is. The present value is zero, and with the CHF rate of <Num of="ex.rd" /> there is no discounting. The proportions of paths below are model probabilities: risk-neutral, not a forecast. If <Num of="m08.tarfPTarget" digits={2} /> of the paths bring about <Num of="m08.tarfTargetChf" /> each, the remaining <Num of="m08.tarfPMaturity" digits={2} /> must lose on average:
 
 <Formula variant="accent"><Num of="m08.tarfPTarget" digits={2} /> · <Num of="m08.tarfTargetChf" /> + <Num of="m08.tarfPMaturity" digits={2} /> · <i>L</i> = 0 ⇒ <i>L</i> ≈ <b><Num of="m08.tarfImpliedLoss" /></b></Formula>
 
@@ -73,6 +73,6 @@ On <Fact id="m08-floor-end" /> the Swiss National Bank discontinued the minimum 
 
 <Takeaway>
 
-A target caps the gain, not the loss. Good scenarios end early, bad ones run to the end, with twice the amount.
+A target caps the gain; there is no built-in stop for the loss. Good scenarios end early, bad ones run to the end, with twice the amount.
 
 </Takeaway>

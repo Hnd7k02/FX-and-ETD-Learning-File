@@ -17,6 +17,7 @@ import {
 import { M04, nums as m04nums } from '@/lib/nums/m04';
 import { quiz as m04quiz } from '@/content/quiz/04-vanilla-options';
 import { fmtMoney, fmtPips, fmtRate } from '@/lib/format';
+import { formatNum } from '@/lib/nums';
 import {
   ATMF_TOL,
   K_RANGE,
@@ -258,5 +259,80 @@ describe('module 04 numbers on screen add up', () => {
     const c3 = m04quiz.checks['3']!;
     expect(c3.options[c3.correct]!.label.de).toBe(`${fmtPips(M04.itmTimePips, 'de')} Pips`);
     expect(M04.itmVsSpotPips).toBeGreaterThan(M04.itmPips);
+  });
+});
+
+describe('module 04.3: spot vs forward moneyness and intrinsic value (C7, C8)', () => {
+  const v = (k: string) => m04nums[k]!.value;
+  const de = (k: string) => formatNum(m04nums[k]!, 'de');
+
+  it('kMid call: ITM in spot moneyness, OTM in forward moneyness (check values)', () => {
+    expect(de('m04.kMid')).toBe('0.7990');
+    expect(de('m04.kMidSpotPips')).toBe('10');
+    expect(de('m04.kMidOtmPips')).toBe('59.7');
+    expect(v('m04.kMid')).toBeLessThan(E.spot);
+    expect(v('m04.kMid')).toBeGreaterThan(F);
+  });
+
+  it('ITM call K = 0.7730: premium, intrinsic value against the forward, time value', () => {
+    expect(de('m04.kItm')).toBe('0.7730');
+    expect(de('m04.itmPips')).toBe('249.8');
+    expect(de('m04.itmIntrinsicPips')).toBe('200.3');
+    expect(de('m04.itmTimePips')).toBe('49.5');
+    expect(v('m04.itmIntrinsicPips') + v('m04.itmTimePips')).toBeCloseTo(v('m04.itmPips'), 9);
+  });
+
+  it('ITM call against spot: classic intrinsic value and a negative time value', () => {
+    expect(v('m04.itmSpotIntrinsicPips')).toBeCloseTo(270.0, 9);
+    expect(de('m04.itmSpotIntrinsicPips')).toBe('270.0');
+    expect(v('m04.itmSpotTimePips')).toBeCloseTo(-20.19, 2);
+    expect(de('m04.itmSpotTimePips')).toBe('−20.2');
+    expect(v('m04.itmSpotIntrinsicPips') + v('m04.itmSpotTimePips')).toBeCloseTo(
+      v('m04.itmPips'),
+      9,
+    );
+    // as shown: 249.8 − 270.0 = −20.2
+    expect(
+      Number(v('m04.itmPips').toFixed(1)) - Number(v('m04.itmSpotIntrinsicPips').toFixed(1)),
+    ).toBeCloseTo(Number(v('m04.itmSpotTimePips').toFixed(1)), 9);
+    expect(M04.itmSpotTimePips).toBe(v('m04.itmSpotTimePips'));
+    expect(M04.itmVsSpotPips).toBe(v('m04.itmSpotIntrinsicPips'));
+  });
+
+  it('quiz m04-q3 asks in forward moneyness and calls the spot answers spot moneyness', () => {
+    const q3 = m04quiz.quiz.find((q) => q.id === 'm04-q3')!;
+    expect(q3.prompt.de).toContain('In Forward-Moneyness, wie in diesem Tool');
+    expect(q3.prompt.en).toContain('In forward moneyness, as in this tool');
+    const wrong = q3.options.filter((_, i) => i !== q3.correct);
+    const spotAnswers = wrong.filter((o) => o.label.en.startsWith('ITM'));
+    expect(spotAnswers).toHaveLength(2);
+    for (const o of spotAnswers) {
+      expect(o.explain.de).toContain('gilt in Spot-Moneyness');
+      expect(o.explain.de).toMatch(/gefragt war Forward-Moneyness/i);
+      expect(o.explain.en).toContain('holds in spot moneyness');
+    }
+    for (const o of q3.options) {
+      expect(o.explain.de).not.toMatch(/typische Fehler/);
+      expect(o.explain.en).not.toMatch(/classic mistake/);
+    }
+  });
+
+  it('check m04-c3 asks for the time value against the forward and names the spot answer', () => {
+    const c3 = m04quiz.checks['3']!;
+    expect(c3.prompt.de).toContain('gegen den Forward');
+    expect(c3.prompt.en).toContain('against the forward');
+    for (const o of c3.options) {
+      expect(o.explain.de).not.toMatch(/ergibt keinen Sinn/);
+      expect(o.explain.en).not.toMatch(/makes no sense/);
+    }
+    const spot = c3.options.find(
+      (o) => o.label.de === `${fmtPips(M04.itmSpotTimePips, 'de', 1)} Pips`,
+    )!;
+    expect(spot).toBeDefined();
+    expect(c3.options.indexOf(spot)).not.toBe(c3.correct);
+    expect(spot.explain.de).toContain('Zeitwert gegen den Spot');
+    expect(spot.explain.en).toContain('time value against spot');
+    // the label shows the same value as the 04.3 text: −20.2 pips
+    expect(spot.label.de).toBe(`${formatNum(m04nums['m04.itmSpotTimePips']!, 'de')} Pips`);
   });
 });

@@ -35,6 +35,8 @@ import {
   type Cell,
 } from '@/lib/matrix';
 import { M09_CONFIG, PIP } from '@/lib/m09/config';
+import { fairProduct } from '@/lib/fx/mc/fair';
+import { maxLoss } from '@/lib/fx/mc/maxloss';
 import { productmatrix } from '@/i18n/dict/productmatrix';
 
 const p = matrixParams();
@@ -140,6 +142,30 @@ describe('risk chips', () => {
     expect(productSeverity('deposit')).toBe(1);
     expect(riskChips('call').find((c) => c.kind === 'loss')?.value).toBe('loss.premium');
     expect(riskChips('stop').find((c) => c.kind === 'path')?.severity).toBe(2);
+  });
+
+  it('splits the worst case of the leveraged structures in two classes, both high', () => {
+    const loss = (id: (typeof PRODUCT_IDS)[number]) =>
+      riskChips(id).find((c) => c.kind === 'loss')!;
+    for (const id of ['structured', 'accumulator', 'tarf', 'tpf'] as const) {
+      expect(PRODUCTS[id].loss, id).toBe('noStop');
+      expect(loss(id)).toEqual({ kind: 'loss', value: 'loss.noStop', severity: 3 });
+    }
+    for (const id of ['pivotTarf', 'rtpf'] as const) {
+      expect(PRODUCTS[id].loss, id).toBe('unbounded');
+      expect(loss(id)).toEqual({ kind: 'loss', value: 'loss.unbounded', severity: 3 });
+    }
+    // the classes follow the theoretical maximum loss of the products (S cannot fall below 0)
+    for (const id of ['accumulator', 'tarf', 'tpf', 'pivotTarf', 'rtpf'] as const) {
+      const cls = maxLoss(fairProduct(id)).kind;
+      expect(PRODUCTS[id].loss, id).toBe(cls === 'finite' ? 'noStop' : 'unbounded');
+    }
+    expect(productmatrix.de['pm.chip.loss.noStop']).toBe('hoch, ohne Stopp');
+    expect(productmatrix.de['pm.chip.loss.unbounded']).toBe('theoretisch unbegrenzt');
+    expect(productmatrix.en['pm.chip.loss.noStop']).toBe('high, no stop');
+    expect(productmatrix.en['pm.chip.loss.unbounded']).toBe('theoretically unlimited');
+    expect(productmatrix.de['pm.clip']).toBe('Verlust geht weiter');
+    expect(productmatrix.en['pm.clip']).toBe('loss continues');
   });
 });
 

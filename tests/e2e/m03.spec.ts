@@ -131,7 +131,7 @@ test('HedgeRoll: settlement sign follows the spot, the tour plays', async ({ pag
   await page.goto(path('de', '3'));
   const fig = await hydrate(page, FIGURES['3']!);
   await expect(fig).toHaveAttribute('data-side', 'receive');
-  const spot = fig.getByRole('slider', { name: 'Spot am Roll-Datum' });
+  const spot = fig.getByRole('slider', { name: 'Spot beim Abschluss des Rolls' });
   await spot.fill('0.78');
   await expect(fig).toHaveAttribute('data-side', 'pay');
   await expect(fig.locator('[data-chip]')).toContainText('13’061');

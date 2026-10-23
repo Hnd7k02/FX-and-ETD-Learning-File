@@ -2,7 +2,11 @@ import MoneynessExplorerFigure from '@/components/figures/MoneynessExplorerFigur
 
 Der Importeur kann den Strike frei wählen. Ein höherer Strike schützt erst ab einem höheren Kurs, ist dafür billiger. Ein tieferer Strike schützt schon früher und kostet mehr. Wie weit ein Strike «im Geld» liegt, nennt man **Moneyness**.
 
-Gemessen wird gegen den **Forward**, nicht gegen den Spot. Die Option wird erst in 3 Monaten ausgeübt, und der faire Kurs für diesen Tag ist der Forward. Ein Beispiel: Ein USD Call mit Strike <Num of="m04.kMid" /> liegt <Num of="m04.kMidSpotPips" /> Pips unter dem Spot und wirkt im Geld. Gegen den Forward von <Num of="ex.forward" /> liegt er aber <Num of="m04.kMidOtmPips" /> Pips darüber. Er ist aus dem Geld.
+Dafür gibt es zwei Konventionen. Die **Spot-Moneyness** misst den Strike gegen den Spot. Die **Forward-Moneyness** misst ihn gegen den Forward. Dieses Tool nutzt die Forward-Moneyness. Eine europäische Option wird erst bei Verfall ausgeübt, und der faire Kurs für diesen Tag ist der Forward.
+
+Ein Beispiel: Ein USD Call mit Strike <Num of="m04.kMid" /> liegt <Num of="m04.kMidSpotPips" /> Pips unter dem Spot. In Spot-Moneyness ist er im Geld (ITM). Gegen den Forward von <Num of="ex.forward" /> liegt er aber <Num of="m04.kMidOtmPips" /> Pips darüber. In Forward-Moneyness ist er aus dem Geld (OTM). Gleicher Strike, zwei Antworten. Sag darum immer dazu, gegen welchen Kurs du misst.
+
+In Forward-Moneyness, wie in diesem Tool, gilt:
 
 - **ATMF** (at the money forward): Strike gleich Forward.
 - **ITM** (in the money): Beim Call liegt der Strike unter dem Forward, beim Put darüber.
@@ -12,13 +16,15 @@ Gemessen wird gegen den **Forward**, nicht gegen den Spot. Die Option wird erst 
 
 ### Prämie = innerer Wert + Zeitwert
 
-Der **innere Wert** ist, was du dir heute schon sichern kannst: Du verkaufst die Dollars per Forward und übst den Call bei Verfall aus. So sind dir mindestens F − K pro USD sicher. Beim Call ist der innere Wert darum max(F − K, 0), abgezinst auf heute. Der **Zeitwert** ist der Rest. Er bezahlt die Chance, dass sich der Kurs bis zum Verfall noch zu deinen Gunsten bewegt.
+Der **innere Wert gegen den Forward** ist, was du dir heute schon sichern kannst: Du verkaufst die Dollars per Forward und übst den Call bei Verfall aus. So sind dir mindestens F − K pro USD sicher. Beim Call ist der innere Wert darum DF · max(F − K, 0). DF ist der Diskontfaktor, der auf heute abzinst. Die klassische Definition max(S − K, 0) misst den Wert bei sofortiger Ausübung, doch eine europäische Option kannst du nicht sofort ausüben. Der **Zeitwert** ist der Rest. Er bezahlt die Chance, dass sich der Kurs bis zum Verfall noch zu deinen Gunsten bewegt.
 
 Drei USD Calls mit 3 Monaten Laufzeit:
 
 - **ATMF**, Strike genau am Forward (<Num of="ex.forward" />): <Num of="m04.atmfPips" /> Pips. Das ist reiner Zeitwert.
-- **ITM**, Strike <Num of="m04.kItm" />: <Num of="m04.itmPips" /> Pips. Davon sind <Num of="m04.itmIntrinsicPips" /> Pips innerer Wert und <Num of="m04.itmTimePips" /> Pips Zeitwert.
+- **ITM**, Strike <Num of="m04.kItm" />: <Num of="m04.itmPips" /> Pips. Davon sind <Num of="m04.itmIntrinsicPips" /> Pips innerer Wert gegen den Forward und <Num of="m04.itmTimePips" /> Pips Zeitwert.
 - **OTM**, Strike <Num of="m04.kOtm" />: <Num of="m04.otmPips" /> Pips, also <Num of="m04.otmChf" />. Auch das ist reiner Zeitwert.
+
+Gegen den Spot wären es beim ITM Call <Num of="m04.itmSpotIntrinsicPips" /> Pips innerer Wert und ein negativer Zeitwert von <Num of="m04.itmSpotTimePips" /> Pips. Genau darum misst das Tool am Forward: Dort ist der Zeitwert nie negativ.
 
 Unser Call aus Abschnitt 1 hat den gerundeten Strike <Num of="ex.strike" />. Der liegt <Num of="m04.fwdVsStrikePips" /> Pips unter dem Forward, darum kostet er eine Spur mehr: <Num of="ex.callPips" /> Pips.
 
@@ -26,7 +32,7 @@ Der Zeitwert ist am Forward am grössten und wird gegen beide Flügel kleiner. T
 
 ### Delta statt Kurs: 25Δ und 10Δ
 
-Am Desk nennt man Strikes oft nicht als Kurs, sondern über das **Delta**. Delta sagt, wie stark der Optionswert auf den Spot reagiert. Grob ist es auch die Chance, dass die Option im Geld verfällt. Ein 25Δ Call endet also etwa in einem von vier Fällen im Geld.
+Am Desk nennt man Strikes oft nicht als Kurs, sondern über das **Delta**. Delta sagt, wie stark der Optionswert auf den Spot reagiert. Grob ist es auch die Chance, dass die Option im Geld verfällt ([risikoneutral](/glossar/#term-risk-neutral), keine Prognose). Ein 25Δ Call endet also etwa in einem von vier Fällen im Geld.
 
 Im Beispiel liegt der 25Δ Call bei <Num of="m04.call25" />, der 25Δ Put bei <Num of="m04.put25" />. Weiter draussen liegen die 10Δ-Strikes, <Num of="m04.call10" /> und <Num of="m04.put10" />. Der Vorteil: «25Δ» bedeutet in jedem Paar, bei jeder Laufzeit und jeder Vola eine vergleichbare Moneyness.
 
@@ -79,6 +85,6 @@ Wird die Prämie in USD bezahlt, wie in USD/CHF üblich, rechnet der Desk mit ei
 
 <Takeaway>
 
-Moneyness misst den Strike am Forward, nicht am Spot. Die Prämie besteht aus innerem Wert und Zeitwert; am Forward ist sie reiner Zeitwert.
+Moneyness gibt es gegen den Spot und gegen den Forward. Dieses Tool misst am Forward, weil eine europäische Option erst bei Verfall ausgeübt wird. Die Prämie besteht aus innerem Wert gegen den Forward und Zeitwert; mit Strike am Forward ist sie reiner Zeitwert.
 
 </Takeaway>

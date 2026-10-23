@@ -38,9 +38,15 @@ Die Optionsmodelle ab Modul 04 rechnen mit stetigen Zinsen und <i>T</i> = Tage/3
 
 <Formula><i>F</i> = <i>S</i> · e<sup>(<i>r</i><sub>d</sub> − <i>r</i><sub>f</sub>) · <i>T</i></sup></Formula>
 
-Dabei ist <i>r</i><sub>d</sub> der Zins der Quote-Währung (CHF) und <i>r</i><sub>f</sub> der Zins der Base-Währung (USD). Mit den Beispielzahlen ergibt das <Num of="ex.forward" />, also <Num of="ex.fwdDiffPips" /> Pips weniger als im Geldmarkt. Auf USD 1 Mio. sind das <Num of="m02.fwdDiffChf" />.
+Dabei ist <i>r</i><sub>d</sub> der Zins der Quote-Währung (CHF) und <i>r</i><sub>f</sub> der Zins der Base-Währung (USD).
 
-Der Unterschied ist kein Fehler. Derselbe Zinssatz bedeutet einmal einfache Verzinsung und einmal stetige. Stetig verzinst wächst Geld etwas schneller, darum diskontiert die stetige Formel den Dollar etwas stärker. Wichtig ist nur: Bleib innerhalb einer Rechnung bei einer Konvention.
+Für «3 Monate» nimmt das Tool in beiden Welten <i>T</i> = <Num of="ex.T" />. Das ist eine stilisierte Konvention. Im Geldmarkt sind es <Num of="ex.mmDays" />/360. Im Optionsmodell sind es <Num of="ex.T" /> Jahre, also <Num of="m02.daysT" /> Tage. Mit diesem <i>T</i> ergibt die stetige Formel <Num of="ex.forward" />, also <Num of="ex.fwdDiffPips" /> Pips weniger als im Geldmarkt. Auf USD 1 Mio. sind das <Num of="m02.fwdDiffChf" />.
+
+Bei gleichem <i>T</i> ist der Unterschied kein Fehler. Derselbe Zinssatz bedeutet einmal einfache Verzinsung und einmal stetige. Stetig verzinst wächst Geld etwas schneller, darum diskontiert die stetige Formel den Dollar etwas stärker.
+
+Bei exakt demselben Termin, <Num of="ex.mmDays" /> Tagen, ist <i>T</i> = <Num of="ex.mmDays" />/365. Dann ergibt die stetige Formel <Num of="m02.fwdCont90" digits={6} />, also <Num of="m02.fwdCont90DiffPips" /> Pips über dem Geldmarkt-Forward von <Num of="m02.fwd" digits={6} />. Die kürzere Laufzeit, <Num of="ex.mmDays" /> statt <Num of="m02.daysT" /> Tage, wiegt mehr als die stetige Verzinsung.
+
+**Merksatz:** Vergleiche Forwards nur mit gleichem Enddatum und gleicher Konvention.
 
 <Derivation title="Herleitung: zwei Wege, ein Preis">
 
@@ -58,7 +64,7 @@ Sei <i>S</i> der Spot in CHF je USD, <i>N</i> der USD-Betrag bei Fälligkeit, <i
 
 **Stetig.** Mit stetigen Zinsen wird aus dem Zinsfaktor 1 + <i>r</i> · <i>t</i> der Faktor e<sup><i>r</i> · <i>T</i></sup>, und der Quotient zweier Exponentialfunktionen ist e<sup>(<i>r</i><sub>d</sub> − <i>r</i><sub>f</sub>) · <i>T</i></sup>.
 
-**Woher die <Num of="ex.fwdDiffPips" /> Pips kommen.** Im Beispiel ist <i>T</i> = <Num of="ex.T" /> in beiden Welten. Der Geldmarkt diskontiert den Dollar mit 1 / <Num of="m02.growthUsd" /> = <Num of="m02.dfMM" />, die stetige Formel mit e<sup>−<i>r</i><sub>f</sub> · <i>T</i></sup> = <Num of="m02.dfCont" />. Der einfache Zins von <Num of="ex.rf" /> über 90 Tage entspricht stetig nur <Num of="m02.rfCont" />. Setzt du diesen Wert ein, liefern beide Formeln denselben Forward. Den CHF-Zins müsstest du genauso umrechnen; bei <Num of="ex.rd" /> ändert sich nichts.
+**Woher die <Num of="ex.fwdDiffPips" /> Pips kommen.** Diese Rechnung gilt bei gleichem <i>T</i>: Im Beispiel ist <i>T</i> = <Num of="ex.T" /> in beiden Welten. Der Geldmarkt diskontiert den Dollar mit 1 / <Num of="m02.growthUsd" /> = <Num of="m02.dfMM" />, die stetige Formel mit e<sup>−<i>r</i><sub>f</sub> · <i>T</i></sup> = <Num of="m02.dfCont" />. Der einfache Zins von <Num of="ex.rf" /> über 90 Tage entspricht stetig nur <Num of="m02.rfCont" />. Setzt du diesen Wert ein, liefern beide Formeln denselben Forward. Den CHF-Zins müsstest du genauso umrechnen; bei <Num of="ex.rd" /> ändert sich nichts.
 
 </Derivation>
 

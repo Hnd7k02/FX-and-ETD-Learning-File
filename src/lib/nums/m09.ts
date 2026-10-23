@@ -14,8 +14,9 @@
 import { EXAMPLE as E } from '@/lib/fx/example';
 import { gkPrice } from '@/lib/fx/vanilla';
 import { digitalCash } from '@/lib/fx/exotics/digital';
-import { MC_PRODUCTS } from '@/lib/fx/mc/fair';
+import { MC_PRODUCTS, fairProduct } from '@/lib/fx/mc/fair';
 import { MC_CONFIG } from '@/lib/fx/mc/products';
+import { maxLoss } from '@/lib/fx/mc/maxloss';
 import { M09_CONFIG, PIP } from '@/lib/m09/config';
 import { hedgeCosts, hedgeSetup } from '@/lib/m09/hedge';
 import { CARRY_DEFAULTS, carryView, cushionPips, probLoss, yieldPnl } from '@/lib/m09/carry';
@@ -123,6 +124,10 @@ export const M09 = {
   rtpfWorst: P.rtpf.stats.pvMin,
   tarfWorst: P.tarf.stats.pvMin,
   accWorst: P.accumulator.stats.pvMin,
+  /** Theoretical maximum losses (CHF, > 0): every fixing at S = 0 (src/lib/fx/mc/maxloss.ts). */
+  tpfMaxLoss: maxLoss(fairProduct('tpf')).down,
+  tarfMaxLoss: maxLoss(fairProduct('tarf')).down,
+  accMaxLoss: maxLoss(fairProduct('accumulator')).down,
   paths: MC_PRODUCTS.engine.paths,
   accNotional: MC_CONFIG.products.accumulator.notional,
   accFixings: MC_CONFIG.products.accumulator.fixings,
@@ -279,6 +284,21 @@ export const nums: NumTable = {
   'm09.rtpfWorst': { value: M.rtpfWorst, kind: 'money' },
   'm09.tarfWorst': { value: M.tarfWorst, kind: 'money' },
   'm09.accWorst': { value: M.accWorst, kind: 'money' },
+  'm09.tpfMaxLoss': {
+    value: M.tpfMaxLoss,
+    kind: 'money',
+    note: 'Theoretical maximum loss, every fixing at S = 0 (src/lib/fx/mc/maxloss.ts)',
+  },
+  'm09.tarfMaxLoss': {
+    value: M.tarfMaxLoss,
+    kind: 'money',
+    note: 'Theoretical maximum loss, every fixing at S = 0',
+  },
+  'm09.accMaxLoss': {
+    value: M.accMaxLoss,
+    kind: 'money',
+    note: 'Theoretical maximum loss, every fixing at S = 0',
+  },
   'm09.paths': { value: M.paths, kind: 'num', digits: 0, note: 'Monte Carlo paths' },
   'm09.accNotional': { value: M.accNotional, kind: 'money', ccy: 'USD' },
   'm09.accFixings': { value: M.accFixings, kind: 'num', digits: 0 },

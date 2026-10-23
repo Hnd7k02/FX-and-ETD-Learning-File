@@ -40,6 +40,7 @@ const yPut = pips(M.yPutPips);
 const yBe = rate(M.yBreakEven);
 
 const tarfWorst = chf(M.tarfWorst);
+const tarfMaxLoss = chf(M.tarfMaxLoss);
 const tarfTarget = pips(M.tarfTargetPips);
 
 /* ---------- checks (one per section, ungraded) ---------- */
@@ -318,12 +319,12 @@ const q3: QuizQuestion = {
   options: [
     {
       label: {
-        de: 'Strike · Direkt (TARF, Accumulator): Gewinn begrenzt, Verlust gehebelt und nicht begrenzt',
-        en: 'Strike · direct (TARF, accumulator): gain capped, loss leveraged and not limited',
+        de: 'Strike · Direkt (TARF, Accumulator): Gewinn gedeckelt, Verlust gehebelt und ohne eingebauten Stopp',
+        en: 'Strike · direct (TARF, accumulator): gain capped, loss leveraged and without a built-in stop',
       },
       explain: {
-        de: `Richtig. Der TARF endet beim Target von ${tarfTarget.de} Pips. Läuft der Dollar gegen sie, kauft sie die doppelte Menge bis zum Ende. Im schlechtesten simulierten Pfad endet er bei ${tarfWorst.de}.`,
-        en: `Correct. The TARF ends at the target of ${tarfTarget.en} pips. If the dollar moves against her, she buys twice the amount until the end. In the worst simulated path it ends at ${tarfWorst.en}.`,
+        de: `Richtig. Der TARF endet beim Target von ${tarfTarget.de} Pips. Läuft der Dollar gegen sie, kauft sie die doppelte Menge bis zum Ende. Im schlechtesten simulierten Pfad endet er bei ${tarfWorst.de}. Theoretisch, mit allen Fixings bei null, verliert er bis zu ${tarfMaxLoss.de}: sehr hoch, aber endlich.`,
+        en: `Correct. The TARF ends at the target of ${tarfTarget.en} pips. If the dollar moves against her, she buys twice the amount until the end. In the worst simulated path it ends at ${tarfWorst.en}. In theory, with every fixing at zero, it loses up to ${tarfMaxLoss.en}: very high, but finite.`,
       },
     },
     {

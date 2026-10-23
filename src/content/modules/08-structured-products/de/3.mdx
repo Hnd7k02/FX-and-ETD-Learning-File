@@ -20,7 +20,7 @@ In Bausteinen: pro Fixing ein gekaufter Call und zwei verkaufte Puts zum Strike,
 
 ### Rechenbeispiel: die Asymmetrie
 
-Mit diesen Beispielwerten liegt das erste Fixing fast immer weit über dem Strike. Das Target ist darum schnell erreicht: in <Num of="m08.tarfPTarget" /> der Monte-Carlo-Pfade, im Schnitt schon nach <Num of="m08.tarfTargetFix" /> Fixings. Drei Szenarien im Simulator:
+Mit diesen Beispielwerten liegt das erste Fixing fast immer weit über dem Strike. Das Target ist darum schnell erreicht: in <Num of="m08.tarfPTarget" /> der Monte-Carlo-Pfade ([risikoneutral](/glossar/#term-risk-neutral), keine Prognose), im Schnitt schon nach <Num of="m08.tarfTargetFix" /> Fixings. Drei Szenarien im Simulator:
 
 - **Trend auf.** Target nach <Num of="m08.tarfUpEnd" /> Fixings. Der TARF bringt <Num of="m08.tarfUpPnl" />, mehr geht nicht. Der Importeur hat erst <Num of="m08.tarfUpUsd" /> gekauft. Den Rest kauft er am Markt, zu steigenden Kursen. Der Forward-Hedge brachte <Num of="m08.tarfUpFwd" />, die Differenz ist <Num of="m08.tarfUpDiff" />.
 - **Schock vor dem Target.** Der Kurs fällt an Tag <Num of="m08.shockDay" /> um <Num of="m08.shockGapAbs" />. Schon das erste Fixing liegt unter dem Strike, das Target kommt nie. Alle <Num of="m08.tarfShockLev" /> Fixings kaufen doppelt, zusammen <Num of="m08.tarfShockUsd" />: doppelt so viel, wie der Importeur braucht. Gegen den Markt: <Num of="m08.tarfShockPnl" />. Der Forward-Hedge verliert fast gleich viel (<Num of="m08.tarfShockFwd" />), denn auch er kauft über dem Marktkurs. Der Unterschied liegt in der Menge: Fällt der Kurs weiter, verliert der TARF doppelt so schnell.
@@ -28,7 +28,7 @@ Mit diesen Beispielwerten liegt das erste Fixing fast immer weit über dem Strik
 
 <Callout variant="bad" title="Wann geht es schief: Gute Szenarien enden früh">
 
-Läuft es gut, endet der TARF nach wenigen Fixings mit einem gekappten Gewinn. Ausgerechnet wenn der Dollar steigt, steht der Importeur dann ohne Absicherung da. Läuft es schlecht, gibt es kein Target, das dich erlöst: Das Produkt läuft bis zum letzten Fixing weiter, jedes Mal mit doppelter Menge. Die Verluste sind gehebelt und nicht begrenzt.
+Läuft es gut, endet der TARF nach wenigen Fixings mit einem gekappten Gewinn. Ausgerechnet wenn der Dollar steigt, steht der Importeur dann ohne Absicherung da. Läuft es schlecht, gibt es kein Target, das dich erlöst: Das Produkt läuft bis zum letzten Fixing weiter, jedes Mal mit doppelter Menge. Die Verluste sind gehebelt, und kein eingebauter Stopp beendet sie.
 
 </Callout>
 
@@ -41,11 +41,11 @@ Der Pivot TARF wettet darauf, dass der Kurs in einem Band bleibt. Um den Pivot <
   caption="Die Bausteine des Pivot TARF: ein Zelt aus Gewinnen zwischen den Strikes, oben vom Target gekappt, ausserhalb doppelte Verluste."
 />
 
-Das Muster ist noch extremer als beim TARF. In <Num of="m08.pivPTarget" /> der Pfade ist das Target erreicht, im Schnitt nach <Num of="m08.pivTargetFix" /> Fixings. Sogar das 5 %-Quantil ist ein Gewinn: <Num of="m08.pivQ05" />. Der schlechteste Pfad endet bei <Num of="m08.pivWorst" />. Schalte im Simulator oben auf Pivot TARF: Mit dem Schock endet er bei <Num of="m08.pivShockPnl" />.
+Das Muster ist noch extremer als beim TARF. In <Num of="m08.pivPTarget" /> der Pfade ist das Target erreicht (risikoneutral, keine Prognose), im Schnitt nach <Num of="m08.pivTargetFix" /> Fixings. Sogar das 5 %-Quantil ist ein Gewinn: <Num of="m08.pivQ05" />. Der schlechteste Pfad endet bei <Num of="m08.pivWorst" />. Schalte im Simulator oben auf Pivot TARF: Mit dem Schock endet er bei <Num of="m08.pivShockPnl" />.
 
 <Callout variant="warn" title="Risiko-Box: TARF und Pivot TARF">
 
-- **Maximalverlust:** nicht begrenzt. Im Extremfall laufen alle <Num of="m08.tarfFixings" /> Fixings mit doppelter Menge, bei beliebig ungünstigem Kurs. Monte Carlo: schlechtester Pfad TARF <Num of="m08.tarfWorst" />, Pivot TARF <Num of="m08.pivWorst" />.
+- **Maximalverlust:** kein eingebauter Verluststopp. Beim TARF ist der Verlust sehr hoch, aber endlich, denn USD/CHF fällt nicht unter null. Im Extremfall liegen alle <Num of="m08.tarfFixings" /> Fixings bei null, und du kaufst jedes Mal die doppelte Menge zum Strike: theoretisch <Num of="m08.tarfMaxLoss" />. Der Pivot TARF verliert nach unten höchstens <Num of="m08.pivMaxLossDown" />. Über <Num of="m08.pivK2" /> verkauft er aber die doppelte Menge zu diesem Strike. Nach oben hat der Kurs keine Grenze, dort ist sein Verlust theoretisch unbegrenzt. Monte Carlo: schlechtester Pfad TARF <Num of="m08.tarfWorst" />, Pivot TARF <Num of="m08.pivWorst" />.
 - **Hebel:** 2 auf der Verlustseite. Gewinne sind durch das Target gekappt (<Num of="m08.tarfTargetChf" /> bzw. <Num of="m08.pivTargetChf" />).
 - **Pfadabhängigkeit:** Ob das Target kommt, entscheiden die ersten Fixings. Ein Schock davor trifft voll, ein Schock danach gar nicht.
 
@@ -57,7 +57,7 @@ Das Muster ist noch extremer als beim TARF. In <Num of="m08.pivPTarget" /> der P
 
 **2.** Das Target nimmt dir die besten Szenarien weg: Gewinne über <Num of="m08.tarfTargetPips" /> Pips bekommst du nie. Zwar enden mit dem Target auch die verkauften Puts. Sie sind in diesen Szenarien aber wenig wert, weil der Kurs dann hoch steht. Unter dem Strich verlierst du Wert. Damit der Barwert null bleibt, muss der Strike sinken: auf <Num of="m08.tarfStrike" /> (Monte Carlo).
 
-**3.** Ein Überschlag zeigt, wie schief die Verteilung ist. Der Barwert ist null, und mit dem CHF-Zins von <Num of="ex.rd" /> wird nicht abgezinst. Bringen <Num of="m08.tarfPTarget" digits={2} /> der Pfade je rund <Num of="m08.tarfTargetChf" />, müssen die übrigen <Num of="m08.tarfPMaturity" digits={2} /> im Mittel verlieren:
+**3.** Ein Überschlag zeigt, wie schief die Verteilung ist. Der Barwert ist null, und mit dem CHF-Zins von <Num of="ex.rd" /> wird nicht abgezinst. Die folgenden Anteile sind Wahrscheinlichkeiten im Modell: risikoneutral, keine Prognose. Bringen <Num of="m08.tarfPTarget" digits={2} /> der Pfade je rund <Num of="m08.tarfTargetChf" />, müssen die übrigen <Num of="m08.tarfPMaturity" digits={2} /> im Mittel verlieren:
 
 <Formula variant="accent"><Num of="m08.tarfPTarget" digits={2} /> · <Num of="m08.tarfTargetChf" /> + <Num of="m08.tarfPMaturity" digits={2} /> · <i>L</i> = 0 ⇒ <i>L</i> ≈ <b><Num of="m08.tarfImpliedLoss" /></b></Formula>
 
@@ -73,6 +73,6 @@ Am <Fact id="m08-floor-end" /> hob die Schweizerische Nationalbank den Mindestku
 
 <Takeaway>
 
-Ein Target begrenzt den Gewinn, nicht den Verlust. Gute Szenarien enden früh, schlechte laufen bis zum Schluss, mit doppelter Menge.
+Ein Target deckelt den Gewinn, für den Verlust gibt es keinen eingebauten Stopp. Gute Szenarien enden früh, schlechte laufen bis zum Schluss, mit doppelter Menge.
 
 </Takeaway>

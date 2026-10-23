@@ -16,7 +16,7 @@ The tool has no closed formula for this. The calculation core values the option 
 | Window barrier, days <Num of="m07.windowStart" /> to <Num of="m07.windowEnd" /> | <Num of="m07.windowPvChf" /> (± <Num of="m07.windowSeChf" />) |
 | Vanilla call | <Num of="m07.windowVanillaChf" /> |
 
-The window is a compromise. It costs <Num of="m07.windowExtraChf" /> more than the barrier for the whole life and saves <Num of="m07.windowSavingChf" /> compared with the vanilla. In <Num of="m07.windowKo" /> of the paths the option is knocked out in the first month. If it survives the window, it is an ordinary call from then on. For the importer this means: a strong dollar in the first month costs him the hedge, a strong dollar later does not.
+The window is a compromise. It costs <Num of="m07.windowExtraChf" /> more than the barrier for the whole life and saves <Num of="m07.windowSavingChf" /> compared with the vanilla. In <Num of="m07.windowKo" /> of the paths the option is knocked out in the first month ([risk-neutral](/en/glossary/#term-risk-neutral), not a forecast). If it survives the window, it is an ordinary call from then on. For the importer this means: a strong dollar in the first month costs him the hedge, a strong dollar later does not.
 
 <Derivation title="Derivation: how the calculation core values the window barrier">
 
@@ -41,15 +41,15 @@ The window is a compromise. It costs <Num of="m07.windowExtraChf" /> more than t
 
 Every formula in this module assumes that the rate moves continuously. To cross a barrier it must pass through every rate in between once, and someone can trade there. On <Fact id="m07-floor-end" /> that was not the case. Since <Fact id="m07-floor-start" />, the Swiss National Bank had enforced a minimum exchange rate of <Fact id="m07-floor" /> francs per euro. On that day it discontinued it and lowered the interest rate on sight deposits to <Fact id="m05-snb-2015-rate" />.
 
-The ECB fixing for EUR/CHF was <Num of="m07.gapBefore" /> the day before and <Num of="m07.gapShock" /> on the day: <Num of="m07.gapDayMove" /> from one fixing to the next. In this series there is not a single rate in between. Where exactly an order was filled in the market depended on the minute and on liquidity. The daily series shows the order of magnitude.
+The ECB fixing for EUR/CHF was <Num of="m07.gapBefore" /> the day before and <Num of="m07.gapShock" /> on the day: <Num of="m07.gapDayMove" /> from one fixing to the next. In this series there is not a single rate in between. The ECB publishes its reference rates for information purposes only. They are not tradable prices. The replay below is therefore a hypothetical scenario with daily ECB reference rates. It shows the order of magnitude, not the rates at which trades were done that day.
 
-<GapReplayFigure caption="ECB reference rates for EUR/CHF, day by day. Below the minimum rate sit a stop-loss and four knock-out barriers. On the day the floor was removed, all of them are triggered at the same rate." />
+<GapReplayFigure caption="Hypothetical scenario with daily ECB reference rates for EUR/CHF. Below the minimum rate sit a stop-loss and knock-out barriers. On the day the floor was removed, the fixing jumps below every level: the stop is filled at that fixing, as a simplification, and the knock-outs are extinguished." />
 
-A stop-loss meant to sell EUR at <Num of="m07.gapStop" /> is filled at the next rate available. In the replay with the ECB fixings that is <Num of="m07.gapShock" />, <Num of="m07.gapStopPips" /> pips lower. On <Num of="m07.gapNotionalEur" /> that is <Num of="m07.gapStopChf" /> less than planned. A stop limits the loss only if there is a market at the stop level.
+A stop-loss meant to sell EUR at <Num of="m07.gapStop" /> is filled at the next tradable price. Where that lay on the day depended on the minute and on liquidity. As a simplification, the replay takes the next fixing: <Num of="m07.gapShock" />, <Num of="m07.gapStopPips" /> pips lower. On <Num of="m07.gapNotionalEur" /> that is <Num of="m07.gapStopChf" /> less than planned. A stop limits the loss only if there is a market at the stop level.
 
 <Callout variant="bad" title="Loss scenario: the reverse knock-out">
 
-An exporter with euro income, the mirror image of our importer, fears a strong franc. He buys a EUR put with a strike of <Num of="m07.gapPutStrike" />. To save premium, he adds a knock-out below the minimum rate. That is a reverse knock-out (section 2): the barrier is in the money. Whether it sits at <Num of="m07.gapKoHigh" /> or at <Num of="m07.gapKoLow" /> makes no difference. All <Num of="m07.gapKoCount" /> variants are knocked out on the same day at the same rate. With the knock-out, intrinsic value of <Num of="m07.gapPutLostChf" /> disappears, at exactly the moment the protection was meant for.
+An exporter with euro income, the mirror image of our importer, fears a strong franc. He buys a EUR put with a strike of <Num of="m07.gapPutStrike" />. To save premium, he adds a knock-out below the minimum rate. That is a reverse knock-out (section 2): the barrier is in the money. Whether it sits at <Num of="m07.gapKoHigh" /> or at <Num of="m07.gapKoLow" /> makes no difference. A knock-out is not a transaction at the barrier rate: the option simply ceases to exist. In the scenario each barrier is observed daily against the fixing. Then all <Num of="m07.gapKoCount" /> variants knock out on the same fixing. With continuous observation, the first rate beyond the barrier counts, under the rules in the term sheet. Measured at the fixing, the knock-out wipes out intrinsic value of <Num of="m07.gapPutLostChf" />, at exactly the moment the protection was meant for.
 
 </Callout>
 
@@ -57,7 +57,7 @@ An exporter with euro income, the mirror image of our importer, fears a strong f
 
 - A barrier is a condition, not protection. Check which scenarios it cuts away.
 - Reverse knock-outs disappear where the option would be worth the most.
-- Stops and barriers assume a market you can trade in. In a gap, every level is triggered at once, at the next available rate.
+- Stops assume a market you can trade in, barriers a rate that moves continuously. In a gap the rate jumps over every level at once: the stop is filled at the next tradable price, the knock-outs are extinguished.
 - Read the term sheet: observation period, type of monitoring, reference rate, and who determines the barrier event.
 
 </Callout>
@@ -74,6 +74,6 @@ Structured products build in exactly these building blocks. The accumulator in m
 
 <Takeaway>
 
-Barriers and stops are only as good as the market you can trade in. If the rate jumps, every level is triggered at once, at the next available rate.
+Stops and barriers assume that the rate moves continuously. If it jumps, it breaks through every level at once. The stop is filled at the next tradable price; the knock-out simply ceases to exist.
 
 </Takeaway>

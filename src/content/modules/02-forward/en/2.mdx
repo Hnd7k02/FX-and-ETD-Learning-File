@@ -38,9 +38,15 @@ The option models from module 04 onwards use continuous rates and <i>T</i> = day
 
 <Formula><i>F</i> = <i>S</i> · e<sup>(<i>r</i><sub>d</sub> − <i>r</i><sub>f</sub>) · <i>T</i></sup></Formula>
 
-Here <i>r</i><sub>d</sub> is the rate of the quote currency (CHF) and <i>r</i><sub>f</sub> the rate of the base currency (USD). With the example numbers this gives <Num of="ex.forward" />, which is <Num of="ex.fwdDiffPips" /> pips below the money-market forward. On USD 1m that is <Num of="m02.fwdDiffChf" />.
+Here <i>r</i><sub>d</sub> is the rate of the quote currency (CHF) and <i>r</i><sub>f</sub> the rate of the base currency (USD).
 
-The difference is not an error. The same rate means simple interest in one case and continuous compounding in the other. Compounded continuously, money grows slightly faster, so the continuous formula discounts the dollar slightly more. All that matters is that you stick to one convention within a calculation.
+For "3 months" the tool uses <i>T</i> = <Num of="ex.T" /> in both worlds. That is a stylised convention. In the money market it is <Num of="ex.mmDays" />/360. In the option model it is <Num of="ex.T" /> years, which is <Num of="m02.daysT" /> days. With this <i>T</i> the continuous formula gives <Num of="ex.forward" />, which is <Num of="ex.fwdDiffPips" /> pips below the money-market forward. On USD 1m that is <Num of="m02.fwdDiffChf" />.
+
+At the same <i>T</i> the difference is not an error. The same rate means simple interest in one case and continuous compounding in the other. Compounded continuously, money grows slightly faster, so the continuous formula discounts the dollar slightly more.
+
+At exactly the same end date, <Num of="ex.mmDays" /> days, <i>T</i> = <Num of="ex.mmDays" />/365. Then the continuous formula gives <Num of="m02.fwdCont90" digits={6} />, which is <Num of="m02.fwdCont90DiffPips" /> pips above the money-market forward of <Num of="m02.fwd" digits={6} />. The shorter term, <Num of="ex.mmDays" /> instead of <Num of="m02.daysT" /> days, outweighs the continuous compounding.
+
+**Remember:** only compare forwards with the same end date and the same convention.
 
 <Derivation title="Derivation: two routes, one price">
 
@@ -58,7 +64,7 @@ Let <i>S</i> be spot in CHF per USD, <i>N</i> the USD amount at maturity, and <i
 
 **Continuous.** With continuous rates the interest factor 1 + <i>r</i> · <i>t</i> becomes e<sup><i>r</i> · <i>T</i></sup>, and the ratio of two exponentials is e<sup>(<i>r</i><sub>d</sub> − <i>r</i><sub>f</sub>) · <i>T</i></sup>.
 
-**Where the <Num of="ex.fwdDiffPips" /> pips come from.** In the example <i>T</i> = <Num of="ex.T" /> in both worlds. The money market discounts the dollar by 1 / <Num of="m02.growthUsd" /> = <Num of="m02.dfMM" />, the continuous formula by e<sup>−<i>r</i><sub>f</sub> · <i>T</i></sup> = <Num of="m02.dfCont" />. A simple rate of <Num of="ex.rf" /> over 90 days corresponds to only <Num of="m02.rfCont" /> continuously. Plug in that value and both formulas give the same forward. The CHF rate would need the same conversion; at <Num of="ex.rd" /> nothing changes.
+**Where the <Num of="ex.fwdDiffPips" /> pips come from.** This calculation holds at the same <i>T</i>: in the example <i>T</i> = <Num of="ex.T" /> in both worlds. The money market discounts the dollar by 1 / <Num of="m02.growthUsd" /> = <Num of="m02.dfMM" />, the continuous formula by e<sup>−<i>r</i><sub>f</sub> · <i>T</i></sup> = <Num of="m02.dfCont" />. A simple rate of <Num of="ex.rf" /> over 90 days corresponds to only <Num of="m02.rfCont" /> continuously. Plug in that value and both formulas give the same forward. The CHF rate would need the same conversion; at <Num of="ex.rd" /> nothing changes.
 
 </Derivation>
 

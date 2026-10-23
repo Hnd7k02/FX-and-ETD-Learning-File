@@ -52,7 +52,8 @@ import {
   startMarket,
   stepRateKind,
 } from '@/lib/m02/carry';
-import { nums } from '@/lib/nums/m02';
+import { M02, nums } from '@/lib/nums/m02';
+import { formatNum } from '@/lib/nums/format';
 import { quiz } from '@/content/quiz/02-forward';
 import { facts } from '@/content/facts/m02';
 
@@ -343,6 +344,32 @@ describe('m02 numbers', () => {
     expect(nums['m02.usdToday']!.value).toBeCloseTo(991_325.9, 1);
     expect(nums['m02.arbProfit']!.value).toBeCloseTo(1000, 6);
     expect(nums['m02.benefitPips']!.value).toBeCloseTo(69.4, 1);
+  });
+
+  it('separates the two forward conventions (same T vs same end date)', () => {
+    // money market 90/360 vs continuous with the stylised T = 0.25 (= 91.25 days)
+    expect(M02.F).toBeCloseTo(0.7930607, 7);
+    expect(M02.fCont).toBeCloseTo(0.7930305, 7);
+    expect((M02.fCont - M02.F) / PIP).toBeCloseTo(-0.3, 2);
+    expect(nums['m02.daysT']!.value).toBeCloseTo(91.25, 12);
+    // continuous with the exact same 90 days, T = 90/365: above the money market
+    expect(nums['m02.fwdCont90']!.value).toBeCloseTo(0.7931256, 7);
+    expect(nums['m02.fwdCont90DiffPips']!.value).toBeCloseTo(0.65, 2);
+    expect(nums['m02.fwdCont90DiffPips']!.value).toBeGreaterThan(0);
+    expect(formatNum(nums['m02.fwdCont90']!, 'de')).toBe('0.79313');
+    expect(formatNum(nums['m02.fwdCont90DiffPips']!, 'de')).toBe('0.65');
+    expect(formatNum(nums['m02.daysT']!, 'de')).toBe('91.25');
+  });
+
+  it('shows both 90-day forwards at 6 digits so the displayed gap adds up to 0.65 pips', () => {
+    const cont = formatNum(nums['m02.fwdCont90']!, 'de', { digits: 6 });
+    const mm = formatNum(nums['m02.fwd']!, 'de', { digits: 6 });
+    expect(cont).toBe('0.793126');
+    expect(mm).toBe('0.793061');
+    const shownGap = (Number(cont) - Number(mm)) / PIP;
+    expect(formatNum({ ...nums['m02.fwdCont90DiffPips']!, value: shownGap }, 'de')).toBe(
+      formatNum(nums['m02.fwdCont90DiffPips']!, 'de'),
+    );
   });
 });
 

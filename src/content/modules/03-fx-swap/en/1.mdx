@@ -2,7 +2,7 @@ import SwapTripFigure from '@/components/figures/SwapTripFigure.astro';
 
 Our importer has to pay USD 1m in 3 months. With the forward from module 02 he has locked in his rate. Now for a related question: what do you do if you do not need a currency for good, but only **for a while**?
 
-Picture a Swiss company. It has francs in its account. Today it has to pay a supplier USD 1m. In one month a customer in the US will transfer exactly that amount back to it. So the company needs the dollars for one month only.
+Picture a Swiss company. It has francs in its account and has to pay a supplier USD 1m. If it buys the dollars at spot today, the money flows T+2 (module 01). So it pays the supplier on the spot value date, in two business days, not today. One month later a customer in the US transfers exactly that amount back to it. So the company needs the dollars for one month only.
 
 ### Three ways to a month in dollars
 
@@ -10,7 +10,7 @@ Picture a Swiss company. It has francs in its account. Today it has to pay a sup
 - **Borrow dollars.** It takes out a USD loan and repays it with the customer's money. That needs a credit line, and its francs sit idle in the meantime.
 - **FX swap.** It buys USD 1m at spot today and, in the same deal, sells them forward for one month. Both rates are fixed today.
 
-The third way is an **FX swap**: two FX deals in opposite directions for the same amount. The earlier one is the **near leg**, the later one the **far leg**. The company exchanges its francs for dollars for a while and gets them back afterwards.
+The third way is an **FX swap**: two FX deals in opposite directions for the same amount. The earlier one is the **near leg**, the later one the **far leg**. The company exchanges its francs for dollars for a while and gets them back afterwards. Here the near leg is a spot deal for value T+2. If the money has to flow today or tomorrow, you use a shorter near leg (value today or tomorrow), at a slightly different rate.
 
 You already know the far leg: it is a forward from module 02. So an FX swap is a spot deal plus a forward in the opposite direction, done as a single trade.
 
@@ -31,7 +31,7 @@ And the FX risk? If the dollar stood at <Num of="m03.tripUp" /> after the month,
 A swap on <i>N</i> USD with near rate <i>S</i> and far rate <i>F</i> has these cash flows from the company's point of view:
 
 <Formula>
-  <span>today: +<i>N</i> USD and −<i>N</i> · <i>S</i> CHF</span>
+  <span>spot value date: +<i>N</i> USD and −<i>N</i> · <i>S</i> CHF</span>
   <span>after the term <i>t</i>: −<i>N</i> USD and +<i>N</i> · <i>F</i> CHF</span>
 </Formula>
 
@@ -62,6 +62,6 @@ Companies use swaps when payments move in time. Investors holding securities in 
 
 <Takeaway>
 
-An FX swap exchanges currencies for a while: there today, back later, both rates fixed. Its price is the interest differential; no FX risk on the notional remains.
+An FX swap exchanges currencies for a while: there at spot, back at a forward date, both rates fixed today. Its price is the interest differential; no FX risk on the notional remains.
 
 </Takeaway>

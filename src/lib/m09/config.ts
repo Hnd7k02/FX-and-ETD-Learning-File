@@ -101,7 +101,10 @@ export const M09_CONFIG = {
   /**
    * ProductMatrix (sections 1 and 3): chart range of S_T relative to spot (±10 %, wide enough
    * to show the leveraged losses below the TARF and pivot strikes), samples per curve and the
-   * y range in pips per USD (curves beyond it are clipped and marked "nicht begrenzt").
+   * y range in pips per USD. Curves beyond it are clipped and marked "Verlust geht weiter"
+   * ("loss continues"): the curve only leaves the chart, the loss does not stop there. How far
+   * it can go is in src/lib/fx/mc/maxloss.ts (very high but finite downwards, theoretically
+   * unlimited upwards for products that sell with leverage above a level).
    */
   matrix: {
     xRange: [-0.1, 0.1] as const,

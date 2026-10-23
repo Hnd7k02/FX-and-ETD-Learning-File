@@ -111,7 +111,9 @@ test('SpotExposure: the rate moves the cost, the blocks and the note', async ({ 
   await expect(fig).toHaveAttribute('data-blocks', '4');
   await expect(fig.locator('[data-annot]')).toBeVisible();
   await expect(hero).toHaveText(/840’000/);
-  await expect(fig.locator('[data-note]')).toContainText('11');
+  // risk-neutral probability (C6): P(S_T ≥ 0.84) = N(d2) ≈ 7 %
+  await expect(fig.locator('[data-note]')).toContainText(/rund 7\s%/);
+  await expect(fig.locator('[data-note]')).toContainText('risikoneutral, keine Prognose');
   await fig.getByRole('button', { name: '0.7600' }).click();
   await expect(fig).toHaveAttribute('data-dir', 'down');
 });

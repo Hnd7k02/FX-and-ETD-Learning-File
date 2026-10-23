@@ -117,8 +117,8 @@ const q2: QuizQuestion = {
 const q3: QuizQuestion = {
   id: 'm04-q3',
   prompt: {
-    de: `Spot ${spot}, Forward 3 Monate ${F5}. Ein USD Call mit Strike ${rate(SC.kMid)} ist …`,
-    en: `Spot ${spot}, 3-month forward ${F5}. A USD call with strike ${rate(SC.kMid)} is …`,
+    de: `Spot ${spot}, Forward 3 Monate ${F5}. In Forward-Moneyness, wie in diesem Tool, ist ein USD Call mit Strike ${rate(SC.kMid)} …`,
+    en: `Spot ${spot}, 3-month forward ${F5}. In forward moneyness, as in this tool, a USD call with strike ${rate(SC.kMid)} is …`,
   },
   options: [
     {
@@ -127,8 +127,8 @@ const q3: QuizQuestion = {
         en: `OTM, ${fmtPips((SC.kMid - M04.F) / PIP, 'en')} pips above the forward`,
       },
       explain: {
-        de: 'Richtig. Moneyness misst man gegen den Forward. Beim Call heisst Strike über dem Forward: aus dem Geld, die Prämie ist reiner Zeitwert.',
-        en: 'Correct. Moneyness is measured against the forward. For a call, a strike above the forward means out of the money; the premium is pure time value.',
+        de: 'Richtig. Forward-Moneyness misst den Strike gegen den Forward. Beim Call heisst Strike über dem Forward: aus dem Geld, die Prämie ist reiner Zeitwert.',
+        en: 'Correct. Forward moneyness measures the strike against the forward. For a call, a strike above the forward means out of the money; the premium is pure time value.',
       },
     },
     {
@@ -137,8 +137,8 @@ const q3: QuizQuestion = {
         en: 'ITM, because the strike is below spot',
       },
       explain: {
-        de: 'Der typische Fehler: Vergleich mit dem Spot. Ausgeübt wird erst bei Verfall, und der faire Kurs dafür ist der Forward.',
-        en: 'The classic mistake: comparing with spot. Exercise only happens at expiry, and the fair rate for that is the forward.',
+        de: 'Das gilt in Spot-Moneyness; gefragt war Forward-Moneyness. Dieses Tool misst am Forward, weil eine europäische Option erst bei Verfall ausgeübt wird.',
+        en: 'That holds in spot moneyness; the question asked for forward moneyness. This tool measures against the forward, because a European option is only exercised at expiry.',
       },
     },
     {
@@ -157,8 +157,8 @@ const q3: QuizQuestion = {
         en: `ITM, ${fmtNumber((E.spot - SC.kMid) / PIP, 'en')} pips in the money`,
       },
       explain: {
-        de: 'Das ist der Abstand zum Spot. Gegen den Forward hat dieser Call keinen inneren Wert.',
-        en: 'That is the distance to spot. Against the forward this call has no intrinsic value.',
+        de: 'Das gilt in Spot-Moneyness: Es ist der Abstand zum Spot. Gefragt war Forward-Moneyness, und gegen den Forward hat dieser Call keinen inneren Wert.',
+        en: 'That holds in spot moneyness: it is the distance to spot. The question asked for forward moneyness, and against the forward this call has no intrinsic value.',
       },
     },
   ],
@@ -298,8 +298,8 @@ const c2: QuizQuestion = {
 const c3: QuizQuestion = {
   id: 'm04-c3',
   prompt: {
-    de: `Ein USD Call mit Strike ${rate(M04.kItm)} kostet ${pips(M04.itmPips, 1).de} Pips. Forward ${F5}, CHF-Zins ${rd.de}. Wie gross ist sein Zeitwert?`,
-    en: `A USD call with strike ${rate(M04.kItm)} costs ${pips(M04.itmPips, 1).en} pips. Forward ${F5}, CHF rate ${rd.en}. How large is its time value?`,
+    de: `Ein USD Call mit Strike ${rate(M04.kItm)} kostet ${pips(M04.itmPips, 1).de} Pips. Forward ${F5}, CHF-Zins ${rd.de}. Wie gross ist sein Zeitwert gegen den Forward, wie in diesem Tool?`,
+    en: `A USD call with strike ${rate(M04.kItm)} costs ${pips(M04.itmPips, 1).en} pips. Forward ${F5}, CHF rate ${rd.en}. How large is its time value against the forward, as in this tool?`,
   },
   options: [
     {
@@ -320,19 +320,19 @@ const c3: QuizQuestion = {
       },
       mono: true,
       explain: {
-        de: 'Das ist der innere Wert, F − K. Gefragt ist der Zeitwert: die Prämie minus den inneren Wert.',
-        en: 'That is the intrinsic value, F − K. The question asks for the time value: the premium minus the intrinsic value.',
+        de: 'Das ist der innere Wert gegen den Forward, F − K. Gefragt ist der Zeitwert: die Prämie minus den inneren Wert.',
+        en: 'That is the intrinsic value against the forward, F − K. The question asks for the time value: the premium minus the intrinsic value.',
       },
     },
     {
       label: {
-        de: `${pips(M04.itmPips - M04.itmVsSpotPips, 1).de} Pips`,
-        en: `${pips(M04.itmPips - M04.itmVsSpotPips, 1).en} pips`,
+        de: `${pips(M04.itmSpotTimePips, 1).de} Pips`,
+        en: `${pips(M04.itmSpotTimePips, 1).en} pips`,
       },
       mono: true,
       explain: {
-        de: `Hier wurde der innere Wert gegen den Spot gerechnet, ${pips(M04.itmVsSpotPips, 1).de} Pips. Ein negativer Zeitwert ergibt keinen Sinn: Innerer Wert und Moneyness misst man gegen den Forward.`,
-        en: `This measures the intrinsic value against spot, ${pips(M04.itmVsSpotPips, 1).en} pips. A negative time value makes no sense: intrinsic value and moneyness are measured against the forward.`,
+        de: `Das ist der Zeitwert gegen den Spot: Prämie minus ${pips(M04.itmVsSpotPips, 1).de} Pips innerer Wert gegen den Spot. Gefragt war der Zeitwert gegen den Forward. Dort ist er nie negativ.`,
+        en: `That is the time value against spot: the premium minus ${pips(M04.itmVsSpotPips, 1).en} pips of intrinsic value against spot. The question asked for the time value against the forward, and that is never negative.`,
       },
     },
     {

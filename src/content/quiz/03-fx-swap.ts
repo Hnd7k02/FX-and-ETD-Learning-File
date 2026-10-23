@@ -140,8 +140,8 @@ const allInSignFlipped = shownRound(M03.oldForward, RD) - shownRound(up.points, 
 const q3: QuizQuestion = {
   id: 'm03-q3',
   prompt: {
-    de: `Der Importeur rollt seinen Forward zu ${oldFwd} um ${M03.slipDays} Tage. Spot am Roll-Datum ${rate(C.roll.scenarioUp)}, Swap Points ${pips(up.points).de}. Welcher All-in-Kurs gilt für die neue Zahlung?`,
-    en: `The importer rolls his forward at ${oldFwd} by ${M03.slipDays} days. Spot on the roll date ${rate(C.roll.scenarioUp)}, swap points ${pips(up.points).en}. Which all-in rate applies to the new payment?`,
+    de: `Der Importeur rollt seinen Forward zu ${oldFwd} um ${M03.slipDays} Tage. Spot beim Abschluss des Rolls ${rate(C.roll.scenarioUp)}, Swap Points ${pips(up.points).de}. Welcher All-in-Kurs gilt für die neue Zahlung?`,
+    en: `The importer rolls his forward at ${oldFwd} by ${M03.slipDays} days. Spot when the roll is dealt ${rate(C.roll.scenarioUp)}, swap points ${pips(up.points).en}. Which all-in rate applies to the new payment?`,
   },
   options: [
     {
@@ -320,8 +320,8 @@ const down = M03.down;
 const c3: QuizQuestion = {
   id: 'm03-c3',
   prompt: {
-    de: `Der Importeur rollt seinen Forward zu ${oldFwd}. Am Roll-Datum steht der Spot bei ${rate(C.roll.scenarioDown)}. Was passiert an diesem Tag?`,
-    en: `The importer rolls his forward at ${oldFwd}. On the roll date the spot is at ${rate(C.roll.scenarioDown)}. What happens on that day?`,
+    de: `Der Importeur rollt seinen Forward zu ${oldFwd}. Beim Abschluss des Rolls steht der Spot bei ${rate(C.roll.scenarioDown)}. Was passiert am alten Fälligkeitstag?`,
+    en: `The importer rolls his forward at ${oldFwd}. When the roll is dealt, the spot is at ${rate(C.roll.scenarioDown)}. What happens on the old maturity date?`,
   },
   options: [
     {

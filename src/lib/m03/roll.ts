@@ -42,7 +42,7 @@ export interface RollView {
   allInVsOldPips: number;
 }
 
-/** Computes the roll for one spot at the roll date. */
+/** Computes the roll for one spot when the roll is dealt (near leg value = old maturity). */
 export function rollView(i: RollInput): RollView {
   const result = rollHedge({
     oldForward: i.oldForward,

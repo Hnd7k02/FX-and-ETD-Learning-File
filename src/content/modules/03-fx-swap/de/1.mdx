@@ -2,7 +2,7 @@ import SwapTripFigure from '@/components/figures/SwapTripFigure.astro';
 
 Unser Importeur muss in 3 Monaten USD 1 Mio. zahlen. Mit dem Forward aus Modul 02 hat er seinen Kurs gesichert. Jetzt geht es um eine verwandte Frage: Was tust du, wenn du eine Währung nicht für immer brauchst, sondern nur **für eine Weile**?
 
-Stell dir eine Schweizer Firma vor. Sie hat Franken auf dem Konto. Heute muss sie einem Lieferanten USD 1 Mio. zahlen. In einem Monat überweist ihr ein Kunde in den USA genau diesen Betrag. Sie braucht die Dollar also nur für einen Monat.
+Stell dir eine Schweizer Firma vor. Sie hat Franken auf dem Konto und muss einem Lieferanten USD 1 Mio. zahlen. Kauft sie die Dollar heute per Spot, fliesst das Geld T+2 (Modul 01). Sie zahlt den Lieferanten darum am Spot-Valutatag, in zwei Bankarbeitstagen, nicht heute. Einen Monat später überweist ihr ein Kunde in den USA genau diesen Betrag. Sie braucht die Dollar also nur für einen Monat.
 
 ### Drei Wege zu einem Monat Dollar
 
@@ -10,7 +10,7 @@ Stell dir eine Schweizer Firma vor. Sie hat Franken auf dem Konto. Heute muss si
 - **Dollar leihen.** Sie nimmt einen Kredit in USD auf und zahlt ihn mit dem Geld des Kunden zurück. Dafür braucht sie eine Kreditlinie, und ihre Franken liegen ungenutzt herum.
 - **FX Swap.** Sie kauft heute USD 1 Mio. zum Spot und verkauft sie im selben Geschäft auf Termin in einem Monat zurück. Beide Kurse stehen heute fest.
 
-Der dritte Weg ist ein **FX Swap**: zwei Devisengeschäfte in Gegenrichtung über denselben Betrag. Das frühere heisst **Near Leg**, das spätere **Far Leg**. Die Firma tauscht ihre Franken auf Zeit gegen Dollar und bekommt sie danach zurück.
+Der dritte Weg ist ein **FX Swap**: zwei Devisengeschäfte in Gegenrichtung über denselben Betrag. Das frühere heisst **Near Leg**, das spätere **Far Leg**. Die Firma tauscht ihre Franken auf Zeit gegen Dollar und bekommt sie danach zurück. Hier ist das Near Leg ein Spot-Geschäft mit Valuta T+2. Muss das Geld schon heute oder morgen fliessen, nimmst du ein kürzeres Near Leg (Valuta heute oder morgen), zu einem leicht anderen Kurs.
 
 Das Far Leg kennst du schon: Es ist ein Forward aus Modul 02. Ein FX Swap ist also ein Spot-Geschäft plus ein Forward in Gegenrichtung, in einem einzigen Abschluss.
 
@@ -31,7 +31,7 @@ Und das Kursrisiko? Steht der Dollar nach dem Monat bei <Num of="m03.tripUp" />,
 Ein Swap über <i>N</i> USD mit Near-Kurs <i>S</i> und Far-Kurs <i>F</i> hat aus Sicht der Firma diese Zahlungen:
 
 <Formula>
-  <span>heute: +<i>N</i> USD und −<i>N</i> · <i>S</i> CHF</span>
+  <span>Spot-Valuta: +<i>N</i> USD und −<i>N</i> · <i>S</i> CHF</span>
   <span>nach der Laufzeit <i>t</i>: −<i>N</i> USD und +<i>N</i> · <i>F</i> CHF</span>
 </Formula>
 
@@ -62,6 +62,6 @@ Firmen nutzen Swaps, wenn sich Zahlungen zeitlich verschieben. Anleger mit Werts
 
 <Takeaway>
 
-Ein FX Swap tauscht Währungen auf Zeit: heute hin, später zurück, beide Kurse fix. Sein Preis ist die Zinsdifferenz; ein Kursrisiko auf dem Nominal bleibt nicht.
+Ein FX Swap tauscht Währungen auf Zeit: per Spot hin, auf Termin zurück, beide Kurse heute fix. Sein Preis ist die Zinsdifferenz; ein Kursrisiko auf dem Nominal bleibt nicht.
 
 </Takeaway>

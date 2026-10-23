@@ -2,10 +2,12 @@
  * Figure (d) GapReplay, section 4: the franc shock of 15.01.2015 in ECB reference rates, and the
  * gap risk of stops and barriers. Pure, no DOM, no file access (the caller passes the raw CSV).
  *
- * Model (choice, see M07_CONFIG.gap): the series has one fixing per business day. An order
- * below the market (stop-loss that sells EUR, down-and-out barrier) is triggered by the first
- * fixing at or below its level and filled / knocked out at that fixing, the next price the
- * series knows. Everything between two fixings is invisible here.
+ * Model (choice, see M07_CONFIG.gap): a hypothetical scenario on daily ECB reference rates,
+ * which are published for information and are not tradable prices. The first fixing at or below
+ * a level triggers it: a stop-loss (sells EUR) is filled at the next tradable price, which the
+ * replay simplifies to that fixing; a down-and-out option is not a trade at all, it simply
+ * expires (daily observation against the fixing, so all barriers go with the same fixing).
+ * Everything between two fixings is invisible here.
  */
 import { parseRawCsv } from '@/lib/data/csv';
 import { pairSeries, type Pair, type Point } from '@/lib/data/series';
@@ -23,7 +25,7 @@ export interface GapOrder {
   level: number;
   /** Index of the triggering fixing in the series, or null if never reached. */
   index: number | null;
-  /** The fixing it is filled / knocked out at (NaN if never). */
+  /** The triggering fixing: the stop's simplified fill, the option's knock-out (NaN if never). */
   fill: number;
   /** The fixing before the trigger (the last price above the level). */
   before: number;

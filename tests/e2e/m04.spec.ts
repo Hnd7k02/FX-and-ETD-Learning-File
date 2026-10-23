@@ -187,9 +187,12 @@ test('payoff builder: synthetic forward is zero cost at the forward; the lock re
   await page.keyboard.press('ArrowRight');
   await expect(pb).toHaveAttribute('data-zero-cost', 'false');
   await expect(pb).toHaveAttribute('data-template', 'risk-reversal');
+  // long call + short put with a net premium is not called a zero-cost collar (C3)
+  await expect(pb.locator('[data-position-name]')).toHaveText('Collar (Risk Reversal)');
   await pb.locator('[data-lock="1"]').click();
   await expect(pb.locator('[data-lock="1"]')).toHaveAttribute('aria-pressed', 'true');
   await expect(pb).toHaveAttribute('data-zero-cost', 'true');
+  await expect(pb.locator('[data-position-name]')).toHaveText('Zero-Cost-Collar');
   // drag the call strike: the locked put strike follows and zero cost stays
   const handle = pb.locator('[data-handle="0"]');
   const box = (await handle.boundingBox())!;

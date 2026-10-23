@@ -1597,7 +1597,7 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
                     ? t('ps.st.pEndSub', {
                         f: fmtNumber(ensSum.meanFixingsEarly, lang, { digits: 1 }),
                       })
-                    : undefined
+                    : t('ps.st.pEndNote')
                 }
               />
               <StatRow label={t('ps.ens.best')} value={chf(ensSum.best, true)} />
@@ -1626,7 +1626,7 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
                     ? t('ps.st.pEndSub', {
                         f: fmtNumber(fairStats.earlyFixings, lang, { digits: 1 }),
                       })
-                    : undefined
+                    : t('ps.st.pEndNote')
                 }
                 value={fmtPct(fairStats.pEnd, lang, 1)}
               />

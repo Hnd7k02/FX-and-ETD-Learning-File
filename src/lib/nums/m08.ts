@@ -12,6 +12,7 @@
 import { EXAMPLE as E } from '@/lib/fx/example';
 import { MC_PRODUCTS, fairProduct } from '@/lib/fx/mc/fair';
 import { MC_CONFIG, PIP } from '@/lib/fx/mc/products';
+import { maxLoss } from '@/lib/fx/mc/maxloss';
 import { gkPrice } from '@/lib/fx/vanilla';
 import { digitalCash } from '@/lib/fx/exotics/digital';
 import { DCI_CONFIG, dciOutcome, dciView, defaultFixing } from '@/lib/dcicalc';
@@ -146,6 +147,8 @@ export const M08 = {
   accKoFix: earlyFix('accumulator', P.accumulator.stats.pKnockOut),
   accQ05: P.accumulator.stats.pvQuantile05,
   accWorst: P.accumulator.stats.pvMin,
+  /** Theoretical maximum loss (CHF, > 0): every fixing at S = 0, fixings × 2 × N × K. */
+  accMaxLoss: maxLoss(acc).down,
   accUp,
   accSide,
   accDown,
@@ -177,6 +180,8 @@ export const M08 = {
   tarfTargetFix: earlyFix('tarf', P.tarf.stats.pTarget),
   tarfQ05: P.tarf.stats.pvQuantile05,
   tarfWorst: P.tarf.stats.pvMin,
+  /** Theoretical maximum loss (CHF, > 0): every fixing at S = 0, fixings × 2 × N × K. */
+  tarfMaxLoss: maxLoss(tarf).down,
   /**
    * Back-of-the-envelope loss of the paths without target: with PV = 0 (rd = 0, no discounting)
    * and every target path earning the full target, P(target) · target · N + P(maturity) · L = 0.
@@ -200,6 +205,8 @@ export const M08 = {
   pivTargetFix: earlyFix('pivotTarf', P.pivotTarf.stats.pTarget),
   pivQ05: P.pivotTarf.stats.pvQuantile05,
   pivWorst: P.pivotTarf.stats.pvMin,
+  /** Theoretical loss downwards (every fixing at S = 0, × K1); upwards above K2 it is unlimited. */
+  pivMaxLossDown: maxLoss(piv).down,
   pivShock,
   // TPF
   tpfStrike: tpf.strike,
@@ -224,6 +231,8 @@ export const M08 = {
   tpfExpFix: P.tpf.stats.expectedFixings,
   tpfQ05: P.tpf.stats.pvQuantile05,
   tpfWorst: P.tpf.stats.pvMin,
+  /** Theoretical maximum loss (CHF, > 0): every fixing at S = 0, fixings × 2 × N × K. */
+  tpfMaxLoss: maxLoss(tpf).down,
   tpfSide,
   tpfDown,
   // RTPF
@@ -237,6 +246,8 @@ export const M08 = {
   rtpfPTarget: P.rtpf.stats.pTarget,
   rtpfQ05: P.rtpf.stats.pvQuantile05,
   rtpfWorst: P.rtpf.stats.pvMin,
+  /** Theoretical loss downwards (every fixing at S = 0, × L); upwards above U it is unlimited. */
+  rtpfMaxLossDown: maxLoss(rtpf).down,
   rtpfUp,
   // dual currency
   dciCapital: dci.capital,
@@ -323,6 +334,11 @@ export const nums: NumTable = {
   },
   'm08.accQ05': { value: M.accQ05, kind: 'money', note: '5 % quantile of path PV' },
   'm08.accWorst': { value: M.accWorst, kind: 'money', note: 'Worst path PV' },
+  'm08.accMaxLoss': {
+    value: M.accMaxLoss,
+    kind: 'money',
+    note: 'Theoretical maximum loss, every fixing at S = 0 (src/lib/fx/mc/maxloss.ts)',
+  },
   'm08.accUpKo': {
     value: M.accUp.endedAt,
     kind: 'num',
@@ -395,6 +411,11 @@ export const nums: NumTable = {
   },
   'm08.tarfQ05': { value: M.tarfQ05, kind: 'money' },
   'm08.tarfWorst': { value: M.tarfWorst, kind: 'money' },
+  'm08.tarfMaxLoss': {
+    value: M.tarfMaxLoss,
+    kind: 'money',
+    note: 'Theoretical maximum loss, every fixing at S = 0',
+  },
   'm08.tarfPMaturity': { value: M.tarfPMaturity, kind: 'pct' },
   'm08.tarfImpliedLoss': {
     value: M.tarfImpliedLoss,
@@ -433,6 +454,11 @@ export const nums: NumTable = {
   'm08.pivTargetFix': { value: M.pivTargetFix, kind: 'num', digits: 1 },
   'm08.pivQ05': { value: M.pivQ05, kind: 'money', sign: true },
   'm08.pivWorst': { value: M.pivWorst, kind: 'money' },
+  'm08.pivMaxLossDown': {
+    value: M.pivMaxLossDown,
+    kind: 'money',
+    note: 'Theoretical loss downwards, every fixing at S = 0 (upwards unlimited)',
+  },
   'm08.pivShockPnl': { value: M.pivShock.pnl, kind: 'money', sign: true },
 
   // TPF
@@ -484,6 +510,11 @@ export const nums: NumTable = {
   'm08.tpfExpFix': { value: M.tpfExpFix, kind: 'num', digits: 1 },
   'm08.tpfQ05': { value: M.tpfQ05, kind: 'money' },
   'm08.tpfWorst': { value: M.tpfWorst, kind: 'money' },
+  'm08.tpfMaxLoss': {
+    value: M.tpfMaxLoss,
+    kind: 'money',
+    note: 'Theoretical maximum loss, every fixing at S = 0',
+  },
   'm08.tpfSidePnl': { value: M.tpfSide.pnl, kind: 'money', sign: true },
   'm08.tpfDownCoupons': { value: M.tpfDown.coupons, kind: 'num', digits: 0 },
   'm08.tpfDownReceived': { value: M.tpfDown.bench, kind: 'money' },
@@ -500,6 +531,11 @@ export const nums: NumTable = {
   'm08.rtpfPTarget': { value: M.rtpfPTarget, kind: 'pct' },
   'm08.rtpfQ05': { value: M.rtpfQ05, kind: 'money' },
   'm08.rtpfWorst': { value: M.rtpfWorst, kind: 'money' },
+  'm08.rtpfMaxLossDown': {
+    value: M.rtpfMaxLossDown,
+    kind: 'money',
+    note: 'Theoretical loss downwards, every fixing at S = 0 (upwards unlimited)',
+  },
   'm08.rtpfUpCoupons': { value: M.rtpfUp.coupons, kind: 'num', digits: 0 },
   'm08.rtpfUpReceived': { value: M.rtpfUp.bench, kind: 'money' },
   'm08.rtpfUpPnl': { value: M.rtpfUp.pnl, kind: 'money', sign: true },

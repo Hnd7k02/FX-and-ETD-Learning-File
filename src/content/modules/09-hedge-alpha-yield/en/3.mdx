@@ -46,7 +46,7 @@ If the dollar falls sharply, every fixing lands on the wrong side. The products 
 
 <Callout variant="warn" title="Risk box: alpha products">
 
-- **Maximum loss:** not limited. The gain is capped, by a target, a knock-out or the coupon.
+- **Maximum loss:** no built-in stop on losses. The gain is capped, by a target, a knock-out or the coupon. Downwards the loss is very high, but finite, because USD/CHF cannot fall below zero: in theory at most <Num of="m09.tpfMaxLoss" /> for the TPF, <Num of="m09.tarfMaxLoss" /> for the TARF and <Num of="m09.accMaxLoss" /> for the accumulator. The RTPF and the pivot TARF also lose with leverage above their upper edge. Upwards their loss is theoretically unlimited.
 - **Leverage:** 2 on the wrong side of the strike or the range.
 - **Path dependence:** target and knock-out end the good scenarios early. The bad ones run to the end.
 - **Generic:** simplified examples, market variants differ. Offers also include a margin.
@@ -63,7 +63,7 @@ All four boxes sell options and put the premium into something else. It is clear
 
 This is exactly the structured hedge from [section 2](/en/module/09-hedge-alpha-yield/2/).
 
-**2. Coupon direct.** The premium pays for a digital instead ([module 07](/en/module/07-barrier-binary/3/)). <i>D</i>(<i>K</i>) is the price of a digital that pays CHF 1 if the fixing is above <i>K</i>. With <i>K</i> = <Num of="m09.kCoupon" />:
+**2. Coupon direct.** The premium pays for a digital instead ([module 07](/en/module/07-barrier-binary/3/)). <i>D</i>(<i>K</i>) is the price of a digital that pays CHF 1 if the fixing is above <i>K</i>. That is the discounted probability that it pays ([risk-neutral](/en/glossary/#term-risk-neutral), not a forecast). With <i>K</i> = <Num of="m09.kCoupon" />:
 
 <Formula><i>c</i> · <i>D</i>(<i>K</i>) = 2 · <i>P</i>(<i>K</i>) ⇒ <i>c</i> = <Num of="m09.coupon1" /> pips</Formula>
 
@@ -83,6 +83,6 @@ A strike product delivers currency. It suits someone who buys the dollars anyway
 
 <Takeaway>
 
-Alpha products turn a view into a coupon or a better strike. They are paid for with sold options: the gain is capped, the loss is not.
+Alpha products turn a view into a coupon or a better strike. They are paid for with sold options. The gain is capped; there is no built-in stop for the loss.
 
 </Takeaway>

@@ -43,7 +43,7 @@ The same option as a CHF put: notional <i>N</i><sub>CHF</sub> = <i>K</i> · <i>N
 
 That is exactly the payoff of the USD call. Two names, one deal.
 
-A note on the forward: option models work with continuous rates, <i>F</i> = <i>S</i> · e<sup>(<i>r</i><sub>d</sub> − <i>r</i><sub>f</sub>)<i>T</i></sup> = <Num of="ex.forward" />. That is only <Num of="ex.fwdDiffPips" /> pips below the money-market forward from module 02. So that forward and option stand on the same footing, this module uses the continuous forward throughout.
+A note on the forward: option models work with continuous rates, <i>F</i> = <i>S</i> · e<sup>(<i>r</i><sub>d</sub> − <i>r</i><sub>f</sub>)<i>T</i></sup> = <Num of="ex.forward" />. At the same <i>T</i> = <Num of="ex.T" />, that is only <Num of="ex.fwdDiffPips" /> pips below the money-market forward from module 02. So that forward and option stand on the same footing, this module uses the continuous forward throughout.
 
 </Derivation>
 

@@ -8,9 +8,14 @@
  *
  * The "typical range" is the ±1σ band of the log-normal model around today's spot, without
  * drift: S · e^(±σ√T). With σ = 8 % and T = 0.25 it covers roughly two thirds of outcomes.
+ *
+ * Probabilities are risk-neutral, as everywhere in the tool (C6): the same log-normal model as
+ * the option prices, drifting at rd − rf, so the rate ends on average at the forward. They are
+ * model values that belong to the price, not a forecast.
  */
 import { EXAMPLE } from '@/lib/fx/example';
 import { normCdf } from '@/lib/fx/normal';
+import { d1d2 } from '@/lib/fx/vanilla';
 
 /** Pip and big figure of USD/CHF (and every non-JPY pair). */
 export const PIP = 1e-4;
@@ -110,19 +115,44 @@ export function sigmaRange(
 }
 
 /**
- * Model probability that the rate after T years lies at S or further away from S0 on the same
- * side (above S if S > S0, below S if S < S0). Same log-normal model without drift as
- * {@link sigmaRange}: P = N(−|ln(S/S0)| / (σ√T)). At S = S0 the answer is ½.
+ * Risk-neutral probability that the rate after T years lies at S or further away from S0 on the
+ * same side (above S if S ≥ S0, below S if S < S0). Log-normal with drift rd − rf (mean = the
+ * forward F), as in the option model: P(S_T ≥ S) = N(d2), P(S_T ≤ S) = N(−d2), with
+ * d2 = [ln(F/S) − ½σ²T] / (σ√T). With the example rates the forward is below spot, so a fall is
+ * more likely than a rise of the same size. A model value, not a forecast.
  */
 export function probBeyond(
   S: number,
   S0: number = EXAMPLE.spot,
   vol: number = EXAMPLE.vol,
   T: number = EXAMPLE.T,
+  rd: number = EXAMPLE.rd,
+  rf: number = EXAMPLE.rf,
 ): number {
   if (!(S > 0) || !(S0 > 0)) throw new RangeError(`rates must be positive, got ${S}, ${S0}`);
-  const z = Math.log(S / S0) / (vol * Math.sqrt(T));
-  return normCdf(-Math.abs(z));
+  if (!(vol > 0) || !(T > 0)) throw new RangeError(`vol and T must be positive, got ${vol}, ${T}`);
+  const { d2 } = d1d2(S0, S, T, vol, rd, rf);
+  return normCdf(S >= S0 ? d2 : -d2);
+}
+
+/**
+ * Risk-neutral probability that the rate after T years ends inside [lo, hi]: N(d2(lo)) − N(d2(hi)),
+ * same model as {@link probBeyond}. For the ±1σ band of {@link sigmaRange} it stays close to
+ * the two thirds of the driftless band. A model value, not a forecast.
+ */
+export function probBetween(
+  lo: number,
+  hi: number,
+  S0: number = EXAMPLE.spot,
+  vol: number = EXAMPLE.vol,
+  T: number = EXAMPLE.T,
+  rd: number = EXAMPLE.rd,
+  rf: number = EXAMPLE.rf,
+): number {
+  if (!(lo > 0) || !(hi > lo)) throw new RangeError(`need 0 < lo < hi, got ${lo}, ${hi}`);
+  if (!(vol > 0) || !(T > 0)) throw new RangeError(`vol and T must be positive, got ${vol}, ${T}`);
+  const above = (K: number) => normCdf(d1d2(S0, K, T, vol, rd, rf).d2);
+  return above(lo) - above(hi);
 }
 
 /**

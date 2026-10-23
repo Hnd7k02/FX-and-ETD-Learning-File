@@ -13,7 +13,7 @@ In building blocks: the TPF is a bought digital call that pays the coupon, paid 
 
 <StructureBlocksFigure
   products={['tpf', 'rtpf']}
-  caption="One fixing of the TPF and the RTPF: a flat coupon on top, leveraged losses without a floor below."
+  caption="One fixing of the TPF and the RTPF: a flat coupon on top, leveraged losses with no built-in stop below."
 />
 
 ### Why the coupon looks so large
@@ -39,9 +39,9 @@ Choose ‘trend down’ and drag the end of the path to <Num of="m08.accDownMove
 
 <Callout variant="warn" title="Risk box: TPF and RTPF">
 
-- **Maximum loss:** not limited. The gain is capped at <Num of="m08.tpfMaxChf" /> (TPF) and <Num of="m08.rtpfMaxChf" /> (RTPF), the loss grows twice for every pip. Monte Carlo: one path in 20 ends at <Num of="m08.tpfQ05" /> (TPF) or <Num of="m08.rtpfQ05" /> (RTPF) or worse, the worst at <Num of="m08.tpfWorst" /> and <Num of="m08.rtpfWorst" />.
+- **Maximum loss:** no built-in stop on losses. The gain is capped at <Num of="m08.tpfMaxChf" /> (TPF) and <Num of="m08.rtpfMaxChf" /> (RTPF), the loss grows twice for every pip. For the TPF it is very high, but finite: if all <Num of="m08.tpfFixings" /> fixings are at zero, you pay twice the distance to the strike each time, <Num of="m08.tpfMaxLoss" /> in theory. Downwards the RTPF loses at most <Num of="m08.rtpfMaxLossDown" />. Above <Num of="m08.rtpfUpper" /> it pays twice the distance: two sold calls without a cap. Upwards its loss is therefore theoretically unlimited. Monte Carlo: one path in 20 ends at <Num of="m08.tpfQ05" /> (TPF) or <Num of="m08.rtpfQ05" /> (RTPF) or worse, the worst at <Num of="m08.tpfWorst" /> and <Num of="m08.rtpfWorst" />.
 - **Leverage:** 2 on every distance to the strike or the range.
-- **Path dependence:** after <Num of="m08.tpfTargetCoupons" /> coupons the product ends, for the TPF in <Num of="m08.tpfPTarget" /> of the paths, for the RTPF in <Num of="m08.rtpfPTarget" />. All others run to the end.
+- **Path dependence:** after <Num of="m08.tpfTargetCoupons" /> coupons the product ends, for the TPF in <Num of="m08.tpfPTarget" /> of the paths, for the RTPF in <Num of="m08.rtpfPTarget" /> ([risk-neutral](/en/glossary/#term-risk-neutral), not a forecast). All others run to the end.
 
 </Callout>
 
@@ -53,7 +53,7 @@ At maturity a single fixing decides. If it is at or above the strike, you get yo
 
 <DciCalculatorFigure caption="Drag the rate at maturity: below the strike your capital is converted, below the break-even you do worse than with a deposit. Move the strike closer to spot: more interest, more conversion." />
 
-In the example the break-even is <Num of="m08.dciBreakEven" />. At a fixing of <Num of="m08.dciFixing" /> the dollars plus interest are worth <Num of="m08.dciOutValue" />, <Num of="m08.dciOutDiff" /> against the deposit. The strike lies only <Num of="m08.dciStrikeVsFwdAbs" /> pips below the forward of <Num of="m08.dciForward" />. In the model the capital is converted in <Num of="m08.dciPConv" /> of cases: not a forecast, but the price of the risk.
+In the example the break-even is <Num of="m08.dciBreakEven" />. At a fixing of <Num of="m08.dciFixing" /> the dollars plus interest are worth <Num of="m08.dciOutValue" />, <Num of="m08.dciOutDiff" /> against the deposit. The strike lies only <Num of="m08.dciStrikeVsFwdAbs" /> pips below the forward of <Num of="m08.dciForward" />. In the model the capital is converted in <Num of="m08.dciPConv" /> of cases: risk-neutral, not a forecast, but the price of the risk.
 
 <Callout variant="bad" title="When it goes wrong: dual currency">
 
@@ -85,6 +85,6 @@ Three numbers belong on every term sheet: the maximum gain (coupon times target)
 
 <Takeaway>
 
-A coupon is the premium for sold options: it is capped, the loss is not. With dual currency you pay for the extra interest with the risk of ending up in the weaker currency.
+A coupon is the premium for sold options. The gain is capped; there is no built-in stop for the loss. With dual currency you pay for the extra interest with the risk of ending up in the weaker currency.
 
 </Takeaway>

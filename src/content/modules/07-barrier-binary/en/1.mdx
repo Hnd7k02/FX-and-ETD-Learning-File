@@ -23,6 +23,8 @@ With the barrier <Num of="m07.barrierPct" /> above spot, at <Num of="m07.barrier
 | Up-and-out call | <Num of="m07.barrierUp" /> | <Num of="m07.uocPips" /> pips · <Num of="m07.uocChf" /> | <Num of="m07.touchUp" /> |
 | Down-and-out call | <Num of="m07.barrierDown" /> | <Num of="m07.docPips" /> pips · <Num of="m07.docChf" /> | <Num of="m07.touchDown" /> |
 
+The column ‘Touched with’ shows how likely the rate is to touch the barrier before expiry ([risk-neutral](/en/glossary/#term-risk-neutral), not a forecast).
+
 Why the difference? The lower barrier is actually touched more often than the upper one. What matters is *which* scenarios are lost. The down-and-out call disappears when the dollar falls. It would be worth little then anyway, and the importer buys his dollars more cheaply in the market. The up-and-out call disappears exactly when the dollar rises sharply. Those are the very scenarios the importer is buying protection for.
 
 <Callout variant="bad" title="Loss scenario">
@@ -48,7 +50,7 @@ The importer picks the up-and-out call and saves <Num of="m07.uocSavingChf" /> i
 
 The first term is P(<i>S</i><sub><i>T</i></sub> ≥ <i>H</i>); the second counts the paths that touch and end below. Without drift the two are equal.
 
-**4.** In the example: <Num of="m07.endAboveUp" /> + <Num of="m07.touchMirrorTerm" /> = <Num of="m07.touchUp1" />. Twice the first term would be only <Num of="m07.endAboveUp2" />. The negative drift (the forward is below spot) pulls the paths down over time. To end above, the rate has to beat the drift of the whole life of the option. For a touch, an early swing is enough, before the drift has done much. That is why the ratio is above 2 here.
+**4.** In the example (risk-neutral, not a forecast): <Num of="m07.endAboveUp" /> + <Num of="m07.touchMirrorTerm" /> = <Num of="m07.touchUp1" />. Twice the first term would be only <Num of="m07.endAboveUp2" />. The negative drift (the forward is below spot) pulls the paths down over time. To end above, the rate has to beat the drift of the whole life of the option. For a touch, an early swing is enough, before the drift has done much. That is why the ratio is above 2 here.
 
 </Derivation>
 
