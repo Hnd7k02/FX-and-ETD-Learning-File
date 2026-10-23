@@ -11,11 +11,11 @@ Here <i>t</i> is the time that passes and <i>T</i> the time left to expiry. The 
 
 The decay is not even. Long before expiry the time value melts slowly, in the last few weeks faster and faster. Options close to the forward are hit hardest, because that is where there is the most time value to lose.
 
-<GreeksLabFigure mode="theta" caption="Drag the time to expiry towards zero, or the dot itself: at the top the slope of the tangent is theta. Below you see theta per day, which accelerates close to expiry at the forward. Push spot deep into the money and theta even turns positive." />
+<GreeksLabFigure mode="theta" caption="Drag the time to expiry towards zero, or the dot itself: at the top the slope of the tangent is theta. Below you see theta per day, which accelerates close to expiry near ATMF. Push spot deep into the money and theta even turns positive." />
 
 ### Theta in the example: gamma share plus carry
 
-The lab shows <Num of="ex.thetaDayChf" /> per day for the call. That number has two parts.
+The lab's table shows about <Num of="m05.thetaDay" /> per day for the call, <Num of="ex.thetaDayChf" /> to be exact. That number has two parts.
 
 The **gamma share** Θ<sub>Γ</sub> = −½ · σ² · <i>S</i>² · Γ / 365 = <Num of="ex.thetaGammaChf" /> is the actual loss of time value: the price of gamma.
 
@@ -25,11 +25,11 @@ Together that makes <Num of="ex.thetaGammaChf" /> + <Num of="m05.thetaCarryDay2"
 
 ### Gamma versus theta
 
-Whoever buys the call and keeps hedging its delta no longer has a directional risk, only the curvature. If USD/CHF moves by Δ<i>S</i> in a day, they earn ½ · Γ · (Δ<i>S</i>)², whichever way the move goes. In return they pay Θ<sub>Γ</sub>. The carry part does not count here: it is exactly offset by the interest on the hedge, the USD sold and the CHF held.
+Whoever buys the call and keeps hedging its delta no longer has a directional risk, only the curvature. If USD/CHF moves by Δ<i>S</i> in a day, they earn ½ · Γ · (Δ<i>S</i>)², whichever way the move goes. In return they pay Θ<sub>Γ</sub>. The carry part does not count here: it is exactly offset by the interest on the hedge: the USD sold, the CHF held and the financed premium.
 
 <Formula variant="accent">P&L ≈ ½ · Γ · [(Δ<i>S</i>)² − σ² · <i>S</i>² · Δ<i>t</i>]</Formula>
 
-The bracket is zero at |Δ<i>S</i>| = σ · <i>S</i> / √365 = <Num of="ex.breakEvenPips" /> pips. A quiet day with a 20-pip move costs <Num of="m05.pnl20" />, a day with 50 pips brings <Num of="m05.pnl50" />. Put differently: the hedged buyer wins when realised volatility is above the implied volatility paid for in the premium.
+The bracket is zero at |Δ<i>S</i>| = σ · <i>S</i> / √365 = <Num of="ex.breakEvenPips" /> pips. A quiet day with a 20-pip move gives <Num of="m05.pnl20" />, a day with 50 pips <Num of="m05.pnl50" />. Put differently: the hedged buyer wins when realised volatility is above the implied volatility paid for in the premium.
 
 <GammaThetaFigure caption="Drag the dot or the slider: this is what a day with that move earns or costs. Between the break-even lines theta eats the gamma gain; outside them gamma earns more. Higher vol pushes the break-even outwards." />
 
@@ -42,7 +42,7 @@ The call reacts to both rates, mainly through the forward <i>F</i> = <i>S</i> ·
   <span>ρ<sub>f</sub> = ∂<i>V</i> / ∂<i>r</i><sub>f</sub> = −<i>S</i> · <i>T</i> · <i>e</i><sup>−<i>r</i><sub>f</sub><i>T</i></sup> · <i>N</i>(<i>d</i><sub>1</sub>)</span>
 </Formula>
 
-In the example, one percentage point more on the CHF rate lifts the forward by about <Num of="m05.fwdPerPct" /> pips. That is worth <Num of="m05.rhoFwdEffect" /> to the call. At the same time the payoff is discounted more heavily, which costs <Num of="m05.rhoDiscount" />. Net, ρ<sub>d</sub> = <Num of="ex.rhoDChf" /> per +1%. For the USD rate only the forward channel acts: ρ<sub>f</sub> = <Num of="ex.rhoFChf" /> per +1%. Rho grows with maturity: for one year and the same strike it reaches <Num of="m05.rhoD1y" /> and <Num of="m05.rhoF1y" />.
+In the example, one percentage point more on the CHF rate lifts the forward by about <Num of="m05.fwdPerPct" /> pips. That is worth <Num of="m05.rhoFwdEffect" /> to the call. At the same time the payoff is discounted more heavily, which accounts for <Num of="m05.rhoDiscount" />. Net, ρ<sub>d</sub> = <Num of="ex.rhoDChf" /> per +1%. For the USD rate only the forward channel acts: ρ<sub>f</sub> = <Num of="ex.rhoFChf" /> per +1%. Rho grows with maturity: for one year and the same strike it reaches <Num of="m05.rhoD1y" /> and <Num of="m05.rhoF1y" />.
 
 The CHF rate can be negative, by the way. In <Fact id="m05-snb-2015-month" /> the Swiss National Bank cut the rate on sight deposits to <Fact id="m05-snb-2015-rate" />, and only in <Fact id="m05-snb-2022-month" /> did its policy rate turn positive again. That is why the CHF slider in the lab reaches below zero.
 
@@ -57,7 +57,7 @@ The CHF rate can be negative, by the way. In <Fact id="m05-snb-2015-month" /> th
   <span>= −<i>S</i><i>e</i><sup>−<i>r</i><sub>f</sub><i>T</i></sup>φ(<i>d</i><sub>1</sub>)σ / (2√<i>T</i>) + <i>r</i><sub>f</sub><i>S</i><i>e</i><sup>−<i>r</i><sub>f</sub><i>T</i></sup><i>N</i>(<i>d</i><sub>1</sub>) − <i>r</i><sub>d</sub><i>K</i><i>e</i><sup>−<i>r</i><sub>d</sub><i>T</i></sup><i>N</i>(<i>d</i><sub>2</sub>)</span>
 </Formula>
 
-The first term is Θ<sub>Γ</sub>, the other two are the carry. Per day (divided by 365) in the example: <Num of="ex.thetaGammaChf" /> + <Num of="m05.thetaCarryAnalytic" sign={false} /> − 0 = <Num of="ex.thetaAnalyticChf" />. The third term is zero because the CHF rate is <Num of="ex.rd" />. Numerically, with −[<i>V</i>(<i>T</i> + <i>h</i>) − <i>V</i>(<i>T</i> − <i>h</i>)] / 2<i>h</i>, the result is also <Num of="m05.thetaNumeric" />. The lab shows <Num of="ex.thetaDayChf" /> because it computes over a whole day. The small gap is the curvature of the time decay within that day.
+The first term is Θ<sub>Γ</sub>, the other two are the carry. Per day (divided by 365) in the example: <Num of="ex.thetaGammaChf" /> + <Num of="m05.thetaCarryAnalytic" sign={false} /> − 0 = <Num of="ex.thetaAnalyticChf" />. The third term is zero because the CHF rate is <Num of="ex.rd" />. The carry is then exactly the daily drift of the forward times the forward delta: <Num of="m05.fwdDriftPips" /> pips · <Num of="m05.deltaFwd" /> · USD 1m ≈ <Num of="m05.thetaCarryAnalytic" />. Numerically, with −[<i>V</i>(<i>T</i> + <i>h</i>) − <i>V</i>(<i>T</i> − <i>h</i>)] / 2<i>h</i>, the result is also <Num of="m05.thetaNumeric" />. The lab shows <Num of="ex.thetaDayChf" /> because it computes over a whole day. The small gap is the curvature of the time decay within that day.
 
 **Gamma versus theta.** The hedged buyer holds the call and is short Δ USD. Over a short period Δ<i>t</i> the call changes by Δ · Δ<i>S</i> + ½Γ(Δ<i>S</i>)² + Θ · Δ<i>t</i>. The hedge loses Δ · Δ<i>S</i> and costs interest: (<i>r</i><sub>f</sub> − <i>r</i><sub>d</sub>) · <i>S</i>Δ · Δ<i>t</i> on the position and <i>r</i><sub>d</sub><i>V</i> · Δ<i>t</i> on the financed premium. Substituting theta from the equation above, delta and carry cancel:
 
@@ -80,14 +80,14 @@ If both rates rise by the same amount, the forward stays put and only discountin
 
 The Greeks so far each measure one lever. On the desk two cross Greeks join them. **Vanna** = <span class="math">∂Δ/∂σ</span> shows how delta changes when volatility rises. **Volga** = <span class="math">∂ν/∂σ</span> shows how vega changes with volatility.
 
-At the forward both are almost zero: one vol point moves the call's delta by only <Num of="m05.vannaPt" />. Two big figures out of the money it is already <Num of="m05.vannaOtmPt" />, and vega grows by <Num of="m05.volgaOtmChf" /> per vol point. That is why vanna and volga drive the price of risk reversals and butterflies, and with them the volatility smile of module 06.
+At the forward both are almost zero: one vol point moves the call's delta by only <Num of="m05.vannaPt" />. Two big figures out of the money it is already <Num of="m05.vannaOtmPt" />, and vega grows by <Num of="m05.volgaOtmChf" /> per vol point. A risk reversal carries mostly vanna, a butterfly mostly volga. What the market charges for these two risks shows up in the volatility smile of module 06.
 
-A note on delta: if the premium is paid in USD rather than CHF, the premium itself already carries a slice of USD risk. Premium-adjusted delta takes it out: Δ − <i>V</i>/<i>S</i> = <Num of="m05.delta" /> − <Num of="m05.premiumInUsd" /> = <Num of="m05.deltaPA" />. Which convention applies depends on the currency pair and the premium currency.
+A note on delta: if the premium is paid in USD rather than CHF, the premium itself already carries a slice of USD risk. Premium-adjusted delta takes it out: Δ − <i>V</i>/<i>S</i> = <Num of="m05.delta" /> − <Num of="m05.premiumInUsd" /> = <Num of="m05.deltaPA" />. Which convention applies depends on the currency pair and the premium currency, just as with the delta strikes in module 04.
 
 </Desk>
 
 <Takeaway>
 
-Theta is the price of gamma: delta-hedged, the call only makes money on days when USD/CHF moves by more than about <Num of="ex.breakEvenPips1" /> pips. Rho works through the forward: a higher CHF rate helps the USD call, a higher USD rate hurts it.
+Theta is mostly the price of gamma: delta-hedged, the call only makes money on days when USD/CHF moves by more than about <Num of="ex.breakEvenPips1" /> pips. Rho works through the forward: a higher CHF rate helps the USD call, a higher USD rate hurts it.
 
 </Takeaway>

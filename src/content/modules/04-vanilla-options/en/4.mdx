@@ -4,9 +4,9 @@ import WowFigure from '@/components/figures/WowFigure.astro';
 
 What does the importer's right cost? The answer comes from the **Garman-Kohlhagen model**, published in <Fact id="gk-1983" />. It is Black-Scholes for currencies: with two interest rates instead of one, that of the quote currency (CHF, <i>r</i><sub>d</sub>) and that of the base currency (USD, <i>r</i><sub>f</sub>).
 
-Six inputs set the price: spot, strike, time to expiry, vol and the two interest rates. Five of them you can see in the market. Only the vol has to be estimated, and that is exactly what the options market trades.
+Six inputs set the price: spot, strike, time to expiry, vol and the two interest rates. Five of them you know: strike and time to expiry are in the contract, spot and rates come from the market. Only the vol is open, and that is exactly what the options market trades.
 
-<PriceDriversFigure caption="Move a slider. The chart shows call and put along that driver, and the arrows show the direction. The slope of the curve is the Greek from module 05." />
+<PriceDriversFigure caption="Move a slider. The chart shows the call (blue) and the put (violet) along that driver, and the arrows show the direction. The slope of the curve is the Greek from module 05." />
 
 ### The formula, all through the forward
 
@@ -37,15 +37,21 @@ Buy a call and sell a put with the same strike. At expiry you always get <i>S</i
   <i>C</i> − <i>P</i> = e<sup>−<i>r</i><sub>d</sub><i>T</i></sup> · (<i>F</i> − <i>K</i>)
 </Formula>
 
-In the example the strike sits <Num of="m04.parityGapPips" /> pips below the forward. So the call is exactly <Num of="ex.parityPips" /> pips dearer than the put: <Num of="ex.callPips" /> against <Num of="ex.putPips" /> pips. With the strike exactly at the forward, call and put cost the same.
+In the example the strike sits <Num of="m04.parityGapPips" /> pips below the forward. So the call is <Num of="m04.parityPips" /> pips dearer than the put: <Num of="ex.callPips" /> against <Num of="ex.putPips" /> pips. With the strike exactly at the forward, call and put cost the same.
 
 A long call plus a short put is therefore a **synthetic forward**. Its spot delta is <Num of="m04.synthDelta" />, that is e<sup>−<i>r</i><sub>f</sub><i>T</i></sup>, and its forward delta is exactly 1: it moves one for one with the forward.
 
-<PayoffBuilderFigure templates={['synthetic-forward', 'long-forward', 'long-call', 'short-put']} initial="synthetic-forward" caption="Drag the shared strike K1·2. The net premium is always DF · (F − K). Zero cost happens exactly at the forward. Compare it with the Forward template." />
+<PayoffBuilderFigure templates={['synthetic-forward', 'long-forward', 'long-call', 'short-put']} initial="synthetic-forward" caption="Drag the shared strike K1·2. The net premium is always DF · (F − K). Zero cost happens exactly at the forward. Compare it with the 'Forward' template." />
 
 ### Arbitrage when parity fails
 
-Suppose the call is quoted <Num of="m04.arbPips" /> pips too high. Then you sell the call, buy the put and also buy a forward at the fair rate. What you pay at expiry is then fixed today, wherever the rate ends up, and covered by today's receipts. What remains is the pricing error, received today: <Num of="m04.arbChf" /> on USD 1m, without exchange-rate risk. Market makers close such gaps immediately. That is why parity holds in liquid markets up to costs and spreads.
+Suppose the call is quoted <Num of="m04.arbPips" /> pips too high. Then you put on three trades:
+
+- You **sell the expensive call** and **buy the put**. That is a synthetic short forward: at expiry you sell USD at the strike, wherever the rate ends up.
+- You **buy a real forward** at the fair rate. It provides exactly the USD you have to deliver.
+- Every payment at expiry is fixed today and covered by today's receipts. What remains is the pricing error: <Num of="m04.arbChf" /> on USD 1m, received today, without exchange-rate risk.
+
+Market makers close such gaps immediately. That is why parity holds in liquid markets up to costs and spreads.
 
 <WowFigure initialPhase={3} autoplay={false} caption="Summary in four steps: from the forward via the call and time value to parity. Click 1 to 4 or start the animation." />
 
@@ -79,6 +85,6 @@ In the interbank market an option is often traded together with its delta hedge.
 
 <Takeaway>
 
-Six inputs set the price, and almost all of them work through the forward. A long call plus a short put with the same strike is a forward: C − P = DF · (F − K).
+Spot and rates work through the forward; the vol is the one open input. A long call plus a short put with the same strike is a forward: C − P = DF · (F − K).
 
 </Takeaway>

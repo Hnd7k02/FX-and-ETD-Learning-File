@@ -4,7 +4,7 @@ import GreeksLabFigure from '@/components/figures/GreeksLabFigure.astro';
 
 Stell dir vor, an den Märkten wird es unruhig. USD/CHF steht noch genau dort, wo er gestern stand, aber alle rechnen mit grösseren Ausschlägen. Der Call des Importeurs wird trotzdem teurer. Warum?
 
-Eine Option ist eine Wette mit begrenztem Verlust. Grössere Ausschläge bringen mehr Chancen nach oben. Nach unten kann der Käufer nie mehr verlieren als die Prämie. Mehr Unsicherheit macht das Recht also wertvoller, beim Call genauso wie beim Put.
+Der Grund ist die Asymmetrie einer gekauften Option. Grössere Ausschläge bringen mehr Chancen nach oben. Nach unten kann der Käufer nie mehr verlieren als die Prämie. Mehr Unsicherheit macht das Recht also wertvoller, beim Call genauso wie beim Put.
 
 Vega misst diesen Effekt: Um wie viel ändert sich die Prämie, wenn die implizite Vola um einen Punkt steigt?
 
@@ -12,7 +12,7 @@ Vega misst diesen Effekt: Um wie viel ändert sich die Prämie, wenn die implizi
 
 Für den Importeur heisst das: Je nervöser der Markt, desto teurer die Absicherung. Wer erst kauft, wenn alle Angst haben, zahlt mehr. Wer den Call schon hat, gewinnt in solchen Phasen, auch wenn sich der Kurs nicht bewegt.
 
-<GreeksLabFigure mode="vega" caption="Zieh an der Vola oder direkt am Punkt: Oben ist die Steigung der Tangente Vega. Unten siehst du Vega über dem Spot, am grössten nahe am Forward. Verlängere die Laufzeit, und die ganze Kurve wächst." />
+<GreeksLabFigure mode="vega" caption="Zieh an der Vola oder direkt am Punkt: Oben ist die Steigung der Tangente Vega. Unten siehst du Vega über dem Spot; der Ring markiert das Maximum, dort liegt der Forward nahe am Strike. Verlängere die Laufzeit, und die ganze Kurve wächst." />
 
 ### Vega im Beispiel
 
@@ -30,9 +30,11 @@ Prämie bei der Vola plus und minus 0.01 Punkte, Differenz durch 0.02 Punkte: <N
 
 Tief im Geld ist so gut wie sicher, dass die Option ausgeübt wird. Sie verhält sich wie ein Forward, und ein Forward kümmert sich nicht um die Vola. Weit aus dem Geld ist so gut wie sicher, dass sie wertlos verfällt. Etwas mehr Vola ändert daran wenig. Am meisten bewirkt die Vola dort, wo das Ergebnis offen ist: wenn der Forward nahe am Strike liegt.
 
-In der Formel steckt das in φ(<i>d</i><sub>1</sub>), einer Glockenkurve. Liegt der Spot zwei Big Figures tiefer, bei <Num of="m05.spotOtm" />, liegt der Forward <Num of="m05.fwdOtmPips" /> Pips unter dem Strike, und Vega fällt auf <Num of="m05.vegaOtm" />. Je weiter weg, desto schneller fällt die Kurve.
+In der Formel steckt das in φ(<i>d</i><sub>1</sub>), einer Glockenkurve. Liegt der Spot zwei Big Figures tiefer, bei <Num of="m05.spotOtm" />, liegt der Forward <Num of="m05.fwdOtmPips" /> Pips unter dem Strike, und Vega fällt auf <Num of="m05.vegaOtm" />. Je weiter der Forward vom Strike weg liegt, desto kleiner wird Vega.
 
-Der zweite Faktor ist √<i>T</i>. Mehr Zeit heisst mehr Raum für Bewegung, aber nicht proportional: Vega wächst mit der Wurzel der Zeit. Ein Jahr hat viermal so viel Zeit wie drei Monate, also rund doppelt so viel Vega. ATMF sind es bei einem Jahr <Num of="m05.vegaAtmf1y" /> je Vola-Punkt, das <Num of="m05.vegaRatio1y" />-Fache.
+Der zweite Faktor ist √<i>T</i>. Mehr Zeit heisst mehr Raum für Bewegung, aber nicht proportional: Vega wächst mit der Wurzel der Zeit. Ein Jahr hat viermal so viel Zeit wie drei Monate, also rund doppelt so viel Vega. ATMF sind es bei einem Jahr <Num of="m05.vegaAtmf1y" /> je Vola-Punkt, das <Num of="m05.vegaRatio1y" />-Fache. Gemeint ist eine Option mit Strike am 1-Jahres-Forward.
+
+Im Labor bleibt der Strike bei <Num of="ex.strike" />. Schieb dort die Laufzeit auf ein Jahr: Das Maximum wandert nach rechts, zu Spot <Num of="m05.vegaPeakSpot1y" />. Über ein Jahr betragen die Forward Points <Num of="m05.fwdPoints1y" /> Pips. Damit der Forward den Strike trifft, muss der Spot also höher liegen. Vega richtet sich nach dem Forward, nicht nach dem Spot.
 
 <Derivation title="Herleitung: Vega aus dem Garman-Kohlhagen-Preis">
 
@@ -58,12 +60,12 @@ Wo genau liegt das Maximum? Über dem Strike betrachtet bei <i>d</i><sub>1</sub>
 
 Optionen werden in Vola gehandelt, nicht in Franken. Händler quotieren eine implizite Vola, die Prämie folgt aus dem Modell. Vega ist die Brücke zwischen beiden Welten: Ein Vola-Punkt auf dem Call des Importeurs ist <Num of="ex.vegaChf" /> wert.
 
-Vega lässt sich nur mit anderen Optionen absichern. Spot und Forwards haben keine Vola. Weil kurze und lange Laufzeiten unterschiedlich reagieren, wird Vega meist je Laufzeit getrennt geführt. Wer long Vega ist, gewinnt, wenn der Markt nervös wird. Wie stark die Vola in Krisen springt, zeigt das [Riskometer](/riskometer/).
+Vega lässt sich nur mit anderen Optionen absichern. Spot und Forwards haben kein Vega. Weil kurze und lange Laufzeiten unterschiedlich reagieren, wird Vega meist je Laufzeit getrennt geführt. Wer long Vega ist, gewinnt, wenn der Markt nervös wird. Wie stark die tatsächlichen Schwankungen in Krisen zunehmen, zeigt das [Riskometer](/riskometer/) mit der realisierten Vola.
 
 </Desk>
 
 <Takeaway>
 
-Vega misst, was Unsicherheit wert ist. Am grössten ist es nahe am Forward und bei langen Laufzeiten, denn Vega wächst mit √<i>T</i>.
+Vega misst, was Unsicherheit wert ist. Am grössten ist es nahe ATMF, wo der Forward beim Strike liegt, und bei langen Laufzeiten, denn Vega wächst mit √<i>T</i>.
 
 </Takeaway>

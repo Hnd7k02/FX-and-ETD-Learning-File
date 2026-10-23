@@ -7,7 +7,6 @@
 import type { Lang } from '@/i18n/types';
 import { fmtMoney, fmtNumber, fmtPct, fmtPips, fmtRate } from '@/lib/format';
 import { EXAMPLE as E } from '@/lib/fx/example';
-import { leverEffect } from '@/lib/greeksfigures';
 import { M05 } from '@/lib/nums/m05';
 import type { ModuleQuiz, QuizQuestion } from './types';
 
@@ -34,53 +33,54 @@ const carryPlain = chf(M05.thetaCarryDayChf);
 const rhoF = chf(M05.rhoForeignChf, true);
 const rhoD = chf(M05.rhoDomesticChf, true);
 const pnl10 = chf(M05.deltaPnl10PipsChf);
-const spotUp = chf(leverEffect('spot', 'up').exact, true);
+const spotUp = chf(M05.spotUpChf, true);
+const spotUpDelta = chf(M05.spotUpDeltaChf, true);
+const spotUpDG = chf(M05.spotUpDeltaGammaChf, true);
+/** Daily cost of gamma as a positive amount ("kostet CHF 69", not "kostet CHF −69"). */
+const thetaGammaCost = chf(Math.abs(M05.thetaGammaDayChf));
+const rhoFLoss = chf(Math.abs(M05.rhoForeignChf));
 
 /* ---------- Checks (one per section, ungraded) ---------- */
 
 const check1: QuizQuestion = {
   id: 'm05-c1',
   prompt: {
-    de: 'Der Importeur hält den USD Call aus dem Beispiel. Welcher Hebel macht diesen Call billiger, wenn er sich allein bewegt?',
-    en: 'The importer holds the USD call from the example. Which lever, moving on its own, makes this call cheaper?',
+    de: `USD/CHF steigt um eine Big Figure. Delta allein schätzt für den Call ${spotUpDelta.de}, die exakte Neubewertung ergibt ${spotUp.de}. Warum liegt die Schätzung mit Delta allein zu tief?`,
+    en: `USD/CHF rises by one big figure. Delta alone estimates ${spotUpDelta.en} for the call; the exact repricing gives ${spotUp.en}. Why is the delta-only estimate too low?`,
   },
   options: [
     {
       label: {
-        de: 'USD/CHF steigt um eine Big Figure',
-        en: 'USD/CHF rises by one big figure',
+        de: 'Delta wächst unterwegs mit dem Kurs, und diese Krümmung (Gamma) fehlt',
+        en: 'Delta grows with the rate along the way, and that curvature (gamma) is missing',
       },
       explain: {
-        de: `Ein höherer Spot macht das Recht, USD zum Strike zu kaufen, wertvoller. Die Prämie steigt um rund ${spotUp.de}: Delta und Gamma sind positiv.`,
-        en: `A higher spot makes the right to buy USD at the strike more valuable. The premium rises by about ${spotUp.en}: delta and gamma are positive.`,
+        de: `Delta ist die Steigung von heute. Steigt der Kurs, wird die Preiskurve steiler, weil Gamma positiv ist. Mit dem Term ½ · Γ · (ΔS)² kommt die Schätzung auf ${spotUpDG.de}, fast genau der exakte Wert.`,
+        en: `Delta is today's slope. As the rate rises, the price curve gets steeper because gamma is positive. With the term ½ · Γ · (ΔS)² the estimate reaches ${spotUpDG.en}, almost exactly the true value.`,
       },
     },
     {
       label: {
-        de: 'Die implizite Vola steigt um einen Punkt',
-        en: 'Implied volatility rises by one point',
+        de: 'Weil gleichzeitig Zeit vergeht (Theta)',
+        en: 'Because time passes at the same time (theta)',
       },
       explain: {
-        de: `Mehr Vola heisst mehr Chance nach oben bei begrenztem Verlust. Vega ist positiv, der Call wird rund ${vega.de} teurer.`,
-        en: `More volatility means more upside with a capped loss. Vega is positive; the call becomes about ${vega.en} dearer.`,
-      },
-    },
-    {
-      label: { de: 'Der USD-Zins steigt um 1 %', en: 'The USD rate rises by 1%' },
-      explain: {
-        de: `Ein höherer USD-Zins drückt den Forward nach unten, und ein tieferer Forward schadet dem USD Call. Rho USD beträgt ${rhoF.de} je +1 %.`,
-        en: `A higher USD rate pushes the forward down, and a lower forward hurts the USD call. Rho USD is ${rhoF.en} per +1%.`,
+        de: 'Ein Greek misst einen Hebel, während alle anderen stillstehen. Hier bewegt sich nur der Spot. Theta würde die Prämie zudem senken, nicht heben. Der Unterschied kommt von der Krümmung: Gamma.',
+        en: 'A Greek measures one lever while all the others stand still. Here only spot moves. Theta would also lower the premium, not raise it. The gap comes from the curvature: gamma.',
       },
     },
     {
-      label: { de: 'Der CHF-Zins steigt um 1 %', en: 'The CHF rate rises by 1%' },
+      label: {
+        de: 'Weil die Vola mit dem Kurs steigt (Vega)',
+        en: 'Because volatility rises with the rate (vega)',
+      },
       explain: {
-        de: `Umgekehrt: Ein höherer CHF-Zins hebt den Forward und hilft dem Call. Rho CHF beträgt ${rhoD.de} je +1 %. Base und Quote nicht verwechseln: CHF ist hier die Quote-Währung.`,
-        en: `The other way round: a higher CHF rate lifts the forward and helps the call. Rho CHF is ${rhoD.en} per +1%. Do not mix up base and quote: CHF is the quote currency here.`,
+        de: 'Die Vola bleibt in diesem Szenario gleich, nur der Spot bewegt sich. Der Unterschied kommt von der Krümmung der Preiskurve: Gamma.',
+        en: 'Volatility stays the same in this scenario; only spot moves. The gap comes from the curvature of the price curve: gamma.',
       },
     },
   ],
-  correct: 2,
+  correct: 0,
 };
 
 const check2: QuizQuestion = {
@@ -133,10 +133,13 @@ const check3: QuizQuestion = {
       },
     },
     {
-      label: { de: 'Nahe am Forward (ATMF)', en: 'Close to the forward (ATMF)' },
+      label: {
+        de: 'Nahe ATMF, wo der Forward beim Strike liegt',
+        en: 'Near ATMF, where the forward sits at the strike',
+      },
       explain: {
-        de: `Nahe am Forward ist offen, ob die Option am Ende etwas wert ist. Dort bewirkt mehr Vola am meisten: Vega beträgt ${vega.de} je Punkt, bei Spot ${spotOtm} nur noch ${vegaOtm.de}.`,
-        en: `Close to the forward it is an open question whether the option will finish with value. That is where extra volatility does the most: vega is ${vega.en} per point, at spot ${spotOtm} only ${vegaOtm.en}.`,
+        de: `Liegt der Forward nahe am Strike, ist offen, ob die Option am Ende etwas wert ist. Dort bewirkt mehr Vola am meisten: Vega beträgt ${vega.de} je Punkt, bei Spot ${spotOtm} nur noch ${vegaOtm.de}.`,
+        en: `With the forward close to the strike, it is an open question whether the option will finish with value. That is where extra volatility does the most: vega is ${vega.en} per point, at spot ${spotOtm} only ${vegaOtm.en}.`,
       },
     },
     {
@@ -153,8 +156,8 @@ const check3: QuizQuestion = {
 const check4: QuizQuestion = {
   id: 'm05-c4',
   prompt: {
-    de: `Das Theta des Calls im Labor beträgt rund ${thetaDay.de} pro Tag, der Gamma-Anteil davon rund ${thetaGamma.de}. Woher kommt der Unterschied?`,
-    en: `The theta of the call in the lab is about ${thetaDay.en} per day, its gamma share about ${thetaGamma.en}. Where does the difference come from?`,
+    de: `Das Theta des Calls im Labor beträgt rund ${thetaDay.de} pro Tag, der Gamma-Anteil allein aber rund ${thetaGamma.de}. Woher kommt der Unterschied?`,
+    en: `The theta of the call in the lab is about ${thetaDay.en} per day, yet its gamma share alone is about ${thetaGamma.en}. Where does the difference come from?`,
   },
   options: [
     {
@@ -238,8 +241,8 @@ const q2: QuizQuestion = {
         en: 'Every day, because gamma is always positive',
       },
       explain: {
-        de: `Gamma ist positiv, aber nicht gratis: Jeden Tag kostet die Position den Gamma-Anteil des Thetas, rund ${thetaGamma.de}. Nur eine Bewegung über dem Break-even von rund ${breakEven.de} Pips deckt diese Kosten.`,
-        en: `Gamma is positive, but not free: every day the position pays the gamma share of theta, about ${thetaGamma.en}. Only a move beyond the break-even of about ${breakEven.en} pips covers that cost.`,
+        de: `Gamma ist positiv, aber nicht gratis: Jeden Tag zahlt die Position den Gamma-Anteil des Thetas, rund ${thetaGammaCost.de}. Nur eine Bewegung über dem Break-even von rund ${breakEven.de} Pips deckt diese Kosten.`,
+        en: `Gamma is positive, but not free: every day the position pays the gamma share of theta, about ${thetaGammaCost.en}. Only a move beyond the break-even of about ${breakEven.en} pips covers that cost.`,
       },
     },
     {
@@ -258,8 +261,8 @@ const q2: QuizQuestion = {
         en: `When USD/CHF moves by more than about ${fmtNumber(Math.abs(M05.thetaGammaDayChf), 'en')} pips`,
       },
       explain: {
-        de: `Hier sind Franken und Pips vermischt: Der Gamma-Anteil des Thetas kostet rund ${thetaGamma.de} pro Tag, aber der Break-even ist eine Kursbewegung, σ · S / √365 ≈ ${breakEven.de} Pips.`,
-        en: `This mixes up francs and pips: the gamma share of theta costs about ${thetaGamma.en} per day, but the break-even is a rate move, σ · S / √365 ≈ ${breakEven.en} pips.`,
+        de: `Hier sind Franken und Pips vermischt: Der Gamma-Anteil des Thetas kostet rund ${thetaGammaCost.de} pro Tag, aber der Break-even ist eine Kursbewegung, σ · S / √365 ≈ ${breakEven.de} Pips.`,
+        en: `This mixes up francs and pips: the gamma share of theta costs about ${thetaGammaCost.en} per day, but the break-even is a rate move, σ · S / √365 ≈ ${breakEven.en} pips.`,
       },
     },
     {
@@ -338,8 +341,8 @@ const q4: QuizQuestion = {
       label: chf(0),
       mono: true,
       explain: {
-        de: `Die Zinsen wirken über den Forward auf die Option, nicht nur über die Diskontierung. +1 % USD-Zins senkt den Forward und kostet rund ${rhoF.de}.`,
-        en: `The rates reach the option through the forward, not just through discounting. +1% in the USD rate lowers the forward and costs about ${rhoF.en}.`,
+        de: `Die Zinsen wirken über den Forward auf die Option, nicht nur über die Diskontierung. +1 % USD-Zins senkt den Forward und kostet rund ${rhoFLoss.de}.`,
+        en: `The rates reach the option through the forward, not just through discounting. +1% in the USD rate lowers the forward and costs about ${rhoFLoss.en}.`,
       },
     },
   ],

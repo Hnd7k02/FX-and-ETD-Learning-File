@@ -12,7 +12,13 @@ import { d1d2, gkPrice } from '@/lib/fx/vanilla';
 import { greeks } from '@/lib/fx/greeks';
 import { atmDnsStrike, strikeFromDelta } from '@/lib/fx/implied';
 import { pipSize } from '@/lib/format';
-import { FORWARD_DIGITS, hedgeCosts, hedgeFacts, savingChf, type HedgeSetup } from '@/lib/hedge-cost';
+import {
+  FORWARD_DIGITS,
+  hedgeCosts,
+  hedgeFacts,
+  savingChf,
+  type HedgeSetup,
+} from '@/lib/hedge-cost';
 import { roundStrike } from '@/lib/payoff';
 import type { NumTable } from './types';
 

@@ -26,8 +26,7 @@ export const g10profiles = defineDict({
       'Rohstoffwährung: folgt den Preisen der wichtigsten Exportgüter und der Weltkonjunktur.',
     'roleLong.funding':
       'Funding-Währung: über lange Zeit tiefe Zinsen. Man leiht sie, um höher verzinste Anlagen zu finanzieren (Carry Trade).',
-    'roleLong.none':
-      'Keine Sonderrolle: Der Kurs folgt vor allem Zinsen, Konjunktur und Politik.',
+    'roleLong.none': 'Keine Sonderrolle: Der Kurs folgt vor allem Zinsen, Konjunktur und Politik.',
     scenario: 'Szenario',
     'scenario.none': 'Keins',
     'scenario.riskOff': 'Krise',
@@ -116,7 +115,8 @@ export const g10profiles = defineDict({
       'Commodity currency: follows the prices of its main exports and the world economy.',
     'roleLong.funding':
       'Funding currency: low interest rates for long periods. It is borrowed to finance higher-yielding investments (carry trade).',
-    'roleLong.none': 'No special role: the rate mainly follows interest rates, growth and politics.',
+    'roleLong.none':
+      'No special role: the rate mainly follows interest rates, growth and politics.',
     scenario: 'Scenario',
     'scenario.none': 'None',
     'scenario.riskOff': 'Crisis',
@@ -125,15 +125,15 @@ export const g10profiles = defineDict({
     'tend.up': 'stronger',
     'tend.down': 'weaker',
     'tend.flat': 'unclear',
-    'scnote.none':
-      'Pick a scenario and see which currencies typically become stronger or weaker.',
+    'scnote.none': 'Pick a scenario and see which currencies typically become stronger or weaker.',
     'scnote.riskOff':
       'Risk-off: investors look for safety. Safe havens tend to appreciate ({up}), commodity currencies to depreciate ({down}).',
     'scnote.riskOn':
       'Risk-on: investors look for yield and build carry trades. Commodity currencies are in demand ({up}), funding currencies are sold ({down}).',
     'scnote.commodityBoom':
       'Commodity prices rise: the exporting countries earn more, and their currencies tend to appreciate ({up}).',
-    caveat: 'These are tendencies, not laws. There are crises in which things turn out differently.',
+    caveat:
+      'These are tendencies, not laws. There are crises in which things turn out differently.',
     'name.USD': 'US dollar',
     'name.EUR': 'Euro',
     'name.JPY': 'Japanese yen',
@@ -160,8 +160,7 @@ export const g10profiles = defineDict({
       'ECB rate decisions|growth and inflation in the euro area|politics within the monetary union',
     'drivers.JPY':
       'BoJ monetary policy, with very low rates for a long time|rate gap to the United States|capital flowing back to Japan in crises',
-    'drivers.GBP':
-      'BoE rate decisions|UK inflation and growth|politics and trade relations',
+    'drivers.GBP': 'BoE rate decisions|UK inflation and growth|politics and trade relations',
     'drivers.CHF':
       'SNB monetary policy, including interventions in the FX market|demand for safe assets|developments in the euro area, the main trading partner',
     'drivers.AUD':

@@ -21,12 +21,12 @@ import { fmtMillions, fmtMoney, fmtNumber, fmtPct, fmtRate } from '@/lib/format'
 import {
   BIG_FIGURE,
   EXPOSURE_RANGE as R,
+  M01_SCENARIOS,
   bigFigureBlocks,
   exposure,
   probBeyond,
   sigmaRange,
 } from '@/lib/m01/exposure';
-import { M01_SCENARIOS } from '@/lib/nums/m01';
 import { snap, useSvgDrag } from './m01-shared';
 
 export interface SpotExposureProps {

@@ -23,6 +23,15 @@ export const EXPOSURE_RANGE = {
   step: 0.0005,
 } as const;
 
+/**
+ * Teaching scenarios of section 1 (D-22): the dollar a few big figures up or down. Same rates as
+ * in module 04 so the stories line up.
+ */
+export const M01_SCENARIOS = {
+  stUp: 0.84,
+  stDown: 0.76,
+} as const;
+
 /** CHF cost of buying `notional` USD at the rate S. */
 export function costChf(S: number, notional: number = EXAMPLE.notional): number {
   return S * notional;

@@ -19,7 +19,6 @@ const pips = (x: number, digits = 2) => both((l) => fmtPips(x, l, digits));
 const num = (x: number, digits: number) => both((l) => fmtNumber(x, l, { digits }));
 
 const K = rate(M04.K);
-const F4 = rate(M04.F);
 const F5 = rate(M04.F, 5);
 const spot = rate(E.spot);
 const callChf = chf(M04.callChf);
@@ -83,8 +82,8 @@ const q2: QuizQuestion = {
       label: { de: `unter ${rate(M04.bePut)}`, en: `below ${rate(M04.bePut)}` },
       mono: true,
       explain: {
-        de: `Richtig. Bis zum Strike verfällt der Put wertlos. Darunter zahlst du K − S, aber die Prämie federt das ab: Break-even bei Strike minus Prämie, ${rate(M04.bePut)}.`,
-        en: `Correct. Down to the strike the put expires worthless. Below it you pay K − S, but the premium cushions that: break-even at strike minus premium, ${rate(M04.bePut)}.`,
+        de: `Richtig. Über dem Strike verfällt der Put wertlos. Darunter zahlst du K − S, aber die Prämie federt das ab: Break-even bei Strike minus Prämie, ${rate(M04.bePut)}.`,
+        en: `Correct. Above the strike the put expires worthless. Below it you pay K − S, but the premium cushions that: break-even at strike minus premium, ${rate(M04.bePut)}.`,
       },
     },
     {
@@ -118,8 +117,8 @@ const q2: QuizQuestion = {
 const q3: QuizQuestion = {
   id: 'm04-q3',
   prompt: {
-    de: `Spot ${spot}, Forward 3 Monate ${F4}. Ein USD Call mit Strike ${rate(SC.kMid)} ist …`,
-    en: `Spot ${spot}, 3-month forward ${F4}. A USD call with strike ${rate(SC.kMid)} is …`,
+    de: `Spot ${spot}, Forward 3 Monate ${F5}. Ein USD Call mit Strike ${rate(SC.kMid)} ist …`,
+    en: `Spot ${spot}, 3-month forward ${F5}. A USD call with strike ${rate(SC.kMid)} is …`,
   },
   options: [
     {
@@ -177,8 +176,8 @@ const q4: QuizQuestion = {
       label: { de: `${putPips.de} Pips`, en: `${putPips.en} pips` },
       mono: true,
       explain: {
-        de: `Richtig. Put-Call-Parität: P = C − DF · (F − K). Der Strike liegt ${pips((M04.F - M04.K) / PIP).de} Pips unter dem Forward, also ist der Put um ${pips(M04.parityPips).de} Pips billiger.`,
-        en: `Correct. Put-call parity: P = C − DF · (F − K). The strike is ${pips((M04.F - M04.K) / PIP).en} pips below the forward, so the put is ${pips(M04.parityPips).en} pips cheaper.`,
+        de: `Richtig. Put-Call-Parität: P = C − DF · (F − K). Der Strike liegt ${pips((M04.F - M04.K) / PIP, 1).de} Pips unter dem Forward, und DF ist 1. Also ist der Put um ${pips(M04.parityPips, 1).de} Pips billiger.`,
+        en: `Correct. Put-call parity: P = C − DF · (F − K). The strike is ${pips((M04.F - M04.K) / PIP, 1).en} pips below the forward, and DF is 1. So the put is ${pips(M04.parityPips, 1).en} pips cheaper.`,
       },
     },
     {
@@ -299,38 +298,49 @@ const c2: QuizQuestion = {
 const c3: QuizQuestion = {
   id: 'm04-c3',
   prompt: {
-    de: `Warum liegt der ATM-DNS-Strike (${rate(M04.dns)}) leicht über dem Forward (${F4})?`,
-    en: `Why does the ATM DNS strike (${rate(M04.dns)}) sit slightly above the forward (${F4})?`,
+    de: `Ein USD Call mit Strike ${rate(M04.kItm)} kostet ${pips(M04.itmPips, 1).de} Pips. Forward ${F5}, CHF-Zins ${rd.de}. Wie gross ist sein Zeitwert?`,
+    en: `A USD call with strike ${rate(M04.kItm)} costs ${pips(M04.itmPips, 1).en} pips. Forward ${F5}, CHF rate ${rd.en}. How large is its time value?`,
   },
   options: [
     {
       label: {
-        de: 'Dort heben sich Call- und Put-Delta auf: d₁ = 0, also K = F · e^(½σ²T).',
-        en: 'There the call and put deltas cancel: d₁ = 0, so K = F · e^(½σ²T).',
+        de: `${pips(M04.itmTimePips, 1).de} Pips`,
+        en: `${pips(M04.itmTimePips, 1).en} pips`,
       },
+      mono: true,
       explain: {
-        de: 'Richtig. Der delta-neutrale Straddle ist die Desk-Konvention für ATM. Der Abstand zum Forward wächst mit Vola und Laufzeit.',
-        en: 'Correct. The delta-neutral straddle is the desk convention for ATM. The gap to the forward grows with vol and time.',
+        de: `Richtig. Der innere Wert gegen den Forward ist F − K = ${pips(M04.itmIntrinsicPips, 1).de} Pips, abgezinst mit Faktor 1. Der Rest der Prämie ist Zeitwert.`,
+        en: `Correct. The intrinsic value against the forward is F − K = ${pips(M04.itmIntrinsicPips, 1).en} pips, discounted with a factor of 1. The rest of the premium is time value.`,
       },
     },
     {
       label: {
-        de: 'Weil der Spot über dem Forward liegt.',
-        en: 'Because spot is above the forward.',
+        de: `${pips(M04.itmIntrinsicPips, 1).de} Pips`,
+        en: `${pips(M04.itmIntrinsicPips, 1).en} pips`,
       },
+      mono: true,
       explain: {
-        de: 'Der Spot spielt für ATM DNS keine direkte Rolle. Auch wenn Spot und Forward gleich wären, läge der Strike über dem Forward.',
-        en: 'Spot plays no direct role for ATM DNS. Even with spot equal to the forward, the strike would sit above the forward.',
+        de: 'Das ist der innere Wert, F − K. Gefragt ist der Zeitwert: die Prämie minus den inneren Wert.',
+        en: 'That is the intrinsic value, F − K. The question asks for the time value: the premium minus the intrinsic value.',
       },
     },
     {
       label: {
-        de: 'Weil der Market Maker eine Marge einrechnet.',
-        en: 'Because the market maker builds in a margin.',
+        de: `${pips(M04.itmPips - M04.itmVsSpotPips, 1).de} Pips`,
+        en: `${pips(M04.itmPips - M04.itmVsSpotPips, 1).en} pips`,
       },
+      mono: true,
       explain: {
-        de: 'Margen stecken im Spread, nicht im Strike. Der Abstand folgt allein aus der Bedingung Delta-Call + Delta-Put = 0.',
-        en: 'Margins sit in the spread, not in the strike. The gap follows from the condition call delta + put delta = 0 alone.',
+        de: `Hier wurde der innere Wert gegen den Spot gerechnet, ${pips(M04.itmVsSpotPips, 1).de} Pips. Ein negativer Zeitwert ergibt keinen Sinn: Innerer Wert und Moneyness misst man gegen den Forward.`,
+        en: `This measures the intrinsic value against spot, ${pips(M04.itmVsSpotPips, 1).en} pips. A negative time value makes no sense: intrinsic value and moneyness are measured against the forward.`,
+      },
+    },
+    {
+      label: { de: `${pips(M04.itmPips, 1).de} Pips`, en: `${pips(M04.itmPips, 1).en} pips` },
+      mono: true,
+      explain: {
+        de: 'Reiner Zeitwert ist die Prämie nur ATMF oder aus dem Geld. Dieser Call liegt unter dem Forward, also im Geld.',
+        en: 'The premium is pure time value only at the forward or out of the money. This call is below the forward, so it is in the money.',
       },
     },
   ],
@@ -361,19 +371,19 @@ const c4: QuizQuestion = {
       },
     },
     {
-      label: num(M04.deltaCall, 3),
+      label: num(1, 3),
       mono: true,
       explain: {
-        de: 'Das ist nur das Delta des Calls. Der Short Put bringt ein positives Delta dazu.',
-        en: 'That is only the delta of the call. The short put adds a positive delta.',
+        de: `Genau 1 ist das Forward-Delta. Das Spot-Delta ist e^(−rf T) = ${fmtNumber(M04.dff, 'de', { digits: 3 })}: USD 1 Mio. in 3 Monaten entsprechen heute nur ihrem Barwert, abgezinst mit dem USD-Zins.`,
+        en: `Exactly 1 is the forward delta. The spot delta is e^(−rf T) = ${fmtNumber(M04.dff, 'en', { digits: 3 })}: USD 1m in 3 months is worth only its present value today, discounted at the USD rate.`,
       },
     },
     {
       label: num(0, 3),
       mono: true,
       explain: {
-        de: 'Keine Nettoprämie heisst nicht kein Risiko. Die Kombination bewegt sich eins zu eins mit dem Forward.',
-        en: 'No net premium does not mean no risk. The combination moves one for one with the forward.',
+        de: 'Fast keine Nettoprämie heisst nicht kein Risiko. Die Kombination bewegt sich eins zu eins mit dem Forward.',
+        en: 'Almost no net premium does not mean no risk. The combination moves one for one with the forward.',
       },
     },
   ],

@@ -1,12 +1,27 @@
 /**
  * Numbers of module 01 (FX market & spot) for <Num of="m01.…" />. Everything is computed from
- * the running example (src/lib/fx/example.ts), the calculation core and the module logic in
- * src/lib/m01; nothing is typed in. Scenario rates (0.8400, 0.7600 as in module 04), the spread
- * model, the order levels and EUR/USD 1.1000 are teaching choices kept in their config objects
- * (M01_SCENARIOS, SPREAD_MODEL, ORDER_DEMO, TRI_CONFIG) so they are easy to change (D-22).
+ * the running example (src/lib/fx/example.ts), the calculation core, the module logic in
+ * src/lib/m01 and the ECB raw data (data/raw/ecb-eur-reference.csv); nothing is typed in.
+ * Scenario rates (as in module 04), the spread model, the order levels and EUR/USD are teaching
+ * choices kept in their config objects (M01_SCENARIOS, SPREAD_MODEL, ORDER_DEMO, TRI_CONFIG,
+ * APRIL_2025) so they are easy to change (D-22).
  */
+import rawCsv from '../../../data/raw/ecb-eur-reference.csv?raw';
+import { parseRawCsv } from '@/lib/data/csv';
+import { pairSeries } from '@/lib/data/series';
 import { EXAMPLE as E } from '@/lib/fx/example';
-import { BIG_FIGURE, PIP, costChf, exposure, inverseRate, sigmaRange } from '@/lib/m01/exposure';
+import {
+  BIG_FIGURE,
+  M01_SCENARIOS,
+  PIP,
+  costChf,
+  exposure,
+  inverseRate,
+  probBeyond,
+  sigmaRange,
+} from '@/lib/m01/exposure';
+import { pairConvention } from '@/lib/m01/g10';
+import { APRIL_2025, windowMove } from '@/lib/m01/history';
 import { SPREAD_MODEL, spreadCost, spreadPips, twoWayQuote } from '@/lib/m01/quote';
 import { ORDER_DEMO, buildPath, fillBuy } from '@/lib/m01/orders';
 import { TRI_CONFIG, directAt, triState } from '@/lib/m01/triangle';
@@ -14,11 +29,7 @@ import type { NumTable } from './types';
 
 const { spot: S, notional: N, vol, T, rd, rf, mmDays } = E;
 
-/** Teaching scenarios of section 1 (same rates as module 04). */
-export const M01_SCENARIOS = {
-  stUp: 0.84,
-  stDown: 0.76,
-} as const;
+export { M01_SCENARIOS };
 const SC = M01_SCENARIOS;
 
 const up = exposure(SC.stUp);
@@ -49,6 +60,11 @@ const triMids = {
 const tri = triState(triMids, true);
 const triFlat = triState(triMids, false);
 
+// Section 4: April 2025 from the ECB reference rates (USD/CHF and EUR/USD)
+const ecb = parseRawCsv(rawCsv);
+const aprUsdChf = windowMove(pairSeries(ecb, 'USD/CHF'), APRIL_2025.anchor, APRIL_2025.to);
+const aprEurUsd = windowMove(pairSeries(ecb, 'EUR/USD'), APRIL_2025.anchor, APRIL_2025.to);
+
 // Section 4: carry with the example rates (borrow CHF, invest USD, money market Act/360)
 const tMM = mmDays / 360;
 const usdEnd = N * (1 + rf * tMM);
@@ -72,6 +88,9 @@ export const M01 = {
   gapMondayAsk: gap.ask[ORDER_DEMO.weekendAt]!,
   tri: { mids: triMids, state: tri, profit: tri.profitPerEurMillion, flat: triFlat },
   carry: { usdEnd, chfDebt, breakEven, interestUsd: usdEnd - N },
+  probUp: probBeyond(SC.stUp),
+  probDown: probBeyond(SC.stDown),
+  april2025: { usdchf: aprUsdChf, eurusd: aprEurUsd },
 } as const;
 
 export const nums: NumTable = {
@@ -97,6 +116,8 @@ export const nums: NumTable = {
   'm01.rangeHi': { value: hi, kind: 'rate' },
   'm01.rangeLoChf': { value: costChf(lo, N) - costChf(S, N), kind: 'money', sign: true },
   'm01.rangeHiChf': { value: costChf(hi, N) - costChf(S, N), kind: 'money', sign: true },
+  'm01.probUp': { value: probBeyond(SC.stUp), kind: 'pct', digits: 0, note: 'P(S_T ≥ stUp)' },
+  'm01.probDown': { value: probBeyond(SC.stDown), kind: 'pct', digits: 0, note: 'P(S_T ≤ stDown)' },
 
   // Section 2 (link to section 3): spread at a quiet hour
   'm01.spreadBase': { value: SPREAD_MODEL.basePips, kind: 'pips', digits: 0 },
@@ -111,6 +132,12 @@ export const nums: NumTable = {
   'm01.spreadMax': { value: maxSpread, kind: 'pips', digits: 0 },
   'm01.halfCostMax': { value: spreadCost(maxSpread, N), kind: 'money' },
   'm01.costAsk': { value: base.ask * N, kind: 'money', note: 'USD 1 Mio. bought on the ask' },
+  'm01.pipJpy': {
+    value: pairConvention('JPY').pipValuePerMillion,
+    kind: 'money',
+    ccy: 'JPY',
+    note: 'USD/JPY: 1 pip (0.01) on USD 1 Mio.',
+  },
 
   // Section 3: orders
   'm01.limitLevel': { value: ORDER_DEMO.limit.level, kind: 'rate' },
@@ -152,4 +179,17 @@ export const nums: NumTable = {
   'm01.carryPnlFlat': { value: usdEnd * S - chfDebt, kind: 'money', sign: true },
   'm01.carryPnlDown': { value: usdEnd * SC.stDown - chfDebt, kind: 'money', sign: true },
   'm01.rateDiff': { value: rf - rd, kind: 'pct', note: 'rf − rd' },
+  'm01.carryChfDebt': { value: chfDebt, kind: 'money', note: 'CHF borrowed plus CHF interest' },
+
+  // Section 4: April 2025 (ECB reference rates)
+  'm01.apr25UsdChfStart': {
+    value: aprUsdChf.start.value,
+    kind: 'rate',
+    note: 'USD/CHF on 2 April 2025',
+  },
+  'm01.apr25UsdChfLow': { value: aprUsdChf.low.value, kind: 'rate', note: 'April 2025 low' },
+  'm01.apr25UsdChfPct': { value: aprUsdChf.lowPct, kind: 'pct', sign: true },
+  'm01.apr25EurUsdStart': { value: aprEurUsd.start.value, kind: 'rate' },
+  'm01.apr25EurUsdHigh': { value: aprEurUsd.high.value, kind: 'rate', note: 'April 2025 high' },
+  'm01.apr25EurUsdPct': { value: aprEurUsd.highPct, kind: 'pct', sign: true },
 };

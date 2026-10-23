@@ -4,14 +4,19 @@ import { gkPrice } from '@/lib/fx/vanilla';
 import { greeks } from '@/lib/fx/greeks';
 import { atmDnsStrike, strikeFromDelta } from '@/lib/fx/implied';
 import {
+  FORWARD_DIGITS,
   ST_RANGE,
   ST_START,
   hedgeCosts,
   hedgeFacts,
   hedgeRegion,
   rankCosts,
+  savingChf,
   type HedgeSetup,
 } from '@/lib/hedge-cost';
+import { M04, nums as m04nums } from '@/lib/nums/m04';
+import { quiz as m04quiz } from '@/content/quiz/04-vanilla-options';
+import { fmtMoney, fmtPips, fmtRate } from '@/lib/format';
 import {
   ATMF_TOL,
   K_RANGE,
@@ -75,6 +80,18 @@ describe('hedge cost: option vs forward', () => {
       if (region !== 'middle') expect(r.dearest).not.toBe('option');
       else expect(r.dearest).toBe('option');
     }
+  });
+
+  it('deals the forward at 5 decimals, so rate × notional matches the CHF amount on screen', () => {
+    const fd = hedgeFacts({ ...H, forwardDigits: FORWARD_DIGITS });
+    expect(fd.F).toBe(Number(F.toFixed(5)));
+    const c = hedgeCosts(0.76, { ...H, forwardDigits: FORWARD_DIGITS }, fd);
+    expect(fmtMoney(c.forward, 'CHF', 'de')).toBe(
+      fmtMoney(Number(fmtRate(fd.F, 'USD/CHF', 5)) * E.notional, 'CHF', 'de'),
+    );
+    // savings are differences of the whole-franc amounts shown
+    expect(savingChf(c, 'option', 'forward')).toBe(Math.round(c.forward) - Math.round(c.option));
+    expect(Number.isInteger(savingChf(c, 'option', 'unhedged'))).toBe(true);
   });
 
   it('regions', () => {
@@ -193,5 +210,53 @@ describe('price drivers', () => {
     expect(c.call[40]).toBeGreaterThan(c.call[0]!);
     expect(c.put[40]).toBeLessThan(c.put[0]!);
     expect(withDriver(v, 'T', 26).weeks).toBe(26);
+  });
+});
+
+describe('module 04 numbers on screen add up', () => {
+  const v = (k: string) => m04nums[k]!.value;
+  const shown = (k: string, digits: number) => Number(v(k).toFixed(digits));
+
+  it('section 1: forward, option cost and saving', () => {
+    expect(shown('m04.fwdChf', 0)).toBe(Math.round(v('m04.fwdDeal') * E.notional));
+    expect(shown('m04.fwdChf', 0) - shown('m04.optionDownChf', 0)).toBe(
+      shown('m04.saveDownChf', 0),
+    );
+    expect(shown('m04.unhedgedUpChf', 0) - shown('m04.capChf', 0)).toBe(shown('m04.saveUpChf', 0));
+    expect(Math.round(K * E.notional) + Math.round(call * E.notional)).toBe(shown('m04.capChf', 0));
+  });
+
+  it('section 2: payoff − premium = P&L (pips) and the CHF amount matches', () => {
+    const pnl = shown('m04.payoffPnlPips', 0) - Number((call / 1e-4).toFixed(2));
+    expect(pnl).toBeCloseTo(shown('m04.pnlPips', 2), 9);
+    expect(Math.round(v('m04.pnlChf'))).toBe(Math.round(shown('m04.pnlPips', 2) * 100));
+  });
+
+  it('section 3: intrinsic + time value = premium (1 digit)', () => {
+    expect(shown('m04.itmIntrinsicPips', 1) + shown('m04.itmTimePips', 1)).toBeCloseTo(
+      shown('m04.itmPips', 1),
+      9,
+    );
+  });
+
+  it('section 4: call − put = parity gap, as shown', () => {
+    const diff = Number((call / 1e-4).toFixed(2)) - Number((put / 1e-4).toFixed(2));
+    expect(Number(diff.toFixed(1))).toBe(shown('m04.parityPips', 1));
+    expect(shown('m04.parityGapPips', 1)).toBe(shown('m04.parityPips', 1));
+  });
+
+  it('quiz: every question has its correct option at the stated index and unique labels', () => {
+    for (const q of [...m04quiz.quiz, ...Object.values(m04quiz.checks)]) {
+      expect(q.options[q.correct]!.explain.de.startsWith('Richtig')).toBe(true);
+      expect(q.options[q.correct]!.explain.en.startsWith('Correct')).toBe(true);
+      const labels = q.options.map((o) => o.label.de);
+      expect(new Set(labels).size).toBe(labels.length);
+    }
+  });
+
+  it('check 3: time value = premium − intrinsic against the forward', () => {
+    const c3 = m04quiz.checks['3']!;
+    expect(c3.options[c3.correct]!.label.de).toBe(`${fmtPips(M04.itmTimePips, 'de')} Pips`);
+    expect(M04.itmVsSpotPips).toBeGreaterThan(M04.itmPips);
   });
 });

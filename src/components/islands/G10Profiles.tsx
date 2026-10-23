@@ -71,7 +71,13 @@ export default function G10Profiles({ lang, initial = 'CHF' }: G10ProfilesProps)
     : [t('roleLong.none')];
 
   return (
-    <div class="g10" data-g10 data-filter={filter} data-scenario={scenario} data-selected={selected}>
+    <div
+      class="g10"
+      data-g10
+      data-filter={filter}
+      data-scenario={scenario}
+      data-selected={selected}
+    >
       <div class="ff-lab-head">
         <div class="g10-head-text">
           <div class="ff-lab-title">{t('title')}</div>

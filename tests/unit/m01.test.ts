@@ -57,6 +57,7 @@ import {
   tendency,
   type G10Code,
 } from '@/lib/m01/g10';
+import { APRIL_2025, windowMove } from '@/lib/m01/history';
 import { M01, nums } from '@/lib/nums/m01';
 import { formatNum } from '@/lib/nums';
 
@@ -411,6 +412,41 @@ describe('G10 profiles (section 4)', () => {
   });
 });
 
+describe('April 2025 window (section 4)', () => {
+  const series = [
+    { date: '2025-03-31', value: 0.9 },
+    { date: '2025-04-02', value: 0.88 },
+    { date: '2025-04-03', value: 0.86 },
+    { date: '2025-04-10', value: 0.81 },
+    { date: '2025-04-30', value: 0.83 },
+    { date: '2025-05-02', value: 0.7 },
+  ];
+
+  it('measures low and high after the anchor inside the window', () => {
+    const m = windowMove(series, '2025-04-02', '2025-04-30');
+    expect(m.start).toEqual({ date: '2025-04-02', value: 0.88 });
+    expect(m.low).toEqual({ date: '2025-04-10', value: 0.81 });
+    expect(m.high.date).toBe('2025-04-03');
+    expect(m.lowPct).toBeCloseTo(0.81 / 0.88 - 1, 12);
+    expect(m.highPct).toBeCloseTo(0.86 / 0.88 - 1, 12);
+    // anchor on a holiday: the next fixing counts
+    expect(windowMove(series, '2025-04-01', '2025-04-30').start.date).toBe('2025-04-02');
+  });
+
+  it('throws without data', () => {
+    expect(() => windowMove(series, '2026-01-01', '2026-02-01')).toThrow(RangeError);
+    expect(() => windowMove(series, '2025-04-30', '2025-04-30')).toThrow(RangeError);
+  });
+
+  it('shows the dollar falling in April 2025 in the ECB data', () => {
+    const { usdchf, eurusd } = M01.april2025;
+    expect(usdchf.start.date).toBe(APRIL_2025.anchor);
+    expect(usdchf.lowPct).toBeLessThan(-0.05);
+    expect(eurusd.highPct).toBeGreaterThan(0.05);
+    expect(usdchf.low.date <= APRIL_2025.to).toBe(true);
+  });
+});
+
 describe('number registry m01', () => {
   it('registers only m01 keys with finite values', () => {
     for (const [k, d] of Object.entries(nums)) {
@@ -432,6 +468,11 @@ describe('number registry m01', () => {
       12,
     );
     expect(M01.tri.profit).toBeGreaterThan(0);
+    expect(nums['m01.probUp']!.value).toBeCloseTo(M01.probUp, 12);
+    expect(M01.probUp).toBeGreaterThan(0.05);
+    expect(M01.probUp).toBeLessThan(0.2);
+    expect(formatNum(nums['m01.pipJpy']!, 'de')).toMatch(/^JPY\s10’000$/);
+    expect(nums['m01.carryPnlDown']!.value).toBeLessThan(0);
     expect(M01.stopGap.slippagePips).toBeGreaterThan(100);
   });
 });

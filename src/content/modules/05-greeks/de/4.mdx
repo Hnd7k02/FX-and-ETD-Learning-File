@@ -11,11 +11,11 @@ Hier ist <i>t</i> die Zeit, die vergeht, und <i>T</i> die Restlaufzeit. Das Labo
 
 Der Verfall ist nicht gleichmässig. Lange vor Verfall schmilzt der Zeitwert langsam, in den letzten Wochen immer schneller. Am stärksten trifft es Optionen nahe am Forward, denn dort ist am meisten Zeitwert zu verlieren.
 
-<GreeksLabFigure mode="theta" caption="Zieh die Laufzeit Richtung Verfall oder direkt am Punkt: Oben ist die Steigung der Tangente Theta. Unten siehst du Theta pro Tag, das am Forward kurz vor Verfall beschleunigt. Schieb den Spot tief ins Geld, und Theta wird sogar positiv." />
+<GreeksLabFigure mode="theta" caption="Zieh die Laufzeit Richtung Verfall oder direkt am Punkt: Oben ist die Steigung der Tangente Theta. Unten siehst du Theta pro Tag, das nahe ATMF kurz vor Verfall beschleunigt. Schieb den Spot tief ins Geld, und Theta wird sogar positiv." />
 
 ### Theta im Beispiel: Gamma-Anteil plus Carry
 
-Das Labor zeigt für den Call <Num of="ex.thetaDayChf" /> pro Tag. Diese Zahl hat zwei Teile.
+In der Tabelle des Labors steht für den Call rund <Num of="m05.thetaDay" /> pro Tag, genau <Num of="ex.thetaDayChf" />. Diese Zahl hat zwei Teile.
 
 Der **Gamma-Anteil** Θ<sub>Γ</sub> = −½ · σ² · <i>S</i>² · Γ / 365 = <Num of="ex.thetaGammaChf" /> ist der eigentliche Zeitwertverlust: der Preis für Gamma.
 
@@ -25,11 +25,11 @@ Zusammen ergibt das <Num of="ex.thetaGammaChf" /> + <Num of="m05.thetaCarryDay2"
 
 ### Gamma gegen Theta
 
-Wer den Call kauft und sein Delta laufend absichert, hat kein Richtungsrisiko mehr, nur noch die Krümmung. Bewegt sich USD/CHF an einem Tag um Δ<i>S</i>, verdient er ½ · Γ · (Δ<i>S</i>)², egal in welche Richtung. Dafür zahlt er Θ<sub>Γ</sub>. Den Carry-Teil zählt man hier nicht: Er wird genau durch die Zinsen auf den Hedge aufgewogen, also auf die verkauften USD und die gehaltenen CHF.
+Wer den Call kauft und sein Delta laufend absichert, hat kein Richtungsrisiko mehr, nur noch die Krümmung. Bewegt sich USD/CHF an einem Tag um Δ<i>S</i>, verdient er ½ · Γ · (Δ<i>S</i>)², egal in welche Richtung. Dafür zahlt er Θ<sub>Γ</sub>. Den Carry-Teil zählt man hier nicht: Er wird genau durch die Zinsen auf den Hedge aufgewogen, also auf die verkauften USD, die gehaltenen CHF und die finanzierte Prämie.
 
 <Formula variant="accent">P&L ≈ ½ · Γ · [(Δ<i>S</i>)² − σ² · <i>S</i>² · Δ<i>t</i>]</Formula>
 
-Die Klammer wird null bei |Δ<i>S</i>| = σ · <i>S</i> / √365 = <Num of="ex.breakEvenPips" /> Pips. Ein ruhiger Tag mit 20 Pips Bewegung kostet <Num of="m05.pnl20" />, ein Tag mit 50 Pips bringt <Num of="m05.pnl50" />. Anders gesagt: Der gehedgte Käufer gewinnt, wenn die realisierte Vola über der impliziten liegt, die er mit der Prämie bezahlt hat.
+Die Klammer wird null bei |Δ<i>S</i>| = σ · <i>S</i> / √365 = <Num of="ex.breakEvenPips" /> Pips. Ein ruhiger Tag mit 20 Pips Bewegung ergibt <Num of="m05.pnl20" />, ein Tag mit 50 Pips <Num of="m05.pnl50" />. Anders gesagt: Der gehedgte Käufer gewinnt, wenn die realisierte Vola über der impliziten liegt, die er mit der Prämie bezahlt hat.
 
 <GammaThetaFigure caption="Zieh am Punkt oder am Regler: So viel bringt oder kostet ein Tag mit dieser Bewegung. Zwischen den Break-even-Linien frisst Theta den Gamma-Gewinn, ausserhalb verdient Gamma mehr. Mehr Vola verschiebt den Break-even nach aussen." />
 
@@ -42,7 +42,7 @@ Der Call reagiert auf beide Zinsen, und zwar vor allem über den Forward <i>F</i
   <span>ρ<sub>f</sub> = ∂<i>V</i> / ∂<i>r</i><sub>f</sub> = −<i>S</i> · <i>T</i> · <i>e</i><sup>−<i>r</i><sub>f</sub><i>T</i></sup> · <i>N</i>(<i>d</i><sub>1</sub>)</span>
 </Formula>
 
-Im Beispiel hebt ein Prozent mehr CHF-Zins den Forward um rund <Num of="m05.fwdPerPct" /> Pips. Das bringt dem Call <Num of="m05.rhoFwdEffect" />. Gleichzeitig wird die Auszahlung stärker abgezinst, das kostet <Num of="m05.rhoDiscount" />. Netto ist ρ<sub>d</sub> = <Num of="ex.rhoDChf" /> je +1 %. Beim USD-Zins wirkt nur der Forward: ρ<sub>f</sub> = <Num of="ex.rhoFChf" /> je +1 %. Rho wächst mit der Laufzeit: Bei einem Jahr und gleichem Strike sind es <Num of="m05.rhoD1y" /> und <Num of="m05.rhoF1y" />.
+Im Beispiel hebt ein Prozent mehr CHF-Zins den Forward um rund <Num of="m05.fwdPerPct" /> Pips. Das bringt dem Call <Num of="m05.rhoFwdEffect" />. Gleichzeitig wird die Auszahlung stärker abgezinst, das macht <Num of="m05.rhoDiscount" /> aus. Netto ist ρ<sub>d</sub> = <Num of="ex.rhoDChf" /> je +1 %. Beim USD-Zins wirkt nur der Forward: ρ<sub>f</sub> = <Num of="ex.rhoFChf" /> je +1 %. Rho wächst mit der Laufzeit: Bei einem Jahr und gleichem Strike sind es <Num of="m05.rhoD1y" /> und <Num of="m05.rhoF1y" />.
 
 Der CHF-Zins kann übrigens auch negativ sein. Im <Fact id="m05-snb-2015-month" /> senkte die Nationalbank den Zins auf Sichtguthaben auf <Fact id="m05-snb-2015-rate" />, erst im <Fact id="m05-snb-2022-month" /> wurde der Leitzins wieder positiv. Darum reicht der CHF-Regler im Labor unter null.
 
@@ -57,7 +57,7 @@ Der CHF-Zins kann übrigens auch negativ sein. Im <Fact id="m05-snb-2015-month" 
   <span>= −<i>S</i><i>e</i><sup>−<i>r</i><sub>f</sub><i>T</i></sup>φ(<i>d</i><sub>1</sub>)σ / (2√<i>T</i>) + <i>r</i><sub>f</sub><i>S</i><i>e</i><sup>−<i>r</i><sub>f</sub><i>T</i></sup><i>N</i>(<i>d</i><sub>1</sub>) − <i>r</i><sub>d</sub><i>K</i><i>e</i><sup>−<i>r</i><sub>d</sub><i>T</i></sup><i>N</i>(<i>d</i><sub>2</sub>)</span>
 </Formula>
 
-Der erste Term ist Θ<sub>Γ</sub>, die beiden anderen sind der Carry. Pro Tag (durch 365) im Beispiel: <Num of="ex.thetaGammaChf" /> + <Num of="m05.thetaCarryAnalytic" sign={false} /> − 0 = <Num of="ex.thetaAnalyticChf" />. Der dritte Term ist null, weil der CHF-Zins <Num of="ex.rd" /> beträgt. Numerisch, mit −[<i>V</i>(<i>T</i> + <i>h</i>) − <i>V</i>(<i>T</i> − <i>h</i>)] / 2<i>h</i>, kommt ebenfalls <Num of="m05.thetaNumeric" /> heraus. Das Labor zeigt <Num of="ex.thetaDayChf" />, weil es über einen ganzen Tag rechnet. Der kleine Unterschied ist die Krümmung des Zeitverfalls innerhalb dieses Tages.
+Der erste Term ist Θ<sub>Γ</sub>, die beiden anderen sind der Carry. Pro Tag (durch 365) im Beispiel: <Num of="ex.thetaGammaChf" /> + <Num of="m05.thetaCarryAnalytic" sign={false} /> − 0 = <Num of="ex.thetaAnalyticChf" />. Der dritte Term ist null, weil der CHF-Zins <Num of="ex.rd" /> beträgt. Der Carry ist dann genau die tägliche Drift des Forwards mal Forward-Delta: <Num of="m05.fwdDriftPips" /> Pips · <Num of="m05.deltaFwd" /> · USD 1 Mio. ≈ <Num of="m05.thetaCarryAnalytic" />. Numerisch, mit −[<i>V</i>(<i>T</i> + <i>h</i>) − <i>V</i>(<i>T</i> − <i>h</i>)] / 2<i>h</i>, kommt ebenfalls <Num of="m05.thetaNumeric" /> heraus. Das Labor zeigt <Num of="ex.thetaDayChf" />, weil es über einen ganzen Tag rechnet. Der kleine Unterschied ist die Krümmung des Zeitverfalls innerhalb dieses Tages.
 
 **Gamma gegen Theta.** Der gehedgte Käufer hält den Call und ist Δ USD short. Über einen kurzen Zeitraum Δ<i>t</i> ändert sich der Call um Δ · Δ<i>S</i> + ½Γ(Δ<i>S</i>)² + Θ · Δ<i>t</i>. Der Hedge verliert Δ · Δ<i>S</i> und kostet Zinsen: (<i>r</i><sub>f</sub> − <i>r</i><sub>d</sub>) · <i>S</i>Δ · Δ<i>t</i> auf die Position und <i>r</i><sub>d</sub><i>V</i> · Δ<i>t</i> auf die finanzierte Prämie. Setzt man Theta aus der Gleichung oben ein, heben sich Delta und Carry weg:
 
@@ -80,14 +80,14 @@ Steigen beide Zinsen gleich stark, bleibt der Forward stehen, und nur die Abzins
 
 Die Greeks bisher messen je einen Hebel. Am Desk kommen zwei gemischte dazu. **Vanna** = <span class="math">∂Δ/∂σ</span> zeigt, wie sich Delta ändert, wenn die Vola steigt. **Volga** = <span class="math">∂ν/∂σ</span> zeigt, wie sich Vega mit der Vola ändert.
 
-Am Forward sind beide fast null: Ein Vola-Punkt ändert das Delta des Calls nur um <Num of="m05.vannaPt" />. Zwei Big Figures aus dem Geld sind es schon <Num of="m05.vannaOtmPt" />, und Vega wächst um <Num of="m05.volgaOtmChf" /> je Vola-Punkt. Darum bestimmen Vanna und Volga den Preis von Risk Reversals und Butterflies, also den Vola-Smile aus Modul 06.
+Am Forward sind beide fast null: Ein Vola-Punkt ändert das Delta des Calls nur um <Num of="m05.vannaPt" />. Zwei Big Figures aus dem Geld sind es schon <Num of="m05.vannaOtmPt" />, und Vega wächst um <Num of="m05.volgaOtmChf" /> je Vola-Punkt. Ein Risk Reversal trägt vor allem Vanna, ein Butterfly vor allem Volga. Was der Markt für diese beiden Risiken verlangt, siehst du im Vola-Smile aus Modul 06.
 
-Ein Hinweis zum Delta: Wird die Prämie in USD bezahlt statt in CHF, steckt in der Prämie selbst schon ein Stück USD-Risiko. Das prämienadjustierte Delta zieht es ab: Δ − <i>V</i>/<i>S</i> = <Num of="m05.delta" /> − <Num of="m05.premiumInUsd" /> = <Num of="m05.deltaPA" />. Welche Konvention gilt, hängt vom Währungspaar und von der Prämienwährung ab.
+Ein Hinweis zum Delta: Wird die Prämie in USD bezahlt statt in CHF, steckt in der Prämie selbst schon ein Stück USD-Risiko. Das prämienadjustierte Delta zieht es ab: Δ − <i>V</i>/<i>S</i> = <Num of="m05.delta" /> − <Num of="m05.premiumInUsd" /> = <Num of="m05.deltaPA" />. Welche Konvention gilt, hängt vom Währungspaar und von der Prämienwährung ab, wie schon bei den Delta-Strikes in Modul 04.
 
 </Desk>
 
 <Takeaway>
 
-Theta ist der Preis für Gamma: Delta-gehedgt verdient der Call nur an Tagen, an denen sich USD/CHF mehr als rund <Num of="ex.breakEvenPips1" /> Pips bewegt. Rho wirkt über den Forward: Ein höherer CHF-Zins hilft dem USD Call, ein höherer USD-Zins schadet ihm.
+Theta ist vor allem der Preis für Gamma: Delta-gehedgt verdient der Call nur an Tagen, an denen sich USD/CHF mehr als rund <Num of="ex.breakEvenPips1" /> Pips bewegt. Rho wirkt über den Forward: Ein höherer CHF-Zins hilft dem USD Call, ein höherer USD-Zins schadet ihm.
 
 </Takeaway>

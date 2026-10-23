@@ -4,7 +4,7 @@ import GreeksLabFigure from '@/components/figures/GreeksLabFigure.astro';
 
 Imagine the markets turning restless. USD/CHF is exactly where it was yesterday, but everyone expects bigger swings. The importer's call becomes more expensive all the same. Why?
 
-An option is a bet with a limited loss. Bigger swings bring more upside. On the downside the buyer can never lose more than the premium. More uncertainty therefore makes the right more valuable, for a call just as for a put.
+The reason is the asymmetry of a bought option. Bigger swings bring more upside. On the downside the buyer can never lose more than the premium. More uncertainty therefore makes the right more valuable, for a call just as for a put.
 
 Vega measures this effect: how much does the premium change when implied volatility rises by one point?
 
@@ -12,7 +12,7 @@ Vega measures this effect: how much does the premium change when implied volatil
 
 For the importer this means: the more nervous the market, the dearer the hedge. Whoever buys only once everyone is afraid pays more. Whoever already holds the call gains in such phases, even if the rate does not move.
 
-<GreeksLabFigure mode="vega" caption="Drag the vol or the dot itself: at the top the slope of the tangent is vega. Below you see vega across spot, largest close to the forward. Lengthen the time to expiry and the whole curve grows." />
+<GreeksLabFigure mode="vega" caption="Drag the vol or the dot itself: at the top the slope of the tangent is vega. Below you see vega across spot; the ring marks the peak, where the forward sits close to the strike. Lengthen the time to expiry and the whole curve grows." />
 
 ### Vega in the example
 
@@ -30,9 +30,11 @@ Premium at the vol plus and minus 0.01 points, difference divided by 0.02 points
 
 Deep in the money, exercise is all but certain. The option behaves like a forward, and a forward does not care about volatility. Far out of the money, expiring worthless is all but certain. A little more volatility changes little. Volatility matters most where the outcome is open: when the forward is close to the strike.
 
-In the formula this sits in φ(<i>d</i><sub>1</sub>), a bell curve. With spot two big figures lower, at <Num of="m05.spotOtm" />, the forward is <Num of="m05.fwdOtmPips" /> pips below the strike, and vega drops to <Num of="m05.vegaOtm" />. The further away, the faster the curve falls.
+In the formula this sits in φ(<i>d</i><sub>1</sub>), a bell curve. With spot two big figures lower, at <Num of="m05.spotOtm" />, the forward is <Num of="m05.fwdOtmPips" /> pips below the strike, and vega drops to <Num of="m05.vegaOtm" />. The further the forward is from the strike, the smaller vega becomes.
 
-The second factor is √<i>T</i>. More time means more room to move, but not proportionally: vega grows with the square root of time. A year is four times as long as three months, so it carries roughly twice the vega. At the money forward, one year gives <Num of="m05.vegaAtmf1y" /> per vol point, <Num of="m05.vegaRatio1y" /> times as much.
+The second factor is √<i>T</i>. More time means more room to move, but not proportionally: vega grows with the square root of time. A year is four times as long as three months, so it carries roughly twice the vega. At the money forward, one year gives <Num of="m05.vegaAtmf1y" /> per vol point, <Num of="m05.vegaRatio1y" /> times as much. This means an option struck at the one-year forward.
+
+In the lab the strike stays at <Num of="ex.strike" />. Push the time to expiry to one year there: the peak moves to the right, to spot <Num of="m05.vegaPeakSpot1y" />. Over one year the forward points are <Num of="m05.fwdPoints1y" /> pips. For the forward to reach the strike, spot has to sit higher. Vega follows the forward, not spot.
 
 <Derivation title="Derivation: vega from the Garman-Kohlhagen price">
 
@@ -58,12 +60,12 @@ Where exactly is the peak? Across strikes it sits at <i>d</i><sub>1</sub> = 0. A
 
 Options trade in volatility, not in francs. Dealers quote an implied volatility, and the premium follows from the model. Vega is the bridge between the two: one vol point on the importer's call is worth <Num of="ex.vegaChf" />.
 
-Vega can only be hedged with other options. Spot and forwards have no volatility. Because short and long expiries react differently, vega is usually managed bucket by bucket across maturities. A desk that is long vega gains when the market turns nervous. How sharply volatility jumps in a crisis is shown by the [Riskometer](/en/riskometer/).
+Vega can only be hedged with other options. Spot and forwards have no vega. Because short and long expiries react differently, vega is usually managed bucket by bucket across maturities. A desk that is long vega gains when the market turns nervous. How much the actual swings grow in a crisis is shown by the [Riskometer](/en/riskometer/), with realised volatility.
 
 </Desk>
 
 <Takeaway>
 
-Vega measures what uncertainty is worth. It is largest close to the forward and for long maturities, because vega grows with √<i>T</i>.
+Vega measures what uncertainty is worth. It is largest near ATMF, where the forward sits at the strike, and for long maturities, because vega grows with √<i>T</i>.
 
 </Takeaway>

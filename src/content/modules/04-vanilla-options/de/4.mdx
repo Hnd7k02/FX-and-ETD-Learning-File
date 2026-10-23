@@ -4,9 +4,9 @@ import WowFigure from '@/components/figures/WowFigure.astro';
 
 Was kostet das Recht des Importeurs? Die Antwort liefert das **Garman-Kohlhagen-Modell**, publiziert <Fact id="gk-1983" />. Es ist Black-Scholes für Devisen: mit zwei Zinsen statt einem, dem der Quote-Währung (CHF, <i>r</i><sub>d</sub>) und dem der Base-Währung (USD, <i>r</i><sub>f</sub>).
 
-Sechs Grössen bestimmen den Preis: Spot, Strike, Laufzeit, Vola und die zwei Zinsen. Fünf davon siehst du am Markt. Nur die Vola musst du schätzen, und genau darüber handelt der Optionsmarkt.
+Sechs Grössen bestimmen den Preis: Spot, Strike, Laufzeit, Vola und die zwei Zinsen. Fünf davon kennst du: Strike und Laufzeit stehen im Vertrag, Spot und Zinsen zeigt der Markt. Offen ist nur die Vola, und genau darüber handelt der Optionsmarkt.
 
-<PriceDriversFigure caption="Beweg einen Regler. Der Chart zeigt Call und Put entlang dieses Treibers, die Pfeile zeigen die Richtung. Die Steigung der Kurve ist der Greek aus Modul 05." />
+<PriceDriversFigure caption="Beweg einen Regler. Der Chart zeigt Call (blau) und Put (violett) entlang dieses Treibers, die Pfeile zeigen die Richtung. Die Steigung der Kurve ist der Greek aus Modul 05." />
 
 ### Die Formel, alles über den Forward
 
@@ -37,15 +37,21 @@ Kauf einen Call und verkauf einen Put mit demselben Strike. Bei Verfall bekommst
   <i>C</i> − <i>P</i> = e<sup>−<i>r</i><sub>d</sub><i>T</i></sup> · (<i>F</i> − <i>K</i>)
 </Formula>
 
-Im Beispiel liegt der Strike <Num of="m04.parityGapPips" /> Pips unter dem Forward. Also ist der Call genau <Num of="ex.parityPips" /> Pips teurer als der Put: <Num of="ex.callPips" /> gegen <Num of="ex.putPips" /> Pips. Liegt der Strike genau beim Forward, kosten Call und Put gleich viel.
+Im Beispiel liegt der Strike <Num of="m04.parityGapPips" /> Pips unter dem Forward. Also ist der Call um <Num of="m04.parityPips" /> Pips teurer als der Put: <Num of="ex.callPips" /> gegen <Num of="ex.putPips" /> Pips. Liegt der Strike genau beim Forward, kosten Call und Put gleich viel.
 
 Long Call plus Short Put ist darum ein **synthetischer Forward**. Sein Spot-Delta ist <Num of="m04.synthDelta" />, also e<sup>−<i>r</i><sub>f</sub><i>T</i></sup>, und sein Forward-Delta genau 1: Er bewegt sich eins zu eins mit dem Forward.
 
-<PayoffBuilderFigure templates={['synthetic-forward', 'long-forward', 'long-call', 'short-put']} initial="synthetic-forward" caption="Zieh den gemeinsamen Strike K1·2. Die Nettoprämie ist immer DF · (F − K). Zero Cost entsteht genau beim Forward. Vergleich mit der Vorlage Forward." />
+<PayoffBuilderFigure templates={['synthetic-forward', 'long-forward', 'long-call', 'short-put']} initial="synthetic-forward" caption="Zieh den gemeinsamen Strike K1·2. Die Nettoprämie ist immer DF · (F − K). Zero Cost entsteht genau beim Forward. Vergleiche mit der Vorlage «Forward»." />
 
 ### Arbitrage, wenn die Parität nicht gilt
 
-Angenommen, der Call notiert <Num of="m04.arbPips" /> Pips zu teuer. Dann verkaufst du den Call, kaufst den Put und kaufst zusätzlich einen Forward zum fairen Kurs. Was du bei Verfall zahlst, steht damit schon heute fest, egal wo der Kurs steht, und ist durch die heutigen Einnahmen gedeckt. Übrig bleibt der Preisfehler, heute vereinnahmt: <Num of="m04.arbChf" /> auf USD 1 Mio., ohne Kursrisiko. Solche Lücken schliessen Market Maker sofort. Darum gilt die Parität in liquiden Märkten bis auf Kosten und Spreads.
+Angenommen, der Call notiert <Num of="m04.arbPips" /> Pips zu teuer. Dann baust du drei Geschäfte:
+
+- Du **verkaufst den teuren Call** und **kaufst den Put**. Das ist ein synthetischer Short Forward: Bei Verfall verkaufst du USD zum Strike, egal wo der Kurs steht.
+- Du **kaufst einen echten Forward** zum fairen Kurs. Damit beschaffst du genau die USD, die du liefern musst.
+- Alle Zahlungen bei Verfall stehen heute fest und sind durch die heutigen Einnahmen gedeckt. Übrig bleibt der Preisfehler: <Num of="m04.arbChf" /> auf USD 1 Mio., heute vereinnahmt, ohne Kursrisiko.
+
+Solche Lücken schliessen Market Maker sofort. Darum gilt die Parität in liquiden Märkten bis auf Kosten und Spreads.
 
 <WowFigure initialPhase={3} autoplay={false} caption="Zusammenfassung in vier Schritten: vom Forward über den Call und den Zeitwert zur Parität. Klick auf 1 bis 4 oder starte die Animation." />
 
@@ -79,6 +85,6 @@ Im Interbankmarkt wird eine Option oft zusammen mit ihrem Delta-Hedge gehandelt.
 
 <Takeaway>
 
-Sechs Inputs bestimmen den Preis, und fast alle wirken über den Forward. Long Call plus Short Put mit gleichem Strike ist ein Forward: C − P = DF · (F − K).
+Spot und Zinsen wirken über den Forward, offen ist allein die Vola. Long Call plus Short Put mit gleichem Strike ist ein Forward: C − P = DF · (F − K).
 
 </Takeaway>

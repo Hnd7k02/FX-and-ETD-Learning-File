@@ -603,7 +603,8 @@ export function aha(mode: LabMode, p: LabParams, n = labNumbers(p)): Aha | null 
     const sPeak = gammaPeakSpot(p);
     const gMax = greeks(sPeak, K, T, vol, rd, rf, TYPE).gamma;
     const nearPeak = Math.abs(p.spot - sPeak) <= A.gammaPeakMaxPips * PIP;
-    if (n.gamma >= A.gammaPeakShare * gMax && nearPeak) return { key: 'gammaPeak', panel: 'bottom' };
+    if (n.gamma >= A.gammaPeakShare * gMax && nearPeak)
+      return { key: 'gammaPeak', panel: 'bottom' };
     if (n.deltaFwd >= A.deltaHigh) return { key: 'deltaHigh', panel: 'bottom' };
     if (n.deltaFwd <= A.deltaLow) return { key: 'deltaLow', panel: 'bottom' };
     return null;

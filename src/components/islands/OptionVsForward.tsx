@@ -116,7 +116,9 @@ export default function OptionVsForward({ lang }: OptionVsForwardProps): JSX.Ele
   }, []);
   const path = (pts: Array<[number, number]>) =>
     linePath(pts.map(([x, y]): Point => [sx(x), yk(y)]));
-  const xTicks = niceTicks(ST_RANGE[0], ST_RANGE[1], L.compact ? 4 : 8).filter((v) =>
+  // 9, not 8: niceStep(0.16 / 8) lands a hair above 0.02 in floating point and jumps to 0.025,
+  // whose ticks (0.725 …) would print as 0.72 / 0.78 with two decimals.
+  const xTicks = niceTicks(ST_RANGE[0], ST_RANGE[1], L.compact ? 4 : 9).filter((v) =>
     inside(v, ST_RANGE[0] + 1e-9, ST_RANGE[1] - 1e-9),
   );
   const yTicks = niceTicks(Y_DOMAIN[0], Y_DOMAIN[1], L.compact ? 4 : 5);
