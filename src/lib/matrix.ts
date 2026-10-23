@@ -20,8 +20,11 @@
  * Profiles ("shape"): result at expiry per USD in CHF per USD (one fixing for the multi-fixing
  * products, the gain of a TARF / pivot TARF fixing capped at the target) as a function of S_T,
  * from the holder's point of view, with the parameters of the running example and the
- * precomputed fair strikes/coupons of module 08 (Monte Carlo). Orders (limit, stop) have no
- * fixed profile: they only become a spot trade when the level trades.
+ * precomputed fair strikes of module 08 (Monte Carlo). TPF and RTPF carry the contractual
+ * coupon: the Monte Carlo fair coupon rounded to the quote step, exactly as module 08 and the
+ * path simulator pay it (simProduct, PATHSIM_CONFIG.couponQuoteStep), so coupon, coupon in CHF
+ * and the maximum gain agree across modules 08 and 09. Orders (limit, stop) have no fixed
+ * profile: they only become a spot trade when the level trades.
  */
 import { EXAMPLE, EXAMPLE_FORWARD } from '@/lib/fx/example';
 import { MC_PRODUCTS, fairProduct } from '@/lib/fx/mc/fair';
@@ -30,6 +33,7 @@ import type { ZeroCostKind } from '@/lib/fx/mc/products';
 import { M09_CONFIG, PIP } from '@/lib/m09/config';
 import { hedgeSetup, hedgeRate, type HedgeSetup } from '@/lib/m09/hedge';
 import { carryView, yieldPnlPerUsd, type CarryView } from '@/lib/m09/carry';
+import { PATHSIM_CONFIG, simProduct } from '@/lib/pathsim';
 import type { SectionKey } from '@/i18n/routes';
 
 /* ---------- ids ---------- */
@@ -436,6 +440,7 @@ export interface MatrixParams {
   /** target: the largest gain counted per fixing (the last gain is capped to the target). */
   tarf: { strike: number; forward: number; target: number };
   pivotTarf: { pivot: number; lower: number; upper: number; target: number };
+  /** coupon: the contractual coupon paid per fixing (fair coupon rounded to the quote step). */
   tpf: { strike: number; coupon: number };
   rtpf: { lower: number; upper: number; coupon: number };
 }
@@ -446,8 +451,9 @@ export function matrixParams(): MatrixParams {
   const acc = fairProduct('accumulator');
   const tarf = fairProduct('tarf');
   const piv = fairProduct('pivotTarf');
-  const tpf = fairProduct('tpf');
-  const rtpf = fairProduct('rtpf');
+  /* the contractual coupon products of module 08 (fair coupon rounded to the quote step) */
+  const tpf = simProduct('tpf');
+  const rtpf = simProduct('rtpf');
   const P = MC_PRODUCTS.products;
   const yp = M09_CONFIG.yieldProducts;
   return {
@@ -475,6 +481,17 @@ export function matrixParams(): MatrixParams {
   };
 }
 
+/**
+ * Decimals of a product's values in pips (key number and chart readout): the coupon products
+ * to the quote step of their contractual coupon (0.1 pip, PATHSIM_CONFIG.couponQuoteStep), so
+ * the readout inside the paying zone shows the same coupon as the card and the texts; all other
+ * products to whole pips.
+ */
+export function pipsDigits(id: ProductId): number {
+  if (id !== 'tpf' && id !== 'rtpf') return 0;
+  return Math.max(0, Math.round(-Math.log10(PATHSIM_CONFIG.couponQuoteStep / PIP)));
+}
+
 /** Key number of a product card: a dictionary key for the label and the values to format. */
 export interface KeyFact {
   /** Dictionary key suffix (pm.key.<label>). */
@@ -484,6 +501,8 @@ export interface KeyFact {
   value2?: number;
   /** Optional comparison in pips (e.g. strike − forward). */
   vsPips?: number;
+  /** Decimals of a pips value (default 0); the contractual coupons show 1, as in the texts. */
+  digits?: number;
 }
 
 export function keyFact(id: ProductId, p: MatrixParams): KeyFact {
@@ -534,9 +553,9 @@ export function keyFact(id: ProductId, p: MatrixParams): KeyFact {
         value2: p.pivotTarf.upper,
       };
     case 'tpf':
-      return { label: 'coupon', kind: 'pips', value: p.tpf.coupon / PIP };
+      return { label: 'coupon', kind: 'pips', value: p.tpf.coupon / PIP, digits: pipsDigits(id) };
     case 'rtpf':
-      return { label: 'coupon', kind: 'pips', value: p.rtpf.coupon / PIP };
+      return { label: 'coupon', kind: 'pips', value: p.rtpf.coupon / PIP, digits: pipsDigits(id) };
     case 'dci':
       return { label: 'yield', kind: 'pct', value: p.yields.dciYieldPa };
     case 'discount':
@@ -712,8 +731,9 @@ const MC_KIND: Partial<Record<ProductId, ZeroCostKind>> = {
 };
 
 /**
- * Typed theoretical maximum loss of a matrix product, per side (src/lib/fx/mc/maxloss.ts), with
- * the same fair products as its profile (matrixParams); null for every other product.
+ * Typed theoretical maximum loss of a matrix product, per side (src/lib/fx/mc/maxloss.ts), from
+ * the fair products of module 08 (the maximum loss does not depend on the coupon, so TPF and RTPF
+ * give the same bound as with their contractual coupon); null for every other product.
  */
 export function productMaxLoss(id: ProductId): MaxLoss | null {
   const kind = MC_KIND[id];

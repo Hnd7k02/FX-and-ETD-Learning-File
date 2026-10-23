@@ -162,3 +162,58 @@ export function forwardCarry(
   const benefit = (S * rf * tb) / growthBase;
   return { spot: S, cost, benefit, forward: S + cost - benefit };
 }
+
+/**
+ * Which base amount a carry notional fixes: the amount bought at spot today, or the amount
+ * held at maturity with interest (bought today as N / (1 + rf · tb)).
+ */
+export type CarryNotionalAt = 'today' | 'maturity';
+
+/** A money-market carry position: buy base at spot, deposit it at rf, compare at maturity. */
+export interface MoneyMarketCarry {
+  /** Base currency bought at spot today. */
+  baseToday: number;
+  /** Base currency at maturity: baseToday · (1 + rf · tb). */
+  baseAtMaturity: number;
+  /** Quote currency spent today: baseToday · S. */
+  quoteToday: number;
+  /** Money-market forward S · (1 + rd · tq) / (1 + rf · tb). */
+  forward: number;
+  /**
+   * Result at maturity against a quote-currency deposit of quoteToday, at an unchanged spot,
+   * in quote currency: baseAtMaturity · (S − F) = S · baseToday · (rf · tb − rd · tq), i.e. the
+   * base interest on baseToday valued at the spot minus the quote interest on quoteToday.
+   */
+  carry: number;
+}
+
+/**
+ * Carry of a base-currency deposit bought at spot, against a quote-currency deposit of the same
+ * amount, at an unchanged spot (money market, simple rates). `notional` is the base amount
+ * today (`at = 'today'`) or at maturity (`at = 'maturity'`). The two notionals differ by the
+ * factor 1 + rf · tb, and so do their carries.
+ */
+export function moneyMarketCarry(
+  S: number,
+  rd: number,
+  rf: number,
+  days: number,
+  notional: number,
+  at: CarryNotionalAt,
+  basisQuote = 360,
+  basisBase = 360,
+): MoneyMarketCarry {
+  const tq = days / basisQuote;
+  const tb = days / basisBase;
+  const growthBase = 1 + rf * tb;
+  const baseToday = at === 'today' ? notional : notional / growthBase;
+  const baseAtMaturity = baseToday * growthBase;
+  const forward = forwardMoneyMarket(S, rd, rf, days, basisQuote, basisBase);
+  return {
+    baseToday,
+    baseAtMaturity,
+    quoteToday: baseToday * S,
+    forward,
+    carry: S * baseToday * (rf * tb - rd * tq),
+  };
+}

@@ -89,7 +89,12 @@ const acc = fairProduct('accumulator');
 const dec = fairProduct('decumulator');
 const tarf = fairProduct('tarf');
 const piv = fairProduct('pivotTarf');
-/** Coupon products with the quoted fair coupon (0.1 pip, PATHSIM_CONFIG.couponQuoteStep). */
+/**
+ * Coupon products with the contractual coupon: the Monte Carlo fair coupon rounded to the quote
+ * step (0.1 pip, PATHSIM_CONFIG.couponQuoteStep). Every paid coupon and every maximum gain in
+ * modules 08 and 09 comes from it; the unrounded fair coupon is shown only as «fairer Coupon
+ * (Monte Carlo) ± Standardfehler» (tpfFairCouponPips, tpfSePips).
+ */
 const tpf = simProduct('tpf');
 const rtpf = simProduct('rtpf');
 /**
@@ -233,7 +238,10 @@ export const M08 = {
   // TPF
   tpfStrike: tpf.strike,
   tpfStrikeVsSpot: tpf.strike / E.spot - 1,
+  /** Contractual coupon per fixing (fair coupon rounded to the quote step). */
   tpfCouponPips: pips(tpf.coupon),
+  /** Unrounded Monte Carlo fair coupon; shown only with its standard error. */
+  tpfFairCouponPips: pips(P.tpf.value),
   tpfSePips: P.tpf.stdErrPips,
   tpfCouponChf: tpf.coupon * tpf.notional,
   tpfMaxChf: tpf.coupon * tpf.notional * tpf.targetCoupons,
@@ -261,6 +269,7 @@ export const M08 = {
   rtpfLower: rtpf.lower,
   rtpfUpper: rtpf.upper,
   rtpfCouponPips: pips(rtpf.coupon),
+  rtpfFairCouponPips: pips(P.rtpf.value),
   rtpfSePips: P.rtpf.stdErrPips,
   rtpfCouponChf: rtpf.coupon * rtpf.notional,
   rtpfMaxChf: rtpf.coupon * rtpf.notional * rtpf.targetCoupons,
@@ -491,8 +500,23 @@ export const nums: NumTable = {
     kind: 'pct',
     note: 'Distance of the strike below spot',
   },
-  'm08.tpfCoupon': { value: M.tpfCouponPips, kind: 'pips' },
-  'm08.tpfSe': { value: M.tpfSePips, kind: 'pips' },
+  'm08.tpfCoupon': {
+    value: M.tpfCouponPips,
+    kind: 'pips',
+    note: 'Contractual coupon: fair coupon rounded to the quote step; paid per fixing',
+  },
+  'm08.tpfFairCoupon': {
+    value: M.tpfFairCouponPips,
+    kind: 'pips',
+    digits: 2,
+    note: 'Fair coupon (Monte Carlo), unrounded; only shown with ± m08.tpfSe',
+  },
+  'm08.tpfSe': {
+    value: M.tpfSePips,
+    kind: 'pips',
+    digits: 2,
+    note: 'Standard error of the fair coupon',
+  },
   'm08.couponQuote': {
     value: PATHSIM_CONFIG.couponQuoteStep / PIP,
     kind: 'pips',
@@ -545,8 +569,23 @@ export const nums: NumTable = {
   // RTPF
   'm08.rtpfLower': { value: M.rtpfLower, kind: 'rate' },
   'm08.rtpfUpper': { value: M.rtpfUpper, kind: 'rate' },
-  'm08.rtpfCoupon': { value: M.rtpfCouponPips, kind: 'pips' },
-  'm08.rtpfSe': { value: M.rtpfSePips, kind: 'pips' },
+  'm08.rtpfCoupon': {
+    value: M.rtpfCouponPips,
+    kind: 'pips',
+    note: 'Contractual coupon: fair coupon rounded to the quote step; paid per fixing',
+  },
+  'm08.rtpfFairCoupon': {
+    value: M.rtpfFairCouponPips,
+    kind: 'pips',
+    digits: 2,
+    note: 'Fair coupon (Monte Carlo), unrounded; only shown with ± m08.rtpfSe',
+  },
+  'm08.rtpfSe': {
+    value: M.rtpfSePips,
+    kind: 'pips',
+    digits: 2,
+    note: 'Standard error of the fair coupon',
+  },
   'm08.rtpfCouponChf': { value: M.rtpfCouponChf, kind: 'money' },
   'm08.rtpfMaxChf': { value: M.rtpfMaxChf, kind: 'money' },
   'm08.rtpfCouponNoTarget': { value: M.rtpfCouponNoTargetPips, kind: 'pips' },

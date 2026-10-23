@@ -4,14 +4,18 @@
  * - the importer's five strategies from src/lib/m09/hedge.ts (Garman-Kohlhagen, zero-cost
  *   strikes solved with the payoff builder of module 06),
  * - the matrix profiles and key numbers from src/lib/matrix.ts, with the precomputed fair
- *   strikes and coupons of module 08 (src/data/fx/mc-products.json, Monte Carlo),
+ *   strikes of module 08 (src/data/fx/mc-products.json, Monte Carlo) and the contractual TPF /
+ *   RTPF coupons (the fair coupon rounded to the quote step, simProduct): the same coupon,
+ *   coupon in CHF and maximum gain as module 08,
  * - carry, discount certificate and dual currency from src/lib/m09/carry.ts (money market
- *   Act/360, options on the same forward),
+ *   Act/360, options on the same forward); the carry on USD 1 Mio. at maturity and on USD 1 Mio.
+ *   bought today (module 01) from moneyMarketCarry (src/lib/fx/forward.ts),
  * - the one-fixing "where does the premium go" example from the core (gkPrice, digitalCash).
  * Every scenario level comes from M09_CONFIG (src/lib/m09/config.ts).
  * Units: rates in CHF per USD, pips = 0.0001, money in CHF unless stated.
  */
 import { EXAMPLE as E } from '@/lib/fx/example';
+import { moneyMarketCarry } from '@/lib/fx/forward';
 import { gkPrice } from '@/lib/fx/vanilla';
 import { digitalCash } from '@/lib/fx/exotics/digital';
 import { MC_PRODUCTS, fairProduct } from '@/lib/fx/mc/fair';
@@ -21,6 +25,7 @@ import { M09_CONFIG, PIP } from '@/lib/m09/config';
 import { hedgeCosts, hedgeSetup } from '@/lib/m09/hedge';
 import { CARRY_DEFAULTS, carryView, cushionPips, probLoss, yieldPnl } from '@/lib/m09/carry';
 import { matrixParams, productResult } from '@/lib/matrix';
+import { PATHSIM_CONFIG } from '@/lib/pathsim';
 import type { NumTable } from './types';
 
 const pips = (x: number): number => x / PIP;
@@ -64,6 +69,12 @@ const y12 = carryView({ ...CARRY_DEFAULTS, months: 12 });
 const y1 = carryView({ ...CARRY_DEFAULTS, months: 1 });
 const yDownMove = sc.down;
 const yDown = S * (1 + yDownMove);
+/**
+ * Carry at an unchanged spot on USD 1 Mio. at maturity (this module: N / (1 + rf · τ) bought
+ * today) and on USD 1 Mio. bought today (module 01). Same rates and days as the figure.
+ */
+const carryEnd = moneyMarketCarry(S, yv.rd, yv.rf, yv.days, yv.notional, 'maturity');
+const carryStart = moneyMarketCarry(S, yv.rd, yv.rf, yv.days, yv.notional, 'today');
 
 /** Raw values for the quiz and tests (rates in CHF per USD, money in CHF unless noted). */
 export const M09 = {
@@ -94,16 +105,25 @@ export const M09 = {
   hDown,
   costUp,
   costDown,
-  // section 3
+  // section 3: TPF / RTPF with the contractual coupon (fair coupon rounded, as in module 08)
   tpfStrike: mp.tpf.strike,
   tpfCouponPips: pips(mp.tpf.coupon),
   tpfNotional: MC_CONFIG.products.tpf.notional,
   tpfTargetCoupons: MC_CONFIG.products.tpf.targetCoupons,
+  tpfCouponChf: mp.tpf.coupon * MC_CONFIG.products.tpf.notional,
+  /** Largest possible gain: target coupons × the coupon paid per fixing. */
+  tpfMaxChf: mp.tpf.coupon * MC_CONFIG.products.tpf.notional * MC_CONFIG.products.tpf.targetCoupons,
   tpfFixings: MC_CONFIG.products.tpf.fixings,
   tpfQ05: P.tpf.stats.pvQuantile05,
   rtpfLower: mp.rtpf.lower,
   rtpfUpper: mp.rtpf.upper,
   rtpfCouponPips: pips(mp.rtpf.coupon),
+  rtpfTargetCoupons: MC_CONFIG.products.rtpf.targetCoupons,
+  rtpfCouponChf: mp.rtpf.coupon * MC_CONFIG.products.rtpf.notional,
+  rtpfMaxChf:
+    mp.rtpf.coupon * MC_CONFIG.products.rtpf.notional * MC_CONFIG.products.rtpf.targetCoupons,
+  /** Quote step of the contractual coupons in pips (PATHSIM_CONFIG.couponQuoteStep). */
+  couponQuotePips: pips(PATHSIM_CONFIG.couponQuoteStep),
   rtpfQ05: P.rtpf.stats.pvQuantile05,
   tarfStrike: mp.tarf.strike,
   tarfFwd: mp.tarf.forward,
@@ -143,7 +163,12 @@ export const M09 = {
   yDays: yv.days,
   carryForward: yv.forward,
   carryPips: cushionPips('carry', yv),
+  /** Carry at an unchanged spot on USD 1 Mio. at maturity: (S − F) · N. */
   carryChf: yieldPnl('carry', S, yv),
+  /** USD bought today for USD 1 Mio. at maturity: N / (1 + rf · τ). */
+  carryUsdToday: carryEnd.baseToday,
+  /** Carry at an unchanged spot on USD 1 Mio. bought today (module 01): S · N · (rf − rd) · τ. */
+  carryChfStart: carryStart.carry,
   carryPLoss: probLoss('carry', yv),
   yStrike: yv.strike,
   yStrikeBelow: CARRY_DEFAULTS.strikeBelow,
@@ -246,24 +271,49 @@ export const nums: NumTable = {
     kind: 'pct',
     note: 'Strike below spot (§8.7)',
   },
-  'm09.tpfCoupon': { value: M.tpfCouponPips, kind: 'pips', digits: 0 },
+  'm09.tpfCoupon': {
+    value: M.tpfCouponPips,
+    kind: 'pips',
+    digits: 1,
+    note: 'Contractual coupon per fixing (fair coupon rounded to the quote step), = m08.tpfCoupon',
+  },
   'm09.tpfCouponChf': {
-    value: M.tpfCouponPips * PIP * M.tpfNotional,
+    value: M.tpfCouponChf,
     kind: 'money',
-    note: 'Coupon per fixing on USD 100’000',
+    note: 'Contractual coupon per fixing on USD 100’000, = m08.tpfCouponChf',
   },
   'm09.structNotional': { value: M.structNotional, kind: 'money', ccy: 'USD' },
   'm09.tpfTargetCoupons': { value: M.tpfTargetCoupons, kind: 'num', digits: 0 },
   'm09.tpfMaxChf': {
-    value: M.tpfCouponPips * PIP * M.tpfNotional * M.tpfTargetCoupons,
+    value: M.tpfMaxChf,
     kind: 'money',
-    note: 'Coupon × target coupons: the largest possible gain',
+    note: 'Coupon × target coupons: the largest possible gain, = m08.tpfMaxChf',
+  },
+  'm09.couponQuote': {
+    value: M.couponQuotePips,
+    kind: 'pips',
+    note: 'Quote step of the contractual coupons (PATHSIM_CONFIG.couponQuoteStep)',
   },
   'm09.fixings': { value: M.tpfFixings, kind: 'num', digits: 0 },
   'm09.tpfQ05': { value: M.tpfQ05, kind: 'money', note: '5 % quantile of path PV (MC)' },
   'm09.rtpfLower': { value: M.rtpfLower, kind: 'rate' },
   'm09.rtpfUpper': { value: M.rtpfUpper, kind: 'rate' },
-  'm09.rtpfCoupon': { value: M.rtpfCouponPips, kind: 'pips', digits: 0 },
+  'm09.rtpfCoupon': {
+    value: M.rtpfCouponPips,
+    kind: 'pips',
+    digits: 1,
+    note: 'Contractual coupon per fixing, = m08.rtpfCoupon',
+  },
+  'm09.rtpfCouponChf': {
+    value: M.rtpfCouponChf,
+    kind: 'money',
+    note: 'Contractual coupon per fixing on USD 100’000, = m08.rtpfCouponChf',
+  },
+  'm09.rtpfMaxChf': {
+    value: M.rtpfMaxChf,
+    kind: 'money',
+    note: 'Coupon × target coupons: the largest possible gain, = m08.rtpfMaxChf',
+  },
   'm09.rtpfQ05': { value: M.rtpfQ05, kind: 'money' },
   'm09.tarfStrike': { value: M.tarfStrike, kind: 'rate' },
   'm09.tarfFwd': { value: M.tarfFwd, kind: 'rate', note: 'Forward at the average fixing day' },
@@ -324,10 +374,27 @@ export const nums: NumTable = {
   'm09.yDays': { value: M.yDays, kind: 'num', digits: 0 },
   'm09.carryFwd': { value: M.carryForward, kind: 'rate', note: 'Money-market forward = BE' },
   'm09.carryPips': { value: M.carryPips, kind: 'pips', digits: 0, note: 'Carry cushion S − F' },
+  'm09.carryPipsExact': {
+    value: M.carryPips,
+    kind: 'pips',
+    digits: 2,
+    note: 'S − F with two decimals, so «pips × USD 1 Mio. = CHF» adds up with m09.carryChf',
+  },
   'm09.carryChf': {
     value: M.carryChf,
     kind: 'money',
-    note: 'Carry at unchanged spot on USD 1 Mio.',
+    note: 'Carry at unchanged spot on USD 1 Mio. AT MATURITY: (S − F) · N',
+  },
+  'm09.carryUsdToday': {
+    value: M.carryUsdToday,
+    kind: 'money',
+    ccy: 'USD',
+    note: 'USD bought today for USD 1 Mio. at maturity: N / (1 + rf · τ)',
+  },
+  'm09.carryChfStart': {
+    value: M.carryChfStart,
+    kind: 'money',
+    note: 'Carry at unchanged spot on USD 1 Mio. bought TODAY (module 01, = m01.carryPnlFlat)',
   },
   'm09.carryPLoss': { value: M.carryPLoss, kind: 'pct', digits: 0, note: 'Model, not a forecast' },
   'm09.yStrike': { value: M.yStrike, kind: 'rate', note: 'Strike / cap 1 % below spot' },

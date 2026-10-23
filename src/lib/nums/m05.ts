@@ -23,7 +23,7 @@ import { d1d2, gkPrice } from '@/lib/fx/vanilla';
 import { greeks, numericGreeks, premiumAdjustedDelta, vannaVolga } from '@/lib/fx/greeks';
 import { pipSize } from '@/lib/format';
 import { gammaTheta, leverEffect } from '@/lib/greeksfigures';
-import { LAB_CONFIG, vegaPeakSpot } from '@/lib/greekslab';
+import { LAB_CONFIG, gammaPeakSpot, vegaPeakSpot } from '@/lib/greekslab';
 import type { NumTable } from './types';
 
 const { spot: S, T, vol, rd, rf, notional: N } = E;
@@ -71,6 +71,16 @@ const callVolUp = gkPrice(S, K, T, vol + 0.01, rd, rf, 'call');
 const spotUp = leverEffect('spot', 'up');
 const month = leverEffect('time', 'month');
 
+/**
+ * Where gamma peaks (section 2): over spot, ∂Γ/∂S = −(Γ/S) · [d1/(σ√T) + 1] = 0 gives
+ * d1 = −σ√T, i.e. F = K · e^(−1.5σ²T), slightly left of ATMF. For comparison the spot where
+ * d1 = 0 (F = K · e^(−σ²T/2)), which is the peak across strikes. Vega peaks across spot at
+ * d1 = +σ√T (d2 = 0), see vegaPeakSpot.
+ */
+const gammaAt = (s: number) => greeks(s, K, T, vol, rd, rf, 'call').gamma;
+const gammaPeakS = gammaPeakSpot(LAB_CONFIG.defaults);
+const spotD1Zero = K * Math.exp((rf - rd) * T - 0.5 * vol * vol * T);
+
 /** Raw values (quote currency per 1 USD unless noted) for quiz files and tests. */
 export const M05 = {
   d1,
@@ -112,6 +122,18 @@ export const M05 = {
   /** Spot below which the levers figure shows "far out of the money" (S − 2 big figures). */
   spotOtm: SPOT_OTM,
   vegaOtmChf: (greeks(SPOT_OTM, K, T, vol, rd, rf, 'call').vega / 100) * N,
+  /** Spot delta deep in the money: e^(−rf T), the spot delta of a forward (forward delta → 1). */
+  spotDeltaLimit: dff,
+  /** Spot where gamma peaks (d1 = −σ√T) and gamma there. */
+  gammaPeakSpot: gammaPeakS,
+  gammaPeak: gammaAt(gammaPeakS),
+  /** Strike minus forward at the gamma peak, in pips (positive: forward below the strike). */
+  gammaPeakFwdPips: (K - gammaPeakS * Math.exp((rd - rf) * T)) / PIP,
+  /**
+   * Spot where d1 = 0 (right of the gamma peak) and gamma there (a little below its peak value).
+   */
+  spotD1Zero,
+  gammaD1Zero: gammaAt(spotD1Zero),
 } as const;
 
 export const nums: NumTable = {
@@ -131,7 +153,7 @@ export const nums: NumTable = {
     value: delta * N,
     kind: 'money',
     ccy: 'USD',
-    note: 'spot delta × notional: the USD amount that behaves like a forward position',
+    note: 'spot delta × notional: the USD amount that behaves like a spot position',
   },
   'm05.spotUpChf': {
     value: spotUp.exact,
@@ -182,6 +204,31 @@ export const nums: NumTable = {
   },
   'm05.gamma': { value: gamma, kind: 'num', digits: 2 },
   'm05.gammaNumeric': { value: gammaNumeric, kind: 'num', digits: 2, note: 'central difference' },
+  'm05.spotDeltaLimit': {
+    value: M05.spotDeltaLimit,
+    kind: 'num',
+    digits: 3,
+    note: 'e^(−rf T): spot delta of the call deep in the money = spot delta of a forward',
+  },
+  'm05.gammaPeakSpot': {
+    value: M05.gammaPeakSpot,
+    kind: 'rate',
+    note: 'spot where gamma (fixed strike) peaks: d1 = −σ√T',
+  },
+  'm05.gammaPeak': { value: M05.gammaPeak, kind: 'num', digits: 2, note: 'gamma at its peak' },
+  'm05.gammaPeakFwdPips': {
+    value: M05.gammaPeakFwdPips,
+    kind: 'pips',
+    digits: 0,
+    note: 'strike minus forward at the gamma peak, in pips',
+  },
+  'm05.spotD1Zero': { value: M05.spotD1Zero, kind: 'rate', note: 'spot where d1 = 0' },
+  'm05.gammaD1Zero': {
+    value: M05.gammaD1Zero,
+    kind: 'num',
+    digits: 2,
+    note: 'gamma at d1 = 0 (right of the peak), a little below its peak value',
+  },
   'm05.deltaPnl10Pips': { value: M05.deltaPnl10PipsChf, kind: 'money' },
   'm05.callChf': { value: M05.callChf, kind: 'money' },
 

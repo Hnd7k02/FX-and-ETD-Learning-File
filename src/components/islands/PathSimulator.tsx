@@ -61,6 +61,7 @@ import {
   isScenario,
   isSimKind,
   monthTicks,
+  paidCoupon,
   paramOf,
   paramOverrides,
   paramRange,
@@ -753,7 +754,8 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
   const paramText =
     solved === 'strike' ? rate(pVal) : t('ps.param.pips', { v: pipsTxt(pVal / PIP) });
   const fairRow = (() => {
-    const se = fmtNumber(fair.stdErrPips, lang, { digits: 1 });
+    /* the unrounded fair coupon only with its standard error, both to 0.01 pip */
+    const se = fmtNumber(fair.stdErrPips, lang, { digits: solved === 'coupon' ? 2 : 1 });
     const sub = t('ps.st.fairSub', { se, paths: count(fair.paths) });
     if (solved === 'strike') {
       return { label: t('ps.st.fairStrike'), value: rate(fair.value), sub };
@@ -761,7 +763,7 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
     if (solved === 'coupon') {
       return {
         label: t('ps.st.fairCoupon'),
-        value: t('ps.param.pips', { v: pipsTxt(fair.value / PIP) }),
+        value: t('ps.param.pips', { v: pipsTxt(fair.value / PIP, 2) }),
         sub,
       };
     }
@@ -783,11 +785,21 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
         }),
       };
     }
-    if (solved === 'coupon') {
+    if (kind === 'tpf' || kind === 'rtpf') {
+      /* the coupon the simulated product pays: contractual (fair coupon rounded to the quote
+         step) or, once the slider moved, the chosen one; the same as in the event table */
+      const paid = paidCoupon(kind, param);
+      const c = pipsTxt(paid.coupon / PIP);
       return {
-        label: t('ps.st.fairCoupon'),
-        value: chf(fair.value * N),
-        sub: t('ps.st.couponChf', { chf: chf(fair.value * N), n: usd(N) }),
+        label: t(paid.chosen ? 'ps.st.chosenCoupon' : 'ps.st.contractCoupon'),
+        value: chf(paid.perFixing),
+        sub: paid.chosen
+          ? t('ps.st.couponChfChosen', { c, n: usd(N) })
+          : t('ps.st.couponChf', {
+              c,
+              n: usd(N),
+              q: pipsTxt(PATHSIM_CONFIG.couponQuoteStep / PIP),
+            }),
       };
     }
     const piv = simProduct('pivotTarf');

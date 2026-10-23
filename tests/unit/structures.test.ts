@@ -17,16 +17,17 @@ import {
 import { fairProduct } from '@/lib/fx/mc/fair';
 import { DEFAULT_MARKET } from '@/lib/fx/mc/products';
 import { gkPrice } from '@/lib/fx/vanilla';
-import type { SimKind } from '@/lib/pathsim';
+import { simProduct, type SimKind } from '@/lib/pathsim';
 
 const KINDS: SimKind[] = ['accumulator', 'decumulator', 'tarf', 'pivotTarf', 'tpf', 'rtpf'];
 
 /**
  * Per-fixing payoff written out from §8.7 (without the end of the product). A target in pips
- * caps the gain of one fixing at the target (TARF, pivot TARF).
+ * caps the gain of one fixing at the target (TARF, pivot TARF). TPF and RTPF pay their
+ * contractual coupon (simProduct: the fair coupon rounded to the quote step).
  */
 function reference(kind: SimKind, S: number): number {
-  const p = fairProduct(kind) as never as Record<string, number>;
+  const p = simProduct(kind) as never as Record<string, number>;
   const N = p.notional!;
   switch (kind) {
     case 'accumulator':

@@ -187,6 +187,26 @@ export function simProduct<K extends SimKind>(kind: K, param?: number): ProductO
   return fairProduct(kind);
 }
 
+/** The coupon a TPF / RTPF pays per fixing, as the simulator shows it. */
+export interface PaidCoupon {
+  /** Coupon per fixing in CHF per USD. */
+  coupon: number;
+  /** Coupon per fixing in CHF on the product's notional. */
+  perFixing: number;
+  /** True for a coupon chosen with the slider, false for the contractual coupon. */
+  chosen: boolean;
+}
+
+/**
+ * The coupon a TPF / RTPF pays per fixing: the contractual coupon (the fair coupon rounded to
+ * the quote step) or, once the slider moved, the chosen coupon. Read from the simulated product
+ * (simProduct), so it is the coupon of the event table and the P&L.
+ */
+export function paidCoupon(kind: 'tpf' | 'rtpf', param?: number): PaidCoupon {
+  const p = simProduct(kind, param);
+  return { coupon: p.coupon, perFixing: p.coupon * p.notional, chosen: param !== undefined };
+}
+
 /**
  * Mean number of fixings of the paths that ended EARLY (knock-out or target), from the mean
  * over all paths: the other paths run all n fixings, so

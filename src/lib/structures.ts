@@ -21,7 +21,7 @@ import {
   type Market,
   type ProductOf,
 } from '@/lib/fx/mc/products';
-import type { SimKind } from './pathsim';
+import { simProduct, type SimKind } from './pathsim';
 
 /** Products with the three-step story (they have a strike that can be compared to F). */
 export const STORY_KINDS = ['accumulator', 'decumulator', 'tarf'] as const;
@@ -63,6 +63,11 @@ export interface Stage {
   knockOut: { from: number; to: number } | null;
   /** Target in CHF per USD (TARF, pivot TARF) or in coupons (TPF, RTPF); null if none. */
   target: { kind: 'pips' | 'coupons'; value: number } | null;
+}
+
+/** The coupon a stage pays per fixing (CHF per USD): the cash of its digital line, or null. */
+export function stageCoupon(stage: Stage): number | null {
+  return stage.blocks.find((b) => b.cash !== undefined)?.cash ?? null;
 }
 
 /** Payoff of one block line at S, in CHF per USD of notional. */
@@ -123,9 +128,12 @@ export function productBlocks(product: ProductOf<SimKind>): BlockLine[] {
   return out;
 }
 
-/** The full (fair) product as a stage. */
+/**
+ * The full product as a stage: the fair product of module 08 (simProduct), TPF and RTPF with
+ * their contractual coupon (the fair coupon rounded to the quote step), the coupon they pay.
+ */
 export function fullStage(kind: SimKind): Stage {
-  const p = fairProduct(kind) as ProductOf<SimKind>;
+  const p = simProduct(kind) as ProductOf<SimKind>;
   let strike: number;
   let knockOut: Stage['knockOut'] = null;
   let target: Stage['target'] = null;

@@ -47,6 +47,7 @@ import {
   matrixGrid,
   matrixParams,
   matrixRange,
+  pipsDigits,
   productResult,
   profileGroups,
   riskChips,
@@ -320,7 +321,9 @@ export default function ProductMatrix(props: ProductMatrixProps): JSX.Element {
 
   /* ---------- texts ---------- */
   const rate = (x: number) => fmtRate(x, PAIR);
-  const pipsTxt = (v: number) => t('pm.pips', { v: fmtPips(v, lang, 0, true) });
+  /* a result in pips: TPF / RTPF to 0.1 pip like their contractual coupon (pipsDigits) */
+  const pipsTxt = (v: number, id?: ProductId) =>
+    t('pm.pips', { v: fmtPips(v, lang, id ? pipsDigits(id) : 0, true) });
   const needName = t(`pm.need.${cell.need}`);
   const viewName = t(`pm.view.${cell.view}`);
   const months = M09_CONFIG.yieldProducts.months;
@@ -336,7 +339,7 @@ export default function ProductMatrix(props: ProductMatrixProps): JSX.Element {
         value = t('pm.key.range', { a: rate(k.value), b: rate(k.value2 ?? k.value) });
         break;
       case 'pips':
-        value = t('pm.key.pips', { v: fmtPips(k.value, lang, 0) });
+        value = t('pm.key.pips', { v: fmtPips(k.value, lang, k.digits ?? 0) });
         break;
       case 'pct':
         value = fmtPct(k.value, lang, 1);
@@ -361,7 +364,8 @@ export default function ProductMatrix(props: ProductMatrixProps): JSX.Element {
       max: t(`pm.chip.loss.${PRODUCTS[spreadRisk.maxId].loss}` as Parameters<typeof t>[0]),
     });
 
-  const resultText = (i: number) => (results[i] === null ? t('pm.noProfile') : pipsTxt(pipsAt[i]!));
+  const resultText = (i: number) =>
+    results[i] === null ? t('pm.noProfile') : pipsTxt(pipsAt[i]!, products[i]);
   const aria = t('pm.aria', {
     need: needName,
     view: viewName,
@@ -785,7 +789,7 @@ export default function ProductMatrix(props: ProductMatrixProps): JSX.Element {
                     {isWorst && <span class="pm-tag is-worst">{t('pm.worst')}</span>}
                   </span>
                   <span class="pm-row-value mono" data-value>
-                    {has ? pipsTxt(tweenPips[i] ?? 0) : t('pm.noProfile')}
+                    {has ? pipsTxt(tweenPips[i] ?? 0, id) : t('pm.noProfile')}
                   </span>
                 </button>
               );

@@ -42,6 +42,7 @@ import {
   fullStage,
   hasStory,
   lerpStage,
+  stageCoupon,
   stagePayoff,
   stageSamples,
   storyStages,
@@ -202,11 +203,13 @@ export default function StructureBlocks(props: StructureBlocksProps): JSX.Elemen
           target: pipsTxt(prod.target! / PIP, 0),
         });
       }
+      /* the coupon the drawn digital pays: the contractual coupon of the stage (fullStage) */
+      const coupon = stageCoupon(p) ?? 0;
       if (kind === 'tpf') {
-        return t('sb.text.tpf', { c: pipsTxt(prod.coupon! / PIP), k: rate(p.strike) });
+        return t('sb.text.tpf', { c: pipsTxt(coupon / PIP), k: rate(p.strike) });
       }
       return t('sb.text.rtpf', {
-        c: pipsTxt(prod.coupon! / PIP),
+        c: pipsTxt(coupon / PIP),
         l: rate(prod.lower!),
         u: rate(prod.upper!),
       });
