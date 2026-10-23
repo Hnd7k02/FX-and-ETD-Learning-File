@@ -195,7 +195,6 @@ export const productmatrix = defineDict({
     'pm.noProfileLong':
       'Eine Order hat kein festes Profil: Erst beim Auslösen wird sie zum Spot-Geschäft.',
     'pm.show': 'Kurve zeigen',
-    'pm.shown': 'Im Chart markiert',
     'pm.rows': 'Ergebnis je Produkt',
     'pm.link': 'Erklärt in Modul {n} · Abschnitt {s}',
     'pm.same': '{a} = {b}',
@@ -226,7 +225,7 @@ export const productmatrix = defineDict({
     'pm.need.alpha': 'Alpha',
     'pm.need.alpha.sub': 'Act on a view',
     'pm.need.yield': 'Yield',
-    'pm.need.yield.sub': 'Earn more interest',
+    'pm.need.yield.sub': 'More interest',
     'pm.view.up': 'USD stronger',
     'pm.view.down': 'USD weaker',
     'pm.view.sideways': 'Sideways',
@@ -401,7 +400,6 @@ export const productmatrix = defineDict({
     'pm.noProfileLong':
       'An order has no fixed profile: it only becomes a spot trade when it is triggered.',
     'pm.show': 'Show curve',
-    'pm.shown': 'Marked in the chart',
     'pm.rows': 'Result per product',
     'pm.link': 'Explained in module {n} · section {s}',
     'pm.same': '{a} = {b}',

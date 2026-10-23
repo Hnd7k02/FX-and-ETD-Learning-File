@@ -84,7 +84,7 @@ export const GLOSSARY: GlossaryEntry[] = [
       en: 'The smallest usual price step: the fourth decimal place, i.e. 0.0001. For JPY pairs one pip is 0.01.',
     },
     module: '01-spot',
-    section: '3',
+    section: '1',
     see: ['big-figure', 'forward-points'],
   },
   {
@@ -96,7 +96,7 @@ export const GLOSSARY: GlossaryEntry[] = [
       en: 'The leading digits of a rate, which rarely change. One big figure is 100 pips, so dealers often quote only the last two digits.',
     },
     module: '01-spot',
-    section: '3',
+    section: '1',
     see: ['pip', 'two-way-price'],
   },
   {
@@ -254,6 +254,42 @@ export const GLOSSARY: GlossaryEntry[] = [
     module: '01-spot',
     section: '3',
     see: ['cross-rate', 'arbitrage'],
+  },
+  {
+    id: 'exposure',
+    term: { de: 'Exposure (Währungsrisiko)', en: 'Exposure (currency risk)' },
+    aliases: ['Währungsrisiko', 'FX risk', 'currency risk', 'offene Position'],
+    def: {
+      de: 'Ein Betrag in fremder Währung, dessen Wert in deiner Heimwährung vom Kurs abhängt, z. B. eine künftige Zahlung in USD. Ungesichert trägst du jede Kursbewegung voll.',
+      en: 'An amount in a foreign currency whose value in your home currency depends on the rate, e.g. a future payment in USD. Unhedged, you carry every move in full.',
+    },
+    module: '01-spot',
+    section: '1',
+    see: ['exchange-rate', 'hedge', 'long-short'],
+  },
+  {
+    id: 'liquidity',
+    term: { de: 'Liquidität', en: 'Liquidity' },
+    aliases: ['Markttiefe', 'market depth'],
+    def: {
+      de: 'Wie leicht du einen Betrag handeln kannst, ohne den Kurs zu bewegen. Hohe Liquidität heisst enge Spreads; sie schwankt mit Tageszeit und Nachrichtenlage.',
+      en: 'How easily you can trade an amount without moving the price. High liquidity means tight spreads; it varies with the time of day and the news.',
+    },
+    module: '01-spot',
+    section: '2',
+    see: ['spread', 'otc', 'gap-risk'],
+  },
+  {
+    id: 'g10',
+    term: { de: 'G10-Währungen', en: 'G10 currencies' },
+    aliases: ['G10', 'Hauptwährungen', 'majors'],
+    def: {
+      de: 'Eine übliche Gruppe von zehn liquiden Währungen grosser Industrieländer: USD, EUR, JPY, GBP, CHF, AUD, NZD, CAD, NOK und SEK. Der Begriff ist eine Marktkonvention, keine Rangliste.',
+      en: 'A customary group of ten liquid currencies of large industrial economies: USD, EUR, JPY, GBP, CHF, AUD, NZD, CAD, NOK and SEK. The term is a market convention, not a ranking.',
+    },
+    module: '01-spot',
+    section: '4',
+    see: ['safe-haven', 'carry-trade', 'funding-currency'],
   },
   {
     id: 'safe-haven',
@@ -891,7 +927,7 @@ export const GLOSSARY: GlossaryEntry[] = [
   /* ---------- 06 · Combos & smile ---------- */
   {
     id: 'call-spread',
-    term: { de: 'Call Spread', en: 'Call spread' },
+    term: { de: 'Call-Spread', en: 'Call spread' },
     aliases: ['Bull Spread', 'Call-Spread'],
     def: {
       de: 'Long Call zu einem Strike und Short Call zu einem höheren Strike. Die verkaufte Option verbilligt den Schutz, begrenzt ihn aber nach oben.',
@@ -903,7 +939,7 @@ export const GLOSSARY: GlossaryEntry[] = [
   },
   {
     id: 'put-spread',
-    term: { de: 'Put Spread', en: 'Put spread' },
+    term: { de: 'Put-Spread', en: 'Put spread' },
     aliases: ['Bear Spread', 'Put-Spread'],
     def: {
       de: 'Long Put zu einem Strike und Short Put zu einem tieferen Strike. Günstiger als ein einfacher Put, schützt aber nur bis zum tieferen Strike.',
@@ -927,7 +963,7 @@ export const GLOSSARY: GlossaryEntry[] = [
   },
   {
     id: 'zero-cost-collar',
-    term: { de: 'Zero-Cost Collar', en: 'Zero-cost collar' },
+    term: { de: 'Zero-Cost-Collar', en: 'Zero-cost collar' },
     aliases: ['Zero Cost', 'Collar', 'Nullkosten-Collar', 'Tunnel'],
     def: {
       de: 'Ein Risk Reversal mit Strikes, bei denen gekaufte und verkaufte Prämie gleich gross sind. Du sicherst dich ohne Prämie ab, gibst dafür aber Gewinne jenseits des verkauften Strikes ab.',

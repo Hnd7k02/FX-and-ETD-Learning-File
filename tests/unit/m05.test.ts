@@ -18,8 +18,12 @@ describe('m05 numbers', () => {
     expect(M05.vegaPointChf).toBeCloseTo(1582, 0);
     expect(M05.thetaOneDayChf).toBeCloseTo(-30.82, 2);
     expect(M05.thetaGammaDayChf).toBeCloseTo(-69.33, 2);
-    // analytic theta per day = gamma share + carry
-    expect(M05.thetaGammaDayChf + M05.thetaCarryDayChf).toBeCloseTo(-30.67, 2);
+    // analytic theta per day = gamma share + analytic carry (CHF −69.33 + 38.66 = −30.67)
+    expect(M05.thetaGammaDayChf + getNum('m05.thetaCarryAnalytic').value).toBeCloseTo(-30.67, 2);
+    // on screen the rounded parts add up to the rounded lab theta: −69 + 38 = −31 (D-26, D-38)
+    expect(Math.round(M05.thetaGammaDayChf) + M05.thetaCarryDayChf).toBe(
+      Math.round(M05.thetaOneDayChf),
+    );
     expect(M05.rhoDomesticChf).toBeCloseTo(976, 0);
     expect(M05.rhoForeignChf).toBeCloseTo(-1008, 0);
     expect(M05.breakEvenPips).toBeCloseTo(33.5, 2);

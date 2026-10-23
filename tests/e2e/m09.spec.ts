@@ -195,16 +195,18 @@ test.describe('module 09 · hedge, alpha, yield', () => {
       .toBeGreaterThan(1);
   });
 
-  for (const s of [...SECTIONS, 'quiz']) {
-    test(`axe: no serious or critical violations (section ${s})`, async ({ page }) => {
-      await page.goto(`${BASE}/${s}/`);
-      await hydrateAll(page);
-      await page.waitForTimeout(400);
-      const r = await new AxeBuilder({ page }).analyze();
-      const bad = r.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
-      expect(
-        bad.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`),
-      ).toEqual([]);
-    });
+  for (const { prefix, lang } of LANGS) {
+    for (const s of [...SECTIONS, 'quiz']) {
+      test(`axe: no serious or critical violations (${lang} ${s})`, async ({ page }) => {
+        await page.goto(`${prefix}${BASE}/${s}/`);
+        await hydrateAll(page);
+        await page.waitForTimeout(400);
+        const r = await new AxeBuilder({ page }).analyze();
+        const bad = r.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
+        expect(
+          bad.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`),
+        ).toEqual([]);
+      });
+    }
   }
 });

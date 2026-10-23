@@ -39,8 +39,7 @@ export const hedgecompare = defineDict({
     'hc.ev.levStrike': 'Strike {k}: Darunter kauft der strukturierte Hedge die doppelte Menge.',
     'hc.ev.levWorse': '{k}: Ab hier ist der strukturierte Hedge teurer als der Forward.',
     'hc.events': 'Wegmarken',
-    'hc.aria':
-      'Bezahlter Kurs bei Verfall für {lines}. Bei {st}: {costs}. Am günstigsten {best}.',
+    'hc.aria': 'Bezahlter Kurs bei Verfall für {lines}. Bei {st}: {costs}. Am günstigsten {best}.',
     'hc.ariaLine': '{name} {rate}',
     'hc.summary': 'Bei {st} kosten {n}: {costs}. Am günstigsten im Rückblick: {best}.',
     'hc.cost': '{name} {chf}',
@@ -72,7 +71,8 @@ export const hedgecompare = defineDict({
     'hc.isFwd': 'reference',
     'hc.best': 'cheapest',
     'hc.lead': 'Cheapest in hindsight: {name}',
-    'hc.ev.forward': 'Forward {k}: above it the forward saves money, below it costs you the chance.',
+    'hc.ev.forward':
+      'Forward {k}: above it the forward saves money, below it costs you the chance.',
     'hc.ev.callStrike': 'Strike {k}: above it the call caps your rate.',
     'hc.ev.collarCap': 'Collar cap {k}: above it you never pay more.',
     'hc.ev.collarFloor': 'Collar floor {k}: below it you no longer benefit.',

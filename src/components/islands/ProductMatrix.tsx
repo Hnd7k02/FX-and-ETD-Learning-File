@@ -841,7 +841,21 @@ export default function ProductMatrix(props: ProductMatrixProps): JSX.Element {
                     data-show={id}
                     onClick={() => setHl(id)}
                   >
-                    {gi === hlGroup ? t('pm.shown') : t('pm.show')}
+                    {gi === hlGroup && (
+                      <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
+                        <path
+                          d="M2.5 7.3L5.6 10.2L11.5 3.8"
+                          style={{
+                            fill: 'none',
+                            stroke: 'currentColor',
+                            strokeWidth: 2,
+                            strokeLinecap: 'round',
+                            strokeLinejoin: 'round',
+                          }}
+                        />
+                      </svg>
+                    )}
+                    {t('pm.show')}
                   </button>
                 ) : (
                   <span class="pm-noprofile">{t('pm.noProfileLong')}</span>
