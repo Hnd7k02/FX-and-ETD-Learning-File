@@ -51,7 +51,7 @@ export const M02_CONFIG = {
   /** (a) HedgeOutcome, section 1. */
   hedge: {
     /** Range and step of the rate at expiry (slider and draggable handle). */
-    stRange: [0.72, 0.88] as [number, number],
+    stRange: [0.68, 0.92] as [number, number],
     stStep: 0.0005,
     /** Start value of the slider: the importer's fear, a strong dollar (choice). */
     stStart: 0.84,
@@ -59,7 +59,7 @@ export const M02_CONFIG = {
     stUp: 0.84,
     stDown: 0.76,
     /** y axis of the chart in CHF thousands. */
-    yDomain: [700, 900] as [number, number],
+    yDomain: [670, 930] as [number, number],
     /**
      * Model scenarios of the "play" mode (choice): lognormal rates at expiry with the example
      * vol, centred on the forward (drift rd − rf, as in the Monte Carlo engine). Antithetic

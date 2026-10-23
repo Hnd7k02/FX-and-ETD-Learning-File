@@ -1,0 +1,79 @@
+/** Module 06 quiz and numbers: shape, both languages, numbers from the core, sums that add up. */
+import { describe, expect, it } from 'vitest';
+import { quiz } from '@/content/quiz/06-combos-smile';
+import { fmtMoney, fmtPct, fmtPips } from '@/lib/format';
+import { EXAMPLE as E } from '@/lib/fx/example';
+import { M06, nums } from '@/lib/nums/m06';
+import { formatNum } from '@/lib/nums/format';
+
+const all = [...quiz.quiz, ...Object.values(quiz.checks)];
+
+describe('m06 quiz', () => {
+  it('has four graded questions and four checks', () => {
+    expect(quiz.slug).toBe('06-combos-smile');
+    expect(quiz.quiz).toHaveLength(4);
+    expect(Object.keys(quiz.checks).sort()).toEqual(['1', '2', '3', '4']);
+    expect(new Set(all.map((q) => q.id)).size).toBe(all.length);
+  });
+
+  it.each(all.map((q) => [q.id, q] as const))('%s is complete in DE and EN', (_id, q) => {
+    expect(q.options.length).toBeGreaterThanOrEqual(3);
+    expect(q.options.length).toBeLessThanOrEqual(4);
+    expect(q.correct).toBeGreaterThanOrEqual(0);
+    expect(q.correct).toBeLessThan(q.options.length);
+    for (const lang of ['de', 'en'] as const) {
+      const texts = [q.prompt[lang], ...q.options.flatMap((o) => [o.label[lang], o.explain[lang]])];
+      for (const s of texts) {
+        expect(s.trim()).not.toBe('');
+        expect(s).not.toMatch(/NaN|undefined|Infinity|\{\w+\}/);
+      }
+      expect(new Set(q.options.map((o) => o.label[lang])).size).toBe(q.options.length);
+    }
+    expect(q.options[q.correct]!.explain.de).toMatch(/^Richtig/);
+    expect(q.options[q.correct]!.explain.en).toMatch(/^Correct/);
+  });
+
+  it('does not always put the right answer first', () => {
+    expect(new Set(all.map((q) => q.correct)).size).toBeGreaterThan(1);
+  });
+
+  it('takes its numbers from the core', () => {
+    const q4 = quiz.quiz[3];
+    expect(q4.options[q4.correct]!.label.de).toBe(fmtPct(M06.vol25P, 'de', 2));
+    const q2 = quiz.quiz[1];
+    expect(q2.options[q2.correct]!.label.en).toBe(fmtMoney(M06.rrPutK * E.notional, 'CHF', 'en'));
+    const c2 = quiz.checks['2'];
+    expect(c2.options[c2.correct]!.label.de).toBe(fmtMoney(M06.csMaxGain, 'CHF', 'de'));
+  });
+});
+
+describe('m06 numbers', () => {
+  it('are finite', () => {
+    for (const [k, d] of Object.entries(nums)) expect(Number.isFinite(d.value), k).toBe(true);
+  });
+
+  it('displayed parts add up (call spread, max gain)', () => {
+    const d = (k: string) => Number(formatNum(nums[k]!, 'en').replace(/,/g, ''));
+    expect(d('m06.shCallPips') - d('m06.shSpreadSavePips')).toBeCloseTo(d('m06.shSpreadPips'), 6);
+    expect(Number(fmtPips(M06.csCallPips, 'en'))).toBeCloseTo(
+      d('m06.csSoldPips') + d('m06.csPips'),
+      6,
+    );
+    expect(d('m06.csWidthPips') - d('m06.csPips')).toBeCloseTo(d('m06.csMaxGainPips'), 6);
+  });
+
+  it('matches the reference structure of the example', () => {
+    // zero-cost puts: seagull below collar; smile helps the importer's collar
+    expect(M06.shSeagull.putStrike!).toBeLessThan(M06.shCollar.putStrike!);
+    expect(M06.rrPutSmile).toBeLessThan(M06.rrPutK);
+    // vol views: straddle long vega, butterfly and seagull short vega
+    expect(M06.straddleVega).toBeGreaterThan(0);
+    expect(M06.straddleShock).toBeGreaterThan(0);
+    expect(M06.flyVega).toBeLessThan(0);
+    expect(M06.seagullVega).toBeLessThan(0);
+    expect(M06.seagullShock).toBeLessThan(0);
+    // smile wings
+    expect(M06.vol25C).toBeCloseTo(M06.atm + M06.bf25 + M06.rr25 / 2, 14);
+    expect(M06.vol25P).toBeCloseTo(M06.atm + M06.bf25 - M06.rr25 / 2, 14);
+  });
+});

@@ -52,10 +52,10 @@ function layoutFor(w: number) {
   const compact = width < 560;
   const labelW = compact ? 74 : 96;
   const curveTop = 30;
-  const curveH = compact ? 92 : 124;
+  const curveH = compact ? 96 : 176;
   const rowsTop = curveTop + curveH + 20;
-  const rowH = compact ? 20 : 24;
-  const rowGap = compact ? 8 : 10;
+  const rowH = compact ? 20 : 28;
+  const rowGap = compact ? 8 : 12;
   const rowsBottom = rowsTop + 5 * rowH + 4 * rowGap;
   const font = compact ? 11 : 12;
   const axisY = rowsBottom + 14 + font;
@@ -151,20 +151,27 @@ export default function SessionClock({ lang }: SessionClockProps): JSX.Element {
   });
 
   /** Two-line annotation (split at ": "), anchored left or right of x. */
-  const note = (x: number, text: string, anchor: 'start' | 'end', key: string) => {
+  const note = (
+    x: number,
+    y: number,
+    text: string,
+    anchor: 'start' | 'end',
+    key: string,
+    dy: number,
+  ) => {
     const [a, b] = text.includes(': ') ? text.split(': ') : [text, ''];
     const tx = anchor === 'end' ? x - 8 : x + 8;
     return (
       <text
         key={key}
         x={tx}
-        y={L.curveTop + 22}
+        y={y}
         class="sc-note-text"
         style={{ fontSize: fs, fontWeight: 700, fill: 'var(--ff-ink-2)', textAnchor: anchor }}
       >
         <tspan x={tx}>{b ? `${a}:` : a}</tspan>
         {b && (
-          <tspan x={tx} dy={L.font + 4} style={{ fontWeight: 600, fill: 'var(--ff-muted)' }}>
+          <tspan x={tx} dy={dy} style={{ fontWeight: 600, fill: 'var(--ff-muted)' }}>
             {b}
           </tspan>
         )}
@@ -252,8 +259,8 @@ export default function SessionClock({ lang }: SessionClockProps): JSX.Element {
                   strokeLinejoin: 'round',
                 }}
               />
-              {day === 'sun' && note(sx(ws.hour), t('weekStart'), 'end', 'ws')}
-              {day === 'fri' && note(sx(23), t('weekEnd'), 'end', 'we')}
+              {day === 'sun' &&
+                note(sx(ws.hour), L.curveTop + 22, t('weekStart'), 'end', 'ws', L.font + 6)}
               {day === 'sat' && (
                 <text
                   x={(L.x0 + L.x1) / 2}
@@ -323,6 +330,23 @@ export default function SessionClock({ lang }: SessionClockProps): JSX.Element {
                   </g>
                 );
               })}
+
+              {day === 'fri' && (
+                <g>
+                  <path
+                    d={`M${sx(23).toFixed(1)},${L.curveTop + 6}V${L.rowsBottom}`}
+                    style={{ fill: 'none', stroke: 'var(--ff-ink)', strokeWidth: 1.5 }}
+                  />
+                  {note(
+                    sx(23),
+                    L.rowsTop + L.rowH / 2 + L.font * 0.35,
+                    t('weekEnd'),
+                    'end',
+                    'we',
+                    L.rowH + L.rowGap,
+                  )}
+                </g>
+              )}
 
               {/* hours */}
               {hours.map((v) => (

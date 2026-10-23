@@ -59,6 +59,8 @@ const BASE = baseVolRange(EXAMPLE_SMILE.atm);
 const PRESETS = smilePresets(EXAMPLE_SMILE);
 const PRESET_IDS: Preset[] = ['example', 'symmetric', 'flat'];
 const PILLARS: Pillar[] = ['put25', 'atm', 'call25'];
+/** lo ≤ v ≤ hi. */
+const inside = (v: number, lo: number, hi: number): boolean => lo <= v && v <= hi;
 
 function layoutFor(w: number) {
   const width = Math.max(280, Math.round(w));
@@ -113,8 +115,8 @@ export default function SmileBuilder(props: SmileBuilderProps): JSX.Element {
   const sy = scaleLinear([dom[0]!, dom[1]!], [L.plotBottom, L.top]);
   const xOf = (K: number, d: number) => sxK(K) + (sxD(d) - sxK(K)) * mix;
   const step = niceStep(dom[1]! - dom[0]!, 5);
-  const yTicks = niceTicks(dom[0]!, dom[1]!, 5).filter(
-    (v) => v >= dom[0]! - 1e-9 && v <= dom[1]! + 1e-9,
+  const yTicks = niceTicks(dom[0]!, dom[1]!, 5).filter((v) =>
+    inside(v, dom[0]! - 1e-9, dom[1]! + 1e-9),
   );
   const yDigits = step >= 0.01 - 1e-12 ? 0 : 1;
   const screen = geom.points.map((p): Point => [xOf(p.K, p.deltaFwd), sy(p.vol)]);
@@ -203,11 +205,11 @@ export default function SmileBuilder(props: SmileBuilderProps): JSX.Element {
   const deltaAxis = mix >= 0.5;
   const xTicks = deltaAxis
     ? DELTA_TICKS.map((d) => d.delta)
-    : niceTicks(X_STRIKE[0], X_STRIKE[1], L.compact ? 4 : 7).filter(
-        (v) => v > X_STRIKE[0] + 1e-9 && v < X_STRIKE[1] - 1e-9,
+    : niceTicks(X_STRIKE[0], X_STRIKE[1], L.compact ? 4 : 7).filter((v) =>
+        inside(v, X_STRIKE[0] + 1e-9, X_STRIKE[1] - 1e-9),
       );
   const deltaLabel = (v: number) => {
-    const d = DELTA_TICKS.find((x) => Math.abs(x.delta - v) < 1e-9);
+    const d = DELTA_TICKS.find((x) => inside(x.delta, v - 1e-9, v + 1e-9));
     return d ? t(`sb.tick.${d.key}`) : '';
   };
   const SHORT: Record<Pillar, 'p25' | 'atm' | 'c25'> = { put25: 'p25', atm: 'atm', call25: 'c25' };
@@ -257,10 +259,15 @@ export default function SmileBuilder(props: SmileBuilderProps): JSX.Element {
             { x: x - dOut, y: down, anchor: inn },
           ];
     const boxes = spots.map((sp) => boxOf(sp.x, sp.y, w, sp.anchor));
-    const inside = boxes
+    const fits = boxes
       .map((b, i) => ({ b, i }))
-      .filter(({ b }) => b.x0 >= L.left && b.x1 <= L.width - L.right && b.y0 >= L.top);
-    const pool = inside.length ? inside : boxes.map((b, i) => ({ b, i }));
+      .filter(
+        ({ b }) =>
+          inside(b.x0, L.left, b.x1) &&
+          inside(b.x1, b.x0, L.width - L.right) &&
+          inside(b.y0, L.top, Infinity),
+      );
+    const pool = fits.length ? fits : boxes.map((b, i) => ({ b, i }));
     const pick =
       pool[
         pickLabelSpot(

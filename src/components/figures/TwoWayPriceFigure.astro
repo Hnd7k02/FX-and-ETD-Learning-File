@@ -1,0 +1,255 @@
+---
+/** Two-way price (module 01, section 3) for MDX. Props: caption. */
+import TwoWayPrice from '@/components/islands/TwoWayPrice';
+import Figure from '@/components/content/Figure.astro';
+import { pageLang } from '@/components/content/lang';
+
+interface Props {
+  caption?: string;
+}
+const { caption } = Astro.props;
+const lang = pageLang(Astro.currentLocale);
+---
+
+<Figure caption={caption}>
+  <TwoWayPrice client:visible lang={lang} />
+</Figure>
+
+<style is:global>
+  .twp {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+  }
+  .twp .ff-lab-head {
+    margin-bottom: 0;
+  }
+  .twp-head-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+  .twp-chip {
+    background: var(--ff-linear-soft);
+    color: var(--ff-linear-text);
+    font-weight: 800;
+  }
+  .twp p {
+    margin: 0;
+  }
+  .twp-quote {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: stretch;
+    gap: 10px;
+  }
+  .twp-side {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 16px 12px 14px;
+    border-radius: var(--ff-r-box);
+    background: var(--ff-surface-2);
+    border: 1px solid var(--ff-line);
+    min-width: 0;
+  }
+  .twp-side--ask {
+    background: var(--ff-exotics-soft);
+    border-color: #fbd3b8;
+  }
+  .twp-side-label {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--ff-ink-2);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .twp-price {
+    display: inline-grid;
+    grid-template-columns: auto auto;
+    align-items: baseline;
+    line-height: 1;
+    color: var(--ff-ink);
+  }
+  .twp-big {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--ff-ink-2);
+  }
+  .twp-pips {
+    font-size: 52px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+  .twp-parts {
+    display: inline-grid;
+    grid-template-columns: auto auto;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--ff-muted);
+  }
+  .twp-part {
+    padding-top: 4px;
+    border-top: 1.5px solid var(--ff-axis);
+    text-align: center;
+  }
+  .twp-part--pips {
+    border-top-color: var(--ff-ink);
+    color: var(--ff-ink);
+  }
+  .twp-role {
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--ff-ink-2);
+    text-align: center;
+  }
+  .twp-mid {
+    display: flex;
+    align-items: center;
+  }
+  .twp-spread-pill {
+    display: inline-flex;
+    padding: 6px 12px;
+    border-radius: var(--ff-r-pill);
+    background: var(--ff-ink);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+  .twp-ruler {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 6px;
+  }
+  .twp-ruler-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ff-ink-2);
+  }
+  .twp-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    font-family: var(--ff-font-ui);
+  }
+  .twp .twp-schematic {
+    font-size: 12px;
+    color: var(--ff-muted);
+  }
+  .twp-drivers {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .twp-drivers-title {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--ff-ink);
+  }
+  .twp-driver {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+    min-height: 52px;
+    padding: 8px 14px;
+    border-radius: var(--ff-r-box);
+    border: 1px solid var(--ff-line);
+    background: var(--ff-surface);
+    color: var(--ff-ink);
+    text-align: left;
+    cursor: pointer;
+    transition:
+      background-color 150ms ease,
+      border-color 150ms ease;
+  }
+  .twp-driver:hover {
+    border-color: var(--ff-line-strong);
+  }
+  .twp-driver[aria-pressed='true'] {
+    background: var(--ff-exotics-soft);
+    border-color: var(--ff-short);
+  }
+  .twp-switch {
+    position: relative;
+    width: 34px;
+    height: 20px;
+    border-radius: 999px;
+    background: var(--ff-line-strong);
+    transition: background-color 150ms ease;
+  }
+  .twp-knob {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 999px;
+    background: #fff;
+    box-shadow: var(--ff-shadow-control);
+    transition: transform 200ms ease;
+  }
+  .twp-driver[aria-pressed='true'] .twp-switch {
+    background: var(--ff-short);
+  }
+  .twp-driver[aria-pressed='true'] .twp-knob {
+    transform: translateX(14px);
+  }
+  .twp-driver-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .twp-driver-label {
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .twp-driver-sub {
+    font-size: 12px;
+    color: var(--ff-muted);
+  }
+  .twp-driver-pips {
+    font-size: 13px;
+    color: var(--ff-exotics-text);
+    white-space: nowrap;
+  }
+  .twp-reset {
+    align-self: flex-start;
+  }
+  .twp .twp-note {
+    padding: 14px 16px;
+    border-radius: var(--ff-r-box);
+    background: var(--ff-surface-2);
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--ff-ink-2);
+  }
+  .twp .twp-note.is-wide {
+    background: var(--ff-exotics-soft);
+    color: var(--ff-ink);
+  }
+  @media (max-width: 520px) {
+    .twp-quote {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+    .twp-mid {
+      grid-column: 1 / -1;
+      grid-row: 2;
+      justify-content: center;
+    }
+    .twp-pips {
+      font-size: 40px;
+    }
+    .twp-big {
+      font-size: 18px;
+    }
+  }
+</style>
