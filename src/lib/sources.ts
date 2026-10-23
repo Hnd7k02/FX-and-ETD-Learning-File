@@ -1,5 +1,5 @@
 /**
- * Parser for the source list (src/content/sources.md and src/content/sources/*.md).
+ * Parser for the source list in src/content/sources.md.
  *
  * Format per entry:
  *

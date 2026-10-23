@@ -394,8 +394,8 @@ export const GLOSSARY: GlossaryEntry[] = [
     term: { de: 'Aufschlag und Abschlag', en: 'Forward premium and discount' },
     aliases: ['Report', 'Deport', 'Terminaufschlag', 'Terminabschlag', 'Contango'],
     def: {
-      de: 'Liegt der Forward über dem Spot, notiert er mit Aufschlag, darunter mit Abschlag. Die Währung mit dem höheren Zins notiert auf Termin immer mit Abschlag.',
-      en: 'If the forward is above spot it trades at a premium, below spot at a discount. The currency with the higher interest rate always trades at a forward discount.',
+      de: 'Liegt der Forward über dem Spot, notiert die Base-Währung auf Termin mit Aufschlag, darunter mit Abschlag. Die Währung mit dem höheren Zins notiert auf Termin immer mit Abschlag. «Contango» ist der Begriff aus dem Rohstoffmarkt.',
+      en: 'If the forward is above spot, the base currency trades at a forward premium; below spot, at a discount. The currency with the higher interest rate always trades at a forward discount. "Contango" is the commodities term.',
     },
     module: '02-forward',
     section: '3',
@@ -510,6 +510,18 @@ export const GLOSSARY: GlossaryEntry[] = [
     module: '03-fx-swap',
     section: '3',
     see: ['fx-swap', 'hedge'],
+  },
+  {
+    id: 'cross-currency-basis',
+    term: { de: 'Cross-Currency Basis', en: 'Cross-currency basis' },
+    aliases: ['Basis', 'Basisspread', 'basis spread'],
+    def: {
+      de: 'Der Auf- oder Abschlag, um den es teurer oder billiger ist, sich eine Währung über FX Swaps statt direkt am Geldmarkt zu beschaffen. Sie misst, wie weit die Zinsparität im Markt abweicht.',
+      en: 'The extra (or lower) cost of obtaining a currency through FX swaps rather than directly in the money market. It measures how far the market deviates from interest rate parity.',
+    },
+    module: '03-fx-swap',
+    section: '4',
+    see: ['cross-currency-swap', 'fx-swap', 'interest-rate-parity'],
   },
   {
     id: 'cross-currency-swap',
@@ -1374,6 +1386,30 @@ export const GLOSSARY: GlossaryEntry[] = [
     module: '09-hedge-alpha-yield',
     section: '4',
     see: ['dual-currency', 'carry'],
+  },
+  {
+    id: 'discount-certificate',
+    term: { de: 'Discount-Zertifikat', en: 'Discount certificate' },
+    aliases: ['Discountzertifikat', 'reverse convertible'],
+    def: {
+      de: 'Du kaufst den Basiswert mit Abschlag, dafür ist der Gewinn nach oben gedeckelt. In Bausteinen: Basiswert gekauft plus Call verkauft; fällt der Kurs stark, trägst du den Verlust fast voll.',
+      en: 'You buy the underlying at a discount in exchange for a capped upside. As building blocks: underlying bought plus call sold; if the price falls sharply you carry almost the full loss.',
+    },
+    module: '09-hedge-alpha-yield',
+    section: '4',
+    see: ['dual-currency', 'call', 'yield'],
+  },
+  {
+    id: 'over-hedging',
+    term: { de: 'Überabsicherung', en: 'Over-hedging' },
+    aliases: ['Overhedge', 'over-hedge'],
+    def: {
+      de: 'Du sicherst mehr ab, als du wirklich brauchst, etwa weil ein Produkt im Verlustfall die doppelte Menge liefert. Der Überschuss ist eine offene Position, kein Hedge.',
+      en: 'You hedge more than you actually need, e.g. because a product delivers double the amount when it goes wrong. The excess is an open position, not a hedge.',
+    },
+    module: '09-hedge-alpha-yield',
+    section: '2',
+    see: ['hedge', 'leverage', 'accumulator'],
   },
 ];
 

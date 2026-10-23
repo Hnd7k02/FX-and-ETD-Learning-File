@@ -137,3 +137,17 @@ describe('the real source files', () => {
     expect(urlHost(e.url)).not.toBe('');
   });
 });
+
+describe('sources.md (single source list)', () => {
+  it('has unique ids and every entry has a title and a URL', async () => {
+    const { readFileSync } = await import('node:fs');
+    const md = readFileSync(`${process.cwd()}/src/content/sources.md`, 'utf8');
+    const entries = parseSources(md);
+    const ids = entries.map((e) => e.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    for (const e of entries) {
+      expect(e.title.length, e.id).toBeGreaterThan(0);
+      expect(e.url ?? '', e.id).toMatch(/^https:\/\//);
+    }
+  });
+});
