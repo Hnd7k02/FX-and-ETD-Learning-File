@@ -70,7 +70,9 @@ export function useInView<T extends Element>(ref: RefObject<T>, rootMargin = '0p
 let lastSlide = Number.NEGATIVE_INFINITY;
 const QUICK_MS = 300;
 const settling = new Set<Element>();
-let settleUntil = 0;
+/** Frames left in which CSS animations of `settling` are ended (frame-based: slow devices too). */
+let settleFrames = 0;
+const SETTLE_FRAMES = 4;
 const lastClick = new WeakMap<Element, number>();
 
 function settleCss(root: Element): void {
@@ -89,16 +91,20 @@ function settleCss(root: Element): void {
 
 function settleLoop(): void {
   for (const root of settling) settleCss(root);
-  if (performance.now() < settleUntil) requestAnimationFrame(settleLoop);
+  settleFrames -= 1;
+  if (settleFrames > 0) requestAnimationFrame(settleLoop);
   else settling.clear();
 }
 
-/** Ends the CSS animations of `root` in the frames of the next 80 ms. */
-function settleSoon(root: Element, now: number): void {
+/**
+ * Ends the CSS animations of `root` in the next frames after an input. Counted in frames, not
+ * milliseconds: on a slow device a render after the input can land two or three frames later.
+ */
+function settleSoon(root: Element): void {
   if (typeof requestAnimationFrame === 'undefined') return;
   const idle = settling.size === 0;
   settling.add(root);
-  settleUntil = now + 80;
+  settleFrames = SETTLE_FRAMES;
   if (idle) requestAnimationFrame(settleLoop);
 }
 
@@ -108,17 +114,16 @@ const islandOf = (el: Element | null) => el?.closest?.('[data-ff-island], astro-
 let down: { x: number; y: number } | null = null;
 
 if (typeof document !== 'undefined') {
-  document.addEventListener(
-    'input',
-    (e) => {
-      const el = e.target as HTMLInputElement | null;
-      if (!el || el.type !== 'range') return;
-      lastSlide = performance.now();
-      const root = islandOf(el);
-      if (root) settleSoon(root, lastSlide);
-    },
-    true,
-  );
+  // 'change' ends a drag on a range slider (mouse up); a render on it belongs to the same gesture
+  const onRange = (e: Event) => {
+    const el = e.target as HTMLInputElement | null;
+    if (!el || el.type !== 'range') return;
+    lastSlide = performance.now();
+    const root = islandOf(el);
+    if (root) settleSoon(root);
+  };
+  document.addEventListener('input', onRange, true);
+  document.addEventListener('change', onRange, true);
   document.addEventListener(
     'pointerdown',
     (e) => {
@@ -134,7 +139,7 @@ if (typeof document !== 'undefined') {
       const root = islandOf(e.target as Element | null);
       if (!root) return;
       lastSlide = performance.now();
-      settleSoon(root, lastSlide);
+      settleSoon(root);
     },
     true,
   );
@@ -149,7 +154,7 @@ if (typeof document !== 'undefined') {
       const root = islandOf(e.target as Element | null);
       if (!root) return;
       const now = performance.now();
-      if (now - (lastClick.get(root) ?? Number.NEGATIVE_INFINITY) < QUICK_MS) settleSoon(root, now);
+      if (now - (lastClick.get(root) ?? Number.NEGATIVE_INFINITY) < QUICK_MS) settleSoon(root);
       lastClick.set(root, now);
     },
     true,
