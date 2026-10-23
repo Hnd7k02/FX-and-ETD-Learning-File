@@ -25,9 +25,9 @@ The forward nets the two. In the example the cost is <Num of="m02.cost" /> (CHF 
 
 ### Longer tenor, more points
 
-The points grow almost in line with time: 1 week <Num of="m02.points1W" />, 1 month <Num of="m02.points1M" />, 3 months <Num of="ex.fwdPointsMM" />, 6 months <Num of="m02.points6M" />, 1 year <Num of="m02.points1Y" /> pips. A rule of thumb is usually enough: points ≈ spot · rate differential · term. For 3 months it gives <Num of="m02.pointsApprox" /> pips, close to the exact value.
+The distance from spot grows almost in line with the term: 1 week <Num of="m02.points1W" />, 1 month <Num of="m02.points1M" />, 3 months <Num of="ex.fwdPointsMM" />, 6 months <Num of="m02.points6M" />, 1 year <Num of="m02.points1Y" /> pips. A rule of thumb is usually enough: points ≈ spot · rate differential · term. For 3 months it gives <Num of="m02.pointsApprox" /> pips, close to the exact value.
 
-Annualised, the forward sits <Num of="m02.premPa" /> below spot. That is almost exactly the CHF minus USD rate differential of <Num of="m02.rateDiff" />.
+Annualised, the forward discount is <Num of="m02.premPa" />. That is almost exactly the CHF minus USD rate differential of <Num of="m02.rateDiff" />.
 
 And if a rate changes? If the CHF rate rises to <Num of="m02.whatIfRd" />, a cost of <Num of="m02.whatIfCostPips" /> pips is added. The 3-month points shrink to <Num of="m02.whatIfPoints" />, and the forward rises to <Num of="m02.whatIfFwd" />. Spot has not moved at all.
 

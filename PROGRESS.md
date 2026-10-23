@@ -39,3 +39,8 @@ Working branch: `claude/forward-first-v1`. Mode: phases without stops (D-16), un
 6. **Seventh Riskometer event?** The April 2025 US tariff shock (EUR/USD vol 14.1 %, higher than any fiscal-2025 value).
 7. **Source descriptions in English:** the "Belegt" lines in the sources are German; the English About page shows them as is.
 8. **Hedge roll (D-25):** include the interest on the cash settlement in the all-in rate?
+9. **Daily barrier monitoring:** the Monte Carlo and the BGK shift use calendar days (Δt = 1/365); business days (1/252) would give a shift of about 24 instead of 20 pips. Keep calendar days?
+10. **Forward used in modules 04 vs 02:** options use the continuous forward 0.79303, the importer's forward deal in module 02 the money-market forward 0.79306; the 0.3-pip gap is explained. OK?
+11. **Market conventions without a source:** "premium paid in USD is usual in USD/CHF" and "interbank one-touches usually pay at expiry" are stated as textbook conventions. Keep or source?
+12. **Structured products vs running example:** §8.7 uses 26 weekly / 12 monthly fixings while the example is 3 months; coupons are quoted to 0.1 pip; should dual currency move to module 09?
+13. **Franc shock intraday:** state how far EUR/CHF fell during 15.01.2015 (needs an official source, e.g. BIS Quarterly Review)? Currently ECB fixings only.

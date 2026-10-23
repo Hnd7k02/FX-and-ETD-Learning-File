@@ -268,3 +268,11 @@ Format: `D-xx · date · origin`, then question, decision, reasoning. Origin is 
 - 08: products compared with a forward hedge of the planned amount (accumulator, decumulator, TARF); pivot TARF, TPF, RTPF show gains/coupons received; start scenarios, speeds and DCI defaults in `PATHSIM_CONFIG` and `DCI_CONFIG`.
 
 **Reasoning:** D-22; the module texts explain each choice where it matters.
+
+## D-39 · 2026-10-23 · Claude
+
+**Question:** How is content quality checked beyond the authors' own tests?
+
+**Decision:** Every module gets a second, fresh review agent that did not write it (finance correctness, numbers, didactics, DE/EN language, figures at 1440/390 px, accessibility) and fixes findings directly. First round (modules 04, 05, 07, 08) corrected, among others: "spot has no vol" → "no vega"; reversed cause and effect for vanna/volga; gamma/vega peaks described "at the strike" although on the spot axis they sit near ATMF; sign wording ("kostet CHF −45"); unequal bar tracks in the levers figure; module-specific findings are in the review reports. Shared follow-ups done centrally: the quiz card strips a leading verdict word from explanations, Markdown tables render in a focusable scroll region, nice ticks tolerate float noise, stat rows without a symbol use two columns, italic variables get a hair space, glossary corrections (intrinsic value, gamma near ATMF, accumulator knock-out at the barrier, target = profit goal) and new terms vanna, volga, premium-adjusted delta.
+
+**Reasoning:** Authors miss their own mistakes; an adversarial second reader is cheap compared to a wrong explanation in a learning tool.
