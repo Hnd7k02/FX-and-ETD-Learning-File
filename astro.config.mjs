@@ -5,9 +5,9 @@ import mdx from '@astrojs/mdx';
 
 // Static site. German lives under /, English under /en/.
 export default defineConfig({
-  // Only used for canonical/hreflang tags of the intermediate web build; the deliverable is the
+  // Only used for canonical/hreflang tags of the local web build (test harness); the deliverable is the
   // offline file release/forward-first.html (DECISIONS.md D-13).
-  site: 'https://forward-first.pages.dev',
+  site: 'http://localhost:4321',
   output: 'static',
   trailingSlash: 'always',
   build: { format: 'directory' },

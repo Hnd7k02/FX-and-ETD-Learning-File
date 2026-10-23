@@ -1,6 +1,8 @@
 # Forward First: Master-Prompt für Claude Code
 
-Version 1.1 · Oktober 2026 · Konzept und Produktentscheide: Dario Moffa
+Version 1.2 · Oktober 2026 · Konzept und Produktentscheide: Dario Moffa
+
+1.2: Ausgabe ist eine einzige Offline-HTML-Datei für Arbeits-PC und iPad, kein Hosting, kein Login (D-13, Abschnitte 3, 4, 9, 11, 13).
 
 Du baust **Forward First**, ein interaktives Lerntool für den Devisenmarkt: vom Spot über Forward und FX Swap zu Vanilla Options, den sechs Greeks und exotischen Strukturen. Der rote Faden: **Alles wird auf den Forward heruntergebrochen.**
 
@@ -49,8 +51,12 @@ Lies dieses Dokument vollständig, danach `docs/design/README.md`. Erst dann beg
 - **Astro** (aktuelle Version, statischer Output) + **TypeScript strict** + **Preact**-Inseln für alle interaktiven Komponenten.
 - **CSS** mit Custom Properties aus `docs/design/tokens.css`, kein Tailwind, keine UI-Bibliothek.
 - **Charts** als handgeschriebenes SVG wie im Prototyp, keine Chart-Bibliothek.
-- **Tests:** Vitest (Unit), Playwright (E2E, Viewports 390 px und 1440 px), `@axe-core/playwright` (Barrierefreiheit). ESLint, Prettier, `astro check` (prüft auch `.astro`-Dateien).
-- **Hosting:** Cloudflare mit GitHub-Integration (Pages oder Workers Static Assets, je nachdem, was Cloudflare aktuell für statische Astro-Seiten empfiehlt; Entscheid in `DECISIONS.md`). Build `npm run build`, Output `dist/`. Sag Dario am Ende von Phase 0 Schritt für Schritt, was er im Cloudflare-Dashboard einstellen muss.
+- **Tests:** Vitest (Unit), Playwright (E2E), `@axe-core/playwright` (Barrierefreiheit). ESLint, Prettier, `astro check` (prüft auch `.astro`-Dateien).
+- **Ausgabe: eine einzige Datei `forward-first.html`** (D-13). Sie läuft offline über `file://` auf dem Arbeits-PC (Chrome und Edge, Doppelklick) und in der Dateien-App des iPad (WebKit). Das iPad lädt dort keine Nebendateien, deshalb steckt alles in der einen Datei: CSS, JavaScript, Schriften (Subset), Riskometer-Daten, beide Sprachen. Keine externen Dateien, keine Netzwerk-Anfragen, abgesichert durch eine Content-Security-Policy im Meta-Tag (`default-src 'none'`, Skript nur per Hash). Ziel unter 3 MB, höchstens 5 MB.
+- **Build:** `npm run build` = Astro-Build (`dist/`, dient nur noch als Zwischenstufe und Testumgebung) und danach `scripts/build-offline.ts`, das alle Seiten in die Datei `release/forward-first.html` packt (Seiteninhalte gzip + Base64, ein JavaScript-Bundle für Router und Inseln, Schriften als data-URI).
+- **Navigation in der Datei** per Hash-Routing mit denselben Pfaden wie in Abschnitt 5, z. B. `#/module/05-greeks/2/` oder `#/riskometer/?pair=USDJPY`. Rechenkern, Komponenten und Inhalte sind dieselben wie im Astro-Build.
+- **Alles Optionale mit Feature-Erkennung und Fallback:** Übergang Station → Modul mit der View Transitions API, sonst normaler Wechsel; Monte Carlo ohne Web Worker in kleinen Häppchen auf dem Main Thread; Fortschritt in `localStorage`, und wenn das blockiert ist, läuft das Tool ohne gespeicherten Fortschritt weiter.
+- **Kein Hosting, keine PWA, kein Login.** Die Datei wird als GitHub Release zum Download bereitgestellt (Abschnitt 9).
 - **Node LTS, npm.**
 
 ```
@@ -61,11 +67,14 @@ src/
   content/         Module (MDX, de/en), Quiz, Glossar, sources.md
   i18n/            UI-Strings de/en
   pages/           Routen (de unter /, en unter /en/)
+  client/          Seitenskripte (Navigation, Stepper, Abschnittsende), im Astro-Build und in der Datei gleich
+  offline/         Laufzeit der Offline-Datei: Hash-Router, Inseln, Übergänge
   data/fx/         generierte JSON-Snapshots für das Riskometer
   styles/          tokens.css, base.css
-scripts/           fetch-ecb.ts, build-riskometer.ts, precompute-mc.ts
+scripts/           fetch-ecb.ts, build-riskometer.ts, precompute-mc.ts, build-offline.ts
 data/raw/          EZB-Rohdaten (CSV), versioniert
-tests/             unit/, e2e/
+tests/             unit/, offline/ (die Datei über file://), e2e/ (Komponenten im Astro-Build)
+release/           forward-first.html (Build-Ergebnis, nicht versioniert)
 docs/              MASTER_PROMPT.md, design/, reference/
 ```
 
@@ -74,26 +83,27 @@ docs/              MASTER_PROMPT.md, design/, reference/
 Referenz: `docs/design/*.dc.html` und `docs/design/tokens.css`. Baue Layout, Abstände, Farben, Schriften und Interaktionen getreu nach. Jede bewusste Abweichung kommt mit Begründung in `DECISIONS.md`.
 
 - **Look:** hell, minimalistisch, Finance. Weisse Karten auf hellgrauer Fläche, schwarze Pill-Buttons. Akzentfarben nur zum Hervorheben.
-- **Schriften:** Plus Jakarta Sans (UI), JetBrains Mono (Kurse, Tabellenwerte), STIX Two Text (Formeln, Variablen kursiv). Selbst gehostet (z. B. über Fontsource), keine Requests an Google; `font-display: swap` und System-Fallbacks.
+- **Schriften:** Plus Jakarta Sans (UI), JetBrains Mono (Kurse, Tabellenwerte), STIX Two Text (Formeln, Variablen kursiv). Aus Fontsource als woff2-Subset (Latin, bei STIX zusätzlich Griechisch) direkt in die Datei eingebettet, keine Requests; `font-display: swap` und System-Fallbacks.
 - **Farbsemantik in Charts:** Long blau, Short orange, Forward und Tangenten schwarz, Zeitwert als blaue Fläche mit 10 % Deckkraft, Auszahlung bei Verfall grau gestrichelt. Gridlines 1 px durchgezogen, Achse dunkler.
 - **Modulfamilien:** Linear blau (01–03), Optionen violett (04–06), Exotics orange (07–08), Anwendung teal (09).
 - **Riskometer-Stufen:** Ruhig grün, Normal lime, Erhöht gelb, Hoch orange, Extrem rot. Immer mit Label, nie Farbe allein.
 - **Startseite:** Top-Nav (Logo "Forward First" mit Hockey-Stick-Glyphe, Module, Riskometer mit Stufen-Punkt, Glossar, DE/EN, schwarzer Button "Weiterlernen"), Hero ("Alles beginnt beim Forward."), Wow-Karte in voller Breite, Lernpfad mit 9 Stationen in 4 Familien, Karte "Weiter, wo du warst", Karte "Riskometer heute" mit Tacho, Footer.
 - **Modulseite:** Kopfband mit Breadcrumb, Familien-Chip, Titel und Abschnitts-Stepper; Lesespalte mit 680 px; Figures (Labore, Charts) in voller Containerbreite von 1080 px; Formelboxen; dunkler "Am Desk"-Callout; Quiz-Karte; Zurück/Weiter.
-- **Übergang (Signature):** Tippt man im Lernpfad eine Station an, wächst sie in den Modulkopf. Umsetzung mit Astros `<ClientRouter />` und passenden `transition:name`-Werten. Ohne Browser-Support wird normal navigiert, bei `prefers-reduced-motion` ohne Animation.
-- **Responsive:** 390 bis 1440 px, kein horizontales Scrollen der Seite. Unter 640 px wird der Lernpfad zur vertikalen Liste, die Labor-Bedienelemente rutschen unter die Charts. Touch-Ziele mindestens 44 px.
+- **Übergang (Signature):** Tippt man im Lernpfad eine Station an, wächst sie in den Modulkopf. Umsetzung in der Offline-Datei mit der View Transitions API (`document.startViewTransition`) und passenden `view-transition-name`-Werten. Ohne Browser-Support wird normal navigiert, bei `prefers-reduced-motion` ohne Animation.
+- **Responsive:** 390 bis 1440 px, kein horizontales Scrollen der Seite. Zielgeräte: Arbeits-PC (1440 × 900) und iPad hoch (820 × 1180) und quer (1180 × 820). Unter 640 px wird der Lernpfad zur vertikalen Liste, die Labor-Bedienelemente rutschen unter die Charts. Touch-Ziele mindestens 44 px.
 - **Barrierefreiheit:** WCAG 2.2 AA. Echte `<button>`, `<a>`, `<input>` mit `<label>`. Jeder Chart hat ein `aria-label` und eine Textalternative. Sichtbare Fokusringe, `prefers-reduced-motion` überall respektiert.
 
 ## 5. Seiten, Navigation, Fortschritt
 
 **Routen** (Deutsch unter `/`, Englisch unter `/en/`):
+In der Offline-Datei stehen dieselben Pfade nach dem `#`, z. B. `forward-first.html#/en/riskometer/`.
 - Startseite: `/` und `/en/`
 - Modulabschnitte: `/module/{modul}/1/` bis `/module/{modul}/4/` sowie `/module/{modul}/quiz/`, in beiden Sprachen mit gleichen Slugs; `/module/{modul}/` leitet auf Abschnitt 1 um. Modul-Slugs: `01-spot`, `02-forward`, `03-fx-swap`, `04-vanilla-options`, `05-greeks`, `06-combos-smile`, `07-barrier-binary`, `08-structured-products`, `09-hedge-alpha-yield`
 - Riskometer: `/riskometer/` und `/en/riskometer/`
 - Glossar: `/glossar/` und `/en/glossary/`
 - Über und Methodik: `/ueber/` und `/en/about/`
 
-**Fortschritt** in `localStorage` (Schlüssel `ff-progress-v1`), nur im Browser, ohne Tracking:
+**Fortschritt** in `localStorage` (Schlüssel `ff-progress-v1`), nur im Browser, ohne Tracking. Ist `localStorage` blockiert, läuft das Tool ohne gespeicherten Fortschritt weiter:
 - Ein Abschnitt ist erledigt, wenn sein Ende sichtbar war (IntersectionObserver).
 - Ein Modul ist erledigt, wenn sein Quiz mit mindestens 3 von 4 bestanden ist.
 - Fortschritt in Prozent = (erledigte Abschnitte + bestandene Quiz) / 45, also 9 Module × 4 Abschnitte plus 9 Quiz.
@@ -218,11 +228,12 @@ Paare: EUR/CHF und EUR/USD direkt; USD/CHF = EURCHF/EURUSD; USD/JPY = EURJPY/EUR
 
 Quellen für die Ereignis-Fakten gehören in `src/content/sources.md`, z. B. die SNB-Medienmitteilung vom 15.01.2015.
 
-**UI** (getreu nach `Riskometer.dc.html`): Paar-Umschalter mit vier Paaren, Tacho mit Stufe und Perzentil, Chart mit Crosshair und Tooltip (Maus und Touch), Ereignis-Buttons (mindestens 44 px) nur für passende Paare, Fallkarte (`aria-live`), Umschalter "Daten als Tabelle" (Jahreshöchstwerte), Fussnote mit Methode und Quelle, "Stand ‹Datum›". Auf der Startseite der Mini-Tacho für EUR/CHF.
+**UI** (getreu nach `Riskometer.dc.html`): Paar-Umschalter mit vier Paaren, Tacho mit Stufe und Perzentil, Chart mit Crosshair und Tooltip (Maus und Touch), Ereignis-Buttons (mindestens 44 px) nur für passende Paare, Fallkarte (`aria-live`), Umschalter "Daten als Tabelle" (Jahreshöchstwerte), Fussnote mit Methode und Quelle, "Stand ‹Datum›". Auf der Startseite der Mini-Tacho für EUR/CHF. Der Footer jeder Seite zeigt den Datenstand ("Kursdaten: EZB-Referenzkurse, Stand ‹Datum›").
 
-**Tägliches Update:** GitHub Action `.github/workflows/data.yml`, Cron `30 15 * * 1-5` (UTC) plus manueller Start: abrufen → validieren → rechnen → `npm run check && npm run build` → nur bei Änderung committen (`data: ECB ‹Datum›`) → Cloudflare deployt.
-- Validierung: Daten aufsteigend, keine Duplikate, Kurse > 0, letzter Wert höchstens 5 Bankarbeitstage alt, tägliche |Log-Rendite| < 10 % für alle vier Paare inklusive der Kreuzkurse. Ausnahmen nur über eine dokumentierte Whitelist (15.01.2015 für EUR/CHF und USD/CHF). Schlägt etwas fehl, endet der Job ohne Commit.
-- Workflow mit `permissions: contents: write` und `concurrency`, damit sich Läufe nicht überholen. Pushes mit dem `GITHUB_TOKEN` starten keine weiteren Workflows; deshalb laufen Check und Build im Daten-Workflow selbst.
+**Daten-Update von Hand** (kein Cron): GitHub Action `.github/workflows/release.yml`, gestartet unter Actions → Release → "Run workflow": EZB-Daten holen → validieren → rechnen → `npm run check` → `npm run build` → Datei in Chromium und WebKit testen → geänderte Daten committen (`data: ECB ‹Datum›`) → GitHub Release mit `forward-first.html` als Download. Die Datei zeigt den Datenstand.
+- Validierung: Daten aufsteigend, keine Duplikate, Kurse > 0, letzter Wert höchstens 5 Bankarbeitstage alt, tägliche |Log-Rendite| < 10 % für alle vier Paare inklusive der Kreuzkurse. Ausnahmen nur über eine dokumentierte Whitelist (15.01.2015 für EUR/CHF und USD/CHF). Schlägt etwas fehl, endet der Lauf ohne Commit und ohne Release.
+- Workflow mit `permissions: contents: write` und `concurrency`, damit sich Läufe nicht überholen. Ohne Datenabruf (Schalter `update_data` aus) baut er nur die Datei neu und veröffentlicht sie.
+- Lokal geht dasselbe mit `npm run data:fetch`, `npm run data:build`, `npm run check`, `npm run build`, `npm run e2e`.
 
 **Tests:** Vola auf synthetischen Reihen mit bekanntem Ergebnis, Perzentile, Stufen-Mapping, Kreuzkurse, Ereignis-Kennzahlen auf Fixture-Daten, Validierungsregeln.
 
@@ -301,11 +312,13 @@ Darios Produktkonzept als interaktive Matrix: Man wählt ein Bedürfnis und eine
 
 ## 11. Qualität und Definition of Done
 
-- `npm run check` = Typecheck + Lint + Unit-Tests; `npm run e2e` = Playwright inklusive axe; `npm run build`. Massgebend ist der Exit-Code.
+- `npm run check` = Typecheck + Lint + Unit-Tests; `npm run build` = Astro-Build und `forward-first.html`; `npm run e2e` = Playwright gegen die gebaute Datei; `npm run e2e:web` = Komponenten-Tests am Astro-Build inklusive axe. Massgebend ist der Exit-Code.
 - **i18n-Test:** jeder Schlüssel DE und EN vorhanden, keine hart codierten UI-Strings in Komponenten.
 - **Content-Lint:** Liste verbotener Begriffe (Banknamen, "garantiert", "risikolos" ausser im Arbitrage-Kontext). Schlägt fehl, wenn ein Beispiel- oder Referenzwert aus `example.ts` als Literal ausserhalb von `<Num>` steht oder ein `<Fact>` keinen Eintrag in `sources.md` hat.
-- **E2E-Smoke:** Startseite lädt; Wow-Moment spielt und lässt sich steuern; Greeks-Labor reagiert auf Regler (Delta und Gamma ändern sich); Quiz-Ablauf; Riskometer (Paarwechsel, Ereignis-Klick aktualisiert die Fallkarte); Sprachwechsel; bei 390 px kein horizontales Scrollen.
-- **Performance:** Startseite höchstens 120 KB JS (gzip); Lighthouse mobil Performance mindestens 90, Accessibility, Best Practices und SEO mindestens 95.
+- **Offline-Datei (E2E):** Playwright öffnet `release/forward-first.html` über `file://` in Chromium (1440 × 900) und WebKit (iPad, 820 × 1180 hoch und 1180 × 820 quer) bei blockiertem Netzwerk. Jede Netzwerk-Anfrage und jeder Konsolenfehler lässt den Test scheitern.
+- **E2E-Smoke gegen diese Datei:** Startseite lädt (mit Disclaimer und Datenstand); Wow-Moment spielt und lässt sich steuern; Greeks-Labor reagiert auf Regler (Delta und Gamma ändern sich); Quiz-Ablauf; Riskometer (Paarwechsel, Ereignis-Klick aktualisiert die Fallkarte); Sprachwechsel; kein horizontales Scrollen. Dazu: Hash-Routing inklusive Zurück-Taste, blockierter `localStorage`, Monte Carlo ohne Worker, jede Seite der Datei rendert ohne Fehler.
+- **Komponenten-Tests** (`npm run e2e:web`): Playwright am Astro-Build bei 390 px und 1440 px, inklusive axe.
+- **Grösse:** Datei unter 3 MB als Ziel, der Build bricht über 5 MB ab. Lighthouse und das JS-Budget pro Seite entfallen (D-13).
 - **Visueller Abgleich** mit den Prototypen in Phase 8.
 
 ## 12. Repo-Doku (Portfolio-Belege)
@@ -321,7 +334,7 @@ Darios Produktkonzept als interaktive Matrix: Man wählt ein Bedürfnis und eine
   - D-07 Name "Forward First" (Claude, von Dario bestätigt)
   - D-08 Kein Modul-Rad als Navigation, der Übergang Station → Modul bleibt (Claude, von Dario bestätigt)
   - D-09 Extras: durchgehendes Fallbeispiel, G10-Steckbriefe, Frankenschock-Fall, Quiz pro Modul, Riskometer mit echten Daten (Dario)
-  - D-10 Stack Astro, TypeScript, Preact, Hosting auf Cloudflare (Claude)
+  - D-10 Stack Astro, TypeScript, Preact; Ausgabe als eine Offline-HTML-Datei (Claude; Ausgabe geändert durch D-13)
   - D-11 Datenquelle EZB-Referenzkurse (Claude)
   - D-12 Riskometer-Methode: 21 Log-Renditen, √252, Perzentile seit 2006, fünf Stufen (Claude, von Dario bestätigt)
 - **`CLAUDE.md`:** Regeln. **`PROGRESS.md`:** Stand. **Lizenz:** keine (alle Rechte vorbehalten), bis Dario entscheidet.
@@ -330,16 +343,17 @@ Darios Produktkonzept als interaktive Matrix: Man wählt ein Bedürfnis und eine
 
 | Phase | Inhalt | Modell · Effort | Stopp, wenn |
 |---|---|---|---|
-| 0 | Setup: Repo-Gerüst, Tooling, Tokens, Layout-Shell (Top-Nav, Footer), i18n-Routing, CI-Workflow (check und build), `CLAUDE.md`, `DECISIONS.md` (vorbefüllt), `PROGRESS.md`, Anleitung Cloudflare | Opus 5.5 · mittel | lokale Vorschau läuft, CI grün |
+| 0 | Setup: Repo-Gerüst, Tooling, Tokens, Layout-Shell (Top-Nav, Footer), i18n-Routing, CI-Workflow (check und build), `CLAUDE.md`, `DECISIONS.md` (vorbefüllt), `PROGRESS.md` | Opus 5.5 · mittel | lokale Vorschau läuft, CI grün |
 | 1 | Rechenkern ohne Monte Carlo (Abschnitt 7: Forward, Swap, Vanilla, Greeks, Smile, geschlossene Exotics) mit Tests und den Referenzwerten aus Abschnitt 6 | Opus 5.5 · hoch | alle Tests grün, Abdeckung ≥ 90 % |
 | 2 | Design-System und Startseite nach `B-Home`, Wow-Moment nach `WowChart`, Modul-Template nach `B-Modul` | Fable 5.1 · hoch | Startseite und leeres Template entsprechen dem Prototyp |
 | 3 | Modul 05 komplett als Vertical Slice: Greeks-Labor (alle Modi), Inhalte, Quiz, Fortschritt | Opus 5.5 · hoch | Dario hat Modul 05 durchgespielt |
-| 4 | Riskometer: Pipeline, Methode, Ereignisse, Seite, Mini-Tacho, GitHub Action | Opus 5.5 · hoch | Daten aktuell, Tests grün, Seite nach Prototyp |
+| 4 | Riskometer: Pipeline, Methode, Ereignisse, Seite, Mini-Tacho | Opus 5.5 · hoch | Daten aktuell, Tests grün, Seite nach Prototyp |
 | 5 | Module 01 bis 04 inklusive Session-Uhr, Rechnern, Payoff-Builder | Opus 5.5 · hoch | Inhalte und Quiz fertig, Content-Lint grün |
 | 6 | Monte-Carlo-Engine und Produkte aus 8.7, Module 06 bis 09 inklusive Pfad-Simulator und Matrix | Opus 5.5 · hoch | Inhalte und Quiz fertig, Monte-Carlo-Tests grün |
 | 7 | Englisch komplett, Glossar, Über und Methodik | Opus 5.5 · mittel | i18n-Test grün |
-| 8 | Politur: Übergänge, Mikro-Interaktionen, Responsive bei 390 px, visueller Abgleich | Fable 5.1 · hoch | Abgleich ohne offene Abweichungen |
-| 9 | Verifikation und Launch: vollständige Tests, E2E, Lighthouse, Fakten-Check gegen `sources.md` durch einen frischen Subagenten, der den Code nicht geschrieben hat; README; Deploy | Opus 5.5 · hoch | live auf Cloudflare, Abschlussbericht |
+| 7b | Offline-Datei (D-13): `forward-first.html` mit Hash-Routing, eingebetteten Schriften und Daten, CSP; Tests über `file://` in Chromium und WebKit; manueller Release-Workflow | Opus 5.5 · hoch | Dario hat die Datei auf Arbeits-PC und iPad getestet, inklusive Modul 05 |
+| 8 | Politur: Übergänge, Mikro-Interaktionen, Responsive bei 390 px und auf dem iPad (hoch und quer), visueller Abgleich | Fable 5.1 · hoch | Abgleich ohne offene Abweichungen |
+| 9 | Verifikation und Release: vollständige Tests, E2E gegen die Datei in Chromium und WebKit, Fakten-Check gegen `sources.md` durch einen frischen Subagenten, der den Code nicht geschrieben hat; README; GitHub Release von `forward-first.html` | Opus 5.5 · hoch | Release veröffentlicht, Abschlussbericht |
 
 ## 14. Erste Aktion
 

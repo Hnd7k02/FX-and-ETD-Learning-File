@@ -23,6 +23,5 @@ blob-report/
 !.vscode/extensions.json
 .idea/
 
-# cloudflare
-.wrangler/
+# single-file build output (published as GitHub Release)
 release/

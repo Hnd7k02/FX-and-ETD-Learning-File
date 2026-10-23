@@ -6,7 +6,11 @@ Read this first, then `PROGRESS.md` (where we are) and `DECISIONS.md` (why thing
 
 A light, calm learning tool for FX: spot → forward → FX swap → vanilla options → six Greeks → exotics. Everything is reduced to the forward. Every number is calculated live; a Riskometer shows real market swings.
 
+**Output: one offline file `forward-first.html`** (D-13) for the work PC (Chrome/Edge, double click) and the iPad Files app (WebKit). No hosting, no PWA, no login, no network requests.
+
 ## Non-negotiable rules
+
+- **Single file.** Everything (CSS, JS, fonts, data, both languages) stays inside `release/forward-first.html`; no external file, no request (CSP `default-src 'none'`). Target < 3 MB, build fails > 5 MB. Optional browser features need feature detection and a fallback (View Transitions, `localStorage`, Web Worker → chunked main thread). Internal links are site paths (`/module/…/`); the file rewrites them to hash routes. Read/write query strings only through `src/lib/url.ts`.
 
 - **Education only.** No names of banks, companies, people or clients. No internal terms, systems or processes of any bank. Dario's employer never appears in the tool or the repo.
 - **Disclaimer** in every footer and on the About page: "Nur zu Bildungszwecken. Keine Anlageberatung." / "For educational purposes only. Not investment advice."
@@ -23,9 +27,11 @@ A light, calm learning tool for FX: spot → forward → FX swap → vanilla opt
 Astro 7 (static) · TypeScript strict · Preact islands · MDX · hand-written SVG charts · Vitest · Playwright + axe · ESLint · Prettier. Node 24 LTS (`.nvmrc`).
 
 - `npm run check` = `astro check` + ESLint + Prettier check + Vitest with coverage (≥ 90 % lines in `src/lib`). The exit code decides.
-- `npm run e2e` = Playwright (390 px and 1440 px) incl. axe. Needs `npm run build` first. In the sandbox set `PW_CHROMIUM_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/chrome` if browsers are not found.
-- `npm run build` → `dist/`.
-- Data: `npm run data:fetch` (ECB API) → `npm run data:build` (Riskometer JSON) → `npm run data:mc` (Monte Carlo fair strikes).
+- `npm run build` = Astro build → `dist/`, then `scripts/build-offline.ts` → `release/forward-first.html`.
+- `npm run e2e` = Playwright against the file over `file://`, network blocked: Chromium 1440 × 900 and WebKit iPad 820 × 1180 / 1180 × 820. Needs `npm run build` first. The sandbox has no WebKit: run `npm run e2e -- --project=chromium-1440` with `PW_CHROMIUM_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/chrome`; WebKit runs in CI.
+- `npm run e2e:web` = detailed component tests on the web build (390 px and 1440 px) incl. axe.
+- Data (manual, no cron): `npm run data:fetch` (ECB API) → `npm run data:build` (Riskometer JSON) → `npm run data:mc` (Monte Carlo fair strikes). On GitHub: Actions → Release → Run workflow (fetch, check, build, test, commit data, GitHub Release with the file).
+- CI runs on `ubuntu-24.04` (Playwright 1.56 has no builds for 26.04).
 
 Sandbox note: Node 24 is linked into `~/.local/bin` (ahead of the preinstalled Node 22).
 
@@ -36,7 +42,9 @@ Sandbox note: Node 24 is linked into `~/.local/bin` (ahead of the preinstalled N
 - `src/content/modules/{slug}/{de|en}/{1..4}.mdx` section texts · `src/content/quiz/{slug}.ts` quiz and per-section check questions · `src/content/glossary.ts` · `src/content/sources.md`.
 - `src/i18n/dict/*.ts` UI strings per namespace (`defineDict` enforces equal keys) · `src/i18n/routes.ts` paths.
 - `src/components/content/` MDX building blocks (Num, Fact, Formula, Desk, Derivation, Takeaway, Figure, Callout) · `src/components/islands/` Preact islands · `src/components/figures/` Astro wrappers that hydrate islands for MDX.
-- `scripts/` data pipeline · `data/raw/` ECB raw data (versioned) · `src/data/fx/` generated JSON.
+- `scripts/` data pipeline and `build-offline.ts` · `data/raw/` ECB raw data (versioned) · `src/data/fx/` generated JSON.
+- `src/offline/main.tsx` runtime of the file (hash router, island mount, view transitions) · `src/client/*.ts` page scripts shared by both builds (run on `astro:page-load`).
+- `tests/unit` Vitest · `tests/offline` the file (smoke tests) · `tests/e2e` web build components.
 
 ## Working style
 

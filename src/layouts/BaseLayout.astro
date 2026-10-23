@@ -38,7 +38,7 @@ const { lang, title, description, nav = null, altPath, family, narrowFooter = fa
 const t = translator(common, lang);
 const other: Lang = lang === 'de' ? 'en' : 'de';
 const otherPath = altPath ?? switchLangPath(Astro.url.pathname, other);
-const site = Astro.site ?? new URL('https://forward-first.pages.dev');
+const site = Astro.site ?? new URL('http://localhost:4321');
 const canonical = new URL(Astro.url.pathname, site).href;
 const alternate = new URL(otherPath, site).href;
 const desc = description ?? t('site.description');

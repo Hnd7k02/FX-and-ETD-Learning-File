@@ -58,9 +58,9 @@ Format: `D-xx · date · origin`, then question, decision, reasoning. Origin is 
 
 ## D-10 · 2026-10 · Claude
 
-**Question:** Stack and hosting?
-**Decision:** Astro, TypeScript, Preact; hosting on Cloudflare.
-**Reasoning:** Static output, tiny JS budget, islands only where interaction is needed; Cloudflare is free and fast for static assets.
+**Question:** Stack and output?
+**Decision:** Astro, TypeScript, Preact. Updated 2026-10-23: no hosting; the output is one offline HTML file `forward-first.html` built from the Astro output (D-13, D-40). The original choice was hosting on Cloudflare.
+**Reasoning:** Static output, islands only where interaction is needed. Static pre-rendering is exactly what the single file needs: every page is rendered once at build time and packed into the file, so calculation core, components and content stay unchanged.
 
 ## D-11 · 2026-10 · Claude
 
@@ -74,11 +74,14 @@ Format: `D-xx · date · origin`, then question, decision, reasoning. Origin is 
 **Decision:** 21 log returns, zero mean, annualised with √252; percentiles of all daily values since 2006 per pair; five levels at P20/P60/P85/P97.
 **Reasoning:** A one-month window reacts quickly but not nervously; percentiles make the pairs comparable.
 
-## D-13 · 2026-10-22 · Claude
+## D-13 · 2026-10-23 · Dario
 
-**Question:** Cloudflare Pages or Workers Static Assets?
-**Decision:** Workers with Static Assets (`wrangler.jsonc`, `assets.directory = ./dist`), connected to GitHub through Workers Builds.
-**Reasoning:** Cloudflare recommends Workers for new projects, including purely static sites; Pages keeps working but receives no new features. Static assets on Workers are free and need no Worker code.
+**Eine Offline-HTML-Datei für Arbeits-PC und iPad, kein Hosting, kein Login**
+
+**Question:** How does Dario use Forward First: hosted site or file?
+**Decision:** Forward First is one HTML file, `forward-first.html`, that runs offline on the work PC (Chrome and Edge, double click) and in the iPad Files app (WebKit). No hosting, no PWA, no Cloudflare, no login. Everything is inside the one file: CSS, JavaScript, fonts (subset), Riskometer data, both languages. No external files and no network requests, enforced by a Content-Security-Policy meta tag. Target under 3 MB, at most 5 MB. Navigation by hash routing inside the file (e.g. `#/module/05-greeks/2/`). Optional features are feature-detected with a fallback: View Transitions for station → module, Monte Carlo without a Web Worker in small chunks on the main thread, progress in `localStorage` (if blocked, the tool runs without saved progress). The data update is manual: fetch ECB data, validate, test, build the file, publish it as a GitHub Release; no daily cron; the tool shows the data date. Tests open the built file over `file://` in Chromium (1440 × 900) and WebKit (iPad 820 × 1180 and 1180 × 820) with the network blocked; any request fails the test. Lighthouse and the 120 KB JS budget are dropped.
+**Evidence:** Device test by Dario on 2026-10-23: a local test HTML file with inline JavaScript runs in the iPad Files app and on the work PC by double click; the iPad does not load side files there, so everything has to be in one file.
+**Reasoning:** The tool is used where hosting is not an option; one file is the only format that works on both devices. Replaces the earlier D-13 (Cloudflare Workers Static Assets, 2026-10-22), which is void; `wrangler.jsonc` and the daily data cron are removed.
 
 ## D-14 · 2026-10-22 · Claude
 
@@ -276,3 +279,20 @@ Format: `D-xx · date · origin`, then question, decision, reasoning. Origin is 
 **Decision:** Every module gets a second, fresh review agent that did not write it (finance correctness, numbers, didactics, DE/EN language, figures at 1440/390 px, accessibility) and fixes findings directly. First round (modules 04, 05, 07, 08) corrected, among others: "spot has no vol" → "no vega"; reversed cause and effect for vanna/volga; gamma/vega peaks described "at the strike" although on the spot axis they sit near ATMF; sign wording ("kostet CHF −45"); unequal bar tracks in the levers figure; module-specific findings are in the review reports. Shared follow-ups done centrally: the quiz card strips a leading verdict word from explanations, Markdown tables render in a focusable scroll region, nice ticks tolerate float noise, stat rows without a symbol use two columns, italic variables get a hair space, glossary corrections (intrinsic value, gamma near ATMF, accumulator knock-out at the barrier, target = profit goal) and new terms vanna, volga, premium-adjusted delta.
 
 **Reasoning:** Authors miss their own mistakes; an adversarial second reader is cheap compared to a wrong explanation in a learning tool.
+
+## D-40 · 2026-10-23 · Claude
+
+**Question:** How is the single file built with the smallest change to the existing code?
+**Decision:**
+
+- `npm run build` runs the Astro build as before and then `scripts/build-offline.ts`. The script reads every pre-rendered page from `dist/`, keeps the content of `#main`, the top navigation and the footer per language, and packs all pages as JSON, gzip and Base64 into one `<script type="application/octet-stream">` block (about 0.45 MB instead of 2.2 MB). Redirect pages become route aliases.
+- Islands: Astro's server markup is dropped, `component-url` becomes `data-ff-island="Name"`, and one esbuild bundle (IIFE, Preact, all 38 islands, the page scripts from `src/client/`, `fflate` for gunzip) renders them with the same props. The page scripts listen to `astro:page-load` as on the web, so they run unchanged after each route change.
+- Router (`src/offline/main.tsx`): `#/path/?query#anchor`, aliases, 404 per language, scroll memory for back/forward, focus to `#main` plus an announcement on every route change, internal links rewritten from `/…` to `#/…`. Islands read and write their query through `src/lib/url.ts`, which works for both hash routes and normal URLs.
+- Fonts: the Fontsource woff2 subsets that the pages need (Plus Jakarta Sans latin 400–800, JetBrains Mono latin 500/600, STIX Two Text latin and greek 400/500 regular/italic) as data URIs; other subsets are dropped.
+- CSP: `default-src 'none'`; the one inline script is allowed by its SHA-256 hash; styles inline; images and fonts only from `data:`; `connect-src 'none'`. The build fails if anything still points outside the file or the file exceeds 5 MB.
+- Monte Carlo: `createInlineMcClient` runs `priceChunked` in chunks of 1’000 paths and yields to the browser between chunks; same random sequence and result as the worker version (unit test), so D-28 stays valid except for "in a Web Worker".
+- The Astro web build (`dist/`) stays as a build stage and as the test harness for the detailed component tests (`npm run e2e:web`, incl. axe); it is not deployed.
+- CI runs on `ubuntu-24.04` because Playwright 1.56 has no browser builds for Ubuntu 26.04 (the `ubuntu-latest` image since October 2026). WebKit cannot be installed in the Claude sandbox, so the WebKit runs happen in CI.
+- Releases are tagged `vYYYY.MM.DD-<run>` and titled with the ECB data date.
+
+**Reasoning:** Reuses the whole Astro pipeline (MDX, `<Num>`, i18n, components) instead of rebuilding the site as a client-only app; the only new runtime code is the router and the island mount. All settings are in the build script (D-22).
