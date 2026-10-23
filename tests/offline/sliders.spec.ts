@@ -16,6 +16,7 @@ import {
   settledAt,
   startRecorder,
   stopRecorder,
+  waitForFramesAfterInput,
   waitForResults,
   type Recording,
 } from './frames';
@@ -74,6 +75,7 @@ test.describe('every slider: no lag, still after two frames', () => {
           else await holdArrow(page, slider);
           await waitForResults(slider);
           await page.waitForTimeout(350);
+          await waitForFramesAfterInput(page, 8);
           const rec = await stopRecorder(page);
           const moved = new Set(rec.frames.map((f) => f.state)).size > 1;
           const p = problems(rec);

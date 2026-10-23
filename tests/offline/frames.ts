@@ -35,7 +35,10 @@ export interface Recording {
 }
 
 /** Starts recording the island that contains `inside`. */
-export async function startRecorder(inside: Locator): Promise<void> {
+export async function startRecorder(
+  inside: Locator,
+  debug = process.env.FF_DEBUG_FRAMES === '1',
+): Promise<void> {
   await inside.evaluate((el, debug) => {
     const root = (el.closest('[data-ff-island]') ?? el) as HTMLElement;
     const SHAPES =
@@ -88,7 +91,8 @@ export async function startRecorder(inside: Locator): Promise<void> {
     const stamp = () => {
       if (rec.on) rec.lastInput = performance.now();
     };
-    for (const type of ['input', 'change', 'pointerup', 'pointercancel', 'keyup', 'touchend']) {
+    const INPUTS = ['input', 'change', 'click', 'pointerup', 'pointercancel', 'keyup', 'touchend'];
+    for (const type of INPUTS) {
       root.addEventListener(type, stamp, true);
     }
     // a Monte Carlo result counts like an input: the figure may change once when it arrives
@@ -174,7 +178,7 @@ export async function startRecorder(inside: Locator): Promise<void> {
       requestAnimationFrame(loop);
     };
     requestAnimationFrame(loop);
-  }, process.env.FF_DEBUG_FRAMES === '1');
+  }, debug);
 }
 
 /** With FF_DEBUG_FRAMES=1: the elements that still change after the second frame. */
@@ -236,6 +240,52 @@ export function expectOnTheLines(rec: Recording, what: string): void {
 
 /** Number of different states in the recording. */
 export const distinctStates = (rec: Recording) => new Set(rec.frames.map((f) => f.state)).size;
+
+/**
+ * Milliseconds between the first and the last frame that differs from the frame before. A jump
+ * changes within one or two frames; an animation keeps changing for most of its duration, at any
+ * frame rate (the WebKit runners in CI draw far fewer frames per second than a desktop).
+ */
+export function changeSpan(rec: Recording): number {
+  const t: number[] = [];
+  for (let i = 1; i < rec.frames.length; i++) {
+    if (rec.frames[i]!.state !== rec.frames[i - 1]!.state) t.push(rec.frames[i]!.t);
+  }
+  return t.length ? t[t.length - 1]! - t[0]! : 0;
+}
+
+/**
+ * Waits until the recorder holds at least `n` frames after the last input, so the stillness check
+ * has frames to look at also where a busy main thread (Monte Carlo in chunks) draws few of them.
+ */
+export async function waitForFramesAfterInput(page: Page, n = 8, timeout = 20_000): Promise<void> {
+  await page.waitForFunction(
+    (k) => {
+      const rec = (window as unknown as { __rec: Recording }).__rec;
+      return rec.frames.filter((f) => f.t > rec.lastInput).length >= k;
+    },
+    n,
+    { timeout },
+  );
+}
+
+/**
+ * Clicks the elements one after the other inside the page, `gap` ms apart. Playwright's own
+ * click waits for stable frames first, which on a slow runner spreads a "quick" series over more
+ * than the 300 ms of the tween rule, so each click becomes a single change.
+ */
+export async function clickSeries(page: Page, targets: Locator[], gap = 50): Promise<void> {
+  const handles = await Promise.all(targets.map((t) => t.elementHandle()));
+  await page.evaluate(
+    async ({ els, ms }) => {
+      for (const el of els) {
+        (el as HTMLElement).click();
+        await new Promise((r) => setTimeout(r, ms));
+      }
+    },
+    { els: handles, ms: gap },
+  );
+}
 
 /** Drags the thumb of a range input in small mouse steps (2 px) towards the far end. */
 export async function dragSlider(page: Page, slider: Locator, steps = 30): Promise<void> {

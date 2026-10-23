@@ -19,6 +19,8 @@ import {
 import { PIP } from '../../src/lib/m07/config';
 import { expect, test } from './fixtures';
 import {
+  changeSpan,
+  clickSeries,
   distinctStates,
   dragSlider,
   expectOnTheLines,
@@ -26,15 +28,24 @@ import {
   holdArrow,
   startRecorder,
   stopRecorder,
+  waitForFramesAfterInput,
 } from './frames';
 
-/** Records while `act` runs, then waits `rest` ms. */
+/** Records while `act` runs, then waits `rest` ms and for enough frames after the last input. */
 async function record(page: Page, inside: Locator, act: () => Promise<void>, rest = 500) {
   await page.waitForTimeout(600); // start from rest
-  await startRecorder(inside);
+  // per-element fingerprints, so a failure names what still moves (few recordings here)
+  await startRecorder(inside, true);
   await act();
   await page.waitForTimeout(rest);
+  await waitForFramesAfterInput(page, 8);
   return stopRecorder(page);
+}
+
+/** A single change animates: in-between frames over most of the 300 ms, not a jump. */
+function expectAnimated(rec: Awaited<ReturnType<typeof record>>, what: string) {
+  expect(distinctStates(rec), `${what}: in-between frames`).toBeGreaterThanOrEqual(3);
+  expect(changeSpan(rec), `${what}: changes over time (ms)`).toBeGreaterThanOrEqual(150);
 }
 
 test.describe('dots stay on their lines while a slider moves', () => {
@@ -128,8 +139,8 @@ test.describe('a single change animates, a quick series does not lag', () => {
     const toggle = page.locator('[data-block="sellCall"]');
     await toggle.scrollIntoViewIfNeeded();
     const rec = await record(page, toggle, () => toggle.click());
-    // in-between frames: the curve glides instead of jumping
-    expect(distinctStates(rec)).toBeGreaterThanOrEqual(5);
+    // the curve glides instead of jumping
+    expectAnimated(rec, 'hedge shaper toggle');
     expectOnTheLines(rec, 'hedge shaper toggle');
   });
 
@@ -137,12 +148,7 @@ test.describe('a single change animates, a quick series does not lag', () => {
     await open('/module/06-combos-smile/1/');
     const toggle = page.locator('[data-block="sellCall"]');
     await toggle.scrollIntoViewIfNeeded();
-    const rec = await record(page, toggle, async () => {
-      for (let i = 0; i < 5; i++) {
-        await toggle.click();
-        await page.waitForTimeout(50);
-      }
-    });
+    const rec = await record(page, toggle, () => clickSeries(page, Array(5).fill(toggle)));
     expectOnTheLines(rec, 'hedge shaper toggles');
     expectSettledWithinTwoFrames(rec, 'hedge shaper toggles');
   });
@@ -157,13 +163,10 @@ test.describe('a single change animates, a quick series does not lag', () => {
     const flat = group.getByRole('button', { name: 'Flach' });
     const example = group.getByRole('button', { name: 'Beispiel' });
     const one = await record(page, flat, () => flat.click());
-    expect(distinctStates(one)).toBeGreaterThanOrEqual(5);
-    const series = await record(page, flat, async () => {
-      for (const b of [example, flat, example, flat]) {
-        await b.click();
-        await page.waitForTimeout(60);
-      }
-    });
+    expectAnimated(one, 'smile builder preset');
+    const series = await record(page, flat, () =>
+      clickSeries(page, [example, flat, example, flat], 60),
+    );
     expectSettledWithinTwoFrames(series, 'smile builder presets');
   });
 
@@ -177,16 +180,13 @@ test.describe('a single change animates, a quick series does not lag', () => {
     const reset = lab.locator('[data-reset]');
     await reset.scrollIntoViewIfNeeded();
     const one = await record(page, reset, () => reset.click());
-    expect(distinctStates(one)).toBeGreaterThanOrEqual(5);
+    expectAnimated(one, 'barrier lab reset');
 
     const daily = lab.getByRole('button', { name: 'Täglich (BGK)' });
     const cont = lab.getByRole('button', { name: 'Stetig' });
-    const series = await record(page, daily, async () => {
-      for (const b of [daily, cont, daily, cont, daily]) {
-        await b.click();
-        await page.waitForTimeout(50);
-      }
-    });
+    const series = await record(page, daily, () =>
+      clickSeries(page, [daily, cont, daily, cont, daily]),
+    );
     expectOnTheLines(series, 'barrier lab toggles');
     expectSettledWithinTwoFrames(series, 'barrier lab toggles');
   });
