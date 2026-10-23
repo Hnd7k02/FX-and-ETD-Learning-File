@@ -2,7 +2,7 @@ import SwapTripFigure from '@/components/figures/SwapTripFigure.astro';
 
 Our importer has to pay USD 1m in 3 months. With the forward from module 02 he has locked in his rate. Now for a related question: what do you do if you do not need a currency for good, but only **for a while**?
 
-Picture a Swiss company. It has francs in its account and has to pay a supplier USD 1m. If it buys the dollars at spot today, the money flows T+2 (module 01). So it pays the supplier on the spot value date, in two business days, not today. One month later a customer in the US transfers exactly that amount back to it. So the company needs the dollars for one month only.
+Picture a Swiss company. It has francs in its account and has to pay a supplier USD 1m. If it buys the dollars at spot today, the money flows T+2 ([module 01](/en/module/01-spot/3/)): two business days later, under the holiday calendars of both currencies. So it pays the supplier on the spot value date, not today. One month later a customer in the US transfers exactly that amount back to it. So the company needs the dollars for one month only.
 
 ### Three ways to a month in dollars
 
@@ -10,7 +10,7 @@ Picture a Swiss company. It has francs in its account and has to pay a supplier 
 - **Borrow dollars.** It takes out a USD loan and repays it with the customer's money. That needs a credit line, and its francs sit idle in the meantime.
 - **FX swap.** It buys USD 1m at spot today and, in the same deal, sells them forward for one month. Both rates are fixed today.
 
-The third way is an **FX swap**: two FX deals in opposite directions for the same amount. The earlier one is the **near leg**, the later one the **far leg**. The company exchanges its francs for dollars for a while and gets them back afterwards. Here the near leg is a spot deal for value T+2. If the money has to flow today or tomorrow, you use a shorter near leg (value today or tomorrow), at a slightly different rate.
+The third way is an **FX swap**: two FX deals in opposite directions for the same amount. The earlier one is the **near leg**, the later one the **far leg**. The company exchanges its francs for dollars for a while and gets them back afterwards. Here the near leg is a spot deal for value T+2. If the money has to flow today or tomorrow, you use a shorter near leg (value today or tomorrow), at a slightly different rate. The term of the swap counts from the value date of the near leg. The tool counts it in days, without a holiday calendar.
 
 You already know the far leg: it is a forward from module 02. So an FX swap is a spot deal plus a forward in the opposite direction, done as a single trade.
 

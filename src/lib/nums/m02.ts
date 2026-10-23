@@ -8,7 +8,7 @@
  * `M02` holds the raw values for the quiz file and the tests.
  */
 import { dayBasis, yearFraction } from '@/lib/fx/daycount';
-import { forwardContinuous } from '@/lib/fx/forward';
+import { continuousFromSimple, forwardContinuous } from '@/lib/fx/forward';
 import { M02_CONFIG, PIP } from '@/lib/m02/config';
 import { carryFor, startMarket } from '@/lib/m02/carry';
 import { curvePoint, pointsApprox } from '@/lib/m02/curve';
@@ -38,7 +38,17 @@ const fCont = forwardContinuous(M.spot, M.rd, M.rf, M.T);
  * (= 91.25 days at Act/365). For the exact same 90 days the option model has T = 90/365.
  */
 const daysT = M.T * dayBasis('ACT/365');
-const fCont90 = forwardContinuous(M.spot, M.rd, M.rf, yearFraction(M.days, 'ACT/365'));
+const t90 = yearFraction(M.days, 'ACT/365');
+const fCont90 = forwardContinuous(M.spot, M.rd, M.rf, t90);
+/**
+ * The +0.65 pips at T = 90/365 come from using the same rate once simple (90/360) and once
+ * continuous (90/365); the larger money-market year fraction outweighs continuous compounding,
+ * hence the plus sign. They are convention, no arbitrage gain. Term-matched continuous rates,
+ * r = ln(1 + r_MM · 90/360) / (90/365), give the money-market forward exactly.
+ */
+const rdCont90 = continuousFromSimple(M.rd, par.tq, t90);
+const rfCont90 = continuousFromSimple(M.rf, par.tb, t90);
+const fCont90Conv = forwardContinuous(M.spot, rdCont90, rfCont90, t90);
 const scn = scenarioStats(defaultScenarios(F), F, N);
 const curveMarket = {
   spot: M.spot,
@@ -63,6 +73,9 @@ export const M02 = {
   F,
   fCont,
   fCont90,
+  rdCont90,
+  rfCont90,
+  fCont90Conv,
   daysT,
   fwdChf: N * F,
   spotChf: N * M.spot,
@@ -143,10 +156,10 @@ export const nums: NumTable = {
     note: 'USD discount factor, continuous',
   },
   'm02.rfCont': {
-    value: Math.log(par.growthBase) / M.T,
+    value: continuousFromSimple(M.rf, par.tb, M.T),
     kind: 'pct',
     digits: 3,
-    note: 'Continuous rate equivalent to the simple USD rate over 90 days',
+    note: 'Continuous rate equivalent to the simple USD rate over 90/360 at the same T = 0.25',
   },
   'm02.fwdDiffChf': {
     value: N * Math.abs(F - fCont),
@@ -170,6 +183,18 @@ export const nums: NumTable = {
     kind: 'pips',
     digits: 2,
     note: 'Continuous forward at T = 90/365 minus money-market forward 90/360 (above it)',
+  },
+  'm02.rfCont90': {
+    value: rfCont90,
+    kind: 'pct',
+    digits: 3,
+    note: 'Term-matched continuous USD rate for the same 90 days: ln(1 + rf · 90/360) / (90/365)',
+  },
+  'm02.fwdCont90Conv': {
+    value: fCont90Conv,
+    kind: 'rate',
+    digits: FD,
+    note: 'Continuous forward at T = 90/365 with term-matched rates (= money-market forward)',
   },
 
   // Section 3: forward points and carry

@@ -168,6 +168,8 @@ export const M07_CONFIG = {
      * Hypothetical orders (choice, not market data): a stop-loss that sells EUR below the floor,
      * and a EUR put / CHF call with strike 1.2000 and four alternative down-and-out barriers
      * (reverse knock-outs: the barrier is in the money). Notional EUR 1 Mio.
+     * No rebate (point 17); if one is added, show it as its own row next to putLostChf and
+     * change the «ohne Rebate» / «no rebate» texts (tests/unit/gap-replay-wording.test.ts).
      */
     stop: 1.195,
     putStrike: 1.2,

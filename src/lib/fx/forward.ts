@@ -50,6 +50,18 @@ export function forwardMoneyMarket(
 }
 
 /**
+ * Continuous rate that matches a simple money-market rate over the same period:
+ * r = ln(1 + rate · tSimple) / tCont, with tSimple the money-market year fraction (days / 360
+ * for CHF and USD) and tCont the option model's (days / 365 for the same end date), tCont > 0.
+ * Converting both rates this way, forwardContinuous(S, rd', rf', tCont) equals
+ * forwardMoneyMarket(S, rd, rf, days): the two formulas write one forward in two conventions,
+ * so a gap between them with unconverted rates is no arbitrage gain.
+ */
+export function continuousFromSimple(rate: number, tSimple: number, tCont: number): number {
+  return Math.log(1 + rate * tSimple) / tCont;
+}
+
+/**
  * Forward in the chosen convention.
  * - 'continuous': S · e^((rd − rf) · T), T in years.
  * - 'moneyMarket': S · (1 + rd · tq) / (1 + rf · tb) with days = opts.days ?? Math.round(T · 360)

@@ -65,7 +65,7 @@ Solche Lücken schliessen Market Maker sofort. Darum gilt die Parität in liquid
 
 Gleiche Zahlungen bei Verfall heissen gleicher Wert heute, sonst gäbe es Arbitrage. Ein Forward zum Kurs <i>K</i> ist heute e<sup>−<i>r</i><sub>d</sub><i>T</i></sup> · (<i>F</i> − <i>K</i>) wert. Daraus folgt <i>C</i> − <i>P</i> = e<sup>−<i>r</i><sub>d</sub><i>T</i></sup> · (<i>F</i> − <i>K</i>). Die Parität braucht kein Modell und keine Vola.
 
-**Garman-Kohlhagen.** Im Modell ist der Kurs bei Verfall lognormal verteilt, mit Erwartungswert <i>F</i> unter dem risikoneutralen Mass. Der Erwartungswert der Auszahlung ist der Black-76-Preis auf den Forward. Abgezinst mit dem CHF-Zins ergibt sich
+**Garman-Kohlhagen.** Unter dem [risikoneutralen Mass](/glossar/#term-risk-neutral) ist der Erwartungswert des Kurses bei Verfall der Forward <i>F</i>. Das Modell nimmt zusätzlich konstante Vola und keine Sprünge an; dann ist der Kurs bei Verfall lognormal verteilt. Der Erwartungswert der Auszahlung ist der Black-76-Preis auf den Forward. Abgezinst mit dem CHF-Zins ergibt sich
 
 <Formula>
   <span><i>C</i> = e<sup>−<i>r</i><sub>d</sub><i>T</i></sup> · E[max(<i>S</i><sub>T</sub> − <i>K</i>, 0)] = e<sup>−<i>r</i><sub>d</sub><i>T</i></sup> · [<i>F</i> N(<i>d</i><sub>1</sub>) − <i>K</i> N(<i>d</i><sub>2</sub>)]</span>

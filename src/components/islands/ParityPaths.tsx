@@ -719,7 +719,12 @@ export default function ParityPaths({ lang }: ParityPathsProps): JSX.Element {
                 <dd class="mono">{fmtRate(fCont, PAIR, FD)}</dd>
               </div>
               <div>
-                <dt>{t('pp.cont.diff')}</dt>
+                <dt>
+                  {t('pp.cont.diff')}{' '}
+                  <span class="m2-dt-sub" data-cont-sub>
+                    {t('pp.cont.diffSub')}
+                  </span>
+                </dt>
                 <dd class="mono">
                   {t('pp.cont.diffVal', { pips: fmtPips(r.diffPips, lang, 1, true) })}
                 </dd>

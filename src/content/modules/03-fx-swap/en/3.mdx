@@ -7,13 +7,13 @@ But the forward matures on the old date. If the importer lets it run, he receive
 - **Near leg:** he sells the USD 1m at the current spot. That offsets the dollars from the forward.
 - **Far leg:** in the same deal he buys USD 1m for the new date, at the new forward rate.
 
-From his point of view this is a sell/buy USD. He deals the swap two business days before the old maturity date. So the near leg (spot, T+2) has exactly the value date of the old forward, and the far leg has the new value date. The dollars now arrive exactly when he has to pay.
+From his point of view this is a sell/buy USD. He deals the swap two business days before the old maturity date, under the holiday calendars of both currencies. So the near leg (spot, T+2) has exactly the value date of the old forward, and the far leg has the new value date. The dollars now arrive exactly when he has to pay. The tool counts in days, without a holiday calendar: the new value date is <Num of="m03.slipDays" /> days after the old one.
 
 <HedgeRollFigure caption="Drag the spot when the roll is dealt. Blue is the new far rate, black your all-in rate. The gap between them is the settlement on the roll date. Use ‘Play spot scenarios’ to see what swings and what stays." />
 
 ### The settlement on the roll date
 
-Roll date here means the old maturity date, the value date of the near leg. Two things happen on that day. The forward delivers USD 1m against <Num of="m03.oldFwdChf" />. At the same time the near leg falls due: the importer delivers the dollars at the spot that applied when the roll was dealt. The dollars cancel out. What remains is a payment in francs: the difference between spot and the old forward.
+Roll date here means the old maturity date, the value date of the near leg. Two things happen on that day. The forward delivers USD 1m against <Num of="m03.oldFwdChf" />. At the same time the near leg falls due: the importer delivers the dollars at the spot that applied when the roll was dealt. The dollars cancel out exactly. What remains is a payment in francs: the difference between spot and the old forward.
 
 **Case 1: the dollar has risen,** the spot when the roll is dealt is at <Num of="m03.rollUp" />. In the near leg the importer receives <Num of="m03.rollNearChfUp" />; for the forward he pays <Num of="m03.oldFwdChf" />. Net, he gets <Num of="m03.rollSettleUp" />. In the far leg he buys the dollars back at <Num of="m03.rollFarUp" />, that is for <Num of="m03.rollFarChfUp" />. The swap points over <Num of="m03.slipDays" /> days are <Num of="m03.rollPointsUp" /> pips.
 

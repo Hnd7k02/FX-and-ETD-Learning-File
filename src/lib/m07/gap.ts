@@ -5,9 +5,10 @@
  * Model (choice, see M07_CONFIG.gap): a hypothetical scenario on daily ECB reference rates,
  * which are published for information and are not tradable prices. The first fixing at or below
  * a level triggers it: a stop-loss (sells EUR) is filled at the next tradable price, which the
- * replay simplifies to that fixing; a down-and-out option is not a trade at all, it simply
- * expires (daily observation against the fixing, so all barriers go with the same fixing).
- * Everything between two fixings is invisible here.
+ * replay simplifies to that fixing; a down-and-out option is not a trade at all, it is
+ * extinguished under the assumed terms (daily observation against the fixing, so all barriers
+ * go with the same fixing; no rebate, see M07_CONFIG.gap). Everything between two fixings is
+ * invisible here.
  */
 import { parseRawCsv } from '@/lib/data/csv';
 import { pairSeries, type Pair, type Point } from '@/lib/data/series';

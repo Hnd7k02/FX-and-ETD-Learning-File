@@ -12,7 +12,7 @@
 import { EXAMPLE as E } from '@/lib/fx/example';
 import { MC_PRODUCTS, fairProduct } from '@/lib/fx/mc/fair';
 import { MC_CONFIG, PIP } from '@/lib/fx/mc/products';
-import { maxLoss } from '@/lib/fx/mc/maxloss';
+import { finiteChf, maxLoss } from '@/lib/fx/mc/maxloss';
 import { gkPrice } from '@/lib/fx/vanilla';
 import { digitalCash } from '@/lib/fx/exotics/digital';
 import { DCI_CONFIG, dciOutcome, dciView, defaultFixing } from '@/lib/dcicalc';
@@ -92,6 +92,28 @@ const piv = fairProduct('pivotTarf');
 /** Coupon products with the quoted fair coupon (0.1 pip, PATHSIM_CONFIG.couponQuoteStep). */
 const tpf = simProduct('tpf');
 const rtpf = simProduct('rtpf');
+/**
+ * The products behind every number of this module, exactly as the texts and the simulator use
+ * them (tests check the maximum loss and the kernels on these very objects).
+ */
+export const M08_PRODUCTS = {
+  accumulator: acc,
+  decumulator: dec,
+  tarf,
+  pivotTarf: piv,
+  tpf,
+  rtpf,
+} as const;
+/** Theoretical maximum loss per side, typed (src/lib/fx/mc/maxloss.ts). */
+export const M08_MAX_LOSS = {
+  accumulator: maxLoss(acc),
+  decumulator: maxLoss(dec),
+  tarf: maxLoss(tarf),
+  pivotTarf: maxLoss(piv),
+  tpf: maxLoss(tpf),
+  rtpf: maxLoss(rtpf),
+} as const;
+const ML = M08_MAX_LOSS;
 const accStory = storyStages('accumulator');
 const tarfStory = storyStages('tarf');
 const decStory = storyStages('decumulator');
@@ -148,7 +170,7 @@ export const M08 = {
   accQ05: P.accumulator.stats.pvQuantile05,
   accWorst: P.accumulator.stats.pvMin,
   /** Theoretical maximum loss (CHF, > 0): every fixing at S = 0, fixings × 2 × N × K. */
-  accMaxLoss: maxLoss(acc).down,
+  accMaxLoss: finiteChf(ML.accumulator.down),
   accUp,
   accSide,
   accDown,
@@ -181,7 +203,7 @@ export const M08 = {
   tarfQ05: P.tarf.stats.pvQuantile05,
   tarfWorst: P.tarf.stats.pvMin,
   /** Theoretical maximum loss (CHF, > 0): every fixing at S = 0, fixings × 2 × N × K. */
-  tarfMaxLoss: maxLoss(tarf).down,
+  tarfMaxLoss: finiteChf(ML.tarf.down),
   /**
    * Back-of-the-envelope loss of the paths without target: with PV = 0 (rd = 0, no discounting)
    * and every target path earning the full target, P(target) · target · N + P(maturity) · L = 0.
@@ -206,7 +228,7 @@ export const M08 = {
   pivQ05: P.pivotTarf.stats.pvQuantile05,
   pivWorst: P.pivotTarf.stats.pvMin,
   /** Theoretical loss downwards (every fixing at S = 0, × K1); upwards above K2 it is unlimited. */
-  pivMaxLossDown: maxLoss(piv).down,
+  pivMaxLossDown: finiteChf(ML.pivotTarf.down),
   pivShock,
   // TPF
   tpfStrike: tpf.strike,
@@ -232,7 +254,7 @@ export const M08 = {
   tpfQ05: P.tpf.stats.pvQuantile05,
   tpfWorst: P.tpf.stats.pvMin,
   /** Theoretical maximum loss (CHF, > 0): every fixing at S = 0, fixings × 2 × N × K. */
-  tpfMaxLoss: maxLoss(tpf).down,
+  tpfMaxLoss: finiteChf(ML.tpf.down),
   tpfSide,
   tpfDown,
   // RTPF
@@ -247,7 +269,7 @@ export const M08 = {
   rtpfQ05: P.rtpf.stats.pvQuantile05,
   rtpfWorst: P.rtpf.stats.pvMin,
   /** Theoretical loss downwards (every fixing at S = 0, × L); upwards above U it is unlimited. */
-  rtpfMaxLossDown: maxLoss(rtpf).down,
+  rtpfMaxLossDown: finiteChf(ML.rtpf.down),
   rtpfUp,
   // dual currency
   dciCapital: dci.capital,

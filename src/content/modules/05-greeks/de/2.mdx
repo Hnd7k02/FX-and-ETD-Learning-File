@@ -12,7 +12,7 @@ Für den Importeur heisst das: Sein Call über <Num of="ex.notional" /> verhält
 
 Probier drei Dinge im Labor. Zieh den Spot ganz nach rechts: Delta läuft gegen eins, der Call wird zum Forward. Zieh ihn nach links: Delta fällt gegen null. Verkürze dann die Laufzeit auf wenige Wochen: Die Delta-Kurve wird zur steilen Stufe, und Gamma schiesst in die Höhe.
 
-Achte dabei auf zwei Details. Beide führen zurück zum Forward. Die steilste Stelle der Delta-Kurve liegt nicht an der Strike-Linie, sondern weiter rechts, nahe beim heutigen Spot von <Num of="ex.spot" />. Erst dort liegt der Forward am Strike, denn die Forward Points betragen <Num of="ex.fwdPoints" /> Pips. Und tief im Geld verläuft die Preiskurve sogar unter der gestrichelten Auszahlung bei Verfall. Der Call rechnet mit dem Forward, nicht mit dem Spot.
+Achte dabei auf zwei Details. Beide führen zurück zum Forward. Die steilste Stelle der Delta-Kurve liegt nicht an der Strike-Linie, sondern weiter rechts, nahe beim heutigen Spot von <Num of="ex.spot" />. Erst dort liegt der Forward am Strike, denn die Forward Points betragen <Num of="ex.fwdPoints" /> Pips. Und tief im Geld verläuft die Preiskurve sogar unter der gestrichelten Auszahlung bei Verfall. Der Call rechnet mit dem Forward, nicht mit dem Spot. Gegen den Spot gemessen ist sein Zeitwert dort negativ. Das ist weder eine negative Prämie noch eine Arbitrage: Der USD-Zins liegt über dem CHF-Zins, darum liegt der Forward unter dem Spot, und eine europäische Option kannst du nicht vorzeitig ausüben ([Modul 04](/module/04-vanilla-options/3/)).
 
 ### Delta und Gamma im Beispiel
 

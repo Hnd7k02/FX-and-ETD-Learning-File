@@ -25,6 +25,8 @@
  */
 import { EXAMPLE, EXAMPLE_FORWARD } from '@/lib/fx/example';
 import { MC_PRODUCTS, fairProduct } from '@/lib/fx/mc/fair';
+import { maxLoss, type MaxLoss } from '@/lib/fx/mc/maxloss';
+import type { ZeroCostKind } from '@/lib/fx/mc/products';
 import { M09_CONFIG, PIP } from '@/lib/m09/config';
 import { hedgeSetup, hedgeRate, type HedgeSetup } from '@/lib/m09/hedge';
 import { carryView, yieldPnlPerUsd, type CarryView } from '@/lib/m09/carry';
@@ -665,7 +667,8 @@ export function productCurve(
 
 /**
  * True if the unclipped profile leaves the chart below −clipPips. The curve only leaves the
- * chart, the loss continues ("Verlust geht weiter"); the bound is in src/lib/fx/mc/maxloss.ts.
+ * chart («läuft aus dem Bild», "off the chart"), the loss goes on; how far it can go is the
+ * worst-case risk chip, typed in src/lib/fx/mc/maxloss.ts.
  */
 export function clippedBelow(
   id: ProductId,
@@ -674,6 +677,52 @@ export function clippedBelow(
   clip: number = M09_CONFIG.matrix.clipPips,
 ): boolean {
   return xs.some((x) => (productResult(id, x, p) ?? 0) / PIP < -clip);
+}
+
+/** A curve that leaves the chart, with the value of the worst-case chip its text points to. */
+export interface ClipNote {
+  id: ProductId;
+  /** Dictionary key suffix of the worst-case chip, e.g. 'loss.noStop'. */
+  chip: string;
+}
+
+/**
+ * Products of a cell whose curve leaves the chart at the bottom, in cell order. The chart marks
+ * the highlighted one «läuft aus dem Bild»; the text alternative names every one and points to
+ * its worst-case risk chip, because the chart cannot show how far the loss goes.
+ */
+export function clipNotes(
+  cell: Cell,
+  xs: readonly number[],
+  p: MatrixParams,
+  clip: number = M09_CONFIG.matrix.clipPips,
+): ClipNote[] {
+  return cellProducts(cell)
+    .filter((id) => clippedBelow(id, xs, p, clip))
+    .map((id) => ({ id, chip: riskChips(id).find((c) => c.kind === 'loss')!.value }));
+}
+
+/** Matrix products that are the Monte Carlo structures of module 08. */
+const MC_KIND: Partial<Record<ProductId, ZeroCostKind>> = {
+  accumulator: 'accumulator',
+  tarf: 'tarf',
+  pivotTarf: 'pivotTarf',
+  tpf: 'tpf',
+  rtpf: 'rtpf',
+};
+
+/**
+ * Typed theoretical maximum loss of a matrix product, per side (src/lib/fx/mc/maxloss.ts), with
+ * the same fair products as its profile (matrixParams); null for every other product.
+ */
+export function productMaxLoss(id: ProductId): MaxLoss | null {
+  const kind = MC_KIND[id];
+  return kind ? maxLoss(fairProduct(kind)) : null;
+}
+
+/** Worst-case chip of a typed maximum loss: an unbounded side → 'unbounded', else 'noStop'. */
+export function lossKindOf(ml: MaxLoss): Extract<LossKind, 'noStop' | 'unbounded'> {
+  return ml.up.kind === 'unbounded' || ml.down.kind === 'unbounded' ? 'unbounded' : 'noStop';
 }
 
 /** S_T snapped to the 5-pip grid and clamped to the matrix range. */

@@ -291,8 +291,8 @@ const q2: QuizQuestion = {
       label: { de: fwd(fCont), en: fwd(fCont) },
       mono: true,
       explain: {
-        de: `Das ist der stetige Forward der Optionsmodelle, ${pips(Math.abs(fCont - F) / PIP).de} Pips daneben. Gefragt war der Geldmarkt: ${fwd(F)}.`,
-        en: `That is the continuous forward of the option models, ${pips(Math.abs(fCont - F) / PIP).en} pips off. The question asked for the money market: ${fwd(F)}.`,
+        de: `Das ist der stetige Forward der Optionsmodelle, ${pips(Math.abs(fCont - F) / PIP).de} Pips daneben. Er setzt den Geldmarktzins unverändert als stetigen Zins ein. Die stetige Formel braucht aber den umgerechneten Zins; damit gäbe sie denselben Forward. Der Abstand ist Konvention, kein Arbitragegewinn. Gefragt war der Geldmarkt: ${fwd(F)}.`,
+        en: `That is the continuous forward of the option models, ${pips(Math.abs(fCont - F) / PIP).en} pips off. It plugs the money-market rate into the continuous formula unchanged. That formula needs the converted rate; with it, it would give the same forward. The gap is convention, not an arbitrage gain. The question asked for the money market: ${fwd(F)}.`,
       },
     },
     {

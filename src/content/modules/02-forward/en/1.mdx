@@ -27,7 +27,7 @@ The second scenario feels like a loss. In cash terms it is not one: the importer
 
 Play the scenarios in the chart. In the model with a vol of <Num of="ex.vol" />, the unhedged dollars cost between <Num of="m02.scnMin" /> and <Num of="m02.scnMax" />. With the forward they cost <Num of="m02.fwdChf" /> in every scenario. In <Num of="m02.scnCheaper" /> of <Num of="m02.scnCount" /> scenarios the forward was cheaper, in the others dearer.
 
-The model is centred on the forward. On average, the unhedged dollars therefore cost about the same as the hedged ones: <Num of="m02.scnMean" />. So the forward makes the dollars neither cheaper nor dearer. It removes the spread of outcomes. The importer can work out his prices today instead of hoping for a good rate.
+The scenarios are centred on the forward, [risk-neutrally](/en/glossary/#term-risk-neutral). On average, the unhedged dollars therefore cost about the same as the hedged ones: <Num of="m02.scnMean" />. So the forward makes the dollars neither cheaper nor dearer. It removes the spread of outcomes. The importer can work out his prices today instead of hoping for a good rate.
 
 ### What the importer gains and what he gives up
 
@@ -49,7 +49,7 @@ Unhedged, the importer pays <i>N</i> · <i>S</i><sub>T</sub>. Add the value of t
 
 The rate at maturity cancels out. That is why the black line in the chart is flat.
 
-**The scenarios.** The chart draws rates from the same distribution the option models use (lognormal, vol <Num of="ex.vol" />, term <i>T</i> = <Num of="ex.T" />), centred on the forward. It is a model, not a forecast. It shows how widely an ordinary quarter can spread.
+**The scenarios.** The chart draws rates from the same distribution the option models use. That they average out at the forward is what the [risk-neutral](/en/glossary/#term-risk-neutral) pricing measure requires. Lognormal with vol <Num of="ex.vol" /> over the term <i>T</i> = <Num of="ex.T" /> is an extra assumption of the model. Together this is a model, not a forecast. It shows how widely an ordinary quarter can spread.
 
 </Derivation>
 

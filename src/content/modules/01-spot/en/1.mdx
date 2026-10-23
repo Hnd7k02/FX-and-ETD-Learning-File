@@ -46,13 +46,13 @@ So one pip (Δ<i>S</i> = 0.0001) costs <Num of="m01.pipChf" />, one big figure (
 
 With <i>x</i> = <Num of="m01.pctUp" /> this gives <Num of="m01.inversePctUp" />. The larger the move, the larger the gap between the two percentages.
 
-**Range.** In the option model (module 04) the log return of the rate over the term <i>T</i> is normally distributed with standard deviation σ√<i>T</i> = <Num of="ex.vol" /> · √<Num of="ex.T" /> = <Num of="m01.sigmaSqrtT" />. For the band we work without drift, so the centre is today's spot. The option model puts the expected rate at the forward, <Num of="m01.fwdBelowPips" /> pips below the spot (module 02). Without drift the rate would lie in the band below with a probability of about <Num of="m01.bandProbNoDrift" />:
+**Range.** In the option model (module 04) the log return of the rate over the term <i>T</i> is normally distributed with standard deviation σ√<i>T</i> = <Num of="ex.vol" /> · √<Num of="ex.T" /> = <Num of="m01.sigmaSqrtT" />. For the band we work without drift, so the centre is today's spot. Under the risk-neutral measure, by contrast, the expected rate is the forward, <Num of="m01.fwdBelowPips" /> pips below the spot (module 02). Without drift the rate would lie in the band below with a probability of about <Num of="m01.bandProbNoDrift" />:
 
 <Formula><i>S</i> · e<sup>−σ√<i>T</i></sup> ≤ <i>S</i><sub>T</sub> ≤ <i>S</i> · e<sup>+σ√<i>T</i></sup></Formula>
 
-That gives <Num of="m01.rangeLo" /> to <Num of="m01.rangeHi" />. The band is symmetric on the log scale, so it reaches a little further above the spot than below. With the drift of the option model the rate ends in the same band in <Num of="m01.bandProb" /> of cases (risk-neutral, not a forecast). So for the band the drift changes little.
+That gives <Num of="m01.rangeLo" /> to <Num of="m01.rangeHi" />. The band is symmetric on the log scale, so it reaches a little further above the spot than below. With the risk-neutral drift the rate ends in the same band in <Num of="m01.bandProb" /> of cases (risk-neutral, not a forecast). So for the band the drift changes little.
 
-**Probability.** This tool computes probabilities risk-neutrally, like the option models: the rate drifts at <i>r</i><sub>d</sub> − <i>r</i><sub>f</sub> and ends on average at the forward <i>F</i>. The chance that the rate ends at or above <i>K</i> at <i>T</i> is then
+**Probability.** This tool computes probabilities [risk-neutrally](/en/glossary/#term-risk-neutral), like the option models. That only means: the rate drifts at <i>r</i><sub>d</sub> − <i>r</i><sub>f</sub>, and its expected value at <i>T</i> is the forward <i>F</i>. A formula needs further assumptions of the model: constant vol, a lognormally distributed rate and no jumps. With both together, the chance that the rate ends at or above <i>K</i> at <i>T</i> is
 
 <Formula>
   <span>P(<i>S</i><sub>T</sub> ≥ <i>K</i>) = N(<i>d</i><sub>2</sub>)</span>

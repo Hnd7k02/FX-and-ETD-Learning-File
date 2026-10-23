@@ -27,7 +27,7 @@ Das zweite Szenario fühlt sich wie ein Verlust an. In der Kasse ist es keiner: 
 
 Spiel die Szenarien in der Grafik ab. Im Modell mit einer Vola von <Num of="ex.vol" /> kosten die Dollars ohne Absicherung zwischen <Num of="m02.scnMin" /> und <Num of="m02.scnMax" />. Mit dem Forward sind es in jedem Szenario <Num of="m02.fwdChf" />. In <Num of="m02.scnCheaper" /> von <Num of="m02.scnCount" /> Szenarien war der Forward günstiger, in den übrigen teurer.
 
-Das Modell ist um den Forward zentriert. Im Mittel kosten die Dollars ohne Absicherung darum etwa gleich viel wie mit: <Num of="m02.scnMean" />. Der Forward macht die Dollars also nicht billiger und nicht teurer. Er nimmt die Streuung weg. Der Importeur kann seine Preise heute rechnen, statt auf den Kurs zu hoffen.
+Die Szenarien sind [risikoneutral](/glossar/#term-risk-neutral) um den Forward zentriert. Im Mittel kosten die Dollars ohne Absicherung darum etwa gleich viel wie mit: <Num of="m02.scnMean" />. Der Forward macht die Dollars also nicht billiger und nicht teurer. Er nimmt die Streuung weg. Der Importeur kann seine Preise heute rechnen, statt auf den Kurs zu hoffen.
 
 ### Was der Importeur gewinnt und was er abgibt
 
@@ -49,7 +49,7 @@ Ohne Absicherung zahlt der Importeur <i>N</i> · <i>S</i><sub>T</sub>. Rechnest 
 
 Der Kurs bei Fälligkeit kürzt sich weg. Darum ist die schwarze Linie im Chart flach.
 
-**Die Szenarien.** Die Grafik zieht Kurse aus derselben Verteilung wie die Optionsmodelle (lognormal, Vola <Num of="ex.vol" />, Laufzeit <i>T</i> = <Num of="ex.T" />), im Mittel beim Forward. Das ist ein Modell, keine Prognose. Es zeigt, wie stark ein gewöhnliches Quartal streuen kann.
+**Die Szenarien.** Die Grafik zieht Kurse aus derselben Verteilung wie die Optionsmodelle. Dass sie im Mittel beim Forward liegen, verlangt das [risikoneutrale](/glossar/#term-risk-neutral) Bewertungsmass. Lognormal mit Vola <Num of="ex.vol" /> über die Laufzeit <i>T</i> = <Num of="ex.T" /> ist eine zusätzliche Annahme des Modells. Zusammen ist das ein Modell, keine Prognose. Es zeigt, wie stark ein gewöhnliches Quartal streuen kann.
 
 </Derivation>
 

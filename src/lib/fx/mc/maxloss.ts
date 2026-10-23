@@ -34,14 +34,20 @@ export type ZeroCostProduct = ProductOf<ZeroCostKind>;
 /** 'finite': very high, but finite. 'unbounded': theoretically unlimited (upwards). */
 export type MaxLossClass = 'finite' | 'unbounded';
 
-/** Theoretical maximum loss of one product, in CHF against the market (loss > 0). */
+/**
+ * Loss on one side, typed so that no Infinity or NaN can reach a formatter: a finite side
+ * carries its bound in CHF (0 if the product does not lose on that side), an unbounded side
+ * carries no number at all.
+ */
+export type SideLoss = { kind: 'finite'; chf: number } | { kind: 'unbounded' };
+
+/** Theoretical maximum loss of one product, per side, in CHF against the market (loss > 0). */
 export interface MaxLoss {
-  /** Loss if every fixing is at S = 0 (0 if the product does not lose when the dollar falls). */
-  down: number;
-  /** Loss as the dollar rises: Infinity if the product loses with leverage above a level, else 0. */
-  up: number;
-  /** The theoretical maximum loss: max(down, up). */
-  total: number;
+  /** The dollar falls: every fixing at S = 0. Always finite, because USD/CHF cannot fall below 0. */
+  down: SideLoss;
+  /** The dollar rises: 'unbounded' if the product loses with leverage above a level. */
+  up: SideLoss;
+  /** 'unbounded' as soon as one side is unbounded, else 'finite'. */
   kind: MaxLossClass;
   /**
    * CHF lost per 1 CHF/USD beyond a loss level when every fixing is there:
@@ -52,6 +58,17 @@ export interface MaxLoss {
   downLevel: number | null;
   /** Level above which the product loses with leverage, or null. */
   upLevel: number | null;
+}
+
+/**
+ * The CHF bound of a finite side. Throws on an unbounded side, so a number registry or a text
+ * can never format "∞" or NaN as a maximum loss.
+ */
+export function finiteChf(side: SideLoss): number {
+  if (side.kind !== 'finite') {
+    throw new RangeError('maxLoss: this side is theoretically unlimited and has no CHF bound');
+  }
+  return side.chf;
 }
 
 /** Levels beyond which a product loses with leverage (null: no loss on that side). */
@@ -84,13 +101,12 @@ export function lossLevels(p: ZeroCostProduct): { down: number | null; up: numbe
 export function maxLoss(p: ZeroCostProduct): MaxLoss {
   const slope = p.fixingDays.length * p.leverage * p.notional;
   const lv = lossLevels(p);
-  const down = lv.down === null ? 0 : slope * lv.down;
-  const up = lv.up === null ? 0 : Number.POSITIVE_INFINITY;
+  const down: SideLoss = { kind: 'finite', chf: lv.down === null ? 0 : slope * lv.down };
+  const up: SideLoss = lv.up === null ? { kind: 'finite', chf: 0 } : { kind: 'unbounded' };
   return {
     down,
     up,
-    total: Math.max(down, up),
-    kind: lv.up === null ? 'finite' : 'unbounded',
+    kind: up.kind === 'unbounded' ? 'unbounded' : 'finite',
     slope,
     downLevel: lv.down,
     upLevel: lv.up,

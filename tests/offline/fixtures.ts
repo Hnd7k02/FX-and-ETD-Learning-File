@@ -56,18 +56,28 @@ export const test = base.extend<{
 
 export { expect };
 
+interface Packed {
+  pages: Record<string, { h: string }>;
+  aliases: Record<string, string>;
+  chrome: Record<string, { top: string; footer: string[] }>;
+}
+let data: Packed | null = null;
 let cache: Record<string, string> | null = null;
 
-/** The markup of every page packed into the file, by route (read from its data block). */
-export function pageHtml(): Record<string, string> {
-  if (cache) return cache;
+/** The data block of the file (pages, aliases, header and footer markup). */
+export function packed(): Packed {
+  if (data) return data;
   const html = readFileSync(FILE, 'utf8');
   const m = /<script id="ff-data" type="application\/octet-stream">([^<]+)<\/script>/.exec(html);
   if (!m) throw new Error('data block not found');
-  const data = JSON.parse(gunzipSync(Buffer.from(m[1]!.trim(), 'base64')).toString('utf8')) as {
-    pages: Record<string, { h: string }>;
-  };
-  cache = Object.fromEntries(Object.entries(data.pages).map(([r, p]) => [r, p.h]));
+  data = JSON.parse(gunzipSync(Buffer.from(m[1]!.trim(), 'base64')).toString('utf8')) as Packed;
+  return data;
+}
+
+/** The markup of every page packed into the file, by route. */
+export function pageHtml(): Record<string, string> {
+  if (cache) return cache;
+  cache = Object.fromEntries(Object.entries(packed().pages).map(([r, p]) => [r, p.h]));
   return cache;
 }
 

@@ -67,6 +67,7 @@ export const paritypaths = defineDict({
     'pp.cont.sub': 'gleiches t = {t} wie im Geldmarkt',
     'pp.cont.fwd': 'Forward stetig',
     'pp.cont.diff': 'Unterschied',
+    'pp.cont.diffSub': 'Konvention, kein Arbitragegewinn',
     'pp.cont.diffVal': '{pips} Pips',
     'pp.aria':
       'Zwei Wege zu USD {notional} in {days} Tagen. Weg A: Forward zu {fwd}, kostet {chfFwd}. Weg B: {chfLoan} leihen, {usdToday} kaufen und zu {rf} anlegen, Kredit zu {rd}; kostet bei Fälligkeit {chfRepay}. Beide gleich teuer.',
@@ -137,6 +138,7 @@ export const paritypaths = defineDict({
     'pp.cont.sub': 'same t = {t} as in the money market',
     'pp.cont.fwd': 'Forward, continuous',
     'pp.cont.diff': 'Difference',
+    'pp.cont.diffSub': 'convention, not an arbitrage gain',
     'pp.cont.diffVal': '{pips} pips',
     'pp.aria':
       'Two routes to USD {notional} in {days} days. Route A: forward at {fwd}, costs {chfFwd}. Route B: borrow {chfLoan}, buy {usdToday} and invest at {rf}, loan at {rd}; costs {chfRepay} at maturity. Both cost the same.',

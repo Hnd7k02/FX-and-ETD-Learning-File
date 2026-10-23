@@ -53,6 +53,8 @@ const GAIN_CAPPED_LOSS_NOT =
   /(begrenzt|gedeckelt|gekappt),?\s+(der\s+|dein\s+)?Verlust\s+nicht|Gewinn,\s+nicht\s+den\s+Verlust|(capped|limited),\s+(the\s+|your\s+)?loss\s+(is\s+)?not|gain,\s+not\s+the\s+loss/i;
 /** «Verluste ohne Boden» and its variants: downwards every loss here has a floor (S = 0). */
 const NO_FLOOR = /ohne\s+(Boden|Grenze)|no\s+floor|without\s+a\s+floor/i;
+/** The old clip label of the product matrix and the old 09.3 caption (no longer used, C16). */
+const OLD_CLIP_WORDING = /Verlust\s+geht\s+weiter|loss\s+continues|aus\s+dem\s+Chart/i;
 
 /**
  * Risk-neutral probabilities (C6): every block (paragraph, list, table) of a section text that
@@ -64,6 +66,10 @@ const RISK_NEUTRAL_NUMS = [
   'm01.probUp',
   'm01.probDown',
   'm01.bandProb',
+  'm04.call25Prob',
+  'm04.put25Prob',
+  'm04.call10Prob',
+  'm04.put10Prob',
   'm07.touchUp',
   'm07.touchDown',
   'm07.touchUp1',
@@ -87,6 +93,7 @@ const RISK_NEUTRAL_NOTE = {
 /** Dictionary strings that show a model probability (besides every string with {prob}). */
 const RISK_NEUTRAL_DICT_KEYS: Record<string, string[]> = {
   spotexposure: ['note.up', 'note.upFar', 'note.down', 'note.downFar'],
+  m04: ['mx.probSub'],
   barrierlab: ['bl.row.probSub', 'bl.summary'],
   barrierpaths: ['bp.row.probSub', 'bp.summary'],
   touchlab: ['tl.row.probSub', 'tl.summary'],
@@ -232,6 +239,11 @@ describe('content lint', () => {
     expect(NO_FLOOR.test('gehebelte Verluste ohne Boden')).toBe(true);
     expect(NO_FLOOR.test('with no floor')).toBe(true);
     expect(NO_FLOOR.test('Nach oben hat der Kurs keine Grenze')).toBe(false);
+    expect(OLD_CLIP_WORDING.test('Verlust geht weiter')).toBe(true);
+    expect(OLD_CLIP_WORDING.test('loss continues')).toBe(true);
+    expect(OLD_CLIP_WORDING.test('der aus dem Chart läuft')).toBe(true);
+    expect(OLD_CLIP_WORDING.test('läuft aus dem Bild')).toBe(false);
+    expect(OLD_CLIP_WORDING.test('off the chart')).toBe(false);
   });
 
   it.each(MAX_LOSS_FILES.map((f) => [relative(ROOT, f), f]))(
@@ -243,6 +255,11 @@ describe('content lint', () => {
       );
       expect(src.match(GAIN_CAPPED_LOSS_NOT)?.[0], 'use «no built-in stop»').toBe(undefined);
       expect(src.match(NO_FLOOR)?.[0], 'USD/CHF cannot fall below zero').toBe(undefined);
+      // the old clip label: a curve only leaves the chart («läuft aus dem Bild» / «off the chart»)
+      expect(
+        src.match(OLD_CLIP_WORDING)?.[0],
+        'say «läuft aus dem Bild» / «off the chart», the chip says how far',
+      ).toBe(undefined);
       for (const sentence of src.split(/\n|[.!?](?=\s)/)) {
         if (/unbegrenzt|unlimited/i.test(sentence)) {
           expect(/theoretisch|theoretically/i.test(sentence), sentence.trim()).toBe(true);

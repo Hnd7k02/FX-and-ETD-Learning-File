@@ -17,7 +17,7 @@ Alle Beispiele zahlen <Num of="m07.payout" /> und laufen drei Monate. Die Wette 
 
 Der Digital Call kostet <Num of="m07.digitalChf" />. Das ist kein Zufall: Die Wahrscheinlichkeit, über dem Strike zu enden, ist <i>N</i>(<i>d</i><sub>2</sub>) = <Num of="m07.digitalProb" /> ([risikoneutral](/glossar/#term-risk-neutral), keine Prognose). Der Preis ist Auszahlung mal Wahrscheinlichkeit, abgezinst mit dem CHF-Zins. Bei einem CHF-Zins von <Num of="ex.rd" digits={0} /> fällt die Abzinsung weg.
 
-Warum nicht genau 50 %? Der Strike liegt am Forward, und der Forward ist der Durchschnitt aller möglichen Kurse bei Verfall. Nach oben kann der Kurs weiter ausschlagen als nach unten. Darum liegt die Mitte der Verteilung leicht unter dem Durchschnitt, und USD/CHF endet etwas öfter unter dem Forward als darüber.
+Warum nicht genau die Hälfte? Der Strike liegt am Forward, und unter dem risikoneutralen Mass ist der Forward der Durchschnitt aller möglichen Kurse bei Verfall. Die Asymmetrie kommt aus einer Annahme des Modells: Der Kurs ist lognormal verteilt und kann nach oben weiter ausschlagen als nach unten. Darum liegt die Mitte der Verteilung leicht unter dem Durchschnitt, und USD/CHF endet etwas öfter unter dem Forward als darüber.
 
 Dasselbe gilt für Touch-Produkte. Der One-Touch auf <Num of="m07.barrierUp" /> kostet <Num of="m07.otChf" />, also <Num of="m07.touchUp1" /> der Auszahlung: genau die Berührwahrscheinlichkeit aus Abschnitt 1 (risikoneutral, keine Prognose). Der No-Touch kostet <Num of="m07.ntChf" />. Zusammen ergeben sie <Num of="m07.otNtSumChf" />: Auf jedem Pfad zahlt genau einer von beiden. Kennst du den einen Preis, kennst du den anderen.
 

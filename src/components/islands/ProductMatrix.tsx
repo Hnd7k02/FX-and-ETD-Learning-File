@@ -41,6 +41,7 @@ import {
   cellProducts,
   cellRiskSpread,
   cellSpreadAt,
+  clipNotes,
   keyFact,
   makeCell,
   matrixGrid,
@@ -167,6 +168,7 @@ export default function ProductMatrix(props: ProductMatrixProps): JSX.Element {
 
   const products = cellProducts(cell);
   const groups = useMemo(() => profileGroups(cell, xs, params), [cell, xs, params]);
+  const clips = useMemo(() => clipNotes(cell, xs, params), [cell, xs, params]);
   const hlGroup = Math.max(
     0,
     groups.findIndex((g) => (hl ? g.includes(hl) : false)),
@@ -375,6 +377,16 @@ export default function ProductMatrix(props: ProductMatrixProps): JSX.Element {
     products: products.map((id) => t(`pm.p.${id}.name`)).join(', '),
     note: t(`pm.cell.${cellKey}` as Parameters<typeof t>[0]),
   });
+  /* text alternative of the curves that run off the chart: it points to their worst-case chip */
+  const clipText = clips
+    .map((c) =>
+      t('pm.clipAlt', {
+        name: t(`pm.p.${c.id}.name`),
+        kind: t('pm.chip.kind.loss'),
+        chip: t(`pm.chip.${c.chip}` as Parameters<typeof t>[0]),
+      }),
+    )
+    .join(' ');
 
   /* ---------- geometry ---------- */
   const fs = `${L.font}px`;
@@ -627,7 +639,7 @@ export default function ProductMatrix(props: ProductMatrixProps): JSX.Element {
                 </text>
               )}
 
-              {/* "loss continues" where the highlighted curve leaves the chart */}
+              {/* "off the chart" where the highlighted curve leaves it; the text alternative says more */}
               {clipMarks.map((cx, i) => {
                 const px = clamp(sx(cx), L.left + 40, L.width - L.right - 40);
                 /* centred label, unless it would run past the plot: then it ends (or starts) at the arrow */
@@ -743,6 +755,7 @@ export default function ProductMatrix(props: ProductMatrixProps): JSX.Element {
           <p class="pm-hint">{t('pm.drag')}</p>
           <p class="sr-only" data-summary>
             {summary}
+            {clipText && <span data-clip-alt>{` ${clipText}`}</span>}
           </p>
         </div>
 

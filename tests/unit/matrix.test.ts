@@ -12,6 +12,7 @@ import {
   cellProducts,
   cellRiskSpread,
   cellSpreadAt,
+  clipNotes,
   clippedBelow,
   defaultView,
   initialMatrixFixing,
@@ -19,12 +20,14 @@ import {
   isDirView,
   isNeed,
   keyFact,
+  lossKindOf,
   makeCell,
   matrixGrid,
   matrixParams,
   matrixRange,
   productCells,
   productCurve,
+  productMaxLoss,
   productResult,
   productSeverity,
   profileGroups,
@@ -38,6 +41,7 @@ import { M09_CONFIG, PIP } from '@/lib/m09/config';
 import { fairProduct } from '@/lib/fx/mc/fair';
 import { maxLoss } from '@/lib/fx/mc/maxloss';
 import { productmatrix } from '@/i18n/dict/productmatrix';
+import { translator } from '@/i18n/types';
 
 const p = matrixParams();
 const S = EXAMPLE.spot;
@@ -155,17 +159,24 @@ describe('risk chips', () => {
       expect(PRODUCTS[id].loss, id).toBe('unbounded');
       expect(loss(id)).toEqual({ kind: 'loss', value: 'loss.unbounded', severity: 3 });
     }
-    // the classes follow the theoretical maximum loss of the products (S cannot fall below 0)
+    // the classes follow the typed maximum loss of the products (S cannot fall below 0)
     for (const id of ['accumulator', 'tarf', 'tpf', 'pivotTarf', 'rtpf'] as const) {
-      const cls = maxLoss(fairProduct(id)).kind;
-      expect(PRODUCTS[id].loss, id).toBe(cls === 'finite' ? 'noStop' : 'unbounded');
+      const ml = productMaxLoss(id)!;
+      expect(ml, id).toEqual(maxLoss(fairProduct(id)));
+      expect(ml.down.kind, id).toBe('finite');
+      expect(PRODUCTS[id].loss, id).toBe(lossKindOf(ml));
+      expect(lossKindOf(ml), id).toBe(ml.kind === 'finite' ? 'noStop' : 'unbounded');
     }
+    expect(productMaxLoss('pivotTarf')!.up).toEqual({ kind: 'unbounded' });
+    expect(productMaxLoss('tpf')!.up).toEqual({ kind: 'finite', chf: 0 });
+    for (const id of ['spot', 'forward', 'call', 'collar', 'structured', 'dci'] as const)
+      expect(productMaxLoss(id), id).toBeNull();
     expect(productmatrix.de['pm.chip.loss.noStop']).toBe('hoch, ohne Stopp');
     expect(productmatrix.de['pm.chip.loss.unbounded']).toBe('theoretisch unbegrenzt');
     expect(productmatrix.en['pm.chip.loss.noStop']).toBe('high, no stop');
     expect(productmatrix.en['pm.chip.loss.unbounded']).toBe('theoretically unlimited');
-    expect(productmatrix.de['pm.clip']).toBe('Verlust geht weiter');
-    expect(productmatrix.en['pm.clip']).toBe('loss continues');
+    expect(productmatrix.de['pm.clip']).toBe('läuft aus dem Bild');
+    expect(productmatrix.en['pm.clip']).toBe('off the chart');
   });
 });
 
@@ -252,6 +263,71 @@ describe('profiles and key numbers', () => {
     expect(clippedBelow('tpf', xs, p)).toBe(true);
     expect(clippedBelow('call', xs, p)).toBe(false);
     expect(productCurve('call', xs, p, 50)!.every((y) => Math.abs(y) <= 50)).toBe(true);
+  });
+
+  it('points the text alternative of a clipped curve to its worst-case chip', () => {
+    const xs = matrixGrid(p);
+    expect(clipNotes({ need: 'alpha', view: 'coupon-direct' }, xs, p)).toEqual([
+      { id: 'tpf', chip: 'loss.noStop' },
+    ]);
+    expect(clipNotes({ need: 'alpha', view: 'coupon-range' }, xs, p)).toEqual([
+      { id: 'rtpf', chip: 'loss.unbounded' },
+    ]);
+    expect(clipNotes({ need: 'hedge', view: 'up' }, xs, p)).toEqual([]);
+    for (const need of NEED_IDS)
+      for (const view of viewsOf(need)) {
+        const cell = makeCell(need, view);
+        const notes = clipNotes(cell, xs, p);
+        expect(notes.map((n) => n.id)).toEqual(
+          cellProducts(cell).filter((id) => clippedBelow(id, xs, p)),
+        );
+        for (const n of notes) {
+          expect(n.chip).toBe(riskChips(n.id).find((c) => c.kind === 'loss')!.value);
+          expect(
+            productmatrix.de[`pm.chip.${n.chip}` as keyof typeof productmatrix.de],
+          ).toBeTruthy();
+        }
+      }
+  });
+
+  it('formats the text alternative pm.clipAlt with the product and its worst-case chip', () => {
+    const xs = matrixGrid(p);
+    const cases = [
+      {
+        view: 'coupon-direct',
+        name: 'TPF',
+        chip: { de: 'hoch, ohne Stopp', en: 'high, no stop' },
+      },
+      {
+        view: 'coupon-range',
+        name: 'RTPF',
+        chip: { de: 'theoretisch unbegrenzt', en: 'theoretically unlimited' },
+      },
+    ] as const;
+    for (const lang of ['de', 'en'] as const) {
+      const t = translator(productmatrix, lang);
+      const kind = t('pm.chip.kind.loss');
+      expect(kind).toBe(lang === 'de' ? 'Worst Case' : 'Worst case');
+      for (const c of cases) {
+        const notes = clipNotes({ need: 'alpha', view: c.view }, xs, p);
+        expect(notes, `${lang} ${c.view}`).toHaveLength(1);
+        // built exactly as ProductMatrix builds its text alternative
+        const text = notes
+          .map((n) =>
+            t('pm.clipAlt', {
+              name: t(`pm.p.${n.id}.name`),
+              kind: t('pm.chip.kind.loss'),
+              chip: t(`pm.chip.${n.chip}` as Parameters<typeof t>[0]),
+            }),
+          )
+          .join(' ');
+        expect(text).toContain(c.name);
+        expect(text).toContain(`${kind}: ${c.chip[lang]}`);
+        expect(text).toContain(lang === 'de' ? 'aus dem Bild' : 'off the chart');
+        expect(text, 'no placeholder left').not.toMatch(/[{}]/);
+        expect(text).not.toMatch(/∞|NaN|Infinity|undefined/);
+      }
+    }
   });
 
   it('groups identical profiles (forward and spot, dual currency and certificate)', () => {

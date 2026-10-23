@@ -17,7 +17,7 @@ All examples pay <Num of="m07.payout" /> and run for three months. The bet is al
 
 The digital call costs <Num of="m07.digitalChf" />. That is no coincidence: the probability of ending above the strike is <i>N</i>(<i>d</i><sub>2</sub>) = <Num of="m07.digitalProb" /> ([risk-neutral](/en/glossary/#term-risk-neutral), not a forecast). The price is payout times probability, discounted at the CHF rate. With a CHF rate of <Num of="ex.rd" digits={0} /> there is no discounting.
 
-Why not exactly 50%? The strike sits at the forward, and the forward is the average of all possible rates at expiry. The rate can swing further up than down. So the middle of the distribution lies slightly below the average, and USD/CHF ends a little more often below the forward than above it.
+Why not exactly one half? The strike sits at the forward, and under the risk-neutral measure the forward is the average of all possible rates at expiry. The asymmetry comes from an assumption of the model: the rate is lognormally distributed and can swing further up than down. So the middle of the distribution lies slightly below the average, and USD/CHF ends a little more often below the forward than above it.
 
 The same holds for touch products. The one-touch at <Num of="m07.barrierUp" /> costs <Num of="m07.otChf" />, or <Num of="m07.touchUp1" /> of the payout: exactly the touch probability from section 1 (risk-neutral, not a forecast). The no-touch costs <Num of="m07.ntChf" />. Together they make <Num of="m07.otNtSumChf" />: on every path exactly one of the two pays. Know one price and you know the other.
 

@@ -75,6 +75,31 @@ export function black76(
     : df * (K * normCdf(-d2) - F * normCdf(-d1));
 }
 
+/**
+ * Risk-neutral probability that the option expires in the money: call P(S_T > K) = N(d2),
+ * put P(S_T < K) = N(−d2). It belongs to the price (drift rd − rf, constant vol), it is not a
+ * forecast, and it is not delta: the call's spot delta is e^(−rf T) · N(d1) with d1 = d2 + σ√T.
+ * T ≤ 0: 1 in the money, 0 out of it, ½ exactly at the strike (the limit of N(±d2), so that
+ * call + put = 1); vol ≤ 0: the same test on the forward.
+ */
+export function probItm(
+  S: number,
+  K: number,
+  T: number,
+  vol: number,
+  rd: number,
+  rf: number,
+  type: OptionType,
+): number {
+  if (T <= 0 || vol <= 0) {
+    const X = T <= 0 ? S : S * Math.exp((rd - rf) * T);
+    if (X === K) return 0.5;
+    return (type === 'call' ? X > K : X < K) ? 1 : 0;
+  }
+  const { d2 } = d1d2(S, K, T, vol, rd, rf);
+  return normCdf(type === 'call' ? d2 : -d2);
+}
+
 /** Intrinsic value against the forward, discounted: df · max(±(F − K), 0). */
 export function intrinsicForward(F: number, K: number, type: OptionType, df = 1): number {
   return df * payoff(F, K, type);

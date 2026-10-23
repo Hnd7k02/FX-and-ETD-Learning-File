@@ -13,6 +13,8 @@ A **risk reversal** buys an option on one side and sells one on the other, both 
 - In a **25Δ risk reversal** the delta convention fixes both strikes: the 25Δ call and the 25Δ put. That is how it trades in the market. So its net premium is rarely exactly zero.
 - In a **zero-cost collar** you choose one strike, here the call's. You solve for the other so that the net premium is zero.
 
+In this section and the next, the tool computes the 25Δ strikes with the [spot delta](/en/glossary/#term-spot-forward-delta), without [premium adjustment](/en/glossary/#term-premium-adjusted-delta), at a flat vol. Then it rounds them to a grid of <Num of="m06.strikeStepPips" /> pips. Here the grid is part of the definition of the 25Δ strike. Without the grid they would be <Num of="m04.call25" /> for the call and <Num of="m04.put25" /> for the put, as in [module 04](/en/module/04-vanilla-options/3/). The smile in section 4, by contrast, is measured in forward delta.
+
 The rest of this section works with the zero-cost collar.
 
 <PayoffBuilderFigure templates={['call-spread', 'put-spread', 'risk-reversal']} initial="risk-reversal" highlightSolved caption="Drag the call strike K1 along the axis: the put strike K2 follows so that the net premium stays zero. The green frame marks the solved strike. Switch to the call and put spreads and compare the premium and the maximum gain." />
@@ -29,13 +31,13 @@ The **put spread** with <Num of="m06.psK1" /> and <Num of="m06.psK2" /> costs <N
 
 ### The importer's zero-cost collar
 
-The importer buys the 25Δ USD call with strike <Num of="m06.rrCallK" />. It costs <Num of="m06.rrCallPips" /> pips, or <Num of="m06.rrCallChf" />. If he also sells the 25Δ USD put with strike <Num of="m06.rr25PutK" />, he has a 25Δ risk reversal. That put brings in more than the call costs. Net, the importer receives <Num of="m06.rr25NetPips" /> pips, or <Num of="m06.rr25NetChf" />. That is not zero cost.
+The importer buys the 25Δ USD call with strike <Num of="m06.rrCallK" />. It costs <Num of="m06.rr25CallPips" /> pips, or <Num of="m06.rrCallChf" />. If he also sells the 25Δ USD put with strike <Num of="m06.rr25PutK" />, he has a 25Δ risk reversal. That put brings in <Num of="m06.rr25PutPips" /> pips, more than the call costs. The net premium is <Num of="m06.rr25CallPips" /> − <Num of="m06.rr25PutPips" /> = <Num of="m06.rr25NetShownPips" /> pips. The minus means the importer receives money. Computed from the unrounded premiums it is <Num of="m06.rr25NetPips" /> pips, which on <Num of="ex.notional" /> is <Num of="m06.rr25NetChf" />. That is not zero cost.
 
-For the zero-cost collar he keeps the call and solves for the put strike. A lower put brings in less premium. The USD put with strike <Num of="m06.rrPutK" digits={5} />, rounded <Num of="m06.rrPutK" />, brings in exactly what the call costs. It lies <Num of="m06.rrPutGapPips" /> pips below the 25Δ put. Together the structure costs nothing. At expiry:
+For the zero-cost collar he keeps the call and solves for the put strike. A lower put brings in less premium. The USD put with strike <Num of="m06.rrPutK" digits={6} />, rounded <Num of="m06.rrPutK" />, brings in exactly what the call costs. The tool solves the strike unrounded and rounds it only for display. It lies <Num of="m06.rrPutGapPips" /> pips below the 25Δ put. Together the structure costs nothing. At expiry:
 
 - Above <Num of="m06.rrCallK" /> he exercises the call. At <Num of="m06.stUp" /> he pays <Num of="m06.upRrChf" />.
 - Between the strikes he buys in the market. The forward of <Num of="ex.forward" digits={4} /> lies inside this band, which is <Num of="m06.rrBandPips" /> pips wide.
-- Below <Num of="m06.rrPutK" /> the put is exercised and he has to buy at the strike. At <Num of="m06.stDown" /> he pays <Num of="m06.downRrChf" />.
+- Below <Num of="m06.rrPutK" digits={6} /> the put is exercised and he has to buy at the strike. At <Num of="m06.stDown" /> he pays <Num of="m06.downRrChf" />.
 
 Look at the Greeks in the payoff builder. Delta is <Num of="m06.rrDelta" />: the collar acts like half a forward. Vega is almost zero at <Num of="m06.rrVegaChf" />. The long call alone has <Num of="m06.callVegaChf" /> per vol point, and the short put takes away almost as much. So the collar hardly reacts to the overall level of vol. It does react to whether calls or puts become dearer. That is the subject of section 4.
 
@@ -51,7 +53,7 @@ Look at the Greeks in the payoff builder. Delta is <Num of="m06.rrDelta" />: the
 
 In the example: <Num of="m06.csPips" /> pips lies between 0 and <Num of="m06.csWidthPips" /> pips (<i>DF</i><sub>d</sub> = <Num of="m06.discountRate" />).
 
-**3.** For a long call and a short put the net premium is <i>C</i>(<i>K</i><sub>C</sub>) − <i>P</i>(<i>K</i><sub>P</sub>). In a 25Δ risk reversal the delta convention fixes both strikes. The net premium follows from them and is rarely zero: in the example you receive <Num of="m06.rr25NetPips" /> pips net. In a zero-cost collar you hold <i>K</i><sub>C</sub> fixed and require <i>P</i>(<i>K</i><sub>P</sub>) = <i>C</i>(<i>K</i><sub>C</sub>). Because the put rises with its strike, exactly one put strike satisfies this.
+**3.** For a long call and a short put the net premium is <i>C</i>(<i>K</i><sub>C</sub>) − <i>P</i>(<i>K</i><sub>P</sub>). In a 25Δ risk reversal the delta convention fixes both strikes. The net premium follows from them and is rarely zero: in the example it is negative, <Num of="m06.rr25NetPips" /> pips, so you receive money. In a zero-cost collar you hold <i>K</i><sub>C</sub> fixed and require <i>P</i>(<i>K</i><sub>P</sub>) = <i>C</i>(<i>K</i><sub>C</sub>). Because the put rises with its strike, exactly one put strike satisfies this.
 
 **4.** A limiting case links this to module 04. If both strikes equal <i>K</i>, a long call plus a short put is a forward at <i>K</i>. By put-call parity the net premium is then <i>DF</i><sub>d</sub> · (<i>F</i> − <i>K</i>), which is zero exactly at <i>K</i> = <i>F</i>. A collar therefore sits between two extremes: the forward (a band of zero) and the plain call (no put).
 

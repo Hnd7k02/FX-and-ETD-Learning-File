@@ -8,7 +8,7 @@
  */
 import { EXAMPLE as E, EXAMPLE_FORWARD as F, EXAMPLE_STRIKE as K } from '@/lib/fx/example';
 import { normCdf } from '@/lib/fx/normal';
-import { d1d2, gkPrice } from '@/lib/fx/vanilla';
+import { d1d2, gkPrice, probItm, type OptionType } from '@/lib/fx/vanilla';
 import { greeks } from '@/lib/fx/greeks';
 import { atmDnsStrike, strikeFromDelta } from '@/lib/fx/implied';
 import { pipSize } from '@/lib/format';
@@ -59,6 +59,15 @@ const itmIntrinsic = dfd * Math.max(F - kItm, 0);
 /** Classic intrinsic value max(S − K, 0): the value of immediate exercise (C8). */
 const itmSpotIntrinsic = Math.max(S - kItm, 0);
 const otm = gkPrice(S, kOtm, T, vol, rd, rf, 'call');
+
+/**
+ * Delta is a price sensitivity, not a probability (supplement point 12). At the exact delta
+ * strikes: spot delta, and the risk-neutral chance to expire in the money, N(d2) / N(−d2).
+ */
+const deltaAt = (k: number, type: OptionType) => greeks(S, k, T, vol, rd, rf, type).delta;
+const probAt = (k: number, type: OptionType) => probItm(S, k, T, vol, rd, rf, type);
+/** N(d1) at the 25Δ call strike = N(−d1) at the 25Δ put strike = 0.25 · e^(rf T). */
+const nd1At25 = normCdf(d1d2(S, call25, T, vol, rd, rf).d1);
 
 /**
  * Section 1 uses the same maths as the OptionVsForward figure: the forward as dealt (5 decimals,
@@ -212,6 +221,11 @@ export const nums: NumTable = {
     kind: 'pips',
     note: 'Time value of the ITM call if measured against spot: negative, hence the forward',
   },
+  'm04.itmSpotGapPips': {
+    value: pips(itmSpotIntrinsic - itmIntrinsic),
+    kind: 'pips',
+    note: 'Intrinsic value against spot minus against the forward; = S − F here (DF = 1, rd = 0)',
+  },
   'm04.kOtm': {
     value: kOtm,
     kind: 'rate',
@@ -228,6 +242,45 @@ export const nums: NumTable = {
   'm04.put25': { value: put25, kind: 'rate' },
   'm04.call10': { value: call10, kind: 'rate' },
   'm04.put10': { value: put10, kind: 'rate' },
+  'm04.call25Delta': {
+    value: deltaAt(call25, 'call'),
+    kind: 'num',
+    digits: 2,
+    note: 'Spot delta at the 25Δ call strike (0.25 by construction): a price sensitivity',
+  },
+  'm04.put25Delta': { value: deltaAt(put25, 'put'), kind: 'num', digits: 2 },
+  'm04.call10Delta': { value: deltaAt(call10, 'call'), kind: 'num', digits: 2 },
+  'm04.put10Delta': { value: deltaAt(put10, 'put'), kind: 'num', digits: 2 },
+  'm04.call25Prob': {
+    value: probAt(call25, 'call'),
+    kind: 'pct',
+    digits: 2,
+    note: 'Risk-neutral P(S_T > K) = N(d2) at the 25Δ call strike; not a forecast, not delta',
+  },
+  'm04.put25Prob': {
+    value: probAt(put25, 'put'),
+    kind: 'pct',
+    digits: 2,
+    note: 'Risk-neutral P(S_T < K) = N(−d2) at the 25Δ put strike',
+  },
+  'm04.call10Prob': {
+    value: probAt(call10, 'call'),
+    kind: 'pct',
+    digits: 2,
+    note: 'Risk-neutral N(d2) at the 10Δ call strike',
+  },
+  'm04.put10Prob': {
+    value: probAt(put10, 'put'),
+    kind: 'pct',
+    digits: 2,
+    note: 'Risk-neutral N(−d2) at the 10Δ put strike',
+  },
+  'm04.nd1At25': {
+    value: nd1At25,
+    kind: 'num',
+    digits: 4,
+    note: 'N(d1) at the 25Δ call strike = N(−d1) at the 25Δ put strike = 0.25·e^(rf T)',
+  },
   'm04.dns': { value: dns, kind: 'rate', note: 'ATM delta-neutral straddle strike F·e^(½σ²T)' },
   'm04.dnsGapPips': { value: pips(dns - F), kind: 'pips', note: 'DNS strike above the forward' },
   'm04.dnsDelta': {

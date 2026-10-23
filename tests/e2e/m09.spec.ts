@@ -99,8 +99,16 @@ test.describe('module 09 · hedge, alpha, yield', () => {
     await pm.locator('[data-need-btn="alpha"]').click();
     await expect(pm).toHaveAttribute('data-need', 'alpha');
     await expect(pm).toHaveAttribute('data-view', 'coupon-direct');
-    // the TPF's leveraged loss runs off the chart: marked "loss continues"
+    // the TPF's leveraged loss runs off the chart: marked «läuft aus dem Bild», and the text
+    // alternative points to the worst-case risk chip
     await expect(pm.locator('[data-clip]')).not.toHaveCount(0);
+    await expect(pm.locator('[data-clip]').first()).toHaveText('läuft aus dem Bild');
+    await expect(pm.locator('[data-clip-alt]')).toContainText(
+      'TPF läuft unten aus dem Bild, der Verlust geht dort weiter: siehe Risiko-Chip «Worst Case: hoch, ohne Stopp».',
+    );
+    await expect(pm.locator('[data-card="tpf"] [data-chip="loss"]')).toContainText(
+      'hoch, ohne Stopp',
+    );
     await pm.locator('[data-view-btn="strike-range"]').click();
     await expect(pm).toHaveAttribute('data-view', 'strike-range');
     await expect(pm.locator('[data-card="pivotTarf"]')).toBeVisible();

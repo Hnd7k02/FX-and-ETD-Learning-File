@@ -65,7 +65,7 @@ Market makers close such gaps immediately. That is why parity holds in liquid ma
 
 Equal payments at expiry mean equal value today, otherwise there would be arbitrage. A forward at the rate <i>K</i> is worth e<sup>−<i>r</i><sub>d</sub><i>T</i></sup> · (<i>F</i> − <i>K</i>) today. Hence <i>C</i> − <i>P</i> = e<sup>−<i>r</i><sub>d</sub><i>T</i></sup> · (<i>F</i> − <i>K</i>). Parity needs no model and no vol.
 
-**Garman-Kohlhagen.** In the model the rate at expiry is lognormally distributed, with expected value <i>F</i> under the risk-neutral measure. The expected payoff is the Black-76 price on the forward. Discounted at the CHF rate:
+**Garman-Kohlhagen.** Under the [risk-neutral measure](/en/glossary/#term-risk-neutral) the expected rate at expiry is the forward <i>F</i>. The model also assumes constant vol and no jumps; then the rate at expiry is lognormally distributed. The expected payoff is the Black-76 price on the forward. Discounted at the CHF rate:
 
 <Formula>
   <span><i>C</i> = e<sup>−<i>r</i><sub>d</sub><i>T</i></sup> · E[max(<i>S</i><sub>T</sub> − <i>K</i>, 0)] = e<sup>−<i>r</i><sub>d</sub><i>T</i></sup> · [<i>F</i> N(<i>d</i><sub>1</sub>) − <i>K</i> N(<i>d</i><sub>2</sub>)]</span>

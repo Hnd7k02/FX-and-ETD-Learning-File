@@ -6,6 +6,12 @@
  *
  * USD/CHF, S = 0.8000, T = 0.25, σ = 8 %, rd = 0 (CHF), rf = 3.5 % (USD), N = USD 1 Mio.
  * Smile (section 4): ATM 8 %, 25Δ RR −1.00, 25Δ BF 0.25 (example values, not market data).
+ *
+ * Delta conventions: the 25Δ strikes of sections 2 and 3 are spot-delta strikes without
+ * premium adjustment at the flat vol, on the 5-pip grid of the payoff builder; the grid is part
+ * of their definition (templateStrikes, src/lib/payoff.ts). Section 4 places the smile pillars
+ * by forward delta (smilePillars, src/lib/fx/smile.ts). Premiums, net premiums and solved
+ * strikes are computed unrounded; only the display rounds.
  */
 import {
   EXAMPLE as E,
@@ -32,6 +38,7 @@ import {
   netPremium,
   positionValue,
   solveZeroCostStrike,
+  STRIKE_STEP,
   templateStrikes,
   type Leg,
   type PayoffMarket,
@@ -54,6 +61,14 @@ export const M06_SCENARIOS = {
   volShock: 0.02,
 } as const;
 const SC = M06_SCENARIOS;
+
+/**
+ * Decimals of the solved zero-cost put strike wherever an amount is derived from it (06.2 text,
+ * quiz m06-q2). On USD 1 Mio. the strike shown to 6 decimals times the notional is the amount in
+ * whole francs, so strike × notional adds up on screen (D-26); elsewhere the strike is rounded
+ * to the usual 4 decimals. A display choice (D-22), not a check value.
+ */
+export const M06_SOLVED_DIGITS = 6;
 
 export const MARKET: PayoffMarket = {
   S,
@@ -102,6 +117,8 @@ const rr = tpl('risk-reversal');
  */
 const rr25Legs: Leg[] = [rr.legs[0]!, { ...rr.legs[1]!, strike: ks.put25 }];
 const rr25 = netPremium(rr25Legs, MARKET);
+/** Rounds to the 0.01-pip display grid of the risk reversal legs (D-26). */
+const r2 = (x: number) => Math.round(x * 100) / 100;
 const straddle = tpl('straddle');
 const strangle = tpl('strangle');
 const fly = tpl('butterfly');
@@ -143,7 +160,11 @@ export const M06 = {
   rrCallPips: legPips(rr.legs[0]!),
   rr25PutK: ks.put25,
   rr25PutPips: legPips(rr25Legs[1]!),
-  rr25NetPips: -rr25.pips,
+  /** Net premium of the 25Δ risk reversal, call − put (< 0: the importer receives). */
+  rr25NetPips: rr25.pips,
+  rr25NetChf: rr25.quote,
+  /** Net value of the zero-cost collar at the unrounded solved put strike (CHF, ≈ 0). */
+  rrResidualChf: positionValue(rr.legs, MARKET),
   rrPutSmile,
   forward: F,
   stUp: SC.stUp,
@@ -238,26 +259,54 @@ export const nums: NumTable = {
   'm06.psBe': { value: ps.be[0]!, kind: 'rate' },
   'm06.psMaxGainChf': { value: maxGain(ps.ext.maxGain), kind: 'money' },
   'm06.rrCallK': { value: rr.legs[0]!.strike, kind: 'rate', note: '25Δ USD call' },
-  'm06.rrPutK': { value: rr.legs[1]!.strike, kind: 'rate', note: 'Solved for zero cost' },
+  'm06.rrPutK': {
+    value: rr.legs[1]!.strike,
+    kind: 'rate',
+    note: 'Solved for zero cost, unrounded; shown to M06_SOLVED_DIGITS where an amount is derived from it',
+  },
   'm06.rr25PutK': { value: ks.put25, kind: 'rate', note: '25Δ USD put, 5-pip grid' },
-  'm06.rr25NetPips': {
-    value: -rr25.pips,
+  'm06.strikeStepPips': {
+    value: pips(STRIKE_STEP),
+    kind: 'pips',
+    digits: 0,
+    note: 'Strike grid of the payoff builder; the 25Δ strikes of sections 2 and 3 sit on it',
+  },
+  'm06.rr25CallPips': {
+    value: legPips(rr25Legs[0]!),
     kind: 'pips',
     digits: 2,
-    note: '25Δ risk reversal (call25 long, put25 short): net premium received, positive',
+    note: '25Δ USD call premium, unrounded (shown with 2 decimals in the net calculation)',
+  },
+  'm06.rr25PutPips': {
+    value: legPips(rr25Legs[1]!),
+    kind: 'pips',
+    digits: 2,
+    note: '25Δ USD put premium, unrounded (shown with 2 decimals in the net calculation)',
+  },
+  'm06.rr25NetPips': {
+    value: rr25.pips,
+    kind: 'pips',
+    digits: 4,
+    note: '25Δ risk reversal (call25 long, put25 short): net premium call − put, unrounded, < 0 = received',
+  },
+  'm06.rr25NetShownPips': {
+    value: r2(legPips(rr25Legs[0]!)) - r2(legPips(rr25Legs[1]!)),
+    kind: 'pips',
+    digits: 2,
+    note: 'Difference of the two displayed (rounded) leg premiums, so the text adds up (D-26)',
   },
   'm06.rr25NetChf': {
-    value: -rr25.quote,
+    value: rr25.quote,
     kind: 'money',
-    note: '25Δ risk reversal: net premium received on USD 1 Mio.',
+    digits: 2,
+    note: '25Δ risk reversal: net premium on USD 1 Mio., unrounded, < 0 = received',
   },
   'm06.rrPutGapPips': {
     value: pips(ks.put25 - rr.legs[1]!.strike),
     kind: 'pips',
-    digits: 1,
-    note: 'Zero-cost put strike below the 25Δ put strike',
+    digits: 2,
+    note: 'Zero-cost put strike below the 25Δ put strike; 2 decimals, so that it adds up with the put strike shown to M06_SOLVED_DIGITS (D-26)',
   },
-  'm06.rrCallPips': { value: legPips(rr.legs[0]!), kind: 'pips', digits: 1 },
   'm06.rrCallChf': { value: legPips(rr.legs[0]!) * PIP * N, kind: 'money' },
   'm06.rrBandPips': {
     value: pips(rr.legs[0]!.strike - rr.legs[1]!.strike),

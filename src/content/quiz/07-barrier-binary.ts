@@ -176,19 +176,19 @@ const shock = fmtRate(g.shock, 'EUR/CHF');
 const check4: QuizQuestion = {
   id: 'm07-c4',
   prompt: {
-    de: `Ein Stop-Loss soll EUR bei ${stop} verkaufen. Im hypothetischen Szenario mit täglichen EZB-Referenzkursen wird er erst zu ${shock} ausgeführt. Warum so tief?`,
-    en: `A stop-loss is meant to sell EUR at ${stop}. In the hypothetical scenario with daily ECB reference rates it is only filled at ${shock}. Why so low?`,
+    de: `Ein angenommener Stop-Loss soll EUR bei ${stop} verkaufen. Im hypothetischen Szenario mit täglichen EZB-Referenzkursen gilt er erst zu ${shock} als ausgeführt. Warum so tief?`,
+    en: `An assumed stop-loss is meant to sell EUR at ${stop}. In the hypothetical scenario with daily ECB reference rates it only counts as filled at ${shock}. Why so low?`,
   },
   ...place(
     [
       {
         label: {
-          de: 'Der Kurs sprang über das Niveau, am Stop-Niveau gab es keinen handelbaren Kurs',
-          en: 'The rate jumped over the level; there was no tradable price at the stop level',
+          de: 'Das Fixing sprang über das Niveau, dazwischen kennt die Reihe keinen Kurs',
+          en: 'The fixing jumped over the level; the series has no rate in between',
         },
         explain: {
-          de: 'Richtig. Ein Stop wird zum nächsten handelbaren Kurs ausgeführt. Bei einem Gap liegt dieser weit hinter dem Stop-Niveau. Das Szenario nimmt vereinfacht das nächste Fixing. Auch Barrieren werden übersprungen, aber ein Knock-out ist keine Transaktion: Die Option erlischt.',
-          en: 'Correct. A stop is filled at the next tradable price. In a gap, that price lies far beyond the stop level. As a simplification, the scenario takes the next fixing. Barriers are jumped over too, but a knock-out is not a transaction: the option is extinguished.',
+          de: 'Richtig. In einem Gap wird ein Stop zum nächsten handelbaren Kurs ausgeführt, und der liegt weit hinter dem Stop-Niveau. Das Szenario nimmt dafür vereinfacht das nächste Fixing an; EZB-Referenzkurse sind keine handelbaren Preise. Auch Barrieren werden übersprungen. Ein Knock-out ist aber keine Transaktion: Die Option erlischt nach den angenommenen Bedingungen.',
+          en: 'Correct. In a gap a stop is filled at the next tradable price, and that lies far beyond the stop level. As a simplification, the scenario assumes the next fixing instead; ECB reference rates are not tradable prices. Barriers are jumped over too. But a knock-out is not a transaction: the option is extinguished under the assumed terms.',
         },
       },
       {
@@ -207,8 +207,8 @@ const check4: QuizQuestion = {
           en: 'The stop was set too close to the minimum rate',
         },
         explain: {
-          de: 'Auch ein tieferer Stop hätte nichts genützt: Im Szenario wird jeder Stop bis hinunter zum Fixing nach dem Schock zu diesem Fixing ausgeführt.',
-          en: 'A lower stop would not have helped either: in the scenario every stop down to the fixing after the shock is filled at that fixing.',
+          de: 'Auch ein tieferer Stop hätte nichts genützt: Im Szenario gilt jeder Stop bis hinunter zum Fixing nach dem Schock als zu diesem Fixing ausgeführt.',
+          en: 'A lower stop would not have helped either: in the scenario every stop down to the fixing after the shock counts as filled at that fixing.',
         },
       },
     ],

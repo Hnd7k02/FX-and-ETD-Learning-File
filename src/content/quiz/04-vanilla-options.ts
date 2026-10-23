@@ -137,8 +137,8 @@ const q3: QuizQuestion = {
         en: 'ITM, because the strike is below spot',
       },
       explain: {
-        de: 'Das gilt in Spot-Moneyness; gefragt war Forward-Moneyness. Dieses Tool misst am Forward, weil eine europäische Option erst bei Verfall ausgeübt wird.',
-        en: 'That holds in spot moneyness; the question asked for forward moneyness. This tool measures against the forward, because a European option is only exercised at expiry.',
+        de: 'Das gilt in Spot-Moneyness; gefragt war Forward-Moneyness. Dieses Tool hat die Forward-Moneyness als Konvention gewählt; sie passt zur Ausübung bei Verfall.',
+        en: 'That holds in spot moneyness; the question asked for forward moneyness. This tool has chosen forward moneyness as its convention; it suits exercise at expiry.',
       },
     },
     {
@@ -331,8 +331,8 @@ const c3: QuizQuestion = {
       },
       mono: true,
       explain: {
-        de: `Das ist der Zeitwert gegen den Spot: Prämie minus ${pips(M04.itmVsSpotPips, 1).de} Pips innerer Wert gegen den Spot. Gefragt war der Zeitwert gegen den Forward. Dort ist er nie negativ.`,
-        en: `That is the time value against spot: the premium minus ${pips(M04.itmVsSpotPips, 1).en} pips of intrinsic value against spot. The question asked for the time value against the forward, and that is never negative.`,
+        de: `Das ist der Zeitwert gegen den Spot: Prämie minus ${pips(M04.itmVsSpotPips, 1).de} Pips innerer Wert gegen den Spot. Das Minus ist weder eine negative Prämie noch eine Arbitrage. Es folgt aus der Zerlegung: Der USD-Zins liegt über dem CHF-Zins, darum liegt der Forward unter dem Spot. Gefragt war der Zeitwert gegen den Forward, und der ist nie negativ.`,
+        en: `That is the time value against spot: the premium minus ${pips(M04.itmVsSpotPips, 1).en} pips of intrinsic value against spot. The minus is neither a negative premium nor an arbitrage. It comes from the split: the USD rate is above the CHF rate, so the forward sits below spot. The question asked for the time value against the forward, and that is never negative.`,
       },
     },
     {

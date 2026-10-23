@@ -6,7 +6,7 @@
 import type { Lang } from '@/i18n/types';
 import { fmtMoney, fmtNumber, fmtPct, fmtPips, fmtRate, pipSize } from '@/lib/format';
 import { EXAMPLE as E } from '@/lib/fx/example';
-import { M06 } from '@/lib/nums/m06';
+import { M06, M06_SOLVED_DIGITS } from '@/lib/nums/m06';
 import type { ModuleQuiz, QuizQuestion } from './types';
 
 const PAIR = E.pair;
@@ -25,6 +25,12 @@ const widthPips = pips((M06.csK2 - M06.csK1) / PIP, 0);
 const maxGainPips = pips(M06.csMaxGain / N / PIP);
 /** "79.4 Pips" / "79.4 pips". */
 const pipsLabel = (x: number) => both((l) => `${fmtPips(x, l)} ${l === 'de' ? 'Pips' : 'pips'}`);
+
+/**
+ * The solved zero-cost put strike to 6 decimals: strike × USD 1 Mio. is the CHF amount the
+ * question asks for, so the shown strike and the shown amounts add up (D-26).
+ */
+const solvedPut = fmtRate(M06.rrPutK, PAIR, M06_SOLVED_DIGITS);
 
 /* ---------- Graded quiz ---------- */
 
@@ -74,8 +80,8 @@ const q1: QuizQuestion = {
 const q2: QuizQuestion = {
   id: 'm06-q2',
   prompt: {
-    de: `Der Importeur hat einen Zero-Cost-Collar: Long USD Call ${rate(M06.rrCallK)}, Short USD Put ${rate(M06.rrPutK)}. Bei Verfall steht USD/CHF auf ${rate(M06.stDown)}. Was zahlt er für die USD 1 Mio.?`,
-    en: `The importer has a zero-cost collar: long USD call ${rate(M06.rrCallK)}, short USD put ${rate(M06.rrPutK)}. At expiry USD/CHF is at ${rate(M06.stDown)}. What does he pay for the USD 1m?`,
+    de: `Der Importeur hat einen Zero-Cost-Collar: Long USD Call ${rate(M06.rrCallK)}, Short USD Put ${solvedPut}. Bei Verfall steht USD/CHF auf ${rate(M06.stDown)}. Was zahlt er für die USD 1 Mio.?`,
+    en: `The importer has a zero-cost collar: long USD call ${rate(M06.rrCallK)}, short USD put ${solvedPut}. At expiry USD/CHF is at ${rate(M06.stDown)}. What does he pay for the USD 1m?`,
   },
   options: [
     {
@@ -98,8 +104,8 @@ const q2: QuizQuestion = {
       label: chf(M06.rrPutK * N),
       mono: true,
       explain: {
-        de: `Richtig. Unter ${rate(M06.rrPutK)} wird der Put ausgeübt, und er kauft zum Put-Strike. Gegenüber dem Markt zahlt er ${chf((M06.rrPutK - M06.stDown) * N).de} mehr: der Preis für den Schutz ohne Prämie.`,
-        en: `Correct. Below ${rate(M06.rrPutK)} the put is exercised and he buys at the put strike. Compared with the market he pays ${chf((M06.rrPutK - M06.stDown) * N).en} more: the price of protection without a premium.`,
+        de: `Richtig. Unter ${solvedPut} wird der Put ausgeübt, und er kauft zum Put-Strike. Gegenüber dem Markt zahlt er ${chf((M06.rrPutK - M06.stDown) * N).de} mehr: der Preis für den Schutz ohne Prämie.`,
+        en: `Correct. Below ${solvedPut} the put is exercised and he buys at the put strike. Compared with the market he pays ${chf((M06.rrPutK - M06.stDown) * N).en} more: the price of protection without a premium.`,
       },
     },
     {

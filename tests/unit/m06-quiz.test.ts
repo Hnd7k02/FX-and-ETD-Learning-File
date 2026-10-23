@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { quiz } from '@/content/quiz/06-combos-smile';
 import { fmtMoney, fmtPct, fmtPips } from '@/lib/format';
 import { EXAMPLE as E } from '@/lib/fx/example';
-import { M06, nums } from '@/lib/nums/m06';
+import { M06, M06_SOLVED_DIGITS, nums } from '@/lib/nums/m06';
 import { formatNum } from '@/lib/nums/format';
 
 const all = [...quiz.quiz, ...Object.values(quiz.checks)];
@@ -104,19 +104,19 @@ describe('m06 numbers', () => {
     expect(M06.rrCallPips).toBeCloseTo(47.27, 2);
     expect(v('m06.rr25PutK')).toBeCloseTo(0.773, 12);
     expect(M06.rr25PutPips).toBeCloseTo(49.5, 2);
-    expect(v('m06.rr25NetPips')).toBeCloseTo(2.24, 2);
-    expect(v('m06.rr25NetPips')).toBeCloseTo(M06.rr25PutPips - M06.rrCallPips, 9);
-    expect(v('m06.rr25NetChf')).toBeCloseTo(223.6, 1);
-    expect(formatNum(nums['m06.rr25NetPips']!, 'de')).toBe('2.24');
-    expect(formatNum(nums['m06.rr25NetChf']!, 'de')).toMatch(/^CHF.224$/);
+    // net premium call − put, unrounded and signed (< 0: the importer receives); details in
+    // tests/unit/m06-rr.test.ts
+    expect(v('m06.rr25NetPips')).toBeCloseTo(-2.2362, 4);
+    expect(v('m06.rr25NetPips')).toBeCloseTo(M06.rrCallPips - M06.rr25PutPips, 9);
+    expect(v('m06.rr25NetChf')).toBeCloseTo(-223.62, 2);
     // zero-cost collar: call kept, put solved lower
     expect(M06.rrPutK).toBeCloseTo(0.77215, 5);
     expect(formatNum(nums['m06.rrPutK']!, 'de')).toBe('0.7722');
-    expect(v('m06.rrPutGapPips')).toBeCloseTo(8.5, 1);
-    expect(formatNum(nums['m06.rrPutGapPips']!, 'de')).toBe('8.5');
-    // the gap adds up with the strikes as the text shows them (25Δ put 4, solved put 5 digits)
-    const k5 = Number(formatNum({ ...nums['m06.rrPutK']!, digits: 5 }, 'en'));
-    expect((v('m06.rr25PutK') - k5) / 1e-4).toBeCloseTo(
+    expect(v('m06.rrPutGapPips')).toBeCloseTo(8.494, 3);
+    expect(formatNum(nums['m06.rrPutGapPips']!, 'de')).toBe('8.49');
+    // the gap adds up with the strikes as the text shows them (25Δ put 4, solved put 6 digits)
+    const k6 = Number(formatNum(nums['m06.rrPutK']!, 'en', { digits: M06_SOLVED_DIGITS }));
+    expect((v('m06.rr25PutK') - k6) / 1e-4).toBeCloseTo(
       Number(formatNum(nums['m06.rrPutGapPips']!, 'en')),
       6,
     );

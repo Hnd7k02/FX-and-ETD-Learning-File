@@ -12,7 +12,7 @@ For the importer this means: his call on <Num of="ex.notional" /> behaves today 
 
 Try three things in the lab. Drag spot all the way to the right: delta heads towards one and the call turns into a forward. Drag it to the left: delta falls towards zero. Then shorten the time to expiry to a few weeks: the delta curve becomes a steep step, and gamma shoots up.
 
-Watch two details while you do. Both lead back to the forward. The steepest point of the delta curve is not at the strike line but further right, close to today's spot of <Num of="ex.spot" />. Only there does the forward sit at the strike, because the forward points are <Num of="ex.fwdPoints" /> pips. And deep in the money the price curve even runs below the dashed payoff at expiry. The call works with the forward, not with spot.
+Watch two details while you do. Both lead back to the forward. The steepest point of the delta curve is not at the strike line but further right, close to today's spot of <Num of="ex.spot" />. Only there does the forward sit at the strike, because the forward points are <Num of="ex.fwdPoints" /> pips. And deep in the money the price curve even runs below the dashed payoff at expiry. The call works with the forward, not with spot. Measured against spot, its time value there is negative. That is neither a negative premium nor an arbitrage: the USD rate is above the CHF rate, so the forward sits below spot, and you cannot exercise a European option early ([module 04](/en/module/04-vanilla-options/3/)).
 
 ### Delta and gamma in the example
 

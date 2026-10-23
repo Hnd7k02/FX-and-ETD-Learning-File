@@ -68,7 +68,9 @@ export const m04 = defineDict({
     'mx.time': 'Zeitwert',
     'mx.timeSub': 'Prämie minus innerer Wert',
     'mx.delta': 'Delta',
-    'mx.deltaSub': 'Spot-Delta',
+    'mx.deltaSub': 'Spot-Delta, eine Preissensitivität',
+    'mx.prob': 'Chance im Geld',
+    'mx.probSub': 'bei Verfall · risikoneutral, keine Prognose',
     'mx.pips': '{v} Pips',
     'mx.bar': 'Zusammensetzung der Prämie',
     'mx.aha.atmf':
@@ -76,13 +78,13 @@ export const m04 = defineDict({
     'mx.aha.dns':
       'ATM DNS: Call-Delta {c} und Put-Delta {p} heben sich auf. Ein Straddle hier ist delta-neutral.',
     'mx.aha.p25':
-      '25Δ Put: Ein Put mit diesem Strike hat das Delta {p}. So quotiert der Markt die Flügel.',
+      '25Δ Put: Ein Put mit diesem Strike hat das Delta {p}. So quotiert der Markt die Flügel. Delta ist aber eine Preissensitivität, keine Wahrscheinlichkeit: Die Chance, dass er im Geld verfällt, ist {prob} (risikoneutral, keine Prognose).',
     'mx.aha.c25':
-      '25Δ Call: Ein Call mit diesem Strike hat das Delta {c}. So quotiert der Markt die Flügel.',
+      '25Δ Call: Ein Call mit diesem Strike hat das Delta {c}. So quotiert der Markt die Flügel. Delta ist aber eine Preissensitivität, keine Wahrscheinlichkeit: Die Chance, dass er im Geld verfällt, ist {prob} (risikoneutral, keine Prognose).',
     'mx.aha.p10':
-      '10Δ Put: Ein Put mit diesem Strike ist weit aus dem Geld, reiner Zeitwert und billig. Für den Call liegt derselbe Strike tief im Geld.',
+      '10Δ Put: Ein Put mit diesem Strike ist weit aus dem Geld, reiner Zeitwert und billig. Delta {p}, Chance im Geld {prob} (risikoneutral, keine Prognose). Für den Call liegt derselbe Strike tief im Geld.',
     'mx.aha.c10':
-      '10Δ Call: Ein Call mit diesem Strike ist weit aus dem Geld, reiner Zeitwert und billig. Für den Put liegt derselbe Strike tief im Geld.',
+      '10Δ Call: Ein Call mit diesem Strike ist weit aus dem Geld, reiner Zeitwert und billig. Delta {c}, Chance im Geld {prob} (risikoneutral, keine Prognose). Für den Put liegt derselbe Strike tief im Geld.',
     'mx.aria':
       'Prämie in Abhängigkeit vom Strike für den {type}. Beim Strike {k}: Prämie {price}, innerer Wert {intrinsic}, Zeitwert {time}, {money}.',
     // PriceDrivers
@@ -221,7 +223,9 @@ export const m04 = defineDict({
     'mx.time': 'Time value',
     'mx.timeSub': 'premium minus intrinsic value',
     'mx.delta': 'Delta',
-    'mx.deltaSub': 'spot delta',
+    'mx.deltaSub': 'spot delta, a price sensitivity',
+    'mx.prob': 'Chance in the money',
+    'mx.probSub': 'at expiry · risk-neutral, not a forecast',
     'mx.pips': '{v} pips',
     'mx.bar': 'What the premium is made of',
     'mx.aha.atmf':
@@ -229,13 +233,13 @@ export const m04 = defineDict({
     'mx.aha.dns':
       'ATM DNS: call delta {c} and put delta {p} cancel out. A straddle here is delta-neutral.',
     'mx.aha.p25':
-      '25Δ put: a put with this strike has a delta of {p}. This is how the market quotes the wings.',
+      '25Δ put: a put with this strike has a delta of {p}. This is how the market quotes the wings. But delta is a price sensitivity, not a probability: the chance that it expires in the money is {prob} (risk-neutral, not a forecast).',
     'mx.aha.c25':
-      '25Δ call: a call with this strike has a delta of {c}. This is how the market quotes the wings.',
+      '25Δ call: a call with this strike has a delta of {c}. This is how the market quotes the wings. But delta is a price sensitivity, not a probability: the chance that it expires in the money is {prob} (risk-neutral, not a forecast).',
     'mx.aha.p10':
-      '10Δ put: a put with this strike is far out of the money, pure time value and cheap. For the call the same strike is deep in the money.',
+      '10Δ put: a put with this strike is far out of the money, pure time value and cheap. Delta {p}, chance in the money {prob} (risk-neutral, not a forecast). For the call the same strike is deep in the money.',
     'mx.aha.c10':
-      '10Δ call: a call with this strike is far out of the money, pure time value and cheap. For the put the same strike is deep in the money.',
+      '10Δ call: a call with this strike is far out of the money, pure time value and cheap. Delta {c}, chance in the money {prob} (risk-neutral, not a forecast). For the put the same strike is deep in the money.',
     'mx.aria':
       'Premium depending on the strike for the {type}. At strike {k}: premium {price}, intrinsic value {intrinsic}, time value {time}, {money}.',
     'pd.title': 'Price drivers',

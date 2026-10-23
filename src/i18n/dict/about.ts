@@ -68,7 +68,7 @@ export const about = defineDict({
       'Die Formeln, mit denen der Rechenkern arbeitet. Konvention überall: Paar Base/Quote, r_d ist der Zins der Quote-Währung, r_f der der Base-Währung, T in Jahren.',
     'about.models.fwd.h': 'Forward: Zinsparität',
     'about.models.fwd.p':
-      'Zwei gleich sichere Wege zum selben Betrag kosten heute gleich viel. Der Geldmarkt rechnet mit einfachen Zinsen und der Tageszählung jeder Währung, die Optionsmodelle mit stetigen Zinsen. Im Beispiel liegen beide {diff} Pips auseinander.',
+      'Zwei gleich sichere Wege zum selben Betrag kosten heute gleich viel. Der Geldmarkt rechnet mit einfachen Zinsen und der Tageszählung jeder Währung, die Optionsmodelle mit stetigen Zinsen. Im Beispiel liegen beide bei gleichem T {diff} Pips auseinander. Mit umgerechneten Zinsen geben beide denselben Forward: Der Abstand ist Konvention, kein Arbitragegewinn.',
     'about.models.gk.h': 'Garman-Kohlhagen',
     'about.models.gk.p':
       'Black-Scholes mit zwei Zinsen: Die Base-Währung wirft ihren Zins r_f ab wie eine Dividende. Damit rechnet das Tool europäische Calls und Puts auf den Spot und die sechs Greeks.',
@@ -251,7 +251,7 @@ export const about = defineDict({
       'The formulas the calculation core works with. Convention throughout: pair base/quote, r_d is the rate of the quote currency, r_f that of the base currency, T in years.',
     'about.models.fwd.h': 'Forward: interest rate parity',
     'about.models.fwd.p':
-      'Two equally safe routes to the same amount cost the same today. The money market uses simple rates and each currency’s day count, the option models continuous rates. In the example the two differ by {diff} pips.',
+      'Two equally safe routes to the same amount cost the same today. The money market uses simple rates and each currency’s day count, the option models continuous rates. In the example the two differ by {diff} pips at the same T. With converted rates both give the same forward: the gap is convention, not an arbitrage gain.',
     'about.models.gk.h': 'Garman-Kohlhagen',
     'about.models.gk.p':
       'Black-Scholes with two interest rates: the base currency pays its rate r_f like a dividend. The tool uses it for European calls and puts on spot and for the six Greeks.',

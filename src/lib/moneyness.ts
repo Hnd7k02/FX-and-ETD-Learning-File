@@ -1,13 +1,15 @@
 /**
  * Moneyness and premium (module 04, section 3). Pure functions, no DOM.
  *
- * Moneyness is measured against the forward F (not the spot): a call is in the money (ITM) if
- * K < F, out of the money (OTM) if K > F, at the money forward (ATMF) if |F − K| ≤ 1 pip
- * (same tolerance as the Greeks lab). For a put it is the other way round.
+ * Moneyness is measured against the forward F, the convention this tool chooses (spot
+ * moneyness, against S, is the other one in use): a call is in the money (ITM) if K < F,
+ * out of the money (OTM) if K > F, at the money forward (ATMF) if |F − K| ≤ 1 pip (same
+ * tolerance as the Greeks lab). For a put it is the other way round.
  * Premium = intrinsic value against the forward, discounted (DF_d · max(±(F − K), 0)),
  * plus time value. Convention: rd = quote (CHF), rf = base (USD), T = days/365.
+ * Delta and the risk-neutral chance to expire in the money (N(±d2)) are two separate values.
  */
-import { gkPrice, intrinsicForward, type OptionType } from '@/lib/fx/vanilla';
+import { gkPrice, intrinsicForward, probItm, type OptionType } from '@/lib/fx/vanilla';
 import { greeks } from '@/lib/fx/greeks';
 import { atmDnsStrike, atmfStrike, strikeFromDelta } from '@/lib/fx/implied';
 
@@ -49,9 +51,11 @@ export interface PremiumSplit {
   time: number;
   /** Premium as a fraction of the base notional at spot: price / S (e.g. 1.58 % of USD). */
   pctBase: number;
-  /** Spot delta and forward delta. */
+  /** Spot delta and forward delta: price sensitivities. */
   delta: number;
   deltaFwd: number;
+  /** Risk-neutral chance to expire in the money, N(d2) (call) or N(−d2) (put); not delta. */
+  probItm: number;
 }
 
 export function premiumSplit(K: number, m: OptionMarket, type: OptionType): PremiumSplit {
@@ -68,6 +72,7 @@ export function premiumSplit(K: number, m: OptionMarket, type: OptionType): Prem
     pctBase: price / m.S,
     delta: g.delta,
     deltaFwd: g.deltaFwd,
+    probItm: probItm(m.S, K, m.T, m.vol, m.rd, m.rf, type),
   };
 }
 

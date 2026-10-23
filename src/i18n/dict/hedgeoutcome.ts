@@ -35,7 +35,8 @@ export const hedgeoutcome = defineDict({
     'ho.row.diff.equal': 'Differenz',
     'ho.row.diffSub': 'ohne minus mit Forward',
     'ho.scn.title': '{shown} von {n} Szenarien',
-    'ho.scn.sub': 'Modell: Vola {vol}, um den Forward zentriert. Keine Prognose.',
+    'ho.scn.sub':
+      'Risikoneutral um den Forward zentriert; Modell: lognormal, Vola {vol}. Keine Prognose.',
     'ho.scn.rangeUnhedged': 'Spannweite ohne Absicherung',
     'ho.scn.rangeHedged': 'Spannweite mit Forward',
     'ho.scn.cheaper': 'Forward günstiger',
@@ -91,7 +92,8 @@ export const hedgeoutcome = defineDict({
     'ho.row.diff.equal': 'Difference',
     'ho.row.diffSub': 'unhedged minus forward',
     'ho.scn.title': '{shown} of {n} scenarios',
-    'ho.scn.sub': 'Model: vol {vol}, centred on the forward. Not a forecast.',
+    'ho.scn.sub':
+      'Risk-neutral, centred on the forward; model: lognormal, vol {vol}. Not a forecast.',
     'ho.scn.rangeUnhedged': 'Range unhedged',
     'ho.scn.rangeHedged': 'Range with forward',
     'ho.scn.cheaper': 'Forward cheaper',

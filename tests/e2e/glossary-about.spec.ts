@@ -86,7 +86,8 @@ test.describe('glossary', () => {
   test('a "see also" link to a filtered-out term clears the filter and jumps there', async ({
     page,
   }) => {
-    await page.goto('/glossar/?q=rebate');
+    // a query only the rebate entry matches (the knock-out definition mentions the rebate too)
+    await page.goto('/glossar/?q=Totalverlust');
     const item = page.locator('#term-rebate');
     await expect(item).toBeVisible();
     await expect(page.locator('#term-knock-out')).toBeHidden();

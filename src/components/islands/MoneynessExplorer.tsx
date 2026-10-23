@@ -1,8 +1,9 @@
 /**
  * Moneyness explorer (module 04, section 3): premium over the strike, split into intrinsic
  * value against the forward and time value; moneyness chip relative to the forward; desk
- * strikes 10Δ/25Δ put, ATMF, ATM DNS, 25Δ/10Δ call. Drag the strike on the chart or use the
- * slider (accessible twin) and the marker buttons.
+ * strikes 10Δ/25Δ put, ATMF, ATM DNS, 25Δ/10Δ call; delta and the risk-neutral chance in the
+ * money side by side. Drag the strike on the chart or use the slider (accessible twin) and the
+ * marker buttons.
  * Maths in src/lib/moneyness.ts, strings in src/i18n/dict/m04.ts (mx.*).
  */
 import type { JSX } from 'preact';
@@ -170,12 +171,14 @@ export default function MoneynessExplorer(props: MoneynessExplorerProps): JSX.El
     time: pipsText(pips(split.time)),
     money: `${money.label}, ${moneyText}`,
   });
-  const callDelta = premiumSplit(K, M, 'call').delta;
-  const putDelta = premiumSplit(K, M, 'put').delta;
+  const callAt = premiumSplit(K, M, 'call');
+  const putAt = premiumSplit(K, M, 'put');
+  // Delta and the risk-neutral chance in the money are two separate values (put markers: put).
   const aha = near
     ? t(`mx.aha.${near.id}`, {
-        c: fmtNumber(callDelta, lang, { digits: 3 }),
-        p: fmtNumber(putDelta, lang, { digits: 3 }),
+        c: fmtNumber(callAt.delta, lang, { digits: 3 }),
+        p: fmtNumber(putAt.delta, lang, { digits: 3 }),
+        prob: fmtPct((near.id.startsWith('p') ? putAt : callAt).probItm, lang, 2),
       })
     : '';
 
@@ -482,6 +485,11 @@ export default function MoneynessExplorer(props: MoneynessExplorerProps): JSX.El
               label={t('mx.delta')}
               sub={t('mx.deltaSub')}
               value={fmtNumber(split.delta, lang, { digits: 3 })}
+            />
+            <StatRow
+              label={t('mx.prob')}
+              sub={t('mx.probSub')}
+              value={fmtPct(split.probItm, lang, 2)}
             />
           </StatTable>
         </div>

@@ -7,13 +7,13 @@ Der Forward wird aber am alten Datum fällig. Lässt der Importeur ihn laufen, b
 - **Near Leg:** Er verkauft die USD 1 Mio. zum aktuellen Spot. Das gleicht die Dollar aus dem Forward aus.
 - **Far Leg:** Im selben Geschäft kauft er USD 1 Mio. für das neue Datum, zum neuen Forward-Kurs.
 
-Aus seiner Sicht ist das ein Sell/Buy USD. Er schliesst den Swap zwei Bankarbeitstage vor dem alten Fälligkeitstag ab. So hat das Near Leg (Spot, T+2) genau die Valuta des alten Forwards und das Far Leg die neue Valuta. Die Dollar kommen nun genau dann, wenn er zahlen muss.
+Aus seiner Sicht ist das ein Sell/Buy USD. Er schliesst den Swap zwei Bankarbeitstage vor dem alten Fälligkeitstag ab, nach den Feiertagskalendern beider Währungen. So hat das Near Leg (Spot, T+2) genau die Valuta des alten Forwards und das Far Leg die neue Valuta. Die Dollar kommen nun genau dann, wenn er zahlen muss. Das Tool rechnet in Tagen, ohne Feiertagskalender: Die neue Valuta liegt <Num of="m03.slipDays" /> Tage nach der alten.
 
 <HedgeRollFigure caption="Zieh den Spot beim Abschluss des Rolls. Blau ist der neue Far-Kurs, schwarz dein All-in-Kurs. Der Abstand dazwischen ist der Ausgleich am Roll-Datum. Mit «Spot-Szenarien abspielen» siehst du, was schwankt und was bleibt." />
 
 ### Der Ausgleich am Roll-Datum
 
-Roll-Datum heisst hier der alte Fälligkeitstag, also die Valuta des Near Leg. An diesem Tag passiert zweierlei. Der Forward liefert USD 1 Mio. gegen <Num of="m03.oldFwdChf" />. Gleichzeitig wird das Near Leg fällig: Der Importeur liefert die Dollar zum Spot, der beim Abschluss des Rolls galt. Die Dollar heben sich auf. Übrig bleibt eine Zahlung in Franken: die Differenz zwischen Spot und altem Forward.
+Roll-Datum heisst hier der alte Fälligkeitstag, also die Valuta des Near Leg. An diesem Tag passiert zweierlei. Der Forward liefert USD 1 Mio. gegen <Num of="m03.oldFwdChf" />. Gleichzeitig wird das Near Leg fällig: Der Importeur liefert die Dollar zum Spot, der beim Abschluss des Rolls galt. Die Dollar heben sich genau auf. Übrig bleibt eine Zahlung in Franken: die Differenz zwischen Spot und altem Forward.
 
 **Fall 1: Der Dollar ist gestiegen,** der Spot beim Abschluss des Rolls steht bei <Num of="m03.rollUp" />. Im Near Leg erhält der Importeur <Num of="m03.rollNearChfUp" />, für den Forward zahlt er <Num of="m03.oldFwdChf" />. Netto bekommt er <Num of="m03.rollSettleUp" />. Im Far Leg kauft er die Dollar zu <Num of="m03.rollFarUp" /> zurück, also für <Num of="m03.rollFarChfUp" />. Die Swap Points über <Num of="m03.slipDays" /> Tage betragen <Num of="m03.rollPointsUp" /> Pips.
 

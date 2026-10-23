@@ -183,7 +183,9 @@ export const productmatrix = defineDict({
     'pm.yAlpha': 'Ergebnis je Fixing, Pips je USD',
     'pm.x': 'USD/CHF bei Verfall',
     'pm.spot': 'Spot',
-    'pm.clip': 'Verlust geht weiter',
+    'pm.clip': 'läuft aus dem Bild',
+    'pm.clipAlt':
+      '{name} läuft unten aus dem Bild, der Verlust geht dort weiter: siehe Risiko-Chip «{kind}: {chip}».',
     'pm.st': 'USD/CHF bei Verfall',
     'pm.drag': 'Zieh den Kurs bei Verfall an der Achse · 1 Pip auf USD 1 Mio. = CHF 100',
     'pm.play': 'Kurs abspielen',
@@ -389,7 +391,9 @@ export const productmatrix = defineDict({
     'pm.yAlpha': 'Result per fixing, pips per USD',
     'pm.x': 'USD/CHF at expiry',
     'pm.spot': 'Spot',
-    'pm.clip': 'loss continues',
+    'pm.clip': 'off the chart',
+    'pm.clipAlt':
+      '{name} runs off the chart at the bottom and the loss goes on there: see the risk chip ‘{kind}: {chip}’.',
     'pm.st': 'USD/CHF at expiry',
     'pm.drag': 'Drag the rate at expiry on the axis · 1 pip on USD 1m = CHF 100',
     'pm.play': 'Play the rate',
