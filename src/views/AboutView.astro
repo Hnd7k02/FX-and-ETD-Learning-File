@@ -1579,6 +1579,11 @@ const sid = (i: number) => toc[i]!.id;
   }
   .ab-source-supports {
     flex-basis: 100%;
+    min-width: 0;
+  }
+  .ab-source-supports dd {
+    min-width: 0;
+    overflow-wrap: anywhere;
   }
   .ab-source-meta code {
     font-family: var(--ff-font-mono);

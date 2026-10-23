@@ -6,7 +6,7 @@ import { defineDict } from '../types';
  */
 export const hedgecompare = defineDict({
   de: {
-    'hc.title': 'Fünf Werkzeuge, ein Kurs bei Verfall',
+    'hc.title': 'Fünf Strategien, ein Kurs bei Verfall',
     'hc.sub':
       '{pair} · Der Importeur kauft {notional} in {months} Monaten · Spot {spot} · Forward {forward}',
     'hc.name.unhedged': 'Ohne Absicherung',
@@ -45,7 +45,7 @@ export const hedgecompare = defineDict({
     'hc.cost': '{name} {chf}',
   },
   en: {
-    'hc.title': 'Five tools, one rate at expiry',
+    'hc.title': 'Five strategies, one rate at expiry',
     'hc.sub':
       '{pair} · The importer buys {notional} in {months} months · Spot {spot} · Forward {forward}',
     'hc.name.unhedged': 'Unhedged',

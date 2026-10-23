@@ -44,7 +44,7 @@ export const productmatrix = defineDict({
     'pm.cell.hedge.up':
       'Du musst USD kaufen und fürchtest einen stärkeren Dollar. Forward und Spot fixieren den Kurs, der Stop begrenzt ihn, der Call deckelt ihn gegen Prämie.',
     'pm.cell.hedge.down':
-      'Du erwartest einen schwächeren Dollar, musst dich aber schützen. Call und Collar lassen dir die Chance, die Limit-Order wartet auf einen besseren Kurs.',
+      'Du erwartest einen schwächeren Dollar, musst dich aber schützen. Der Call lässt dir die ganze Chance, der Collar einen Teil davon. Die Limit-Order wartet auf einen besseren Kurs.',
     'pm.cell.hedge.sideways':
       'Du erwartest wenig Bewegung. Der Collar kostet nichts, der strukturierte Hedge bietet einen besseren Kurs als der Forward, aber mit Hebel.',
     'pm.cell.hedge.unsure':
@@ -96,7 +96,7 @@ export const productmatrix = defineDict({
     'pm.p.structured.name': 'Strukturierter Hedge',
     'pm.p.structured.blocks': 'Long Call + 2 × Short Put zum besseren Strike, oft mit Knock-out',
     'pm.p.structured.use':
-      'Besser als der Forward, solange der Dollar nicht stark fällt. Darunter kaufst du die doppelte Menge.',
+      'Besser als der Forward, solange der Dollar nicht stark fällt. Unter dem Strike kaufst du die doppelte Menge.',
     'pm.p.accumulator.name': 'Accumulator',
     'pm.p.accumulator.blocks': 'Je Fixing Long Call + 2 × Short Put, Knock-out über dem Spot',
     'pm.p.accumulator.use':
@@ -124,7 +124,7 @@ export const productmatrix = defineDict({
     'pm.p.discount.name': 'Discount-Zertifikat',
     'pm.p.discount.blocks': 'Long USD + Short USD Call am Cap',
     'pm.p.discount.use':
-      'USD mit Abschlag, Gewinn bis zum Cap. Darunter verlierst du wie mit USD, gepuffert.',
+      'USD mit Abschlag, Gewinn bis zum Cap. Unter dem Break-even verlierst du wie mit USD, nur gepuffert.',
     'pm.p.carry.name': 'Carry',
     'pm.p.carry.blocks': 'USD am Spot kaufen und zum USD-Zins anlegen',
     'pm.p.carry.use': 'Verdient den Zinsvorsprung. Der Break-even ist der Forward.',
@@ -204,7 +204,7 @@ export const productmatrix = defineDict({
     'pm.aha.deposit': 'Ohne Risiko kein Zusatzzins',
     'pm.aria':
       'Ergebnis bei Verfall für {need}, Sicht {view}: {curves}. Markierter Kurs {st}; {results}.',
-    'pm.ariaCurve': '{name} {v} Pips',
+    'pm.ariaCurve': '{name} {v}',
     'pm.summary': '{need} · {view}: {products}. {note}',
     'pm.table': 'Ganze Matrix als Tabelle',
     'pm.table.need': 'Bedürfnis',
@@ -251,7 +251,7 @@ export const productmatrix = defineDict({
     'pm.cell.hedge.up':
       'You have to buy USD and fear a stronger dollar. The forward and spot fix the rate, the stop limits it, the call caps it for a premium.',
     'pm.cell.hedge.down':
-      'You expect a weaker dollar but need protection. The call and the collar leave you the chance; the limit order waits for a better rate.',
+      'You expect a weaker dollar but need protection. The call leaves you the full chance, the collar part of it. The limit order waits for a better rate.',
     'pm.cell.hedge.sideways':
       'You expect little movement. The collar costs nothing; the structured hedge offers a better rate than the forward, but with leverage.',
     'pm.cell.hedge.unsure':
@@ -330,7 +330,7 @@ export const productmatrix = defineDict({
     'pm.p.discount.name': 'Discount certificate',
     'pm.p.discount.blocks': 'Long USD + short USD call at the cap',
     'pm.p.discount.use':
-      'USD at a discount, gains up to the cap. Below that you lose like holding USD, cushioned.',
+      'USD at a discount, gains up to the cap. Below the break-even you lose like holding USD, only cushioned.',
     'pm.p.carry.name': 'Carry',
     'pm.p.carry.blocks': 'Buy USD at spot and deposit them at the USD rate',
     'pm.p.carry.use': 'Earns the interest differential. The break-even is the forward.',
@@ -408,7 +408,7 @@ export const productmatrix = defineDict({
     'pm.aha.alpha': 'The gain is capped, the loss is not',
     'pm.aha.deposit': 'No risk, no extra yield',
     'pm.aria': 'Result at expiry for {need}, view {view}: {curves}. Marked rate {st}; {results}.',
-    'pm.ariaCurve': '{name} {v} pips',
+    'pm.ariaCurve': '{name} {v}',
     'pm.summary': '{need} · {view}: {products}. {note}',
     'pm.table': 'The whole matrix as a table',
     'pm.table.need': 'Need',

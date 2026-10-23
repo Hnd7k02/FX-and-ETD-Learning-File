@@ -17,7 +17,7 @@ Two questions with two answers each give four boxes and four product families:
 | **Coupon** | TPF | RTPF |
 | **Strike** | TARF and accumulator | Pivot TARF |
 
-<ProductMatrixFigure need="alpha" view="coupon-direct" caption="The alpha matrix: choose a box. Every curve shows one fixing. Above, a capped gain; below, a leveraged loss that runs off the chart." />
+<ProductMatrixFigure need="alpha" view="coupon-direct" caption="The alpha matrix: choose a box. Each curve shows a single fixing. Above, a capped gain; below, a leveraged loss that runs off the chart." />
 
 ### Worked example: four boxes, one pattern
 
@@ -26,8 +26,8 @@ All products come from [module 08](/en/module/08-structured-products/1/), with t
 - **Coupon direct, TPF:** <Num of="m09.tpfCoupon" /> pips per fixing, so <Num of="m09.tpfCouponChf" />, as long as the fixing is above <Num of="m09.tpfStrike" />. After <Num of="m09.tpfTargetCoupons" /> coupons it ends.
 - **Coupon range, RTPF:** <Num of="m09.rtpfCoupon" /> pips per fixing as long as the fixing is between <Num of="m09.rtpfLower" /> and <Num of="m09.rtpfUpper" />.
 - **Strike direct, TARF:** buys at <Num of="m09.tarfStrike" />, <Num of="m09.tarfBetter" /> pips below the forward at the average fixing date. It ends at a gain of <Num of="m09.tarfTarget" /> pips.
-- **Strike direct, accumulator:** buys at <Num of="m09.accStrike" />, <Num of="m09.accBetter" /> pips below the forward, with a knock-out at <Num of="m09.accBarrier" />.
-- **Strike range, pivot TARF:** buys at <Num of="m09.pivLower" /> below the pivot <Num of="m09.pivPivot" />, sells at <Num of="m09.pivUpper" /> above it, target <Num of="m09.pivTarget" /> pips.
+- **Strike direct, accumulator:** buys at <Num of="m09.accStrike" />, <Num of="m09.accBetter" /> pips below the forward at the average fixing date, with a knock-out at <Num of="m09.accBarrier" />.
+- **Strike range, pivot TARF:** if the fixing is below the pivot <Num of="m09.pivPivot" />, she buys at <Num of="m09.pivLower" />. If it is above, she sells at <Num of="m09.pivUpper" />. Target <Num of="m09.pivTarget" /> pips.
 
 The pattern is the same everywhere. The gain is capped: by a target, a knock-out or the size of the coupon. The loss is leveraged: on the wrong side every pip counts twice.
 
@@ -40,7 +40,7 @@ The pattern is the same everywhere. The gain is capped: by a target, a knock-out
 
 <Callout variant="bad" title="When it goes wrong: the view is wrong">
 
-If the dollar falls sharply, every fixing lands on the wrong side. The products then run to maturity, with double the amount. In the worst of the <Num of="m09.paths" /> simulated paths the TPF ends at <Num of="m09.tpfWorst" />, the RTPF at <Num of="m09.rtpfWorst" />, the TARF at <Num of="m09.tarfWorst" />, the pivot TARF at <Num of="m09.pivWorst" /> and the accumulator at <Num of="m09.accWorst" />. The TPF, by contrast, can gain at most <Num of="m09.tpfMaxChf" />: <Num of="m09.tpfTargetCoupons" /> coupons.
+If the dollar falls sharply, every fixing lands on the wrong side. The products then run to maturity, with double the amount. In the worst of the <Num of="m09.paths" /> simulated paths the TPF ends at <Num of="m09.tpfWorst" />, the RTPF at <Num of="m09.rtpfWorst" />, the TARF at <Num of="m09.tarfWorst" />, the pivot TARF at <Num of="m09.pivWorst" /> and the accumulator at <Num of="m09.accWorst" />. The TPF, by contrast, can gain at most <Num of="m09.tpfMaxChf" />: <Num of="m09.tpfTargetCoupons" /> coupons. And the worst simulated path is not a limit. An even worse one is possible.
 
 </Callout>
 
@@ -57,7 +57,7 @@ If the dollar falls sharply, every fixing lands on the wrong side. The products 
 
 All four boxes sell options and put the premium into something else. It is clearest with a single fixing in 3 months, without a target.
 
-**1. Strike direct.** The premium of the two sold puts pays for a bought call at the same, lower strike:
+**1. Strike direct.** The premium of the two sold puts pays for a bought call at the same strike. Because two puts pay for it, that strike can sit below the forward:
 
 <Formula><i>C</i>(<i>K</i>) = 2 · <i>P</i>(<i>K</i>) ⇒ <i>K</i> = <Num of="m09.levStrike" /></Formula>
 

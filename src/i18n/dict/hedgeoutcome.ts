@@ -72,7 +72,7 @@ export const hedgeoutcome = defineDict({
     'ho.region.costsA': 'Weaker dollar:',
     'ho.region.costsB': 'chance given up',
     'ho.fLabel': 'F {fwd}',
-    'ho.strip.unhedged': 'without',
+    'ho.strip.unhedged': 'no F',
     'ho.strip.hedged': 'with F',
     'ho.chip.saves': 'Forward saves {chf}',
     'ho.chip.costs': 'Unhedged {chf} cheaper',

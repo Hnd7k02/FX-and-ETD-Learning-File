@@ -11,6 +11,10 @@ found). The statements below were checked with two independent web searches whos
 the bis.org pages listed (statistical release `rpfx25_fx.htm`, commentary of 30.09.2025, press
 release `p250930.htm`); all give the same figures. They are preliminary survey results. Please
 open the URL once from a normal browser before publishing (open question in the module report).
+Second check by the review agent (23.10.2026): a fresh web search again quotes the BIS release
+"Turnover of FX spot increased by 42% and outright forwards rose 60%. Their shares in global
+turnover increased to 31% and 19%"; bis.org itself was still unreachable from the sandbox. The
+60 % is growth of turnover, not of the share; the module text says so.
 
 ## bis-rpfx25-fx
 

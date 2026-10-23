@@ -17,7 +17,7 @@ Zwei Fragen mit je zwei Antworten ergeben vier Felder und vier Produktfamilien:
 | **Coupon** | TPF | RTPF |
 | **Strike** | TARF und Accumulator | Pivot TARF |
 
-<ProductMatrixFigure need="alpha" view="coupon-direct" caption="Die Alpha-Matrix: Wähle ein Feld. Alle vier Kurven zeigen ein Fixing. Oben ein begrenzter Gewinn, unten ein gehebelter Verlust, der aus dem Chart läuft." />
+<ProductMatrixFigure need="alpha" view="coupon-direct" caption="Die Alpha-Matrix: Wähle ein Feld. Jede Kurve zeigt ein einzelnes Fixing. Oben ein begrenzter Gewinn, unten ein gehebelter Verlust, der aus dem Chart läuft." />
 
 ### Rechenbeispiel: vier Felder, ein Muster
 
@@ -26,8 +26,8 @@ Alle Produkte stammen aus [Modul 08](/module/08-structured-products/1/), mit Str
 - **Coupon direkt, TPF:** <Num of="m09.tpfCoupon" /> Pips je Fixing, also <Num of="m09.tpfCouponChf" />, solange das Fixing über <Num of="m09.tpfStrike" /> liegt. Nach <Num of="m09.tpfTargetCoupons" /> Coupons ist Schluss.
 - **Coupon Range, RTPF:** <Num of="m09.rtpfCoupon" /> Pips je Fixing, solange das Fixing zwischen <Num of="m09.rtpfLower" /> und <Num of="m09.rtpfUpper" /> liegt.
 - **Strike direkt, TARF:** Kauf zu <Num of="m09.tarfStrike" />, <Num of="m09.tarfBetter" /> Pips unter dem Forward am mittleren Fixing-Tag. Bei <Num of="m09.tarfTarget" /> Pips Gewinn endet er.
-- **Strike direkt, Accumulator:** Kauf zu <Num of="m09.accStrike" />, <Num of="m09.accBetter" /> Pips unter dem Forward, mit Knock-out bei <Num of="m09.accBarrier" />.
-- **Strike Range, Pivot TARF:** Kauf zu <Num of="m09.pivLower" /> unter dem Pivot <Num of="m09.pivPivot" />, Verkauf zu <Num of="m09.pivUpper" /> darüber, Target <Num of="m09.pivTarget" /> Pips.
+- **Strike direkt, Accumulator:** Kauf zu <Num of="m09.accStrike" />, <Num of="m09.accBetter" /> Pips unter dem Forward am mittleren Fixing-Tag, mit Knock-out bei <Num of="m09.accBarrier" />.
+- **Strike Range, Pivot TARF:** Liegt das Fixing unter dem Pivot <Num of="m09.pivPivot" />, kauft sie zu <Num of="m09.pivLower" />. Liegt es darüber, verkauft sie zu <Num of="m09.pivUpper" />. Target <Num of="m09.pivTarget" /> Pips.
 
 Das Muster ist überall gleich. Der Gewinn ist begrenzt: durch ein Target, einen Knock-out oder die Höhe des Coupons. Der Verlust ist gehebelt: Auf der falschen Seite zählt jedes Pip doppelt.
 
@@ -40,7 +40,7 @@ Das Muster ist überall gleich. Der Gewinn ist begrenzt: durch ein Target, einen
 
 <Callout variant="bad" title="Wann geht es schief: Die Sicht ist falsch">
 
-Fällt der Dollar deutlich, liegen alle Fixings auf der falschen Seite. Die Produkte laufen dann bis zum Ende, mit doppelter Menge. Im schlechtesten der <Num of="m09.paths" /> simulierten Pfade endet der TPF bei <Num of="m09.tpfWorst" />, der RTPF bei <Num of="m09.rtpfWorst" />, der TARF bei <Num of="m09.tarfWorst" />, der Pivot TARF bei <Num of="m09.pivWorst" /> und der Accumulator bei <Num of="m09.accWorst" />. Gewinnen kann der TPF dagegen höchstens <Num of="m09.tpfMaxChf" />: <Num of="m09.tpfTargetCoupons" /> Coupons.
+Fällt der Dollar deutlich, liegen alle Fixings auf der falschen Seite. Die Produkte laufen dann bis zum Ende, mit doppelter Menge. Im schlechtesten der <Num of="m09.paths" /> simulierten Pfade endet der TPF bei <Num of="m09.tpfWorst" />, der RTPF bei <Num of="m09.rtpfWorst" />, der TARF bei <Num of="m09.tarfWorst" />, der Pivot TARF bei <Num of="m09.pivWorst" /> und der Accumulator bei <Num of="m09.accWorst" />. Gewinnen kann der TPF dagegen höchstens <Num of="m09.tpfMaxChf" />: <Num of="m09.tpfTargetCoupons" /> Coupons. Und der schlechteste simulierte Pfad ist keine Grenze. Ein noch schlechterer ist möglich.
 
 </Callout>
 
@@ -57,7 +57,7 @@ Fällt der Dollar deutlich, liegen alle Fixings auf der falschen Seite. Die Prod
 
 Alle vier Felder verkaufen Optionen und stecken deren Prämie in etwas anderes. Am klarsten ist das bei einem einzigen Fixing in 3 Monaten, ohne Target.
 
-**1. Strike direkt.** Die Prämie der zwei verkauften Puts bezahlt einen gekauften Call zum selben, tieferen Strike:
+**1. Strike direkt.** Die Prämie der zwei verkauften Puts bezahlt einen gekauften Call zum selben Strike. Weil zwei Puts bezahlen, darf dieser Strike unter dem Forward liegen:
 
 <Formula><i>C</i>(<i>K</i>) = 2 · <i>P</i>(<i>K</i>) ⇒ <i>K</i> = <Num of="m09.levStrike" /></Formula>
 

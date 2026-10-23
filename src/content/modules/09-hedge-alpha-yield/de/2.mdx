@@ -6,18 +6,18 @@ Der Importeur ist short USD: Steigt der Dollar, wird seine Rechnung teurer. Ein 
 
 ### Der Werkzeugkasten
 
-1. **Spot.** Er kauft die Dollars heute zu <Num of="ex.spot" /> und legt sie bis zum Zahltag zum USD-Zins an. Das bindet schon heute Franken. Rechnerisch landet er beim Forward: Kaufen und Anlegen ist genau der zweite Weg der Zinsparität aus [Modul 02](/module/02-forward/2/).
+1. **Spot.** Er kauft die Dollars heute zu <Num of="ex.spot" /> und legt sie bis zum Zahltag zum USD-Zins an. Das bindet schon heute Franken. Rechnerisch landet er beim Forward: Kaufen und Anlegen ist genau der zweite Weg der Zinsparität aus [Modul 02](/module/02-forward/2/). Der Forward-Abschlag ist der USD-Zins, den er sonst selbst verdient hätte.
 2. **Forward.** Er fixiert heute <Num of="ex.forward" digits={4} /> für die Zahlung in 3 Monaten ([Modul 02](/module/02-forward/1/)). Keine Prämie, volle Planbarkeit. Fällt der Dollar, profitiert er nicht.
 3. **Limit und Stop-Loss.** Das sind Orders auf den Spot ([Modul 01](/module/01-spot/3/)). Ein Limit kauft bei <Num of="m09.limit" />, falls der Dollar dorthin fällt. Ein Stop-Loss kauft bei <Num of="m09.stop" />, falls er dorthin steigt. Bis zur Ausführung ist er ungesichert. Springt der Kurs über den Stop, wird schlechter ausgeführt: das Gap-Risiko aus [Modul 07](/module/07-barrier-binary/4/).
-4. **USD Call / CHF Put.** Ein Deckel gegen Prämie ([Modul 04](/module/04-vanilla-options/1/)). Der Strike <Num of="ex.strike" /> plus die Prämie von <Num of="m09.callPremiumPips" /> Pips ergibt den schlechtesten Kurs, <Num of="m09.callCap" />.
-5. **Risk Reversal.** Der Zero-Cost-Collar aus [Modul 06](/module/06-combos-smile/2/): ein gekaufter Call bei <Num of="m09.collarCall" />, bezahlt mit einem verkauften Put bei <Num of="m09.collarPut" />. Der Kurs bleibt in diesem Band.
+4. **USD Call / CHF Put.** Ein Deckel gegen Prämie ([Modul 04](/module/04-vanilla-options/1/)). Fällt der Dollar, kauft er am Markt und behält die Chance. Der Strike <Num of="ex.strike" /> plus die Prämie von <Num of="m09.callPremiumPips" /> Pips ergibt den schlechtesten Kurs, <Num of="m09.callCap" />.
+5. **Risk Reversal.** Der Zero-Cost-Collar aus [Modul 06](/module/06-combos-smile/2/): ein gekaufter Call bei <Num of="m09.collarCall" />, bezahlt mit einem verkauften Put bei <Num of="m09.collarPut" />. Sein Kurs bleibt in diesem Band: nie über dem Call-Strike, nie unter dem Put-Strike.
 6. **Strukturierter Hedge.** Ein besserer Kurs als der Forward, bezahlt mit zusätzlich verkauften Puts ([Modul 08](/module/08-structured-products/2/)). Hier als ein einziges Fixing ohne Knock-out: Strike <Num of="m09.levStrike" />, also <Num of="m09.levBetter" /> Pips besser als der Forward. Unter dem Strike kauft der Importeur die doppelte Menge.
 
-<HedgeCompareFigure caption="Fünf Hedges auf einer Achse. Zieh den Kurs bei Verfall oder spiel ihn ab: Die Rangliste sortiert sich neu, und an jeder Wegmarke wechselt eine Strategie ihren Charakter." />
+<HedgeCompareFigure caption="Fünf Strategien auf einer Achse. Zieh den Kurs bei Verfall oder spiel ihn ab: Die Rangliste sortiert sich neu, und an jeder Wegmarke wechselt eine Strategie ihren Charakter." />
 
 ### Rechenbeispiel: USD 1 Mio. bei ±<Num of="m09.hMove" />
 
-So viel zahlt der Importeur für USD 1 Mio., wenn der Dollar bei Verfall bei <Num of="m09.hUp" /> oder bei <Num of="m09.hDown" /> steht. In Klammern der Unterschied zum Forward.
+So viel zahlt der Importeur für USD 1 Mio., wenn der Dollar bei Verfall bei <Num of="m09.hUp" /> oder bei <Num of="m09.hDown" /> steht. In Klammern der Unterschied zum Forward: Plus heisst teurer, Minus günstiger. Wie in [Modul 04](/module/04-vanilla-options/1/) rechnet der Vergleich mit dem stetigen Forward <Num of="ex.forward" />, damit Forward und Optionen auf derselben Basis stehen. Der Geldmarkt-Forward aus Modul 02, <Num of="ex.forwardMM" />, liegt nur <Num of="ex.fwdDiffPips" /> Pips darüber.
 
 | Hedge | Dollar stärker, <Num of="m09.hUp" /> | Dollar schwächer, <Num of="m09.hDown" /> |
 | --- | --- | --- |
@@ -27,11 +27,11 @@ So viel zahlt der Importeur für USD 1 Mio., wenn der Dollar bei Verfall bei <Nu
 | Collar | <Num of="m09.up.collar" /> (<Num of="m09.upVsFwd.collar" />) | <Num of="m09.down.collar" /> (<Num of="m09.downVsFwd.collar" />) |
 | Strukturiert 2× | <Num of="m09.up.leveraged" /> (<Num of="m09.upVsFwd.leveraged" />) | <Num of="m09.down.leveraged" /> (<Num of="m09.downVsFwd.leveraged" />) |
 
-Bei einem starken Dollar gewinnt der strukturierte Hedge, bei einem schwachen ist er am teuersten. Der Call liegt in beiden Szenarien in der Mitte. Am teuersten ist er knapp über dem Strike: Dann zahlst du die Prämie fast für nichts. Zieh den Kurs im Chart dorthin.
+Bei einem starken Dollar gewinnt der strukturierte Hedge, bei einem schwachen ist er am teuersten. Der Call liegt in beiden Szenarien in der Mitte. Am schlechtesten steht er da, wenn der Kurs nahe beim Strike endet: Dann zahlst du die Prämie und brauchst den Schutz kaum. Zieh den Kurs im Chart dorthin: Der Call rutscht ans Ende der Rangliste.
 
 <Callout variant="bad" title="Wann geht es schief: Überabsicherung">
 
-Unter dem Strike kauft der strukturierte Hedge die doppelte Menge: USD 2 Mio. statt USD 1 Mio. Die zweite Million braucht der Importeur nicht. Er muss sie am Markt wieder verkaufen, unter dem Strike also mit Verlust. Ab <Num of="m09.levWorse" /> ist er schlechter dran als mit dem Forward, bei <Num of="m09.hDown" /> um <Num of="m09.downVsFwd.leveraged" />. Aus dem Hedge ist eine Spekulation geworden.
+Unter dem Strike kauft der strukturierte Hedge die doppelte Menge: USD 2 Mio. statt USD 1 Mio. Die zweite Million braucht der Importeur nicht. Er muss sie am Markt wieder verkaufen, unter dem Strike also mit Verlust. Unter <Num of="m09.levWorse" /> ist er schlechter dran als mit dem Forward, bei <Num of="m09.hDown" /> um <Num of="m09.downVsFwd.leveraged" sign={false} />. Jeder weitere Pip nach unten macht seinen Kurs teurer statt günstiger. Aus dem Hedge ist eine Spekulation geworden.
 
 </Callout>
 
@@ -45,7 +45,7 @@ Der strukturierte Hedge ist ein gekaufter Call und zwei verkaufte Puts zum selbe
 
 <Formula><span><i>C</i>(<i>K</i><sub>L</sub>) = 2 · <i>P</i>(<i>K</i><sub>L</sub>)</span><span>bezahlter Kurs = <i>K</i><sub>L</sub> für <i>S</i><sub><i>T</i></sub> ≥ <i>K</i><sub>L</sub>, sonst 2<i>K</i><sub>L</sub> − <i>S</i><sub><i>T</i></sub></span></Formula>
 
-Warum ist der Strike gerade <Num of="m09.levBetter" /> Pips besser? Mit einem einzigen verkauften Put wäre <i>C</i> − <i>P</i> = 0 der Forward (Put-Call-Parität). Weil der CHF-Zins hier <Num of="ex.rd" /> ist, gilt <i>C</i>(<i>K</i>) − <i>P</i>(<i>K</i>) = <i>F</i> − <i>K</i>. Mit <i>C</i> = 2<i>P</i> folgt <i>P</i>(<i>K</i><sub>L</sub>) = <i>F</i> − <i>K</i><sub>L</sub>: Die Verbesserung ist genau der Wert des zweiten Puts, <Num of="m09.levSecondPut" /> Pips. Teurer als der Forward wird es unter 2<i>K</i><sub>L</sub> − <i>F</i> = <Num of="m09.levWorse" />.
+Warum ist der Strike gerade <Num of="m09.levBetter" /> Pips besser? Mit nur einem verkauften Put wäre der Strike der Forward: <i>C</i>(<i>K</i>) = <i>P</i>(<i>K</i>) gilt genau bei <i>K</i> = <i>F</i> (Put-Call-Parität, [Modul 04](/module/04-vanilla-options/4/)). Allgemein gilt <i>C</i>(<i>K</i>) − <i>P</i>(<i>K</i>) = DF<sub>CHF</sub> · (<i>F</i> − <i>K</i>), und weil der CHF-Zins hier <Num of="ex.rd" /> ist, ist DF<sub>CHF</sub> = 1. Mit <i>C</i> = 2<i>P</i> folgt <i>P</i>(<i>K</i><sub>L</sub>) = <i>F</i> − <i>K</i><sub>L</sub>: Die Verbesserung ist genau der Wert des zweiten Puts, <Num of="m09.levSecondPut" /> Pips. Teurer als der Forward wird es unter 2<i>K</i><sub>L</sub> − <i>F</i> = <Num of="m09.levWorse" />.
 
 </Derivation>
 

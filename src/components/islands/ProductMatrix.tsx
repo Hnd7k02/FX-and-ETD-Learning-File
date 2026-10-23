@@ -246,6 +246,16 @@ export default function ProductMatrix(props: ProductMatrixProps): JSX.Element {
     return marks;
   }, [groups, hlGroup, xs, params]);
 
+  /**
+   * Grey comparison curves must stay tellable apart without colour: the first one is solid,
+   * every further one dashed (legend and chart match).
+   */
+  const otherDash = (gi: number): string | undefined => {
+    if (gi === hlGroup) return undefined;
+    const rank = groups.slice(0, gi).filter((_, i) => i !== hlGroup).length;
+    return rank === 0 ? undefined : '6 5';
+  };
+
   const groupName = (g: ProductId[]) =>
     g.length > 1
       ? t('pm.same', { a: t(`pm.p.${g[0]!}.name`), b: t(`pm.p.${g[1]!}.name`) })
@@ -502,6 +512,7 @@ export default function ProductMatrix(props: ProductMatrixProps): JSX.Element {
               label: groupName(g),
               color: gi === hlGroup ? 'var(--ff-forward)' : 'var(--ff-ref)',
               width: gi === hlGroup ? 3 : 2,
+              kind: otherDash(gi) ? ('dashed' as const) : ('line' as const),
             }))}
           />
           <div ref={box}>
@@ -556,8 +567,18 @@ export default function ProductMatrix(props: ProductMatrixProps): JSX.Element {
                     <path d={areas.neg} style={{ fill: 'rgba(234, 88, 12, 0.1)' }} />
                   </g>
                 )}
-                {curvePts.map((pts, gi) =>
-                  gi === hlGroup ? null : (
+                {curvePts.map((pts, gi) => {
+                  if (gi === hlGroup) return null;
+                  const dash = otherDash(gi);
+                  /* a dashed curve cannot use the pathLength draw-in, it fades in instead */
+                  return dash ? (
+                    <path
+                      key={`c${gi}`}
+                      d={linePath(pts)}
+                      class="pm-curve-dash"
+                      style={lineStyle('var(--ff-ref)', 1.75, dash)}
+                    />
+                  ) : (
                     <path
                       key={`c${gi}`}
                       d={linePath(pts)}
@@ -565,8 +586,8 @@ export default function ProductMatrix(props: ProductMatrixProps): JSX.Element {
                       pathLength={1}
                       style={lineStyle('var(--ff-ref)', 1.75)}
                     />
-                  ),
-                )}
+                  );
+                })}
                 {hlPts && (
                   <path
                     d={linePath(hlPts)}

@@ -6,18 +6,18 @@ The importer is short USD: if the dollar rises, his invoice gets more expensive.
 
 ### The toolbox
 
-1. **Spot.** He buys the dollars today at <Num of="ex.spot" /> and deposits them at the USD rate until the payment date. That ties up francs today. Mathematically he ends up at the forward: buying and depositing is exactly the second route of interest rate parity from [module 02](/en/module/02-forward/2/).
+1. **Spot.** He buys the dollars today at <Num of="ex.spot" /> and deposits them at the USD rate until the payment date. That ties up francs today. Mathematically he ends up at the forward: buying and depositing is exactly the second route of interest rate parity from [module 02](/en/module/02-forward/2/). The forward discount is the USD interest he would otherwise have earned himself.
 2. **Forward.** He fixes <Num of="ex.forward" digits={4} /> today for the payment in 3 months ([module 02](/en/module/02-forward/1/)). No premium, full certainty. If the dollar falls, he does not benefit.
 3. **Limit and stop-loss.** These are orders on the spot rate ([module 01](/en/module/01-spot/3/)). A limit buys at <Num of="m09.limit" /> if the dollar falls that far. A stop-loss buys at <Num of="m09.stop" /> if it rises that far. Until it is filled he is unhedged. If the rate jumps over the stop, it is filled at a worse rate: the gap risk from [module 07](/en/module/07-barrier-binary/4/).
-4. **USD call / CHF put.** A cap for a premium ([module 04](/en/module/04-vanilla-options/1/)). The strike <Num of="ex.strike" /> plus the premium of <Num of="m09.callPremiumPips" /> pips gives the worst rate, <Num of="m09.callCap" />.
-5. **Risk reversal.** The zero-cost collar from [module 06](/en/module/06-combos-smile/2/): a bought call at <Num of="m09.collarCall" />, paid for with a sold put at <Num of="m09.collarPut" />. The rate stays within this band.
+4. **USD call / CHF put.** A cap for a premium ([module 04](/en/module/04-vanilla-options/1/)). If the dollar falls, he buys in the market and keeps the upside. The strike <Num of="ex.strike" /> plus the premium of <Num of="m09.callPremiumPips" /> pips gives the worst rate, <Num of="m09.callCap" />.
+5. **Risk reversal.** The zero-cost collar from [module 06](/en/module/06-combos-smile/2/): a bought call at <Num of="m09.collarCall" />, paid for with a sold put at <Num of="m09.collarPut" />. His rate stays within this band: never above the call strike, never below the put strike.
 6. **Structured hedge.** A better rate than the forward, paid for with additional sold puts ([module 08](/en/module/08-structured-products/2/)). Here as a single fixing without a knock-out: strike <Num of="m09.levStrike" />, so <Num of="m09.levBetter" /> pips better than the forward. Below the strike the importer buys twice the amount.
 
-<HedgeCompareFigure caption="Five hedges on one axis. Drag the rate at expiry or play it: the ranking re-sorts itself, and at every landmark a strategy changes its character." />
+<HedgeCompareFigure caption="Five strategies on one axis. Drag the rate at expiry or play it: the ranking re-sorts itself, and at every landmark a strategy changes its character." />
 
 ### Worked example: USD 1m at ±<Num of="m09.hMove" />
 
-This is what the importer pays for USD 1m if the dollar stands at <Num of="m09.hUp" /> or at <Num of="m09.hDown" /> at expiry. In brackets, the difference from the forward.
+This is what the importer pays for USD 1m if the dollar stands at <Num of="m09.hUp" /> or at <Num of="m09.hDown" /> at expiry. In brackets, the difference from the forward: plus means dearer, minus cheaper. As in [module 04](/en/module/04-vanilla-options/1/), the comparison uses the continuous forward <Num of="ex.forward" /> so that the forward and the options stand on the same basis. The money-market forward from module 02, <Num of="ex.forwardMM" />, is only <Num of="ex.fwdDiffPips" /> pips higher.
 
 | Hedge | Dollar stronger, <Num of="m09.hUp" /> | Dollar weaker, <Num of="m09.hDown" /> |
 | --- | --- | --- |
@@ -27,11 +27,11 @@ This is what the importer pays for USD 1m if the dollar stands at <Num of="m09.h
 | Collar | <Num of="m09.up.collar" /> (<Num of="m09.upVsFwd.collar" />) | <Num of="m09.down.collar" /> (<Num of="m09.downVsFwd.collar" />) |
 | Structured 2× | <Num of="m09.up.leveraged" /> (<Num of="m09.upVsFwd.leveraged" />) | <Num of="m09.down.leveraged" /> (<Num of="m09.downVsFwd.leveraged" />) |
 
-With a strong dollar the structured hedge wins; with a weak one it is the most expensive. The call sits in the middle in both scenarios. It is most expensive just above the strike: there you pay the premium for almost nothing. Drag the rate in the chart to that spot.
+With a strong dollar the structured hedge wins; with a weak one it is the most expensive. The call sits in the middle in both scenarios. It looks worst when the rate ends close to the strike: then you pay the premium and barely need the protection. Drag the rate in the chart there: the call drops to the bottom of the ranking.
 
 <Callout variant="bad" title="When it goes wrong: over-hedging">
 
-Below the strike the structured hedge buys twice the amount: USD 2m instead of USD 1m. The importer does not need the second million. He has to sell it again in the market, below the strike at a loss. From <Num of="m09.levWorse" /> he is worse off than with the forward, at <Num of="m09.hDown" /> by <Num of="m09.downVsFwd.leveraged" />. The hedge has turned into speculation.
+Below the strike the structured hedge buys twice the amount: USD 2m instead of USD 1m. The importer does not need the second million. He has to sell it again in the market, below the strike at a loss. Below <Num of="m09.levWorse" /> he is worse off than with the forward, at <Num of="m09.hDown" /> by <Num of="m09.downVsFwd.leveraged" sign={false} />. Every further pip down makes his rate dearer instead of cheaper. The hedge has turned into speculation.
 
 </Callout>
 
@@ -45,7 +45,7 @@ The structured hedge is a bought call and two sold puts at the same strike <i>K<
 
 <Formula><span><i>C</i>(<i>K</i><sub>L</sub>) = 2 · <i>P</i>(<i>K</i><sub>L</sub>)</span><span>rate paid = <i>K</i><sub>L</sub> for <i>S</i><sub><i>T</i></sub> ≥ <i>K</i><sub>L</sub>, otherwise 2<i>K</i><sub>L</sub> − <i>S</i><sub><i>T</i></sub></span></Formula>
 
-Why is the strike exactly <Num of="m09.levBetter" /> pips better? With a single sold put, <i>C</i> − <i>P</i> = 0 would give the forward (put-call parity). Because the CHF rate is <Num of="ex.rd" /> here, <i>C</i>(<i>K</i>) − <i>P</i>(<i>K</i>) = <i>F</i> − <i>K</i>. With <i>C</i> = 2<i>P</i> it follows that <i>P</i>(<i>K</i><sub>L</sub>) = <i>F</i> − <i>K</i><sub>L</sub>: the improvement is exactly the value of the second put, <Num of="m09.levSecondPut" /> pips. It costs more than the forward below 2<i>K</i><sub>L</sub> − <i>F</i> = <Num of="m09.levWorse" />.
+Why is the strike exactly <Num of="m09.levBetter" /> pips better? With only one sold put the strike would be the forward: <i>C</i>(<i>K</i>) = <i>P</i>(<i>K</i>) holds exactly at <i>K</i> = <i>F</i> (put-call parity, [module 04](/en/module/04-vanilla-options/4/)). In general <i>C</i>(<i>K</i>) − <i>P</i>(<i>K</i>) = DF<sub>CHF</sub> · (<i>F</i> − <i>K</i>), and because the CHF rate is <Num of="ex.rd" /> here, DF<sub>CHF</sub> = 1. With <i>C</i> = 2<i>P</i> it follows that <i>P</i>(<i>K</i><sub>L</sub>) = <i>F</i> − <i>K</i><sub>L</sub>: the improvement is exactly the value of the second put, <Num of="m09.levSecondPut" /> pips. It costs more than the forward below 2<i>K</i><sub>L</sub> − <i>F</i> = <Num of="m09.levWorse" />.
 
 </Derivation>
 

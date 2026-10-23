@@ -1,9 +1,10 @@
 /**
  * Module template (B-Modul): header and stepper, MDX numbers, check question, progress
  * tracking via the end-of-section marker, pager links, quiz flow, English route, redirect,
- * placeholder for unwritten sections, axe and no horizontal scroll (390 px project).
+ * every section and quiz has content, axe and no horizontal scroll (390 px project).
  */
 import AxeBuilder from '@axe-core/playwright';
+import { MODULE_SLUGS } from '../../src/data/modules';
 import { expect, test, type Page } from '@playwright/test';
 
 const SEC2 = '/module/05-greeks/2/';
@@ -30,11 +31,18 @@ async function expectNoSeriousAxeViolations(page: Page) {
   ).toEqual([]);
 }
 
-/** Waits until every Preact island on the page has hydrated (Astro drops the ssr attribute). */
-async function waitHydrated(page: Page) {
-  await page.waitForFunction(() =>
-    [...document.querySelectorAll('astro-island')].every((i) => !i.hasAttribute('ssr')),
-  );
+/**
+ * Waits until islands have hydrated (Astro drops the ssr attribute). With a selector, only the
+ * island containing that element counts: client:visible islands elsewhere on the page may never
+ * scroll into view on a phone.
+ */
+async function waitHydrated(page: Page, selector?: string) {
+  await page.waitForFunction((sel) => {
+    const islands = sel
+      ? [document.querySelector(sel)?.closest('astro-island')].filter(Boolean)
+      : [...document.querySelectorAll('astro-island')];
+    return islands.length > 0 && islands.every((i) => !i!.hasAttribute('ssr'));
+  }, selector);
 }
 
 const progress = (page: Page) =>
@@ -81,7 +89,7 @@ test.describe('module section page', () => {
     await page.goto(SEC2);
     const card = page.locator('[data-quiz="check"]');
     await card.scrollIntoViewIfNeeded();
-    await waitHydrated(page);
+    await waitHydrated(page, '[data-quiz="check"]');
     await expect(card).toContainText('Kurz geprüft');
     const options = card.locator('.qz-opt');
     await expect(options).toHaveCount(3);
@@ -162,16 +170,22 @@ test.describe('module section page', () => {
     await expect(page.locator('[data-step="1"]')).toHaveAttribute('aria-current', 'step');
   });
 
-  test('a section without text shows the placeholder, with header and pager', async ({ page }) => {
-    await page.goto('/module/01-spot/3/');
-    await expect(
-      page.getByRole('heading', { level: 1, name: 'Der Devisenmarkt und der Spotkurs' }),
-    ).toBeVisible();
-    await expect(page.locator('[data-coming="section"]')).toContainText(
-      'Dieser Abschnitt entsteht gerade.',
-    );
-    await expect(page.locator('[data-quiz]')).toHaveCount(0);
-    await expect(page.locator('.pager-next')).toHaveAttribute('href', '/module/01-spot/4/');
+  test('every section in both languages has content (no placeholder left)', async ({ page }) => {
+    for (const prefix of ['', '/en']) {
+      for (const slug of MODULE_SLUGS) {
+        for (const sec of ['1', '2', '3', '4']) {
+          await page.goto(`${prefix}/module/${slug}/${sec}/`);
+          await expect(
+            page.locator('[data-coming]'),
+            `${prefix}/module/${slug}/${sec}/`,
+          ).toHaveCount(0);
+          await expect(
+            page.locator('[data-quiz="check"]'),
+            `${prefix}/module/${slug}/${sec}/`,
+          ).toHaveCount(1);
+        }
+      }
+    }
   });
 
   test('English section renders in English with the same numbers', async ({ page }) => {
@@ -248,11 +262,14 @@ test.describe('module quiz page', () => {
     expect((await progress(page)).quiz['05-greeks']).toEqual({ best: 3, total: 4, passed: true });
   });
 
-  test('a module without a quiz shows the placeholder', async ({ page }) => {
-    await page.goto('/module/02-forward/quiz/');
-    await expect(page.locator('[data-coming="quiz"]')).toContainText(
-      'Das Quiz zu diesem Modul entsteht gerade.',
-    );
+  test('every module has a quiz with four questions in both languages', async ({ page }) => {
+    for (const prefix of ['', '/en']) {
+      for (const slug of MODULE_SLUGS) {
+        await page.goto(`${prefix}/module/${slug}/quiz/`);
+        await expect(page.locator('[data-coming]'), slug).toHaveCount(0);
+        await expect(page.locator('[data-quiz="quiz"]'), slug).toHaveCount(1);
+      }
+    }
   });
 });
 

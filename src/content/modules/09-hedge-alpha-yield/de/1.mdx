@@ -12,26 +12,28 @@ Drei Personen schauen auf denselben Kurs, USD/CHF <Num of="ex.spot" />:
 
 Das Bedürfnis entscheidet, welches Risiko überhaupt erwünscht ist. Der Importeur hat schon ein Risiko: Er ist short USD. Er will es loswerden. Die Anlegerin will ein Risiko eingehen, aber nur das, auf das sie setzt. Der Anleger nimmt etwas Risiko in Kauf, um mehr Zins zu bekommen.
 
+Der Massstab bleibt für alle drei derselbe: der Forward. Jedes Produkt in diesem Modul misst du daran, wo es besser und wo es schlechter ist als der Forward.
+
 ### Gleiche Sicht, anderes Risiko
 
 Erst danach kommt die Marktsicht. Nimm «USD wird stärker». Der Importeur kann diese Sicht mit einem Forward, einer Stop-Loss-Order oder einem USD Call umsetzen. Alle drei schützen ihn, aber jedes mit einem anderen Worst Case: eine verpasste Chance, ein Gap oder die Prämie.
 
 <ProductMatrixFigure caption="Wähle Bedürfnis und Sicht. Der Chart legt alle passenden Produkte auf eine Achse; zieh den Kurs bei Verfall oder spiel ihn ab. Die Chips zeigen Hebel, Pfad, Worst Case und Komplexität, immer mit Text." />
 
-Klick dich durch die Matrix. Bei «Alpha» heisst dieselbe Sicht plötzlich TARF oder Accumulator: ein Strike weit besser als der Forward, aber unter dem Strike die doppelte Menge. Bei «Yield» und «Seitwärts» zahlen Dual Currency und Discount-Zertifikat mehr Zins, solange der Dollar nicht fällt. Und die beiden haben genau dieselbe Kurve. Warum, zeigt [Abschnitt 4](/module/09-hedge-alpha-yield/4/).
+Klick dich durch die Matrix. Bei «Alpha» wird aus einer ähnlichen Sicht («Der Dollar fällt nicht») plötzlich ein TARF oder ein Accumulator: ein Strike weit besser als der Forward, aber unter dem Strike die doppelte Menge. Bei «Yield» und «Seitwärts» zahlen Dual Currency und Discount-Zertifikat mehr Zins, solange der Dollar nicht stark fällt. Und die beiden haben genau dieselbe Kurve. Warum, zeigt [Abschnitt 4](/module/09-hedge-alpha-yield/4/).
 
 ### Rechenbeispiel: Forward oder Call?
 
-Der Importeur vergleicht zwei Hedges für die Sicht «USD stärker». Das Ergebnis des Hedges bei Verfall misst er in Pips je USD. Ein Plus gleicht seine Mehrkosten aus.
+Der Importeur vergleicht zwei Hedges für die Sicht «USD stärker». Das Ergebnis des Hedges bei Verfall misst er in Pips je USD. Ein Plus gleicht seine Mehrkosten aus. Ein Minus heisst: Ohne Hedge hätte er günstiger gekauft.
 
 - **Dollar <Num of="m09.s1Move" /> stärker, USD/CHF <Num of="m09.s1Up" />:** Der Forward bringt <Num of="m09.s1FwdUp" /> Pips, auf USD 1 Mio. also <Num of="m09.s1FwdUpChf" />. Der Call bringt nur <Num of="m09.s1CallUp" /> Pips, weil die Prämie von <Num of="m09.callPremiumPips" /> Pips abgeht.
-- **Dollar <Num of="m09.s1Move" /> schwächer, USD/CHF <Num of="m09.s1Down" />:** Jetzt dreht es. Der Forward kostet <Num of="m09.s1FwdDown" /> Pips, denn der Importeur hätte günstiger kaufen können. Der Call kostet nur die Prämie, <Num of="m09.s1CallDown" /> Pips.
+- **Dollar <Num of="m09.s1Move" /> schwächer, USD/CHF <Num of="m09.s1Down" />:** Jetzt dreht es. Der Forward bringt <Num of="m09.s1FwdDown" /> Pips, denn der Importeur hätte günstiger kaufen können. Beim Call verfällt nur die Prämie, <Num of="m09.s1CallDown" /> Pips.
 
 Keines der beiden ist «besser». Der Forward ist ideal, wenn die Sicht stimmt. Der Call ist ideal, wenn sie falsch ist. Die Frage lautet also: Welchen Worst Case kannst du tragen? Genau das zeigen die Chips der Matrix.
 
 <Derivation title="Herleitung: Warum kein Produkt den Forward gratis schlägt">
 
-**1.** Im Modell wächst der Kurs im Mittel genau zum Forward: Der Erwartungswert unter dem risikoneutralen Mass ist der Forward ([Modul 02](/module/02-forward/2/)).
+**1.** Im Modell landet der Kurs bei Verfall im Mittel genau beim Forward: Der Erwartungswert unter dem risikoneutralen Mass ist der Forward ([Modul 02](/module/02-forward/2/)). Das ist eine Preisregel, keine Prognose.
 
 <Formula>E[<i>S</i><sub><i>T</i></sub>] = <i>F</i> = <Num of="ex.forward" digits={4} /></Formula>
 
@@ -39,7 +41,7 @@ Keines der beiden ist «besser». Der Forward ist ideal, wenn die Sicht stimmt. 
 
 <Formula>Wert = <i>e</i><sup>−<i>r</i><sub>d</sub><i>T</i></sup> · E[<i>X</i>(<i>S</i><sub><i>T</i></sub>)]</Formula>
 
-**3.** Ein Forward zum Kurs <i>F</i> hat <i>X</i> = <i>S</i><sub><i>T</i></sub> − <i>F</i>, also den Wert null. Ein «Zero-Cost»-Produkt hat ebenfalls den Wert null. Liegt es in einem Szenario über dem Forward, muss es in einem anderen darunter liegen. Sonst wäre sein Erwartungswert grösser als null.
+**3.** Ein Forward zum Kurs <i>F</i> hat <i>X</i> = <i>S</i><sub><i>T</i></sub> − <i>F</i>, also den Wert null. Ein «Zero-Cost»-Produkt hat ebenfalls den Wert null. Ist es in einem Szenario besser als der Forward, muss es in einem anderen schlechter sein. Sonst wäre es mehr wert als null.
 
 **4.** Darum kostet jede Verbesserung etwas: eine Prämie (Call), einen Teil der Chance (Collar) oder ein zusätzliches Risiko wie Hebel und Knock-out (strukturierte Produkte). In der Praxis kommt noch die Marge des Anbieters dazu.
 

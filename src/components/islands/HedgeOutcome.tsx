@@ -139,15 +139,28 @@ export default function HedgeOutcome({ lang }: HedgeOutcomeProps): JSX.Element {
     inside(v, H.stRange[0] + 1e-9, H.stRange[1] - 1e-9),
   );
 
-  // Verdict bracket label on the side where the orange line moves away from it: right of the
-  // guide when the forward saves (the line rises to the right), left when it costs (the line
-  // falls to the left). Falls back to the other side if there is no room.
+  // Verdict bracket label at mid-height, on the side where the orange line moves away from it:
+  // right of the guide when the forward saves (the line rises to the right), left when it costs
+  // (the line falls to the left). Without room there, it goes to the other side but beyond the
+  // point where the orange line crosses mid-height, so the line never runs through the text.
   const diffLabel = chf(Math.abs(shownDiff));
   const labelW = textWidth(diffLabel, L.font + 1) + 8;
   const fitsRight = x + 12 + labelW <= L.plotRight;
   const fitsLeft = x - 12 - labelW >= L.left;
-  const labelLeft = verdict === 'costs' ? fitsLeft || !fitsRight : !fitsRight;
+  const xCross = sx((st + F) / 2);
+  const labelLeft = verdict === 'costs' ? fitsLeft : !fitsRight;
+  const labelX = labelLeft
+    ? verdict === 'costs'
+      ? x - 12
+      : Math.min(x - 12, xCross - 14)
+    : verdict === 'saves'
+      ? x + 12
+      : Math.max(x + 12, xCross + 14);
   const yMid = (yU + yF) / 2;
+
+  // The forward's label sits right of its line, or left when the rate guide would cross it.
+  const fLabel = t('ho.fLabel', { fwd: fwdTxt });
+  const fLabelLeft = x > xF - 4 && x < xF + 14 + textWidth(fLabel, L.font, 0.6);
 
   // Strip headers: centred over their columns unless they would collide, then pushed apart.
   const headU = t('ho.strip.unhedged');
@@ -290,12 +303,12 @@ export default function HedgeOutcome({ lang }: HedgeOutcomeProps): JSX.Element {
               {/* forward reference */}
               <path d={`M${xF.toFixed(1)},${L.top}V${L.plotBottom}`} class="m2-ref" />
               <text
-                x={xF + 6}
+                x={fLabelLeft ? xF - 6 : xF + 6}
                 y={L.top + (L.compact ? 2 : 1) * (L.font + 6)}
                 class="m2-ref-label"
-                style={{ fontSize: fs }}
+                style={{ fontSize: fs, textAnchor: fLabelLeft ? 'end' : 'start' }}
               >
-                {t('ho.fLabel', { fwd: fwdTxt })}
+                {fLabel}
               </text>
 
               {/* lines */}
@@ -388,7 +401,7 @@ export default function HedgeOutcome({ lang }: HedgeOutcomeProps): JSX.Element {
               )}
               {verdict !== 'equal' && Math.abs(yU - yF) > 14 && (
                 <text
-                  x={labelLeft ? x - 12 : x + 12}
+                  x={labelX}
                   y={yMid + L.font * 0.35}
                   class="ho-diff-label"
                   style={{

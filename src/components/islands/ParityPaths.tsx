@@ -704,13 +704,10 @@ export default function ParityPaths({ lang }: ParityPathsProps): JSX.Element {
             <div class="m2-box-head">
               <b>{t('pp.cont.title')}</b>
               <span>
-                <span class="math">
-                  <i>S</i> · e
-                  <sup>
-                    (<i>r</i>
-                    <sub>CHF</sub> − <i>r</i>
-                    <sub>USD</sub>) · <i>t</i>
-                  </sup>
+                <span class="math pp-formula">
+                  <i>S</i> · exp((<i>r</i>
+                  <sub>CHF</sub> − <i>r</i>
+                  <sub>USD</sub>) · <i>t</i>)
                 </span>
                 , {t('pp.cont.sub', { t: fmtNumber(r.tq, lang, { digits: 4 }) })}
               </span>
