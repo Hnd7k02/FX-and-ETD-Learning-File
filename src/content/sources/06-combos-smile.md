@@ -16,6 +16,11 @@ indexed text also says that before the crisis the franc's safe-haven role "was f
 questioned". The SNB and BIS sites themselves could not be opened from the build sandbox (DNS
 blocked), so the wording was checked against the search index only.
 
+Review (23.10.2026, second agent): a fresh web search again returned the SNB page with the exact
+sentence, given by a member of the SNB Governing Board. The module text therefore attributes the
+statement to "ein Mitglied des Direktoriums der SNB" in a 2009 speech (no person named, D-01),
+not to the SNB as an institution.
+
 Everything else in module 06 (spreads, risk reversal, straddle, strangle, butterfly, seagull,
 the ATM / 25Δ risk reversal / 25Δ butterfly quotes and the quadratic smile in delta) is
 textbook material; all numbers come from the calculation core and are example values, not

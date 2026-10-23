@@ -17,12 +17,12 @@ Rates such as USD/CHF have four decimal places. The last digit is called a **pip
 Three scenarios for payment day:
 
 - **One big figure higher, <Num of="m01.sBf" />.** The dollars cost <Num of="m01.costBf" />, that is <Num of="m01.bigFigChf" /> more than today.
-- **The dollar rises to <Num of="m01.stUp" />.** That is <Num of="m01.bfUp" /> big figures or <Num of="m01.pctUp" />. The importer pays <Num of="m01.costUp" />, a difference of <Num of="m01.diffUp" />.
-- **The dollar falls to <Num of="m01.stDown" />.** He pays <Num of="m01.costDown" />, that is <Num of="m01.diffDown" />.
+- **The dollar rises to <Num of="m01.stUp" />.** That is <Num of="m01.bfUp" /> big figures or <Num of="m01.pctUp" sign={false} />. The importer pays <Num of="m01.costUp" />, <Num of="m01.diffUp" sign={false} /> more.
+- **The dollar falls to <Num of="m01.stDown" />.** He pays <Num of="m01.costDown" />, <Num of="m01.saveDown" /> less.
 
 ### How far can the rate move?
 
-With a volatility of <Num of="ex.vol" />, the model puts the rate in 3 months between <Num of="m01.rangeLo" /> and <Num of="m01.rangeHi" /> in roughly two cases out of three. That is the grey band in the chart. For the importer it means: his bill differs from today's by <Num of="m01.rangeLoChf" /> to <Num of="m01.rangeHiChf" />, in a perfectly ordinary quarter.
+How much a rate swings is measured by its **volatility** (vol for short), stated per year. With a volatility of <Num of="ex.vol" />, the model puts the rate in 3 months between <Num of="m01.rangeLo" /> and <Num of="m01.rangeHi" /> in roughly two cases out of three. That is the grey band in the chart. For the importer it means: his bill can come out <Num of="m01.rangeLoSave" /> lower or <Num of="m01.rangeHiChf" sign={false} /> higher than today. And that is in a perfectly ordinary quarter.
 
 And a rise to <Num of="m01.stUp" /> or higher? The model gives it a probability of about <Num of="m01.probUp" />. Unlikely, but no freak event. These are exactly the cases the importer wants protection against. Module 02 shows how, with the forward.
 
@@ -30,7 +30,7 @@ And a rise to <Num of="m01.stUp" /> or higher? The model gives it a probability 
 
 You can write any rate the other way round. Instead of francs per dollar you state dollars per franc: CHF/USD = 1 ÷ <Num of="ex.spot" /> = <Num of="m01.inverse" />. The market trades and shows USD/CHF. The first currency is called the **base**, the second the **quote**. More on this in section 3.
 
-Percentages are not symmetric here. If USD/CHF rises from <Num of="ex.spot" /> to <Num of="m01.stUp" />, the dollar gains <Num of="m01.pctUp" />. But the franc loses only <Num of="m01.inversePctUp" />: CHF/USD falls from <Num of="m01.inverse" /> to <Num of="m01.inverseUp" />.
+Percentages are not symmetric here. If USD/CHF rises from <Num of="ex.spot" /> to <Num of="m01.stUp" />, the dollar gains <Num of="m01.pctUp" sign={false} />. But the franc loses only <Num of="m01.inverseLossUp" />: CHF/USD falls from <Num of="m01.inverse" /> to <Num of="m01.inverseUp" />.
 
 <Derivation title="Derivation: cost, inverse, range and probability">
 
@@ -46,7 +46,7 @@ So one pip (Δ<i>S</i> = 0.0001) costs <Num of="m01.pipChf" />, one big figure (
 
 With <i>x</i> = <Num of="m01.pctUp" /> this gives <Num of="m01.inversePctUp" />. The larger the move, the larger the gap between the two percentages.
 
-**Range.** In the option model (module 04) the log return of the rate over the term <i>T</i> is normally distributed with standard deviation σ√<i>T</i> = <Num of="ex.vol" /> · √<Num of="ex.T" /> = <Num of="m01.sigmaSqrtT" />. Here we work without drift. The rate then lies in the band below with a probability of about 68%:
+**Range.** In the option model (module 04) the log return of the rate over the term <i>T</i> is normally distributed with standard deviation σ√<i>T</i> = <Num of="ex.vol" /> · √<Num of="ex.T" /> = <Num of="m01.sigmaSqrtT" />. Here we work without drift, so the centre is today's spot. In the option model the expected rate is the forward, <Num of="m01.fwdBelowPips" /> pips below the spot (module 02). For a feel of the range that changes little. Without drift the rate lies in the band below with a probability of about 68%:
 
 <Formula><i>S</i> · e<sup>−σ√<i>T</i></sup> ≤ <i>S</i><sub>T</sub> ≤ <i>S</i> · e<sup>+σ√<i>T</i></sup></Formula>
 
@@ -70,6 +70,6 @@ In the charts of this tool, long is blue and short is orange. That is why the im
 
 <Takeaway>
 
-An exchange rate is the price of one currency in another. Whoever has to pay USD 1m in 3 months is short USD: every big figure costs him <Num of="m01.bigFigChf" />.
+An exchange rate is the price of one currency in another. Whoever has to pay USD 1m in 3 months is short USD: every big figure the dollar rises costs him <Num of="m01.bigFigChf" />.
 
 </Takeaway>

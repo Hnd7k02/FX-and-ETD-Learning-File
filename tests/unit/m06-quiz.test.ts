@@ -62,6 +62,40 @@ describe('m06 numbers', () => {
     expect(d('m06.csWidthPips') - d('m06.csPips')).toBeCloseTo(d('m06.csMaxGainPips'), 6);
   });
 
+  it('displayed smile price differences are the differences of the displayed prices', () => {
+    const d = (k: string) => Number(formatNum(nums[k]!, 'en').replace(/[+,]/g, '').replace('−', '-'));
+    expect(d('m06.put25SmilePips') - d('m06.put25FlatPips')).toBeCloseTo(d('m06.put25DiffPips'), 6);
+    expect(d('m06.call25SmilePips') - d('m06.call25FlatPips')).toBeCloseTo(
+      d('m06.call25DiffPips'),
+      6,
+    );
+  });
+
+  it('supports the claims in the text', () => {
+    const v = (k: string) => nums[k]!.value;
+    // section 1: every option structure lies between the forward and staying unhedged
+    for (const id of ['Call', 'Spread', 'Collar', 'Seagull']) {
+      expect(v(`m06.up${id}Chf`)).toBeGreaterThan(v('m06.fwdChf'));
+      expect(v(`m06.up${id}Chf`)).toBeLessThan(v('m06.upUnhedgedChf'));
+      expect(v(`m06.down${id}Chf`)).toBeLessThan(v('m06.fwdChf'));
+      expect(v(`m06.down${id}Chf`)).toBeGreaterThan(v('m06.downUnhedgedChf'));
+    }
+    // ... and the collar is the cheapest option structure when the dollar is strong
+    for (const id of ['Call', 'Spread', 'Seagull'])
+      expect(v('m06.upCollarChf')).toBeLessThan(v(`m06.up${id}Chf`));
+    // section 3: a full revaluation, not vega × shock (volga): the strangle gains more,
+    // the seagull loses more than vega alone says
+    const pts = v('m06.shockPts');
+    expect(v('m06.strShockChf')).toBeGreaterThan(pts * v('m06.strVegaChf'));
+    expect(v('m06.sgShockChf')).toBeLessThan(pts * v('m06.sgVegaChf'));
+    // the straddle approximation √(2/π)·σ√T·F matches the exact value at K = F to 0.1 pip
+    expect(Math.abs(v('m06.straddleApproxPips') - v('m06.straddleAtFPips'))).toBeLessThan(0.1);
+    // the break-even move ≈ the expected absolute move √(2/π)·σ√T
+    expect(Math.abs(v('m06.straddleMovePct') - v('m06.expMovePct'))).toBeLessThan(5e-4);
+    // the straddle at the DNS strike loses if USD/CHF is still at the spot at expiry
+    expect(v('m06.straddleBeHi')).toBeGreaterThan(E.spot);
+  });
+
   it('matches the reference structure of the example', () => {
     // zero-cost puts: seagull below collar; smile helps the importer's collar
     expect(M06.shSeagull.putStrike!).toBeLessThan(M06.shCollar.putStrike!);
