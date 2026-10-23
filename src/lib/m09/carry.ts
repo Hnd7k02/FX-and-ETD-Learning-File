@@ -152,6 +152,19 @@ export function yieldPnlPerUsd(step: YieldStep, ST: number, v: CarryView): numbe
   return Math.min(ST, v.strike) - v.strike + v.put / v.dfd;
 }
 
+/**
+ * Building blocks per USD, each against the deposit: long USD with interest (= carry), the sold
+ * call and the sold put with their premiums carried to maturity. long + shortCall = discount
+ * certificate; deposit (0) + shortPut = dual currency.
+ */
+export type YieldBlock = 'long' | 'shortCall' | 'shortPut';
+
+export function yieldBlockPerUsd(b: YieldBlock, ST: number, v: CarryView): number {
+  if (b === 'long') return ST - v.forward;
+  if (b === 'shortCall') return v.call / v.dfd - Math.max(ST - v.strike, 0);
+  return v.put / v.dfd - Math.max(v.strike - ST, 0);
+}
+
 /** Result against the CHF deposit on the whole exposure (N USD), in CHF. */
 export function yieldPnl(step: YieldStep, ST: number, v: CarryView): number {
   return yieldPnlPerUsd(step, ST, v) * v.notional;

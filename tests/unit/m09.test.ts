@@ -36,6 +36,7 @@ import {
   yieldPnl,
   yieldPnlPerUsd,
   yieldReturnPa,
+  yieldBlockPerUsd,
 } from '@/lib/m09/carry';
 import { forward } from '@/lib/fx/forward';
 
@@ -174,6 +175,16 @@ describe('CarryCushion: carry, discount certificate and dual currency', () => {
         yieldPnlPerUsd('carry', x, v) + v.call / v.dfd - Math.max(x - v.strike, 0),
         12,
       );
+    }
+  });
+
+  it('builds the certificate and the DCI from blocks', () => {
+    for (const x of [0.72, 0.79, 0.85]) {
+      expect(yieldBlockPerUsd('long', x, v) + yieldBlockPerUsd('shortCall', x, v)).toBeCloseTo(
+        yieldPnlPerUsd('discount', x, v),
+        12,
+      );
+      expect(yieldBlockPerUsd('shortPut', x, v)).toBeCloseTo(yieldPnlPerUsd('dci', x, v), 12);
     }
   });
 

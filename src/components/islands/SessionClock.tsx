@@ -201,6 +201,8 @@ export default function SessionClock({ lang }: SessionClockProps): JSX.Element {
   const showNow = !!now && now.day === day && now.season === season;
   const xNow = now ? sx(now.hour) : 0;
   const xCur = sx(h);
+  // the time pill on the rail stays inside the SVG at the end of the day
+  const pillX = Math.min(Math.max(xCur, 29), L.width - 29);
   const yCur = sy(liquidityAt(season, day, h));
 
   const aria = t('aria', {
@@ -491,14 +493,14 @@ export default function SessionClock({ lang }: SessionClockProps): JSX.Element {
               />
               <g class={`sc-handle${dragging ? ' is-active' : ''}`} data-handle {...handlers}>
                 <rect
-                  x={xCur - 30}
+                  x={pillX - 30}
                   y={L.rail - 22}
                   width={60}
                   height={44}
                   style={{ fill: 'transparent' }}
                 />
                 <rect
-                  x={xCur - 28}
+                  x={pillX - 28}
                   y={L.rail - 11}
                   width={56}
                   height={22}
@@ -506,7 +508,7 @@ export default function SessionClock({ lang }: SessionClockProps): JSX.Element {
                   style={{ fill: 'var(--ff-ink)', stroke: '#fff', strokeWidth: 2 }}
                 />
                 <text
-                  x={xCur}
+                  x={pillX}
                   y={L.rail + 4}
                   style={{
                     fontSize: '11px',

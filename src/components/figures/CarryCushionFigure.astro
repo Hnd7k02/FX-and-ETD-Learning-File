@@ -1,0 +1,277 @@
+---
+/**
+ * Carry cushion (module 09, section 4) for MDX: carry → discount certificate → dual currency.
+ *
+ * Props (all optional)
+ * - step?: 'carry' | 'discount' | 'dci'   Step shown first (default carry).
+ * - months?: number   Tenor shown first, 1 to 12 (default 3).
+ * - st?: number       USD/CHF at expiry marked first (default spot − 2 %).
+ * - caption?: string
+ *
+ * Example: <CarryCushionFigure step="discount" caption="…" />
+ */
+import CarryCushion from '@/components/islands/CarryCushion';
+import Figure from '@/components/content/Figure.astro';
+import { pageLang } from '@/components/content/lang';
+
+interface Props {
+  step?: string;
+  months?: number;
+  st?: number;
+  caption?: string;
+}
+const { caption, ...rest } = Astro.props;
+const lang = pageLang(Astro.currentLocale);
+---
+
+<Figure caption={caption}>
+  <CarryCushion client:visible lang={lang} {...rest} />
+</Figure>
+
+<style is:global>
+  .cc {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
+    color: var(--ff-ink);
+  }
+  .cc p {
+    margin: 0;
+  }
+  .cc .ff-lab-head {
+    margin-bottom: 0;
+  }
+  .cc-head-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+  .cc-example {
+    font-size: 12px;
+    color: var(--ff-ink-2);
+  }
+  .cc .cc-steps {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .cc .cc-steps li {
+    display: flex;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+  .cc-step {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    min-height: 56px;
+    padding: 8px 12px;
+    border: 1px solid var(--ff-line-input);
+    border-radius: 14px;
+    background: var(--ff-surface);
+    color: var(--ff-ink);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition:
+      background-color 160ms ease,
+      border-color 160ms ease;
+  }
+  .cc-step:hover {
+    border-color: var(--ff-ref);
+  }
+  .cc-step[aria-pressed='true'] {
+    border-color: var(--ff-ink);
+    background: var(--ff-ink);
+    color: #fff;
+  }
+  .cc-step-n {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 999px;
+    background: var(--ff-chip);
+    color: var(--ff-ink);
+    font-size: 13px;
+    font-weight: 800;
+  }
+  .cc-step[aria-pressed='true'] .cc-step-n {
+    background: #fff;
+  }
+  .cc-step-text {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+  }
+  .cc-step-name {
+    font-size: 14px;
+    font-weight: 800;
+  }
+  .cc-step-sub {
+    font-size: 12px;
+    color: var(--ff-muted);
+  }
+  .cc-step[aria-pressed='true'] .cc-step-sub {
+    color: var(--ff-on-dark-muted);
+  }
+  .cc-desc-row {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .cc .cc-desc {
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--ff-ink-2);
+    max-width: 760px;
+    min-height: 3.1em;
+    animation: cc-in 320ms ease-out both;
+  }
+  .cc .cc-twin {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: var(--ff-r-pill);
+    background: var(--ff-apply-soft);
+    color: var(--ff-apply-text);
+    font-size: 13px;
+    font-weight: 800;
+    animation: cc-pop 420ms cubic-bezier(0.2, 0.9, 0.3, 1.25) both;
+  }
+  .cc .ff-legend {
+    flex-direction: row;
+    padding-left: 0;
+    gap: 6px 18px;
+  }
+  .cc .ff-legend li {
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--ff-ink-2);
+  }
+  .cc-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    font-family: var(--ff-font-ui);
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .cc-block {
+    animation: cc-in 360ms ease-out both;
+  }
+  .cc-handle {
+    cursor: grab;
+    touch-action: none;
+  }
+  .cc-handle.is-active {
+    cursor: grabbing;
+  }
+  .cc .cc-hint {
+    font-size: 12px;
+    color: var(--ff-muted);
+  }
+  .cc .cc-aha {
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: var(--ff-apply-soft);
+    color: var(--ff-apply-text);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.5;
+    animation: cc-pop 420ms cubic-bezier(0.2, 0.9, 0.3, 1.25) both;
+  }
+  .cc .ff-stat-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .cc-meter {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px 16px;
+    border-top: 1px solid var(--ff-row);
+  }
+  .cc-meter-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 4px 10px;
+    align-items: center;
+  }
+  .cc-meter-label {
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .cc-meter-value {
+    font-size: 13px;
+    text-align: right;
+  }
+  .cc-meter-track {
+    grid-column: 1 / -1;
+    display: block;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--ff-chip);
+    overflow: hidden;
+  }
+  .cc-meter-bar {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+    transform-origin: left center;
+    transition: transform 420ms cubic-bezier(0.65, 0, 0.35, 1);
+  }
+  .cc-meter-bar.is-cushion {
+    background: var(--ff-apply);
+  }
+  .cc-meter-bar.is-sigma {
+    background: var(--ff-ref);
+  }
+  .cc-play {
+    align-self: flex-start;
+  }
+  .cc-icon-fill {
+    fill: currentColor;
+  }
+  .cc-icon-stroke {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.4;
+    stroke-linecap: round;
+  }
+  @media (max-width: 640px) {
+    .cc .cc-steps {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @keyframes cc-in {
+    from {
+      transform: translateY(4px);
+    }
+    to {
+      transform: none;
+    }
+  }
+  @keyframes cc-pop {
+    0% {
+      transform: scale(0.85);
+    }
+    70% {
+      transform: scale(1.04);
+    }
+    100% {
+      transform: none;
+    }
+  }
+</style>
