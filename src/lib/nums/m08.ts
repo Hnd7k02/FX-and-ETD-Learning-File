@@ -445,6 +445,11 @@ export const nums: NumTable = {
   },
   'm08.tpfCoupon': { value: M.tpfCouponPips, kind: 'pips' },
   'm08.tpfSe': { value: M.tpfSePips, kind: 'pips' },
+  'm08.couponQuote': {
+    value: PATHSIM_CONFIG.couponQuoteStep / PIP,
+    kind: 'pips',
+    note: 'Quote step of the coupons (PATHSIM_CONFIG.couponQuoteStep)',
+  },
   'm08.tpfCouponChf': { value: M.tpfCouponChf, kind: 'money' },
   'm08.tpfMaxChf': { value: M.tpfMaxChf, kind: 'money' },
   'm08.tpfTargetCoupons': { value: M.tpfTargetCoupons, kind: 'num', digits: 0 },

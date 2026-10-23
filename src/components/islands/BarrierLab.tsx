@@ -253,9 +253,7 @@ export default function BarrierLab({ lang, initial }: BarrierLabProps): JSX.Elem
   const showEff = s.monitoring === 'daily' && Math.abs(n.effectiveBarrier - s.barrier) > 1e-9;
   const labelLeft = s.dir === 'down';
   const zoneText = t(s.io === 'out' ? 'bl.zone.out' : 'bl.zone.in');
-  const zoneWidth = Math.abs(
-    x(Math.min(xb, curves.region[1])) - x(Math.max(xa, curves.region[0])),
-  );
+  const zoneWidth = Math.abs(x(Math.min(xb, curves.region[1])) - x(Math.max(xa, curves.region[0])));
   const zoneFits = zoneWidth >= zoneText.length * 7 + 20;
   const zoneY = LV.height - LV.bottom - 10;
   const zoneX = labelLeft ? bx - 6 : bx + 17;
@@ -424,7 +422,7 @@ export default function BarrierLab({ lang, initial }: BarrierLabProps): JSX.Elem
             {showEff && (
               <text
                 x={effX + (labelLeft ? -8 : 8)}
-                y={LV.top + 30}
+                y={LV.top + 52}
                 class="m7-barrier-label"
                 text-anchor={labelLeft ? 'end' : 'start'}
               >

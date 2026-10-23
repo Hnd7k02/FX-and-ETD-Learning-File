@@ -58,6 +58,12 @@ function layoutFor(w: number) {
   };
 }
 
+/** Receive (+) flows point up; a zero CHF coupon counts as "up" (it would be received). */
+function isReceive(total: number, ccy: Flow['ccy']): boolean {
+  if (Math.abs(total) * 2 < 1) return ccy === 'quote';
+  return total > 0;
+}
+
 interface Seg {
   len: number;
   kind: 'notional' | 'coupon' | 'ghost';
@@ -145,7 +151,7 @@ export default function SwapCompare({ lang, tenor: tenorProp }: SwapCompareProps
     let couponLabelled = false;
     return gs.map((g) => {
       const x = xAt(g.day) + (g.ccy === 'base' ? -L.dx : L.dx);
-      const up = g.total > 0 || (Math.abs(g.total) < 0.5 && g.ccy === 'quote');
+      const up = isReceive(g.total, g.ccy);
       let segs = g.segs;
       // FX swap far CHF: shrink with the tweened ratio, add the ghost of the missing part
       if (which === 'fx' && g.day === tenor.days && g.ccy === 'quote') {

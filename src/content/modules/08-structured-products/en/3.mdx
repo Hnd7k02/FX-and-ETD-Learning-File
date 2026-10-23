@@ -3,7 +3,7 @@ import StructureBlocksFigure from '@/components/figures/StructureBlocksFigure.as
 
 {/* 08 Structured products · Section 3 · TARF and pivot TARF. Numbers only via <Num />, registry src/lib/nums/m08.ts. */}
 
-A TARF (target redemption forward) is a series of forwards at a better strike that ends as soon as enough gain has built up. In the example the importer buys <Num of="m08.tarfNotional" /> every month for <Num of="m08.tarfFixings" /> months, <Num of="m08.tarfTotal" /> in total. The fair strike is <Num of="m08.tarfStrike" />, <Num of="m08.tarfBetter" /> pips below the forward of <Num of="m08.tarfFwd" /> (standard error <Num of="m08.tarfSe" /> pips).
+A TARF (target redemption forward) is a series of forwards at a better strike that ends as soon as enough gain has built up. In the example the importer plans to buy <Num of="m08.tarfNotional" /> every month for <Num of="m08.tarfFixings" /> months, <Num of="m08.tarfTotal" /> in total. The fair strike is <Num of="m08.tarfStrike" />, <Num of="m08.tarfBetter" /> pips below the forward of <Num of="m08.tarfFwd" /> (standard error <Num of="m08.tarfSe" /> pips).
 
 On every fixing:
 
@@ -20,28 +20,28 @@ In building blocks: per fixing, a bought call and two sold puts at the strike, p
 
 ### Worked example: the asymmetry
 
-With these example values the first fixing is almost always far above the strike. The target is therefore reached quickly: in <Num of="m08.tarfPTarget" /> of the Monte Carlo paths, on average after <Num of="m08.tarfExpFix" /> fixings. Three scenarios in the simulator:
+With these example values the first fixing is almost always far above the strike. The target is therefore reached quickly: in <Num of="m08.tarfPTarget" /> of the Monte Carlo paths, on average after only <Num of="m08.tarfTargetFix" /> fixings. Three scenarios in the simulator:
 
 - **Trend up.** Target after <Num of="m08.tarfUpEnd" /> fixings. The TARF brings <Num of="m08.tarfUpPnl" />, and that is the maximum. The importer has bought only <Num of="m08.tarfUpUsd" />. He buys the rest in the market, at rising rates. The forward hedge brought <Num of="m08.tarfUpFwd" />; the difference is <Num of="m08.tarfUpDiff" />.
-- **Shock before the target.** The rate falls by <Num of="m08.shockGapAbs" /> on day <Num of="m08.shockDay" />. The very first fixing is below the strike and the target never comes. All <Num of="m08.tarfShockLev" /> fixings buy double, <Num of="m08.tarfShockUsd" /> in total: twice what the importer needs. Result against the market: <Num of="m08.tarfShockPnl" />.
-- **100 paths.** The bars below the chart show the result of each path. Almost all are small gains of at most <Num of="m08.tarfTargetChf" />. On the far right stand a few deep losses. One path in 20 loses more than <Num of="m08.tarfQ05" />, the worst of <Num of="m08.paths" /> paths <Num of="m08.tarfWorst" />.
+- **Shock before the target.** The rate falls by <Num of="m08.shockGapAbs" /> on day <Num of="m08.shockDay" />. The very first fixing is below the strike and the target never comes. All <Num of="m08.tarfShockLev" /> fixings buy double, <Num of="m08.tarfShockUsd" /> in total: twice what the importer needs. Against the market: <Num of="m08.tarfShockPnl" />. The forward hedge loses almost as much (<Num of="m08.tarfShockFwd" />), because it also buys above the market rate. The difference is the amount: if the rate keeps falling, the TARF loses twice as fast.
+- **100 paths.** The bars below the chart show the result of each path. Almost all are small gains of at most <Num of="m08.tarfTargetChf" />. On the far right stand a few deep losses. One path in 20 ends at <Num of="m08.tarfQ05" /> or worse, the worst of <Num of="m08.paths" /> paths at <Num of="m08.tarfWorst" />.
 
 <Callout variant="bad" title="When it goes wrong: good scenarios end early">
 
-If things go well, the TARF ends after a few fixings with a capped gain. If things go badly, there is no target to release you: the product runs on to the last fixing, every time with twice the amount. The losses are leveraged and not limited.
+If things go well, the TARF ends after a few fixings with a capped gain. Precisely when the dollar rises, the importer is then left without a hedge. If things go badly, there is no target to release you: the product runs on to the last fixing, every time with twice the amount. The losses are leveraged and not limited.
 
 </Callout>
 
 ### Pivot TARF: two strikes around a pivot
 
-The pivot TARF bets that the rate stays within a band. Around the pivot <Num of="m08.pivPivot" /> lie two strikes: <Num of="m08.pivK1" /> and <Num of="m08.pivK2" />, each <Num of="m08.pivWidth" /> pips away (standard error <Num of="m08.pivSe" /> pips). Below the pivot you buy at <Num of="m08.pivK1" />, above it you sell at <Num of="m08.pivK2" />. Both bring a gain as long as the fixing is between the strikes. Outside them you trade twice the amount at a loss. The target is <Num of="m08.pivTargetPips" /> pips, that is <Num of="m08.pivTargetChf" />.
+The pivot TARF bets that the rate stays within a band. Around the pivot <Num of="m08.pivPivot" /> lie two strikes: <Num of="m08.pivK1" /> and <Num of="m08.pivK2" />, each <Num of="m08.pivWidth" /> pips away (standard error <Num of="m08.pivSe" /> pips). Below the pivot you buy at <Num of="m08.pivK1" />, above it you sell at <Num of="m08.pivK2" />. Both bring a gain as long as the fixing is between the strikes. Outside them you trade twice the amount at a loss. The target is <Num of="m08.pivTargetPips" /> pips, that is <Num of="m08.pivTargetChf" />. For the importer this is no longer a hedge: the fixing decides whether he buys or sells dollars.
 
 <StructureBlocksFigure
   products={['pivotTarf']}
-  caption="The building blocks of the pivot TARF: a tent of gains between the strikes, double losses outside them."
+  caption="The building blocks of the pivot TARF: a tent of gains between the strikes, capped by the target at the top, double losses outside them."
 />
 
-The pattern is even more extreme than with the TARF. In <Num of="m08.pivPTarget" /> of the paths the target is reached after <Num of="m08.pivExpFix" /> fixings on average. Even the 5% quantile is a gain: <Num of="m08.pivQ05" />. The worst path loses <Num of="m08.pivWorst" />. In the simulator with the shock: <Num of="m08.pivShockPnl" />.
+The pattern is even more extreme than with the TARF. In <Num of="m08.pivPTarget" /> of the paths the target is reached, on average after <Num of="m08.pivTargetFix" /> fixings. Even the 5% quantile is a gain: <Num of="m08.pivQ05" />. The worst path ends at <Num of="m08.pivWorst" />. Switch the simulator above to the pivot TARF: with the shock it ends at <Num of="m08.pivShockPnl" />.
 
 <Callout variant="warn" title="Risk box: TARF and pivot TARF">
 
@@ -55,11 +55,11 @@ The pattern is even more extreme than with the TARF. In <Num of="m08.pivPTarget"
 
 **1.** Without the target, the TARF is a series of one call and two puts per fixing. As with the accumulator, Garman-Kohlhagen gives the fair strike: <Num of="m08.tarfK2" />.
 
-**2.** The target takes away your best scenarios: you never get gains above <Num of="m08.tarfTargetPips" /> pips. Your bought call is therefore worth less. For the present value to stay zero, the strike has to fall: to <Num of="m08.tarfStrike" /> (Monte Carlo).
+**2.** The target takes away your best scenarios: you never get gains above <Num of="m08.tarfTargetPips" /> pips. The sold puts end with the target too, but in those scenarios they are worth little, because the rate is high. On balance you lose value. For the present value to stay zero, the strike has to fall: to <Num of="m08.tarfStrike" /> (Monte Carlo).
 
-**3.** A back-of-the-envelope check shows how skewed the distribution is. The present value is zero, and with the CHF rate of <Num of="ex.rd" /> there is no discounting. If <Num of="m08.tarfPTarget" /> of the paths bring about <Num of="m08.tarfTargetChf" /> each, the remaining <Num of="m08.tarfPMaturity" /> must lose on average:
+**3.** A back-of-the-envelope check shows how skewed the distribution is. The present value is zero, and with the CHF rate of <Num of="ex.rd" /> there is no discounting. If <Num of="m08.tarfPTarget" digits={2} /> of the paths bring about <Num of="m08.tarfTargetChf" /> each, the remaining <Num of="m08.tarfPMaturity" digits={2} /> must lose on average:
 
-<Formula variant="accent"><Num of="m08.tarfPTarget" /> · <Num of="m08.tarfTargetChf" /> + <Num of="m08.tarfPMaturity" /> · <i>L</i> = 0 ⇒ <i>L</i> ≈ <b><Num of="m08.tarfImpliedLoss" /></b></Formula>
+<Formula variant="accent"><Num of="m08.tarfPTarget" digits={2} /> · <Num of="m08.tarfTargetChf" /> + <Num of="m08.tarfPMaturity" digits={2} /> · <i>L</i> = 0 ⇒ <i>L</i> ≈ <b><Num of="m08.tarfImpliedLoss" /></b></Formula>
 
 It is only an estimate: some target paths had a losing fixing first. The order of magnitude is still right. Many small gains pay for a few large losses.
 
@@ -67,7 +67,7 @@ It is only an estimate: some target paths had a losing fixing first. The order o
 
 <Desk title="A franc shock is not a thought experiment">
 
-On <Fact id="m08-floor-end" /> the Swiss National Bank discontinued the minimum exchange rate of CHF <Fact id="m08-floor" /> per euro with immediate effect. The [Riskometer](/en/riskometer/) shows what that set off in the currency market. For products with a double amount such a day is the real test: the rate jumps across a gap, no stop-loss fills at its planned level, and a target that has not yet been reached saves nobody.
+On <Fact id="m08-floor-end" /> the Swiss National Bank discontinued the minimum exchange rate of CHF <Fact id="m08-floor" /> per euro with immediate effect. The [Riskometer](/en/riskometer/) shows what that set off in the currency market. For products with a double amount such a day is the real test: the rate jumps across a gap, no stop-loss fills at its planned level, and a target that has not yet been reached saves nobody. More on gap risk in [module 07](/en/module/07-barrier-binary/4/).
 
 </Desk>
 

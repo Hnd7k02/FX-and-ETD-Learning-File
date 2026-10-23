@@ -3,7 +3,7 @@ import StructureBlocksFigure from '@/components/figures/StructureBlocksFigure.as
 
 {/* 08 Strukturierte Produkte · Abschnitt 3 · TARF und Pivot TARF. Zahlen nur über <Num />, Registry src/lib/nums/m08.ts. */}
 
-Ein TARF (Target Redemption Forward) ist eine Serie von Forwards zu einem besseren Strike, die endet, sobald genug Gewinn angefallen ist. Im Beispiel kauft der Importeur <Num of="m08.tarfFixings" /> Monate lang je <Num of="m08.tarfNotional" />, zusammen <Num of="m08.tarfTotal" />. Der faire Strike ist <Num of="m08.tarfStrike" />, <Num of="m08.tarfBetter" /> Pips unter dem Forward von <Num of="m08.tarfFwd" /> (Standardfehler <Num of="m08.tarfSe" /> Pips).
+Ein TARF (Target Redemption Forward) ist eine Serie von Forwards zu einem besseren Strike, die endet, sobald genug Gewinn angefallen ist. Im Beispiel plant der Importeur, <Num of="m08.tarfFixings" /> Monate lang je <Num of="m08.tarfNotional" /> zu kaufen, zusammen <Num of="m08.tarfTotal" />. Der faire Strike ist <Num of="m08.tarfStrike" />, <Num of="m08.tarfBetter" /> Pips unter dem Forward von <Num of="m08.tarfFwd" /> (Standardfehler <Num of="m08.tarfSe" /> Pips).
 
 An jedem Fixing gilt:
 
@@ -20,28 +20,28 @@ In Bausteinen: pro Fixing ein gekaufter Call und zwei verkaufte Puts zum Strike,
 
 ### Rechenbeispiel: die Asymmetrie
 
-Mit diesen Beispielwerten liegt das erste Fixing fast immer weit über dem Strike. Das Target ist darum schnell erreicht: in <Num of="m08.tarfPTarget" /> der Monte-Carlo-Pfade, im Schnitt nach <Num of="m08.tarfExpFix" /> Fixings. Drei Szenarien im Simulator:
+Mit diesen Beispielwerten liegt das erste Fixing fast immer weit über dem Strike. Das Target ist darum schnell erreicht: in <Num of="m08.tarfPTarget" /> der Monte-Carlo-Pfade, im Schnitt schon nach <Num of="m08.tarfTargetFix" /> Fixings. Drei Szenarien im Simulator:
 
 - **Trend auf.** Target nach <Num of="m08.tarfUpEnd" /> Fixings. Der TARF bringt <Num of="m08.tarfUpPnl" />, mehr geht nicht. Der Importeur hat erst <Num of="m08.tarfUpUsd" /> gekauft. Den Rest kauft er am Markt, zu steigenden Kursen. Der Forward-Hedge brachte <Num of="m08.tarfUpFwd" />, die Differenz ist <Num of="m08.tarfUpDiff" />.
-- **Schock vor dem Target.** Der Kurs fällt an Tag <Num of="m08.shockDay" /> um <Num of="m08.shockGapAbs" />. Schon das erste Fixing liegt unter dem Strike, das Target kommt nie. Alle <Num of="m08.tarfShockLev" /> Fixings kaufen doppelt, zusammen <Num of="m08.tarfShockUsd" />: doppelt so viel, wie der Importeur braucht. Ergebnis gegen den Markt: <Num of="m08.tarfShockPnl" />.
-- **100 Pfade.** Die Balken unter dem Chart zeigen das Ergebnis jedes Pfads. Fast alle sind kleine Gewinne bis höchstens <Num of="m08.tarfTargetChf" />. Ganz rechts stehen wenige tiefe Verluste. Jeder 20. Pfad verliert mehr als <Num of="m08.tarfQ05" />, der schlechteste von <Num of="m08.paths" /> Pfaden <Num of="m08.tarfWorst" />.
+- **Schock vor dem Target.** Der Kurs fällt an Tag <Num of="m08.shockDay" /> um <Num of="m08.shockGapAbs" />. Schon das erste Fixing liegt unter dem Strike, das Target kommt nie. Alle <Num of="m08.tarfShockLev" /> Fixings kaufen doppelt, zusammen <Num of="m08.tarfShockUsd" />: doppelt so viel, wie der Importeur braucht. Gegen den Markt: <Num of="m08.tarfShockPnl" />. Der Forward-Hedge verliert fast gleich viel (<Num of="m08.tarfShockFwd" />), denn auch er kauft über dem Marktkurs. Der Unterschied liegt in der Menge: Fällt der Kurs weiter, verliert der TARF doppelt so schnell.
+- **100 Pfade.** Die Balken unter dem Chart zeigen das Ergebnis jedes Pfads. Fast alle sind kleine Gewinne bis höchstens <Num of="m08.tarfTargetChf" />. Ganz rechts stehen wenige tiefe Verluste. Jeder 20. Pfad endet bei <Num of="m08.tarfQ05" /> oder schlechter, der schlechteste von <Num of="m08.paths" /> Pfaden bei <Num of="m08.tarfWorst" />.
 
 <Callout variant="bad" title="Wann geht es schief: Gute Szenarien enden früh">
 
-Läuft es gut, endet der TARF nach wenigen Fixings mit einem gekappten Gewinn. Läuft es schlecht, gibt es kein Target, das dich erlöst: Das Produkt läuft bis zum letzten Fixing weiter, jedes Mal mit doppelter Menge. Die Verluste sind gehebelt und nicht begrenzt.
+Läuft es gut, endet der TARF nach wenigen Fixings mit einem gekappten Gewinn. Ausgerechnet wenn der Dollar steigt, steht der Importeur dann ohne Absicherung da. Läuft es schlecht, gibt es kein Target, das dich erlöst: Das Produkt läuft bis zum letzten Fixing weiter, jedes Mal mit doppelter Menge. Die Verluste sind gehebelt und nicht begrenzt.
 
 </Callout>
 
 ### Pivot TARF: zwei Strikes um einen Pivot
 
-Der Pivot TARF wettet darauf, dass der Kurs in einem Band bleibt. Um den Pivot <Num of="m08.pivPivot" /> liegen zwei Strikes: <Num of="m08.pivK1" /> und <Num of="m08.pivK2" />, je <Num of="m08.pivWidth" /> Pips entfernt (Standardfehler <Num of="m08.pivSe" /> Pips). Unter dem Pivot kaufst du zu <Num of="m08.pivK1" />, darüber verkaufst du zu <Num of="m08.pivK2" />. Beides bringt Gewinn, solange das Fixing zwischen den Strikes liegt. Ausserhalb handelst du die doppelte Menge mit Verlust. Das Target ist <Num of="m08.pivTargetPips" /> Pips, also <Num of="m08.pivTargetChf" />.
+Der Pivot TARF wettet darauf, dass der Kurs in einem Band bleibt. Um den Pivot <Num of="m08.pivPivot" /> liegen zwei Strikes: <Num of="m08.pivK1" /> und <Num of="m08.pivK2" />, je <Num of="m08.pivWidth" /> Pips entfernt (Standardfehler <Num of="m08.pivSe" /> Pips). Unter dem Pivot kaufst du zu <Num of="m08.pivK1" />, darüber verkaufst du zu <Num of="m08.pivK2" />. Beides bringt Gewinn, solange das Fixing zwischen den Strikes liegt. Ausserhalb handelst du die doppelte Menge mit Verlust. Das Target ist <Num of="m08.pivTargetPips" /> Pips, also <Num of="m08.pivTargetChf" />. Für den Importeur ist das kein Hedge mehr: Ob er Dollars kauft oder verkauft, entscheidet das Fixing.
 
 <StructureBlocksFigure
   products={['pivotTarf']}
-  caption="Die Bausteine des Pivot TARF: ein Zelt aus Gewinnen zwischen den Strikes, ausserhalb doppelte Verluste."
+  caption="Die Bausteine des Pivot TARF: ein Zelt aus Gewinnen zwischen den Strikes, oben vom Target gekappt, ausserhalb doppelte Verluste."
 />
 
-Das Muster ist noch extremer als beim TARF. In <Num of="m08.pivPTarget" /> der Pfade ist das Target nach durchschnittlich <Num of="m08.pivExpFix" /> Fixings erreicht. Sogar das 5 %-Quantil ist ein Gewinn: <Num of="m08.pivQ05" />. Der schlechteste Pfad verliert <Num of="m08.pivWorst" />. Im Simulator mit dem Schock: <Num of="m08.pivShockPnl" />.
+Das Muster ist noch extremer als beim TARF. In <Num of="m08.pivPTarget" /> der Pfade ist das Target erreicht, im Schnitt nach <Num of="m08.pivTargetFix" /> Fixings. Sogar das 5 %-Quantil ist ein Gewinn: <Num of="m08.pivQ05" />. Der schlechteste Pfad endet bei <Num of="m08.pivWorst" />. Schalte im Simulator oben auf Pivot TARF: Mit dem Schock endet er bei <Num of="m08.pivShockPnl" />.
 
 <Callout variant="warn" title="Risiko-Box: TARF und Pivot TARF">
 
@@ -55,11 +55,11 @@ Das Muster ist noch extremer als beim TARF. In <Num of="m08.pivPTarget" /> der P
 
 **1.** Ohne Target ist der TARF eine Serie aus einem Call und zwei Puts je Fixing. Wie beim Accumulator liefert Garman-Kohlhagen den fairen Strike: <Num of="m08.tarfK2" />.
 
-**2.** Das Target nimmt dir die besten Szenarien weg: Gewinne über <Num of="m08.tarfTargetPips" /> Pips bekommst du nie. Dein gekaufter Call ist dadurch weniger wert. Damit der Barwert null bleibt, muss der Strike sinken: auf <Num of="m08.tarfStrike" /> (Monte Carlo).
+**2.** Das Target nimmt dir die besten Szenarien weg: Gewinne über <Num of="m08.tarfTargetPips" /> Pips bekommst du nie. Zwar enden mit dem Target auch die verkauften Puts. Sie sind in diesen Szenarien aber wenig wert, weil der Kurs dann hoch steht. Unter dem Strich verlierst du Wert. Damit der Barwert null bleibt, muss der Strike sinken: auf <Num of="m08.tarfStrike" /> (Monte Carlo).
 
-**3.** Ein Überschlag zeigt, wie schief die Verteilung ist. Der Barwert ist null, und mit dem CHF-Zins von <Num of="ex.rd" /> wird nicht abgezinst. Bringen <Num of="m08.tarfPTarget" /> der Pfade je rund <Num of="m08.tarfTargetChf" />, müssen die übrigen <Num of="m08.tarfPMaturity" /> im Mittel verlieren:
+**3.** Ein Überschlag zeigt, wie schief die Verteilung ist. Der Barwert ist null, und mit dem CHF-Zins von <Num of="ex.rd" /> wird nicht abgezinst. Bringen <Num of="m08.tarfPTarget" digits={2} /> der Pfade je rund <Num of="m08.tarfTargetChf" />, müssen die übrigen <Num of="m08.tarfPMaturity" digits={2} /> im Mittel verlieren:
 
-<Formula variant="accent"><Num of="m08.tarfPTarget" /> · <Num of="m08.tarfTargetChf" /> + <Num of="m08.tarfPMaturity" /> · <i>L</i> = 0 ⇒ <i>L</i> ≈ <b><Num of="m08.tarfImpliedLoss" /></b></Formula>
+<Formula variant="accent"><Num of="m08.tarfPTarget" digits={2} /> · <Num of="m08.tarfTargetChf" /> + <Num of="m08.tarfPMaturity" digits={2} /> · <i>L</i> = 0 ⇒ <i>L</i> ≈ <b><Num of="m08.tarfImpliedLoss" /></b></Formula>
 
 Das ist ein Überschlag: Einige Target-Pfade hatten vorher ein Verlust-Fixing. Die Grössenordnung stimmt trotzdem. Viele kleine Gewinne bezahlen wenige grosse Verluste.
 
@@ -67,7 +67,7 @@ Das ist ein Überschlag: Einige Target-Pfade hatten vorher ein Verlust-Fixing. D
 
 <Desk title="Ein Franken-Schock ist kein Gedankenexperiment">
 
-Am <Fact id="m08-floor-end" /> hob die Schweizerische Nationalbank den Mindestkurs von <Fact id="m08-floor" /> Franken pro Euro auf, mit sofortiger Wirkung. Was das am Devisenmarkt auslöste, zeigt das [Riskometer](/riskometer/). Für Produkte mit doppelter Menge ist so ein Tag der Ernstfall: Über ein Gap springt der Kurs hinweg, kein Stop-Loss greift zum geplanten Kurs, und ein Target, das noch nicht erreicht ist, rettet niemanden.
+Am <Fact id="m08-floor-end" /> hob die Schweizerische Nationalbank den Mindestkurs von <Fact id="m08-floor" /> Franken pro Euro auf, mit sofortiger Wirkung. Was das am Devisenmarkt auslöste, zeigt das [Riskometer](/riskometer/). Für Produkte mit doppelter Menge ist so ein Tag der Ernstfall: Über ein Gap springt der Kurs hinweg, kein Stop-Loss greift zum geplanten Kurs, und ein Target, das noch nicht erreicht ist, rettet niemanden. Mehr zum Gap-Risiko in [Modul 07](/module/07-barrier-binary/4/).
 
 </Desk>
 

@@ -19,7 +19,7 @@ const paths = both((l) => fmtNumber(M.paths, l));
 
 const accK = rate(M.accStrike);
 const accF = rate(M.accFwd);
-const accBetter = pips(M.accBetterPips);
+const accBetter = pips(M.accBetterPips, 0);
 const accUpUsd = usd(M.accUp.base);
 const accUpDiff = chf(M.accUp.diff, true);
 const accSideDiff = chf(M.accSide.diff, true);
@@ -29,14 +29,20 @@ const accNeed = usd(M.accNotional * M.accFixings);
 const tarfTarget = chf(M.tarfTargetChf);
 const tarfP = pct(M.tarfPTarget);
 const tarfPM = pct(M.tarfPMaturity);
+/** Two decimals in the worked equation, so it can be recomputed from the shown numbers. */
+const tarfP2 = pct(M.tarfPTarget, 2);
+const tarfPM2 = pct(M.tarfPMaturity, 2);
 const tarfLoss = chf(M.tarfImpliedLoss);
+/** "about CHF 84’000" in the answer label: the implied loss rounded to thousands. */
+const tarfLossRound = chf(Math.round(Math.abs(M.tarfImpliedLoss) / 1000) * 1000);
 const tarfWorst = chf(M.tarfWorst);
 const tpfCoupon = pips(M.tpfCouponPips);
-const tpfDrop = pips(M.tpfFwdDropPips);
+const tpfDrop = pips(M.tpfFwdDropPips, 0);
 const tpfFwdEnd = rate(M.tpfFwdEnd);
 const tpfK = rate(M.tpfStrike);
 const tpfVsSpot = pct(M.tpfStrikeVsSpot);
 const tpfNoTarget = pips(M.tpfCouponNoTargetPips);
+const tpfNoDrift = pips(M.tpfCouponNoDriftPips);
 const dciK = rate(M.dciStrike);
 const dciBe = rate(M.dciBreakEven);
 const dciS = rate(M.dciFixing);
@@ -149,8 +155,8 @@ const check3: QuizQuestion = {
     {
       label: { de: 'Den Verlust', en: 'The loss' },
       explain: {
-        de: `Umgekehrt: Verluste zählen nicht aufs Target. Der schlechteste von ${paths.de} Monte-Carlo-Pfaden verliert ${tarfWorst.de}.`,
-        en: `The other way round: losses do not count towards the target. The worst of ${paths.en} Monte Carlo paths loses ${tarfWorst.en}.`,
+        de: `Umgekehrt: Verluste zählen nicht aufs Target. Der schlechteste von ${paths.de} Monte-Carlo-Pfaden endet bei ${tarfWorst.de}.`,
+        en: `The other way round: losses do not count towards the target. The worst of ${paths.en} Monte Carlo paths ends at ${tarfWorst.en}.`,
       },
     },
     {
@@ -187,7 +193,7 @@ const check4: QuizQuestion = {
         en: `If the fixing at maturity is below ${dciK}`,
       },
       explain: {
-        de: `Richtig. Dann übt die Gegenseite die verkaufte USD Put / CHF Call aus, und du erhältst ${dciUsd.de} zum Strike.`,
+        de: `Richtig. Dann übt die Gegenseite den verkauften USD Put / CHF Call aus, und du erhältst ${dciUsd.de} zum Strike.`,
         en: `Correct. Then the counterparty exercises the sold USD put / CHF call and you receive ${dciUsd.en} at the strike.`,
       },
     },
@@ -258,13 +264,13 @@ const q2: QuizQuestion = {
   options: [
     {
       label: {
-        de: `Die übrigen ${tarfPM.de} der Pfade verlieren im Schnitt rund ${both((l) => fmtMoney(Math.abs(M.tarfImpliedLoss), 'CHF', l)).de}`,
-        en: `The remaining ${tarfPM.en} of the paths lose about ${both((l) => fmtMoney(Math.abs(M.tarfImpliedLoss), 'CHF', l)).en} on average`,
+        de: `Die übrigen ${tarfPM.de} der Pfade verlieren im Schnitt rund ${tarfLossRound.de}`,
+        en: `The remaining ${tarfPM.en} of the paths lose about ${tarfLossRound.en} on average`,
       },
       mono: false,
       explain: {
-        de: `Richtig. Barwert null heisst: ${tarfP.de} · ${tarfTarget.de} + ${tarfPM.de} · L = 0, also L ≈ ${tarfLoss.de}. Viele kleine Gewinne bezahlen wenige grosse Verluste.`,
-        en: `Correct. A present value of zero means ${tarfP.en} · ${tarfTarget.en} + ${tarfPM.en} · L = 0, so L ≈ ${tarfLoss.en}. Many small gains pay for a few large losses.`,
+        de: `Richtig. Barwert null heisst: ${tarfP2.de} · ${tarfTarget.de} + ${tarfPM2.de} · L = 0, also L ≈ ${tarfLoss.de}. Viele kleine Gewinne bezahlen wenige grosse Verluste.`,
+        en: `Correct. A present value of zero means ${tarfP2.en} · ${tarfTarget.en} + ${tarfPM2.en} · L = 0, so L ≈ ${tarfLoss.en}. Many small gains pay for a few large losses.`,
       },
     },
     {
@@ -273,8 +279,8 @@ const q2: QuizQuestion = {
         en: `The remaining paths also lose about ${tarfTarget.en} on average`,
       },
       explain: {
-        de: `Dann wäre der Barwert deutlich positiv. Weil die guten Pfade so häufig sind, müssen die seltenen schlechten im Schnitt viel mehr verlieren: rund ${tarfLoss.de}.`,
-        en: `Then the present value would be clearly positive. Because the good paths are so frequent, the rare bad ones must lose much more on average: about ${tarfLoss.en}.`,
+        de: `Dann wäre der Barwert deutlich positiv. Weil die guten Pfade so häufig sind, müssen die seltenen schlechten im Schnitt viel mehr verlieren: rund ${tarfLossRound.de}.`,
+        en: `Then the present value would be clearly positive. Because the good paths are so frequent, the rare bad ones must lose much more on average: about ${tarfLossRound.en}.`,
       },
     },
     {
@@ -324,8 +330,8 @@ const q3: QuizQuestion = {
         en: `Because the strike ${tpfK} is set relative to the spot (${tpfVsSpot.en}), while the forward falls by ${tpfDrop.en} pips to ${tpfFwdEnd}`,
       },
       explain: {
-        de: `Richtig. Für die späten Fixings liegt der Forward unter dem Strike. Die verkauften Puts sind darum viel wert, und ihre Prämie bezahlt den Coupon. Schon ohne Target wären es ${tpfNoTarget.de} Pips.`,
-        en: `Correct. For the late fixings the forward lies below the strike. The sold puts are therefore worth a lot, and their premium pays for the coupon. Even without a target it would be ${tpfNoTarget.en} pips.`,
+        de: `Richtig. Für die späten Fixings liegt der Forward unter dem Strike. Die verkauften Puts sind darum viel wert, und ihre Prämie bezahlt den Coupon. Ohne Target wären es ${tpfNoTarget.de} Pips, ohne Zinsdifferenz nur ${tpfNoDrift.de} Pips.`,
+        en: `Correct. For the late fixings the forward lies below the strike. The sold puts are therefore worth a lot, and their premium pays for the coupon. Without a target it would be ${tpfNoTarget.en} pips, without the interest-rate differential only ${tpfNoDrift.en} pips.`,
       },
     },
     {

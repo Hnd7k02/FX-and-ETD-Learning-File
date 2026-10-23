@@ -23,7 +23,7 @@ import { translator, type Lang } from '@/i18n/types';
 import { clamp, linePath, scaleLinear, type Point } from '@/lib/chart';
 import { fmtMillions, fmtMoney, fmtNumber, fmtPct, fmtPips, fmtRate } from '@/lib/format';
 import { M03_CONFIG, PIP } from '@/lib/m03/config';
-import { stepTicks, textWidth } from '@/lib/m03/text';
+import { innerTicks, textWidth } from '@/lib/m03/text';
 import { EXAMPLE_MARKET as MK, pathAt, roundTripChf, spotPath, tripSwap } from '@/lib/m03/trip';
 import { usePlayback } from './m03-shared';
 
@@ -82,7 +82,7 @@ export default function SwapTrip({ lang }: SwapTripProps): JSX.Element {
   // path up to the playhead (interpolated head)
   const pts: Point[] = [];
   for (let i = 0; i <= dayInt && i < path.length; i++) pts.push([sx(i), sy(path[i]!)]);
-  if (day > dayInt && dayInt + 1 < path.length) pts.push([sx(day), sy(spot)]);
+  if (dayInt + 1 < path.length && day > dayInt) pts.push([sx(day), sy(spot)]);
   const headX = sx(day);
   const headY = sy(spot);
   const nearY = sy(NEAR);
@@ -100,7 +100,7 @@ export default function SwapTrip({ lang }: SwapTripProps): JSX.Element {
   const aha = done;
 
   const yStep = y1 - y0 > 0.09 ? 0.04 : 0.02;
-  const yTicks = stepTicks(y0, y1, yStep).filter((v) => v > y0 && v < y1);
+  const yTicks = innerTicks(y0, y1, yStep);
   const xTicks = [0, 10, 20, 30].filter((d) => d <= T.days);
 
   // open-result bracket at the head (orange), label left or right of it

@@ -27,7 +27,7 @@ import { clamp, scaleLinear } from '@/lib/chart';
 import { fmtMillions, fmtMoney, fmtNumber, fmtPct, fmtPips, fmtRate } from '@/lib/format';
 import { M03_CONFIG, tenorById } from '@/lib/m03/config';
 import { allInRange, rollView, snapSpot, tourAt } from '@/lib/m03/roll';
-import { stepTicks, textWidth } from '@/lib/m03/text';
+import { innerTicks, textWidth } from '@/lib/m03/text';
 import { EXAMPLE_MARKET as MK } from '@/lib/m03/trip';
 import { useDragX, usePlayback, useSliderDrag } from './m03-shared';
 
@@ -143,12 +143,8 @@ export default function HedgeRoll({ lang }: HedgeRollProps): JSX.Element {
       ? t('hr.insight.running', { spot: r4(spot), settle: settleTxt, allIn: r5(v.allIn) })
       : t('hr.insight.idle');
 
-  const xTicks = stepTicks(R.spotRange[0], R.spotRange[1], 0.02).filter(
-    (z) => z > R.spotRange[0] + 1e-9 && z < R.spotRange[1] - 1e-9,
-  );
-  const yTicks = stepTicks(R.yDomain[0], R.yDomain[1], 0.02).filter(
-    (z) => z > R.yDomain[0] && z < R.yDomain[1],
-  );
+  const xTicks = innerTicks(R.spotRange[0], R.spotRange[1], 0.02);
+  const yTicks = innerTicks(R.yDomain[0], R.yDomain[1], 0.02);
   const gapLabel =
     side === 'receive'
       ? t('hr.gap.receive', { chf: absTxt })

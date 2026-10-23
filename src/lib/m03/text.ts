@@ -28,3 +28,9 @@ export function stepTicks(lo: number, hi: number, step: number): number[] {
   }
   return out;
 }
+
+/** Like {@link stepTicks}, without ticks that sit on the ends of [lo, hi]. */
+export function innerTicks(lo: number, hi: number, step: number): number[] {
+  const eps = step * 1e-6;
+  return stepTicks(lo, hi, step).filter((v) => v - lo > eps && hi - v > eps);
+}

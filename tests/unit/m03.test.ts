@@ -12,7 +12,7 @@ import {
   snapSpot,
   tourAt,
 } from '@/lib/m03/roll';
-import { fitCentre, stepTicks, textWidth } from '@/lib/m03/text';
+import { fitCentre, innerTicks, stepTicks, textWidth } from '@/lib/m03/text';
 import {
   EXAMPLE_MARKET as M,
   pathAt,
@@ -276,5 +276,6 @@ describe('text helpers', () => {
     expect(stepTicks(0.73, 0.87, 0.02)).toEqual([0.74, 0.76, 0.78, 0.8, 0.82, 0.84, 0.86]);
     expect(stepTicks(0.76, 0.8, 0.02)).toEqual([0.76, 0.78, 0.8]);
     expect(stepTicks(1, 0.5, 0.1)).toEqual([]);
+    expect(innerTicks(0.74, 0.86, 0.02)).toEqual([0.76, 0.78, 0.8, 0.82, 0.84]);
   });
 });

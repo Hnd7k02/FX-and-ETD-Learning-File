@@ -336,7 +336,9 @@ export default function TouchLab({ lang, mc, initialMode }: TouchLabProps): JSX.
   const PB = (pts: Point[]) => linePath(pts.map(([a, b]): Point => [xB(a), yB(b)]));
   const bTicksX =
     curves.x === 'vol'
-      ? [2, 4, 6, 8, 10, 12, 14, 16]
+      ? compact
+        ? [4, 8, 12, 16]
+        : [2, 4, 6, 8, 10, 12, 14, 16]
       : compact
         ? [0.76, 0.8, 0.84]
         : [0.75, 0.77, 0.79, 0.81, 0.83, 0.85];
@@ -423,8 +425,12 @@ export default function TouchLab({ lang, mc, initialMode }: TouchLabProps): JSX.
             });
       default:
         if (s.mode === 'oneTouch' && s.payAt === 'hit') {
-          const key =
-            s.rdPct > 0 ? 'tl.check.hit' : s.rdPct < 0 ? 'tl.check.hitNeg' : 'tl.check.hitZero';
+          const keys = {
+            1: 'tl.check.hit',
+            0: 'tl.check.hitZero',
+            [-1]: 'tl.check.hitNeg',
+          } as const;
+          const key = keys[Math.sign(s.rdPct) as 1 | 0 | -1];
           return t(key, { v: chf(n.df * n.prob) });
         }
         return t('tl.check.expiry', { v: chf(n.df * n.prob) });

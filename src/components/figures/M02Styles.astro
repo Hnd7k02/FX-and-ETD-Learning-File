@@ -634,6 +634,109 @@
     font-weight: 700;
     fill: var(--ff-on-dark-body);
   }
+  /* ForwardCurve */
+  .m2-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .m2 .segmented > button {
+    min-height: var(--ff-touch);
+  }
+  .m2-seg-fill .segmented {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+  }
+  .m2-seg-fill .segmented > button {
+    padding: 0 8px;
+  }
+  .m2-eq-head {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--ff-ink-2);
+    margin-bottom: -6px;
+  }
+  .m2-sq {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    vertical-align: middle;
+  }
+  .m2-small {
+    font-size: 12px;
+    line-height: 1.45;
+    color: var(--ff-muted);
+  }
+  .fc-svg {
+    cursor: pointer;
+  }
+  .fc-svg.is-dragging {
+    cursor: grabbing;
+  }
+  .fc-band {
+    fill: var(--ff-chip);
+  }
+  .fc-bars {
+    opacity: 0.45;
+    transition: opacity 300ms ease;
+  }
+  .fc-bars.is-sel {
+    opacity: 1;
+  }
+  .fc-step {
+    fill: none;
+    stroke: var(--ff-ink-2);
+    stroke-width: 1;
+    stroke-dasharray: 2 2;
+  }
+  .fc-spot {
+    fill: #fff;
+    stroke: var(--ff-forward);
+    stroke-width: 2;
+  }
+  .fc-spot-label {
+    font-weight: 700;
+    fill: var(--ff-ink-2);
+  }
+  .fc-dot {
+    fill: var(--ff-forward);
+    stroke: #fff;
+    stroke-width: 2;
+  }
+  .fc-label-main {
+    font-weight: 800;
+    fill: var(--ff-ink);
+    paint-order: stroke;
+    stroke: #fff;
+    stroke-width: 4px;
+    stroke-linejoin: round;
+    font-variant-numeric: tabular-nums;
+  }
+  .fc-label-sub {
+    font-family: var(--ff-font-mono);
+    font-weight: 600;
+    fill: var(--ff-ink-2);
+    paint-order: stroke;
+    stroke: #fff;
+    stroke-width: 4px;
+    stroke-linejoin: round;
+  }
+  .fc-note {
+    font-style: italic;
+    fill: var(--ff-muted);
+  }
+  .fc-xlabel {
+    text-anchor: middle;
+    fill: var(--ff-muted);
+    font-family: var(--ff-font-mono);
+  }
+  .fc-xlabel.is-sel {
+    fill: var(--ff-ink);
+    font-weight: 800;
+  }
+
   @keyframes pp-pop {
     from {
       transform: scale(0.4);

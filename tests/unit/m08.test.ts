@@ -74,6 +74,43 @@ describe('module 08 numbers back the texts', () => {
     expect(M.dci3Yield).toBeLessThan(M.dciYield);
   });
 
+  it('review: shown numbers add up and conditional means are what the text claims', () => {
+    // product − forward from whole francs, as the text and the simulator show them
+    for (const sc of [M.accUp, M.accSide, M.accDown, M.tarfUp, M.tarfShock]) {
+      expect(sc.diff).toBe(Math.round(sc.pnl) - Math.round(sc.bench));
+    }
+    // quoted coupons: coupon × count adds up in whole francs
+    expect(Number.isInteger(Math.round(M.tpfCouponChf * 1e6) / 1e6)).toBe(true);
+    expect(M.tpfMaxChf).toBeCloseTo(M.tpfTargetCoupons * M.tpfCouponChf, 6);
+    expect(M.tpfDown.bench).toBeCloseTo(M.tpfDown.coupons * M.tpfCouponChf, 6);
+    expect(M.rtpfUp.bench).toBeCloseTo(M.rtpfUp.coupons * M.rtpfCouponChf, 6);
+    expect(M.tpfSide.pnl).toBeCloseTo(M.tpfMaxChf, 6);
+    // "im Schnitt schon nach … Fixings": the early-ending paths, not all paths
+    expect(M.accKoFix).toBeGreaterThan(1);
+    expect(M.accKoFix).toBeLessThan(M.accExpFix);
+    expect(M.tarfTargetFix).toBeLessThan(M.tarfExpFix);
+    expect(M.tarfTargetFix).toBeLessThan(3);
+    expect(M.pivTargetFix).toBeLessThan(M.tarfTargetFix);
+    // decumulator: barrier closer to the forward, more knock-outs, more pips
+    expect(M.decFwdToBarrierPips).toBeLessThan(M.accFwdToBarrierPips);
+    expect(M.decPKo).toBeGreaterThan(M.accPKo);
+    expect(M.decBetterPips).toBeGreaterThan(M.accBetterPips);
+    expect(M.decSePips).toBeLessThan(1);
+    // "Ab Fixing n … m Fixings kaufen die doppelte Menge": every later fixing is leveraged
+    expect(M.accDown.leveraged).toBe(M.accFixings - M.accDown.firstLeveraged + 1);
+    expect(M.tpfDown.leveraged).toBe(M.tpfFixings - M.tpfDown.coupons);
+    // early shock: the forward hedge loses almost as much as the TARF
+    expect(M.tarfShock.bench).toBeLessThan(0);
+    expect(Math.abs(M.tarfShock.diff)).toBeLessThan(0.1 * Math.abs(M.tarfShock.pnl));
+    // "fast die Hälfte des Coupons kommt vom Forward"
+    const share = 1 - M.tpfCouponNoDriftPips / M.tpfCouponNoTargetPips;
+    expect(share).toBeGreaterThan(0.4);
+    expect(share).toBeLessThan(0.5);
+    // dual currency: 3 months bring more francs but less per year
+    expect(M.dci3Interest).toBeGreaterThan(M.dciInterest);
+    expect(M.dci3Yield).toBeLessThan(M.dciYield);
+  });
+
   it('registers only finite m08 numbers', () => {
     for (const [k, d] of Object.entries(nums)) {
       expect(k.startsWith('m08.'), k).toBe(true);
