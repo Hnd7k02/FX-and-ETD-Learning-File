@@ -148,6 +148,17 @@ test('TwoWayPrice: drivers widen the spread', async ({ page }) => {
   await expect(fig.locator('[data-driver="event"]')).toHaveAttribute('aria-pressed', 'true');
   await fig.locator('[data-driver="time"]').click();
   await expect(fig).toHaveAttribute('data-spread', '18');
+  // all drivers on: the bid and ask labels of the ruler stay inside the chart
+  for (const d of ['liquidity', 'size', 'vol']) await fig.locator(`[data-driver="${d}"]`).click();
+  await expect(fig).toHaveAttribute('data-spread', '28');
+  const inside = await fig.locator('.twp-svg').evaluate((svg) => {
+    const box = svg.getBoundingClientRect();
+    return [...svg.querySelectorAll('text')].every((t) => {
+      const r = t.getBoundingClientRect();
+      return r.left >= box.left - 1 && r.right <= box.right + 1;
+    });
+  });
+  expect(inside).toBe(true);
 });
 
 test('OrderDemo: a stop is filled far worse after a weekend gap', async ({ page }) => {
@@ -161,6 +172,7 @@ test('OrderDemo: a stop is filled far worse after a weekend gap', async ({ page 
   await expect(fig.locator('[data-slip]')).toBeVisible();
   await fig.getByRole('button', { name: 'Limit', exact: true }).click();
   await expect(fig).toHaveAttribute('data-filled', 'false');
+  await expect(fig.locator('[data-note]')).toContainText('more than with the market order');
 });
 
 test('TriangularArbitrage: a gap outside the band pays, aligning removes it', async ({ page }) => {

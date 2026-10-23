@@ -475,4 +475,22 @@ describe('number registry m01', () => {
     expect(nums['m01.carryPnlDown']!.value).toBeLessThan(0);
     expect(M01.stopGap.slippagePips).toBeGreaterThan(100);
   });
+
+  it('gives prose amounts that add up and carry no double signs', () => {
+    const v = (k: string) => nums[k]!.value;
+    // the CHF band amounts match the band rates as shown (4 decimals) times USD 1 Mio.
+    const shown = (k: string) => Number(formatNum(nums[k]!, 'en'));
+    expect(v('m01.rangeLoChf')).toBeCloseTo((shown('m01.rangeLo') - S0) * N, 6);
+    expect(v('m01.rangeHiChf')).toBeCloseTo((shown('m01.rangeHi') - S0) * N, 6);
+    // positive twins for sentences that already say "less", "loses", "falls"
+    expect(v('m01.rangeLoSave')).toBeCloseTo(-v('m01.rangeLoChf'), 9);
+    expect(v('m01.saveDown')).toBeCloseTo(-v('m01.diffDown'), 9);
+    expect(v('m01.inverseLossUp')).toBeCloseTo(-v('m01.inversePctUp'), 12);
+    expect(v('m01.apr25UsdChfFall')).toBeCloseTo(-v('m01.apr25UsdChfPct'), 12);
+    for (const k of ['m01.rangeLoSave', 'm01.saveDown', 'm01.inverseLossUp', 'm01.apr25UsdChfFall'])
+      expect(v(k), k).toBeGreaterThan(0);
+    // the option-model forward lies below the spot (USD rate above the CHF rate)
+    expect(v('m01.fwdBelowPips')).toBeGreaterThan(60);
+    expect(v('m01.fwdBelowPips')).toBeLessThan(80);
+  });
 });

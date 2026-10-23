@@ -89,8 +89,7 @@ export const orderdemo = defineDict({
     pipsValue: '{pips} pips',
     'note.market':
       'Filled at once at the current ask, {rate}. Execution is certain; you take the rate as it is.',
-    'note.limitFilled':
-      'The ask fell to your limit: bought at {rate}. That is {diff} on day one.',
+    'note.limitFilled': 'The ask fell to your limit: bought at {rate}. That is {diff} on day one.',
     'note.limitGapFilled':
       'The market jumped through your limit: bought at {rate}, even better than the limit.',
     'note.limitMissed':

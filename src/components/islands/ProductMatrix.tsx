@@ -150,9 +150,7 @@ export default function ProductMatrix(props: ProductMatrixProps): JSX.Element {
   const [hl, setHl] = useState<ProductId | null>(null);
   const [st, setSt] = useState(() =>
     snapMatrixFixing(
-      typeof props.st === 'number'
-        ? props.st
-        : EXAMPLE.spot * (1 + M09_CONFIG.matrix.initialMove),
+      typeof props.st === 'number' ? props.st : EXAMPLE.spot * (1 + M09_CONFIG.matrix.initialMove),
     ),
   );
   const [dragging, setDragging] = useState(false);
@@ -348,8 +346,7 @@ export default function ProductMatrix(props: ProductMatrixProps): JSX.Element {
       max: t(`pm.chip.loss.${PRODUCTS[spreadRisk.maxId].loss}` as Parameters<typeof t>[0]),
     });
 
-  const resultText = (i: number) =>
-    results[i] === null ? t('pm.noProfile') : pipsTxt(pipsAt[i]!);
+  const resultText = (i: number) => (results[i] === null ? t('pm.noProfile') : pipsTxt(pipsAt[i]!));
   const aria = t('pm.aria', {
     need: needName,
     view: viewName,
@@ -464,7 +461,11 @@ export default function ProductMatrix(props: ProductMatrixProps): JSX.Element {
                   aria-pressed={cell.view === v}
                   data-view-btn={v}
                   onClick={() =>
-                    choose(cell.need === 'yield' ? { need: 'yield', view: v } : { need: 'hedge', view: v })
+                    choose(
+                      cell.need === 'yield'
+                        ? { need: 'yield', view: v }
+                        : { need: 'hedge', view: v },
+                    )
                   }
                 >
                   <ArrowGlyph view={v} />
@@ -914,4 +915,3 @@ export default function ProductMatrix(props: ProductMatrixProps): JSX.Element {
     </div>
   );
 }
-

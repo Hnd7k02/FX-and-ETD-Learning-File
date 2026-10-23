@@ -136,6 +136,8 @@ export default function SpotExposure({ lang }: SpotExposureProps): JSX.Element {
   const annotLeft = up;
   // "today" label below the dashed cost line, on the side away from the column
   const todayLeft = dirSign >= 0;
+  // the rate pill on the rail stays inside the SVG at both ends of the range
+  const pillX = clamp(x, 35, L.width - 35);
   const annotTick = annotLeft ? 5 : -5;
   const annotX = annotLeft ? x - L.block / 2 - 8 : x + L.block / 2 + 8;
   const lineGap = L.font + 5;
@@ -314,11 +316,7 @@ export default function SpotExposure({ lang }: SpotExposureProps): JSX.Element {
                     }}
                   >
                     <tspan x={textX}>{annotBf}</tspan>
-                    <tspan
-                      x={textX}
-                      dy={lineGap}
-                      style={{ fontFamily: 'var(--ff-font-mono)' }}
-                    >
+                    <tspan x={textX} dy={lineGap} style={{ fontFamily: 'var(--ff-font-mono)' }}>
                       {chf(shown.diff, true)}
                     </tspan>
                   </text>
@@ -376,14 +374,14 @@ export default function SpotExposure({ lang }: SpotExposureProps): JSX.Element {
               />
               <g class={`spx-handle${dragging ? ' is-active' : ''}`} data-handle {...handlers}>
                 <rect
-                  x={x - 30}
+                  x={pillX - 30}
                   y={L.rail - 22}
                   width={60}
                   height={44}
                   style={{ fill: 'transparent' }}
                 />
                 <rect
-                  x={x - 34}
+                  x={pillX - 34}
                   y={L.rail - 11}
                   width={68}
                   height={22}
@@ -391,7 +389,7 @@ export default function SpotExposure({ lang }: SpotExposureProps): JSX.Element {
                   style={{ fill: 'var(--ff-ink)', stroke: '#fff', strokeWidth: 2 }}
                 />
                 <text
-                  x={x}
+                  x={pillX}
                   y={L.rail + 4}
                   style={{
                     fontSize: '11px',

@@ -48,7 +48,7 @@ A stop-loss is not a guaranteed rate. It only protects you in a market that move
 
 You can trade EUR/CHF directly or via the dollar: euros into dollars, dollars into francs. Both routes must give roughly the same rate. The rate via the dollar is called the **cross rate**: <Num of="m01.eurusd" /> × <Num of="ex.spot" /> = <Num of="m01.implied" />.
 
-With spreads there is no single cross rate but a band. Via the dollar you buy a euro for <Num of="m01.impliedAsk" /> francs (the ask twice). You can sell it for <Num of="m01.impliedBid" /> (the bid twice). As long as the direct mid is less than <Num of="m01.triBandPips" /> pips away from the cross rate, no round trip pays.
+With spreads there is no single cross rate but a band. Via the dollar you buy a euro for <Num of="m01.impliedAsk" /> francs (ask times ask). You can sell it for <Num of="m01.impliedBid" /> (bid times bid). As long as the direct mid is less than <Num of="m01.triBandPips" /> pips away from the cross rate, no round trip pays.
 
 Suppose EUR/CHF is quoted directly at <Num of="m01.eurchfBid" /> to <Num of="m01.eurchfAsk" />. The mid is then <Num of="m01.triGapPips" /> pips above the cross rate, and even the direct bid is higher than the cross ask. Then the round trip pays:
 

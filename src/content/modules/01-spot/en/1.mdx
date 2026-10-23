@@ -46,7 +46,7 @@ So one pip (Δ<i>S</i> = 0.0001) costs <Num of="m01.pipChf" />, one big figure (
 
 With <i>x</i> = <Num of="m01.pctUp" /> this gives <Num of="m01.inversePctUp" />. The larger the move, the larger the gap between the two percentages.
 
-**Range.** In the option model (module 04) the log return of the rate over the term <i>T</i> is normally distributed with standard deviation σ√<i>T</i> = <Num of="ex.vol" /> · √<Num of="ex.T" /> = <Num of="m01.sigmaSqrtT" />. Here we work without drift, so the centre is today's spot. In the option model the expected rate is the forward, <Num of="m01.fwdBelowPips" /> pips below the spot (module 02). For a feel of the range that changes little. Without drift the rate lies in the band below with a probability of about 68%:
+**Range.** In the option model (module 04) the log return of the rate over the term <i>T</i> is normally distributed with standard deviation σ√<i>T</i> = <Num of="ex.vol" /> · √<Num of="ex.T" /> = <Num of="m01.sigmaSqrtT" />. Here we work without drift, so the centre is today's spot. The option model puts the expected rate at the forward, <Num of="m01.fwdBelowPips" /> pips below the spot (module 02). For a feel of the range that changes little. Without drift the rate lies in the band below with a probability of about 68%:
 
 <Formula><i>S</i> · e<sup>−σ√<i>T</i></sup> ≤ <i>S</i><sub>T</sub> ≤ <i>S</i> · e<sup>+σ√<i>T</i></sup></Formula>
 

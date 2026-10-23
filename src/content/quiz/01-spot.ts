@@ -199,8 +199,8 @@ const check4: QuizQuestion = {
       label: { de: 'JPY', en: 'JPY' },
       mono: true,
       explain: {
-        de: 'Japan importiert viel Energie, ein teurer Ölpreis belastet eher. Dazu ist der Yen Funding-Währung: In guter Stimmung wird er für Carry Trades verkauft.',
-        en: 'Japan imports a lot of energy, so expensive oil tends to weigh on it. The yen is also a funding currency: in a good mood it is sold to fund carry trades.',
+        de: 'Japan importiert viel Energie, ein teurer Ölpreis belastet den Yen eher. Dazu ist der Yen Funding-Währung: In guter Stimmung wird er für Carry Trades verkauft.',
+        en: 'Japan imports a lot of energy, so expensive oil tends to weigh on the yen. The yen is also a funding currency: in a good mood it is sold to fund carry trades.',
       },
     },
     {
