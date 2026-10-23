@@ -82,7 +82,7 @@ export default function TriangularArbitrage({ lang }: TriangularArbitrageProps):
     withSpread ? t('quote', { bid: r4(b), ask: r4(a) }) : t('quoteMid', { mid: r4(mid) });
 
   // ---------- ruler ----------
-  const RH = 96;
+  const RH = 108;
   const rl = 14;
   const rr = W - 14;
   const span = C.rulerPips;
@@ -285,13 +285,13 @@ export default function TriangularArbitrage({ lang }: TriangularArbitrageProps):
             })}
             class="tri-svg tri-ruler"
           >
-            <path d={`M${rl},48H${rr}`} style={{ stroke: 'var(--ff-axis)', strokeWidth: 1 }} />
+            <path d={`M${rl},42H${rr}`} style={{ stroke: 'var(--ff-axis)', strokeWidth: 1 }} />
             {[-span, -span / 2, 0, span / 2, span].map((p) => (
               <g key={p}>
-                <path d={`M${rx(p)},44V52`} style={{ stroke: 'var(--ff-axis)', strokeWidth: 1 }} />
+                <path d={`M${rx(p)},38V46`} style={{ stroke: 'var(--ff-axis)', strokeWidth: 1 }} />
                 <text
                   x={clamp(rx(p), rl + 18, rr - 18)}
-                  y={70}
+                  y={102}
                   style={{ fontSize: `${fs}px`, fill: 'var(--ff-muted)', textAnchor: 'middle' }}
                 >
                   {p === 0
@@ -305,15 +305,15 @@ export default function TriangularArbitrage({ lang }: TriangularArbitrageProps):
             {/* cross band (via USD) */}
             <rect
               x={cx(ib)}
-              y={30}
+              y={20}
               width={Math.max(2, cx(ia) - cx(ib))}
-              height={14}
+              height={12}
               rx={4}
               style={{ fill: 'var(--ff-chip)', stroke: 'var(--ff-ink-2)', strokeWidth: 1.25 }}
             />
             <text
               x={cx((ib + ia) / 2)}
-              y={24}
+              y={14}
               style={{ fontSize: `${fs}px`, fontWeight: 700, fill: 'var(--ff-ink-2)', textAnchor: 'middle' }}
             >
               {t('viaUsd')}
@@ -322,7 +322,7 @@ export default function TriangularArbitrage({ lang }: TriangularArbitrageProps):
             {arb && (
               <rect
                 x={cx(Math.min(gapLo, gapHi))}
-                y={46}
+                y={40}
                 width={Math.max(0, cx(Math.max(gapLo, gapHi)) - cx(Math.min(gapLo, gapHi)))}
                 height={4}
                 style={{ fill: 'var(--ff-good)' }}
@@ -332,7 +332,7 @@ export default function TriangularArbitrage({ lang }: TriangularArbitrageProps):
             <g class={`tri-direct${dragging ? ' is-active' : ''}`} data-handle {...handlers}>
               <rect
                 x={cx(db) - 14}
-                y={40}
+                y={46}
                 width={Math.max(28, cx(da) - cx(db) + 28)}
                 height={44}
                 style={{ fill: 'transparent' }}
@@ -341,7 +341,7 @@ export default function TriangularArbitrage({ lang }: TriangularArbitrageProps):
                 x={cx(db)}
                 y={52}
                 width={Math.max(3, cx(da) - cx(db))}
-                height={14}
+                height={12}
                 rx={4}
                 style={{
                   fill: arb ? 'var(--ff-good-soft)' : 'var(--ff-linear-soft)',
@@ -350,8 +350,8 @@ export default function TriangularArbitrage({ lang }: TriangularArbitrageProps):
                 }}
               />
               <text
-                x={cx((db + da) / 2)}
-                y={88}
+                x={clamp(cx((db + da) / 2), rl + 50, rr - 50)}
+                y={80}
                 style={{
                   fontSize: `${fs}px`,
                   fontWeight: 700,
@@ -367,7 +367,7 @@ export default function TriangularArbitrage({ lang }: TriangularArbitrageProps):
               x={rl}
               y={0}
               width={rr - rl}
-              height={40}
+              height={46}
               class="tri-surface"
               style={{ fill: 'transparent' }}
               {...handlers}

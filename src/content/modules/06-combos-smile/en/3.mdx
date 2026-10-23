@@ -17,7 +17,7 @@ Picture a trader who is waiting for an important interest rate decision. She has
 
 The straddle has both legs at the ATM strike <Num of="m06.dns" />, the strike of the delta-neutral straddle. It costs <Num of="m06.straddlePips" /> pips, or <Num of="m06.straddleChf" />. It only makes money outside the two break-evens <Num of="m06.straddleBeLo" /> and <Num of="m06.straddleBeHi" />. So USD/CHF has to move by more than <Num of="m06.straddleMovePct" /> by expiry.
 
-Vega is <Num of="m06.straddleVegaChf" /> per vol point, twice as much as a single option. If implied vol rises by <Num of="m06.shockPts" /> points to <Num of="m06.shockVol" />, the straddle gains <Num of="m06.straddleShockChf" /> today without the spot moving. In return, every quiet day costs it time value: theta is <Num of="m06.straddleThetaChf" /> per day.
+Vega is <Num of="m06.straddleVegaChf" /> per vol point, twice as much as a single option. If implied vol rises by <Num of="m06.shockPts" /> points to <Num of="m06.shockVol" />, the straddle gains <Num of="m06.straddleShockChf" sign={false} /> today without the spot moving. In return, every quiet day costs it time value: theta is <Num of="m06.straddleThetaChf" /> per day.
 
 The strangle with <Num of="m06.put25K" /> and <Num of="m06.call25K" /> costs only <Num of="m06.strPips" /> pips. Its break-evens lie further out, at <Num of="m06.strBeLo" /> and <Num of="m06.strBeHi" />. Its vega is still high at <Num of="m06.strVegaChf" />: a strangle is a cheap bet on more vol.
 
@@ -25,7 +25,7 @@ The strangle with <Num of="m06.put25K" /> and <Num of="m06.call25K" /> costs onl
 
 The butterfly buys calls at <Num of="m06.flyLow" /> and <Num of="m06.flyHigh" /> and sells two calls at <Num of="m06.flyMid" />. It costs <Num of="m06.flyPips" /> pips. If USD/CHF ends exactly at <Num of="m06.flyMid" />, it earns <Num of="m06.flyMaxGainChf" />. It makes money between <Num of="m06.flyBeLo" /> and <Num of="m06.flyBeHi" />. Vega is negative at <Num of="m06.flyVegaChf" />, and theta positive at <Num of="m06.flyThetaChf" /> per day: calm and time work in its favour.
 
-The importer's seagull (calls at <Num of="m06.sgK1" /> and <Num of="m06.sgK2" />, put at <Num of="m06.sgPut" />) costs nothing. But it is short vega: <Num of="m06.sgVegaChf" /> per point. If vol rises by <Num of="m06.shockPts" /> points, the structure loses <Num of="m06.sgShockChf" /> in value today. The hedge still works at expiry. Until then, though, the daily valuation shows a loss.
+The importer's seagull (calls at <Num of="m06.sgK1" /> and <Num of="m06.sgK2" />, put at <Num of="m06.sgPut" />) costs nothing. But it is short vega: <Num of="m06.sgVegaChf" /> per point. If vol rises by <Num of="m06.shockPts" /> points, the structure loses <Num of="m06.sgShockLossChf" /> in value today. The hedge still works at expiry. Until then, though, the daily valuation shows a loss.
 
 | Structure | Vega per point | Vol +<Num of="m06.shockPts" /> points |
 | --- | --- | --- |

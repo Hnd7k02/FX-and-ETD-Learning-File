@@ -305,6 +305,11 @@ export const nums: NumTable = {
   'm06.sgPut': { value: seagull.legs[2]!.strike, kind: 'rate' },
   'm06.sgVegaChf': { value: seagull.greeks.vega, kind: 'money' },
   'm06.sgShockChf': { value: shockPnl(seagull.legs), kind: 'money', sign: true },
+  'm06.sgShockLossChf': {
+    value: -shockPnl(seagull.legs),
+    kind: 'money',
+    note: 'Loss of the seagull from the vol shock, as a positive amount',
+  },
   'm06.sgDelta': { value: seagull.greeks.delta / N, kind: 'num', digits: 3 },
 
   // Section 4: smile (example values)

@@ -11,10 +11,10 @@ export const hedgeoutcome = defineDict({
     'ho.legend.scenarios': 'Szenarien (Modell)',
     'ho.y': 'Kosten in CHF 1’000',
     'ho.x': 'USD/CHF bei Fälligkeit',
-    'ho.region.saves': 'Dollar stärker: Forward spart',
-    'ho.region.costs': 'Dollar schwächer: Chance verpasst',
-    'ho.region.savesShort': 'Forward spart',
-    'ho.region.costsShort': 'Chance verpasst',
+    'ho.region.savesA': 'Dollar stärker:',
+    'ho.region.savesB': 'Forward spart',
+    'ho.region.costsA': 'Dollar schwächer:',
+    'ho.region.costsB': 'Chance verpasst',
     'ho.fLabel': 'F {fwd}',
     'ho.strip.unhedged': 'ohne',
     'ho.strip.hedged': 'mit F',
@@ -42,6 +42,10 @@ export const hedgeoutcome = defineDict({
     'ho.scn.cheaperVal': '{k} von {n}',
     'ho.scn.none': 'noch keine',
     'ho.aha.title': 'Der Forward nimmt die Unsicherheit weg',
+    'ho.insight.idle':
+      'Spiel die Szenarien ab: Jeder Punkt ist ein möglicher Kurs in {months} Monaten. Schau, wie weit die Kosten ohne Absicherung streuen.',
+    'ho.insight.running':
+      'Szenario {i}: USD/CHF {st}, ohne Absicherung {unhedged}, mit Forward {hedged}.',
     'ho.aha.text': 'Ohne Absicherung: {min} bis {max}. Mit Forward: immer {fwd}.',
     'ho.note.saves':
       'Der Dollar steht bei {st}, über dem Forward. Ohne Absicherung zahlt der Importeur {unhedged}. Mit dem Forward bleibt es bei {hedged}: Er spart {diff}.',
@@ -57,17 +61,16 @@ export const hedgeoutcome = defineDict({
   },
   en: {
     'ho.title': 'With or without a forward?',
-    'ho.sub':
-      'USD {notional} in {months} months · forward fixed today: {fwd} · spot today: {spot}',
+    'ho.sub': 'USD {notional} in {months} months · forward fixed today: {fwd} · spot today: {spot}',
     'ho.legend.unhedged': 'Unhedged',
     'ho.legend.forward': 'With forward',
     'ho.legend.scenarios': 'Scenarios (model)',
     'ho.y': 'Cost in CHF thousands',
     'ho.x': 'USD/CHF at maturity',
-    'ho.region.saves': 'Stronger dollar: forward saves',
-    'ho.region.costs': 'Weaker dollar: chance missed',
-    'ho.region.savesShort': 'Forward saves',
-    'ho.region.costsShort': 'Chance missed',
+    'ho.region.savesA': 'Stronger dollar:',
+    'ho.region.savesB': 'forward saves',
+    'ho.region.costsA': 'Weaker dollar:',
+    'ho.region.costsB': 'chance missed',
     'ho.fLabel': 'F {fwd}',
     'ho.strip.unhedged': 'none',
     'ho.strip.hedged': 'with F',
@@ -95,6 +98,10 @@ export const hedgeoutcome = defineDict({
     'ho.scn.cheaperVal': '{k} of {n}',
     'ho.scn.none': 'none yet',
     'ho.aha.title': 'The forward removes the uncertainty',
+    'ho.insight.idle':
+      'Play the scenarios: each dot is a possible rate in {months} months. Watch how far the unhedged cost spreads.',
+    'ho.insight.running':
+      'Scenario {i}: USD/CHF {st}, unhedged {unhedged}, with the forward {hedged}.',
     'ho.aha.text': 'Unhedged: {min} to {max}. With the forward: always {fwd}.',
     'ho.note.saves':
       'The dollar is at {st}, above the forward. Unhedged, the importer pays {unhedged}. With the forward it stays at {hedged}: he saves {diff}.',

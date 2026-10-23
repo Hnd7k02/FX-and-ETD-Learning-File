@@ -31,7 +31,7 @@ import {
   snapRate,
   type HedgeVerdict,
 } from '@/lib/m02/hedge';
-import { textWidth, wrapText } from '@/lib/m02/text';
+import { textWidth } from '@/lib/m02/text';
 import { useDragX, usePlayback, useSliderDrag } from './m02-shared';
 
 export interface HedgeOutcomeProps {
@@ -142,28 +142,19 @@ export default function HedgeOutcome({ lang }: HedgeOutcomeProps): JSX.Element {
   const labelLeft = x + 12 + labelW > L.plotRight;
   const yMid = (yU + yF) / 2;
 
-  // Aha box after a full run.
+  // Aha after a full run of all scenarios.
   const aha = play.done && shown === SC.count && play.started;
-  const ahaTitle = t('ho.aha.title');
-  const ahaText = t('ho.aha.text', {
-    min: chf(stats.min),
-    max: chf(stats.max),
-    fwd: chf(N * F),
-  });
-  const ahaMaxW = Math.min(L.compact ? 210 : 300, (L.plotRight - L.left) * 0.62);
-  const ahaLines = wrapText(ahaText, Math.max(14, Math.floor((ahaMaxW - 20) / (L.font * 0.56))));
-  const ahaW = Math.min(
-    ahaMaxW,
-    Math.max(
-      textWidth(ahaTitle, L.font, 0.6),
-      ...ahaLines.map((l) => textWidth(l, L.font)),
-    ) + 20,
-  );
-  const ahaTitleLines = wrapText(
-    ahaTitle,
-    Math.max(14, Math.floor((ahaW - 20) / (L.font * 0.6))),
-  );
-  const ahaH = 14 + (ahaTitleLines.length + ahaLines.length) * (L.font + 5);
+  const last = shown > 0 ? rates[shown - 1]! : null;
+  const insight = aha
+    ? t('ho.aha.text', { min: chf(stats.min), max: chf(stats.max), fwd: chf(N * F) })
+    : play.playing && last !== null
+      ? t('ho.insight.running', {
+          i: shown,
+          st: fmtRate(last, PAIR),
+          unhedged: chf(N * last),
+          hedged: chf(N * F),
+        })
+      : t('ho.insight.idle', { months: M.months });
 
   const aria =
     t('ho.aria', {
@@ -176,8 +167,12 @@ export default function HedgeOutcome({ lang }: HedgeOutcomeProps): JSX.Element {
       ? ` ${t('ho.aria.scn', { n: shown, min: chf(stats.min), max: chf(stats.max), hedged: chf(o.hedged) })}`
       : '');
 
-  const regionSaves = t(L.compact ? 'ho.region.savesShort' : 'ho.region.saves');
-  const regionCosts = t(L.compact ? 'ho.region.costsShort' : 'ho.region.costs');
+  const regionSaves = L.compact
+    ? [t('ho.region.savesB')]
+    : [t('ho.region.savesA'), t('ho.region.savesB')];
+  const regionCosts = L.compact
+    ? [t('ho.region.costsB')]
+    : [t('ho.region.costsA'), t('ho.region.costsB')];
   const chipKey =
     verdict === 'saves' ? 'ho.chip.saves' : verdict === 'costs' ? 'ho.chip.costs' : 'ho.chip.equal';
   const noteKey =
@@ -259,28 +254,34 @@ export default function HedgeOutcome({ lang }: HedgeOutcomeProps): JSX.Element {
               <text x={L.left} y={L.top - 18} class="m2-axis-title" style={{ fontSize: fs }}>
                 {t('ho.y')}
               </text>
-              <text
-                x={L.left + 8}
-                y={L.top + L.font + 6}
-                class="ho-region-label is-costs"
-                style={{ fontSize: fs }}
-              >
-                {regionCosts}
-              </text>
-              <text
-                x={L.plotRight - 8}
-                y={L.top + L.font + 6}
-                class="ho-region-label is-saves"
-                style={{ fontSize: fs, textAnchor: 'end' }}
-              >
-                {regionSaves}
-              </text>
+              {regionCosts.map((line, i) => (
+                <text
+                  key={`c${i}`}
+                  x={L.left + 8}
+                  y={L.top + L.font + 6 + i * (L.font + 4)}
+                  class="ho-region-label is-costs"
+                  style={{ fontSize: fs }}
+                >
+                  {line}
+                </text>
+              ))}
+              {regionSaves.map((line, i) => (
+                <text
+                  key={`s${i}`}
+                  x={L.plotRight - 8}
+                  y={L.plotBottom - 8 - (regionSaves.length - 1 - i) * (L.font + 4)}
+                  class="ho-region-label is-saves"
+                  style={{ fontSize: fs, textAnchor: 'end' }}
+                >
+                  {line}
+                </text>
+              ))}
 
               {/* forward reference */}
               <path d={`M${xF.toFixed(1)},${L.top}V${L.plotBottom}`} class="m2-ref" />
               <text
                 x={xF + 6}
-                y={L.plotBottom - 8}
+                y={L.top + L.font + 6}
                 class="m2-ref-label"
                 style={{ fontSize: fs }}
               >
@@ -392,48 +393,6 @@ export default function HedgeOutcome({ lang }: HedgeOutcomeProps): JSX.Element {
               <circle cx={x} cy={yF} r={6} class="ho-dot" style={{ fill: COLOR.forward }} />
               <circle cx={x} cy={yU} r={6} class="ho-dot" style={{ fill: COLOR.unhedged }} />
 
-              {aha && (
-                <g class="m2-aha" data-aha>
-                  <rect
-                    x={L.left + 8}
-                    y={L.top + L.font + 16}
-                    width={ahaW}
-                    height={ahaH}
-                    rx={10}
-                    class="m2-aha-box"
-                  />
-                  {ahaTitleLines.map((line, i) => (
-                    <text
-                      key={`t${i}`}
-                      x={L.left + 18}
-                      y={L.top + L.font + 16 + 10 + (i + 1) * (L.font + 5) - 4}
-                      class="m2-aha-title"
-                      style={{ fontSize: fs }}
-                    >
-                      {line}
-                    </text>
-                  ))}
-                  {ahaLines.map((line, i) => (
-                    <text
-                      key={`l${i}`}
-                      x={L.left + 18}
-                      y={
-                        L.top +
-                        L.font +
-                        16 +
-                        10 +
-                        (ahaTitleLines.length + i + 1) * (L.font + 5) -
-                        4
-                      }
-                      class="m2-aha-text"
-                      style={{ fontSize: fs }}
-                    >
-                      {line}
-                    </text>
-                  ))}
-                </g>
-              )}
-
               {/* rail with the draggable handle */}
               <path d={`M${L.left},${L.rail}H${L.plotRight}`} class="m2-rail" />
               <g
@@ -468,6 +427,10 @@ export default function HedgeOutcome({ lang }: HedgeOutcomeProps): JSX.Element {
                 fontSize={L.font}
               />
             </svg>
+          </div>
+          <div class={`m2-insight${aha ? ' is-aha' : ''}`} data-insight>
+            {aha && <b>{t('ho.aha.title')}</b>}
+            <span>{insight}</span>
           </div>
           <p class="m2-hint">{t('ho.hint')}</p>
         </div>

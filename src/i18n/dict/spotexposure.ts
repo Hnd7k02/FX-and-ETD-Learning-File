@@ -86,8 +86,7 @@ export const spotexposure = defineDict({
       'That is outside the typical range for {months} months: rare, but possible. The importer pays {diff} more.',
     'note.down':
       'The dollar has become cheaper: the importer saves {diff}. But he does not want to bet on it.',
-    'note.downFar':
-      'A strong franc: the importer saves {diff}. A windfall he cannot rely on.',
+    'note.downFar': 'A strong franc: the importer saves {diff}. A windfall he cannot rely on.',
     'status.flat': 'Rate as today.',
     'status.up': 'Dollar dearer: extra cost.',
     'status.upFar': 'Dollar much dearer: outside the typical range.',

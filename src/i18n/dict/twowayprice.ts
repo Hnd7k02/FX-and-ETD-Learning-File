@@ -44,9 +44,10 @@ export const twowayprice = defineDict({
     rowFullSub: 'ganzer Spread × Nominal',
     'note.base':
       'In liquiden Stunden ist der Spread eng. Der Importeur zahlt gegenüber der Mitte {half}. Schalte die Treiber ein und schau, was passiert.',
-    'note.wider': 'Der Spread ist auf {pips} Pips gewachsen. Der Importeur zahlt jetzt {half} statt {base}.',
+    'note.wider':
+      'Der Spread ist auf {pips} Pips gewachsen. Der Importeur zahlt jetzt {half} statt {base}.',
     'note.wide':
-      'Alles kommt zusammen: {pips} Pips. Der Market Maker trägt jetzt viel mehr Risiko und lässt sich das bezahlen: {half} statt {base}, {factor}-mal so viel.',
+      'Mehrere Treiber kommen zusammen: {pips} Pips. Der Market Maker trägt jetzt viel mehr Risiko und lässt sich das bezahlen: {half} statt {base}, {factor}-mal so viel.',
     schematic: 'Schematische Werte zum Lernen, keine Marktdaten.',
   },
   en: {
@@ -88,9 +89,10 @@ export const twowayprice = defineDict({
     rowFullSub: 'full spread × notional',
     'note.base':
       'In liquid hours the spread is tight. Against the mid the importer pays {half}. Switch the drivers on and see what happens.',
-    'note.wider': 'The spread has grown to {pips} pips. The importer now pays {half} instead of {base}.',
+    'note.wider':
+      'The spread has grown to {pips} pips. The importer now pays {half} instead of {base}.',
     'note.wide':
-      'Everything comes together: {pips} pips. The market maker now carries much more risk and charges for it: {half} instead of {base}, {factor} times as much.',
+      'Several drivers come together: {pips} pips. The market maker now carries much more risk and charges for it: {half} instead of {base}, {factor} times as much.',
     schematic: 'Schematic values for learning, not market data.',
   },
 });

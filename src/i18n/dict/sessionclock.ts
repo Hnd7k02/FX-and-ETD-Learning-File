@@ -48,8 +48,7 @@ export const sessionclock = defineDict({
       'Wochenende: Niemand stellt Kurse. Was am Wochenende passiert, zeigt sich erst am Montagmorgen in Wellington, oft mit einem Sprung.',
     'hint.thin':
       'Wenige Händler sind wach. Grössere Aufträge bewegen den Kurs leichter, die Spreads sind breiter.',
-    'hint.moderate':
-      'Ein Finanzzentrum ist aktiv. Der Markt läuft, aber nicht in voller Breite.',
+    'hint.moderate': 'Ein Finanzzentrum ist aktiv. Der Markt läuft, aber nicht in voller Breite.',
     'hint.high':
       'Ein grosses Zentrum ist offen. Viele Händler stellen Kurse, die Spreads sind eng.',
     'hint.peak':

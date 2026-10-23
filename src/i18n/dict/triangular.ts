@@ -33,7 +33,7 @@ export const triangular = defineDict({
     'side.buy': 'kaufe',
     leg: '{n}. {pair}: {side} {base} zu {rate}',
     legFlow: '{pay} → {receive}',
-    noLegs: 'Keine Rundreise: Mit diesen Kursen landest du nicht über EUR {notional}.',
+    noLegs: 'Keine Rundreise lohnt sich, solange der direkte Kurs im Band des Kreuzkurses liegt.',
     'note.none':
       'Die Kurse passen zusammen. Der direkte EUR/CHF-Kurs liegt im Band des Kreuzkurses: Jede Rundreise kostet dich den Spread.',
     'note.sellDirectBuyCross':
@@ -75,7 +75,7 @@ export const triangular = defineDict({
     'side.buy': 'buy',
     leg: '{n}. {pair}: {side} {base} at {rate}',
     legFlow: '{pay} → {receive}',
-    noLegs: 'No round trip: with these rates you do not end above EUR {notional}.',
+    noLegs: 'No round trip pays as long as the direct quote lies inside the band of the cross rate.',
     'note.none':
       'The rates fit together. The direct EUR/CHF quote lies inside the band of the cross rate: every round trip costs you the spread.',
     'note.sellDirectBuyCross':

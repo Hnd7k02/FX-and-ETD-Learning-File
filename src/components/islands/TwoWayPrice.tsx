@@ -197,6 +197,30 @@ export default function TwoWayPrice({ lang }: TwoWayPriceProps): JSX.Element {
               ))}
             </svg>
           </div>
+          <div class="twp-cost-title">{t('costTitle')}</div>
+          <StatTable>
+            <StatRow
+              label={t('rowBuy', { notional })}
+              sub={t('rowBuySub')}
+              value={chf(q.ask * N)}
+            />
+            <StatRow
+              label={t('rowSell', { notional })}
+              sub={t('rowSellSub')}
+              value={chf(q.bid * N)}
+            />
+            <StatRow
+              label={t('rowHalf')}
+              sub={t('rowHalfSub')}
+              value={chf(spreadCost(half * 2, N))}
+              highlight
+            />
+            <StatRow
+              label={t('rowFull')}
+              sub={t('rowFullSub')}
+              value={chf(spreadCost(half * 2, N, 'full'))}
+            />
+          </StatTable>
           <p class="twp-schematic">{t('schematic')}</p>
         </div>
         <div class="ff-lab-side">
@@ -227,29 +251,6 @@ export default function TwoWayPrice({ lang }: TwoWayPriceProps): JSX.Element {
               </button>
             )}
           </div>
-          <StatTable>
-            <StatRow
-              label={t('rowBuy', { notional })}
-              sub={t('rowBuySub')}
-              value={chf(q.ask * N)}
-            />
-            <StatRow
-              label={t('rowSell', { notional })}
-              sub={t('rowSellSub')}
-              value={chf(q.bid * N)}
-            />
-            <StatRow
-              label={t('rowHalf')}
-              sub={t('rowHalfSub')}
-              value={chf(spreadCost(half * 2, N))}
-              highlight
-            />
-            <StatRow
-              label={t('rowFull')}
-              sub={t('rowFullSub')}
-              value={chf(spreadCost(half * 2, N, 'full'))}
-            />
-          </StatTable>
           <p class={`twp-note${count >= 4 ? ' is-wide' : ''}`} data-note aria-live="polite">
             {note}
           </p>

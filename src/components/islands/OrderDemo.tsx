@@ -53,7 +53,7 @@ function layoutFor(w: number) {
     compact,
     font: compact ? 11 : 12,
     left: compact ? 44 : 52,
-    right: compact ? 12 : 16,
+    right: compact ? 62 : 70,
     top: 30,
     bottom: height - 28,
   };
@@ -151,7 +151,7 @@ export default function OrderDemo({ lang }: OrderDemoProps): JSX.Element {
       ? t('ariaFilled', { n: day, rate: rate(fill.price) })
       : t('ariaMissed', { rate: rate(fill.price) }),
   });
-  const pillW = L.compact ? 104 : 118;
+  const pillW = L.compact ? 56 : 62;
   const fillText = fill.filled
     ? t('fillLabel', { rate: rate(fill.price) })
     : t('endLabel', { rate: rate(fill.price) });
@@ -262,7 +262,7 @@ export default function OrderDemo({ lang }: OrderDemoProps): JSX.Element {
               {level !== null && (
                 <g>
                   <path
-                    d={`M${L.left},${ly.toFixed(1)}H${L.width - L.right}`}
+                    d={`M${L.left},${ly.toFixed(1)}H${L.width - pillW}`}
                     style={{
                       fill: 'none',
                       stroke: type === 'limit' ? 'var(--ff-long)' : 'var(--ff-short)',
@@ -337,14 +337,14 @@ export default function OrderDemo({ lang }: OrderDemoProps): JSX.Element {
               {level !== null && (
                 <g class={`od-handle${dragging ? ' is-active' : ''}`} data-handle {...handlers}>
                   <rect
-                    x={L.width - L.right - pillW - 4}
+                    x={L.width - L.right}
                     y={ly - 22}
-                    width={pillW + 4}
+                    width={L.right}
                     height={44}
                     style={{ fill: 'transparent' }}
                   />
                   <rect
-                    x={L.width - L.right - pillW}
+                    x={L.width - pillW - 2}
                     y={ly - 11}
                     width={pillW}
                     height={22}
@@ -356,7 +356,7 @@ export default function OrderDemo({ lang }: OrderDemoProps): JSX.Element {
                     }}
                   />
                   <text
-                    x={L.width - L.right - pillW / 2}
+                    x={L.width - pillW / 2 - 2}
                     y={ly + 4}
                     style={{
                       fontSize: '11px',
@@ -367,7 +367,7 @@ export default function OrderDemo({ lang }: OrderDemoProps): JSX.Element {
                       pointerEvents: 'none',
                     }}
                   >
-                    {t('levelLabel', { type: typeLabel, rate: rate(level) })}
+                    {rate(level)}
                   </text>
                 </g>
               )}
@@ -378,6 +378,12 @@ export default function OrderDemo({ lang }: OrderDemoProps): JSX.Element {
               <span aria-hidden="true" class="od-swatch" />
               {t('askLine')}
             </span>
+            {level !== null && (
+              <span class="od-legend-item">
+                <span aria-hidden="true" class={`od-swatch od-swatch--${type}`} />
+                {t('levelLabel', { type: typeLabel, rate: rate(level) })}
+              </span>
+            )}
             {level !== null && <span class="od-hint">{t('drag')}</span>}
           </div>
         </div>

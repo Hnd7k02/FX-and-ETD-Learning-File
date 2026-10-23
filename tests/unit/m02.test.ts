@@ -16,7 +16,10 @@ import {
 import {
   PARITY_STEPS,
   balancesAt,
+  endOf,
+  nextTarget,
   parity,
+  prevTarget,
   startOf,
   stepAt,
   stepState,
@@ -178,6 +181,21 @@ describe('m02 parity', () => {
     expect(stepState(3, 2, 0.5)).toBe('todo');
     expect(stepState(2, 2, 0.5)).toBe('active');
     expect(stepState(2, 2, 1)).toBe('done');
+    expect(stepState(2, 2, 0)).toBe('todo');
+  });
+
+  it('steps forward and back through the timeline', () => {
+    const tl = timeline([100, 100, 100]);
+    // mid-step 1 → end of step 1; at a step start → end of that step; at the end → end
+    expect(nextTarget(150, tl)).toBe(200);
+    expect(nextTarget(200, tl)).toBe(300);
+    expect(nextTarget(0, tl)).toBe(100);
+    expect(nextTarget(tl.total, tl)).toBe(tl.total);
+    expect(prevTarget(150, tl)).toBe(100);
+    expect(prevTarget(200, tl)).toBe(100);
+    expect(prevTarget(0, tl)).toBe(0);
+    expect(prevTarget(tl.total, tl)).toBe(tl.starts[PARITY_STEPS.length - 1]);
+    expect(endOf(99, tl)).toBe(tl.total);
   });
 });
 

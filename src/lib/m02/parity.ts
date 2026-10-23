@@ -139,9 +139,37 @@ export function startOf(index: number, tl: Timeline = timeline()): number {
   return tl.starts[Math.max(0, index)]!;
 }
 
-/** State of a step relative to the active one. */
+/** State of a step relative to the active one (a step at frac 0 has not begun yet). */
 export function stepState(step: number, active: number, frac: number): 'todo' | 'active' | 'done' {
   if (step < active) return 'done';
   if (step > active) return 'todo';
-  return frac >= 1 ? 'done' : 'active';
+  if (frac >= 1) return 'done';
+  return frac <= 0 ? 'todo' : 'active';
+}
+
+/** End of step `index` in ms (clamped to the timeline). */
+export function endOf(index: number, tl: Timeline = timeline()): number {
+  const i = Math.min(PARITY_STEPS.length - 1, Math.max(0, index));
+  return tl.starts[i]! + tl.durations[i]!;
+}
+
+/**
+ * Target of the "next step" button: the end of the step that is running, or the end of the next
+ * one if the current step has not begun or is complete.
+ */
+export function nextTarget(pos: number, tl: Timeline = timeline()): number {
+  const { index, frac } = stepAt(pos, tl);
+  if (frac > 0 && frac < 1) return endOf(index, tl);
+  return frac >= 1 ? endOf(index + 1, tl) : endOf(index, tl);
+}
+
+/**
+ * Target of the "previous step" button: the start of the running step (undo it), or the start of
+ * the previous one if the current step has not begun.
+ */
+export function prevTarget(pos: number, tl: Timeline = timeline()): number {
+  const { index, frac } = stepAt(pos, tl);
+  if (frac >= 1) return startOf(index, tl);
+  if (frac > 0) return startOf(index, tl);
+  return startOf(Math.max(0, index - 1), tl);
 }
