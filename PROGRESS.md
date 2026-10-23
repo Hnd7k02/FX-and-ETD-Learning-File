@@ -15,6 +15,10 @@ Working branch: `claude/forward-first-v1`. Mode: phases without stops (D-16), un
 | 8     | Polish: transitions, micro-interactions, 390 px, visual comparison                | open                                                                |
 | 9     | Verification and launch: tests, E2E, Lighthouse, fact check, README, deploy guide | open                                                                |
 
+## Stop point (Dario, 23.10.2026)
+
+Stop after the integration (all modules built and reviewed, sources merged, `npm run check`, build and full e2e green). Dario clicks through the modules first; phase 7 (English review), phase 8 (polish) and phase 9 (launch) start only after his go.
+
 ## Current state
 
 - Calculation core: forward, swap, roll, arbitrage, Garman-Kohlhagen, Black-76, implied vol, delta strikes, six Greeks, smile, digitals, 8 barriers, touch, double no-touch; all §6 reference values within tolerance; cross-checked against independent formulas (max diff 1.8e-13).
