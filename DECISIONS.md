@@ -247,3 +247,24 @@ Format: `D-xx · date · origin`, then question, decision, reasoning. Origin is 
 **Decision:** `overrides: { "playwright-core": "1.56.1" }` in `package.json`, matching `@playwright/test` (D-14).
 
 **Reasoning:** One Playwright version in the tree, types agree, no casts in the specs.
+
+## D-37 · 2026-10-23 · Claude
+
+**Question:** Plus Jakarta Sans has no Greek glyphs; system fallbacks drew ν like a "v".
+
+**Decision:** STIX Two Text is the second family in `--ff-font-ui`, so Greek letters in UI text fall back per glyph to the formula font (its Greek subset is self-hosted and loaded only when needed via `unicode-range`).
+
+**Reasoning:** Δ, Γ, ν, Θ, ρ, σ look the same in labels and formulas; no extra request for pages without Greek letters.
+
+## D-38 · 2026-10-23 · Claude
+
+**Question:** Choices made while building modules 04, 05, 07 and 08 that Dario may want to change?
+
+**Decision:** Kept as built, each in one config object:
+
+- 04: strikes named by spot delta (USD/CHF practice is premium-adjusted; the desk box says so) — `strikeMarkers` in `src/lib/moneyness.ts`; the moneyness explorer starts at the exact forward (pure time value 126.5 pips), the builder at the rounded strike 0.7930 (126.69 pips), explained in the text; short-put maximum loss shown as K − premium ("if USD/CHF fell to zero").
+- 05: the carry part of theta is shown as the rounded residual so −69 + 38 = −31 on screen (extends D-26); rho mode has sliders for both interest rates; lab limits in `LAB_CONFIG`, `LEVER_CONFIG`, `GT_CONFIG`.
+- 07: barriers at spot × 1.03 / × 0.97 (same as the MC window barrier), hypothetical orders in the franc-shock replay (stop at 1.1950, knock-outs at 1.18/1.15/1.10/1.05), fill at the first fixing beyond the level — `M07_CONFIG`.
+- 08: products compared with a forward hedge of the planned amount (accumulator, decumulator, TARF); pivot TARF, TPF, RTPF show gains/coupons received; start scenarios, speeds and DCI defaults in `PATHSIM_CONFIG` and `DCI_CONFIG`.
+
+**Reasoning:** D-22; the module texts explain each choice where it matters.

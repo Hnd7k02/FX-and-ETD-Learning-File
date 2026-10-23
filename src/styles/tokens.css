@@ -69,8 +69,11 @@
   --ff-level-5: #dc2626; /* Extrem */
 
   /* Typografie */
+  /* STIX Two Text second: Plus Jakarta Sans has no Greek glyphs (Δ, Γ, ν, σ …); the browser
+     falls back per glyph, so Greek letters in UI text match the formula font (D-37). */
   --ff-font-ui:
-    'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+    'Plus Jakarta Sans', 'STIX Two Text', ui-sans-serif, system-ui, -apple-system, 'Segoe UI',
+    sans-serif;
   --ff-font-mono:
     'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace; /* Kurse, Tabellenwerte */
   --ff-font-math: 'STIX Two Text', 'Times New Roman', serif; /* Formeln, Variablen kursiv */
