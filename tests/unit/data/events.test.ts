@@ -1,5 +1,4 @@
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { MODULE_SLUGS } from '@/data/modules';
 import { parseRawCsv } from '@/lib/data/csv';
@@ -61,11 +60,10 @@ describe('events.json', () => {
       for (const m of e.modules) expect(MODULE_SLUGS, `${e.id} → ${m}`).toContain(m);
   });
 
-  it('names sources that exist in src/content/sources', () => {
-    const dir = 'src/content/sources';
-    const files = ['src/content/sources.md', ...readdirSync(dir).map((f) => join(dir, f))];
+  it('names sources that exist in src/content/sources.md', () => {
+    const files = ['src/content/sources.md'];
     const ids = new Set<string>();
-    for (const f of files.filter((x) => existsSync(x) && x.endsWith('.md'))) {
+    for (const f of files.filter((x) => existsSync(x))) {
       for (const m of readFileSync(f, 'utf8').matchAll(/^##\s+([a-z0-9][a-z0-9-]*)\s*$/gm))
         ids.add(m[1]!);
     }

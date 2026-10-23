@@ -32,6 +32,7 @@ import {
 } from '@/lib/riskometer-ui';
 import { RiskometerChart, type ChartMarker } from './RiskometerChart';
 import { RiskometerGauge } from './RiskometerGauge';
+import { readQuery, writeQuery } from '@/lib/url';
 
 const H1_KEY = {
   'EUR/CHF': 'rk.h1.EURCHF',
@@ -80,17 +81,12 @@ export default function Riskometer(p: RiskometerProps): JSX.Element {
 
   // Deep link on load; write the selection back after the first interaction.
   useEffect(() => {
-    const dl = parseDeepLink(window.location.search);
+    const dl = parseDeepLink(`?${readQuery().toString()}`);
     if (dl.pair || dl.event) setSel(resolveSelection(p.events, dl.pair, dl.event));
   }, []);
   useEffect(() => {
     if (!touched.current) return;
-    const { pathname, hash } = window.location;
-    window.history.replaceState(
-      window.history.state,
-      '',
-      `${pathname}${deepLinkSearch(p.events, sel)}${hash}`,
-    );
+    writeQuery(new URLSearchParams(deepLinkSearch(p.events, sel)));
   }, [sel]);
 
   const choosePair = (pair: Pair) => {

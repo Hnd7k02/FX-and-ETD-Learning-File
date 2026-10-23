@@ -5,7 +5,8 @@ import mdx from '@astrojs/mdx';
 
 // Static site. German lives under /, English under /en/.
 export default defineConfig({
-  // Replaced by the production URL once Cloudflare is connected (see DECISIONS.md D-13).
+  // Only used for canonical/hreflang tags of the intermediate web build; the deliverable is the
+  // offline file release/forward-first.html (DECISIONS.md D-13).
   site: 'https://forward-first.pages.dev',
   output: 'static',
   trailingSlash: 'always',

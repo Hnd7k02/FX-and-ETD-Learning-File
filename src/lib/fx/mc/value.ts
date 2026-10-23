@@ -213,6 +213,47 @@ export function price(
   return ev.result(o.seed);
 }
 
+/** Yields to the browser between chunks (macrotask, so input and painting can run). */
+const yieldNow = (): Promise<void> => new Promise((r) => setTimeout(r, 0));
+
+/**
+ * Same valuation as `price`, computed in chunks of `chunkPaths` paths on the main thread with a
+ * pause after each chunk (no Web Worker in the offline file, DECISIONS D-13). The random numbers
+ * are drawn in the same order, so the result equals `price` for the same options.
+ * `isCancelled` is checked after each chunk; a cancelled run rejects with an Error('cancelled').
+ */
+export async function priceChunked(
+  product: Product,
+  market: Market = DEFAULT_MARKET,
+  opts: McOptions = {},
+  chunkPaths = 1000,
+  isCancelled?: () => boolean,
+  pause: () => Promise<void> = yieldNow,
+): Promise<PriceResult> {
+  const o = resolve(opts);
+  const days = product.fixingDays;
+  const n = days.length;
+  const src = new GbmPathSource(market, { ...o, days: days[n - 1]! });
+  const ev = new PathEvaluator(
+    product,
+    discountFactors(days, market.rd),
+    src.info.antithetic,
+    src.info.paths,
+  );
+  const obs = new Float64Array(n);
+  const step = Math.max(2, Math.floor(chunkPaths / 2) * 2); // keep antithetic pairs together
+  let k = 0;
+  for (let path = src.next(); path !== undefined; path = src.next()) {
+    for (let i = 0; i < n; i++) obs[i] = path[days[i]!]!;
+    ev.add(obs, 0);
+    if (++k % step === 0) {
+      await pause();
+      if (isCancelled?.()) throw new Error('cancelled');
+    }
+  }
+  return ev.result(o.seed);
+}
+
 /** Spots of every simulated path on a set of observation days (row-major, path by path). */
 export interface ObservationSet {
   days: readonly number[];

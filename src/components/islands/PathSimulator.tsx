@@ -24,7 +24,7 @@
  * Interaction: play/pause, restart, speed, scrub by slider or by dragging on the chart; drag
  * the end of a trend path, the shock (day and depth) and the strike; every drag has a slider
  * as its accessible twin. Logic in src/lib/pathsim.ts; the Monte Carlo valuation of an
- * adjusted parameter runs in the Web Worker (src/lib/fx/mc/mc.worker.ts).
+ * adjusted parameter runs on the main thread in chunks (createInlineMcClient, no Web Worker).
  */
 import type { JSX } from 'preact';
 import { useEffect, useId, useMemo, useRef, useState } from 'preact/hooks';
@@ -44,7 +44,7 @@ import { translator, type Lang } from '@/i18n/types';
 import { clamp, linePath, niceTicks, scaleLinear, type Point } from '@/lib/chart';
 import { EXAMPLE, EXAMPLE_LABEL } from '@/lib/fx/example';
 import { MC_CONFIG, PIP } from '@/lib/fx/mc/products';
-import { createMcClient, type McClient, type WorkerLike } from '@/lib/fx/mc/protocol';
+import { createInlineMcClient, type McClient } from '@/lib/fx/mc/protocol';
 import type { PriceResult } from '@/lib/fx/mc/value';
 import type { ScenarioName } from '@/lib/fx/mc/scenarios';
 import { fmtMoney, fmtNumber, fmtPct, fmtPips, fmtRate } from '@/lib/format';
@@ -343,7 +343,7 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
   const setGapDay = (d: number) =>
     setScen((s) => ({ ...s, gapFrac: clamp(Math.round(d), 1, days - 1) / days }));
 
-  /* ---------- live Monte Carlo value of an adjusted parameter (Web Worker) ---------- */
+  /* ---------- live Monte Carlo value of an adjusted parameter (main thread, chunked) ---------- */
   const [pv, setPv] = useState<{ status: 'idle' | 'busy' | 'done' | 'error'; res?: PriceResult }>({
     status: 'idle',
   });
@@ -367,18 +367,8 @@ export default function PathSimulator(props: PathSimulatorProps): JSX.Element {
     reqKey.current = key;
     setPv((p) => ({ ...p, status: 'busy' }));
     const timer = setTimeout(() => {
-      if (!client.current && typeof Worker !== 'undefined') {
-        try {
-          client.current = createMcClient(
-            () =>
-              new Worker(new URL('../../lib/fx/mc/mc.worker.ts', import.meta.url), {
-                type: 'module',
-              }) as unknown as WorkerLike,
-          );
-        } catch {
-          client.current = null;
-        }
-      }
+      // Main thread in chunks (no Web Worker: the offline file must run from file://, D-13).
+      if (!client.current) client.current = createInlineMcClient();
       if (!client.current) {
         setPv({ status: 'error' });
         return;

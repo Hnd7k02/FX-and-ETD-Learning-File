@@ -11,6 +11,7 @@ import { FAMILIES } from '@/data/modules';
 import { glossary as dict } from '@/i18n/dict/glossary';
 import { translator, type Lang } from '@/i18n/types';
 import { matchRanges, matchesTokens, searchTokens } from '@/lib/glossary';
+import { readQuery, scrollToId, writeQuery } from '@/lib/url';
 
 type FamilyFilter = 'all' | Family;
 
@@ -77,16 +78,12 @@ function highlight(tokens: string[]): void {
 }
 
 function writeUrl(query: string, family: FamilyFilter): void {
-  try {
-    const url = new URL(location.href);
-    if (query.trim()) url.searchParams.set('q', query.trim());
-    else url.searchParams.delete('q');
-    if (family !== 'all') url.searchParams.set('f', family);
-    else url.searchParams.delete('f');
-    history.replaceState(history.state, '', url.pathname + url.search + url.hash);
-  } catch {
-    /* ignore (sandboxed iframes) */
-  }
+  const params = readQuery();
+  if (query.trim()) params.set('q', query.trim());
+  else params.delete('q');
+  if (family !== 'all') params.set('f', family);
+  else params.delete('f');
+  writeQuery(params);
 }
 
 export default function GlossarySearch({ lang, total, familyCounts }: GlossarySearchProps) {
@@ -99,7 +96,7 @@ export default function GlossarySearch({ lang, total, familyCounts }: GlossarySe
 
   // Initial state from the URL (?q=…&f=…).
   useEffect(() => {
-    const p = new URLSearchParams(location.search);
+    const p = readQuery();
     const q = p.get('q') ?? '';
     const f = p.get('f');
     if (q) setQuery(q);
@@ -133,7 +130,8 @@ export default function GlossarySearch({ lang, total, familyCounts }: GlossarySe
       applyFilter('', 'all');
       setQuery('');
       setFamily('all');
-      location.hash = id;
+      // hash routing in the offline file: never assign location.hash, scroll instead
+      requestAnimationFrame(() => scrollToId(id));
     };
     document.addEventListener('keydown', onKey);
     document.addEventListener('click', onClick);

@@ -21,7 +21,7 @@ import {
   type ProductOverrides,
   type ZeroCostKind,
 } from './products';
-import { price, solveParameter, type PriceResult, type SolveResult } from './value';
+import { price, priceChunked, solveParameter, type PriceResult, type SolveResult } from './value';
 
 /** Valuation request: price a product (defaults + overrides) on a market. */
 export interface McPriceRequest {
@@ -137,6 +137,35 @@ export function createMcClient(workerFactory?: () => WorkerLike): McClient {
       worker?.terminate();
       for (const p of pending.values()) p.reject(new Error('mc worker terminated'));
       pending.clear();
+    },
+  };
+}
+
+/**
+ * Client for the offline file: no Web Worker. Prices run on the main thread in chunks
+ * (`priceChunked`), so sliders stay responsive; a newer request cancels the running one.
+ * Solves are rare and run synchronously.
+ */
+export function createInlineMcClient(chunkPaths = 1000): McClient {
+  let generation = 0;
+  let stopped = false;
+  return {
+    price: async (product, overrides, opts = {}) => {
+      const my = ++generation;
+      const market: Market = { ...DEFAULT_MARKET, ...opts.market };
+      const raw = { paths: opts.paths, seed: opts.seed, antithetic: opts.antithetic };
+      const clean = Object.fromEntries(Object.entries(raw).filter(([, v]) => v !== undefined));
+      const built = buildProduct(product, market, overrides ?? {});
+      return priceChunked(built, market, clean, chunkPaths, () => stopped || my !== generation);
+    },
+    solve: (product, overrides, opts = {}) => {
+      const res = handleMcRequest({ ...opts, id: 0, type: 'solve', product, overrides });
+      return res.error !== undefined
+        ? Promise.reject(new Error(res.error))
+        : Promise.resolve(res.result as SolveResult);
+    },
+    terminate: () => {
+      stopped = true;
     },
   };
 }

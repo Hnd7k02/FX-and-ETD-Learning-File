@@ -693,3 +693,9 @@ details.derivation > .derivation-body {
     scroll-behavior: auto !important;
   }
 }
+
+/* #main receives programmatic focus after a route change (offline router, ClientRouter);
+   it is a landmark, not a control, so no focus ring. */
+#main:focus {
+  outline: none;
+}

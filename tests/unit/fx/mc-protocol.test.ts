@@ -114,3 +114,32 @@ describe('client', () => {
     expect(terminated).toBe(true);
   });
 });
+
+describe('main-thread chunked pricing (offline file)', () => {
+  it('priceChunked equals price for the same options', async () => {
+    const { price, priceChunked } = await import('@/lib/fx/mc/value');
+    const { buildProduct, DEFAULT_MARKET } = await import('@/lib/fx/mc/products');
+    const product = buildProduct('accumulator', DEFAULT_MARKET, {});
+    const opts = { paths: 2000, seed: 7 };
+    const a = price(product, DEFAULT_MARKET, opts);
+    const b = await priceChunked(product, DEFAULT_MARKET, opts, 300, undefined, () =>
+      Promise.resolve(),
+    );
+    expect(b.pv).toBe(a.pv);
+    expect(b.stdErr).toBe(a.stdErr);
+  });
+
+  it('a newer request cancels the running one; terminate stops it', async () => {
+    const { createInlineMcClient } = await import('@/lib/fx/mc/protocol');
+    const c = createInlineMcClient(200);
+    const first = c.price('accumulator', {}, { paths: 4000, seed: 1 });
+    const second = c.price('accumulator', {}, { paths: 400, seed: 1 });
+    await expect(first).rejects.toThrow('cancelled');
+    await expect(second).resolves.toMatchObject({ paths: 400 });
+    const s = await c.solve('accumulator', {}, { paths: 400, seed: 3 });
+    expect(Number.isFinite(s.value)).toBe(true);
+    const third = c.price('accumulator', {}, { paths: 4000, seed: 1 });
+    c.terminate();
+    await expect(third).rejects.toThrow('cancelled');
+  });
+});

@@ -2,6 +2,8 @@
 import { common } from '@/i18n/dict/common';
 import { translator, type Lang } from '@/i18n/types';
 import { aboutPath, glossaryPath, riskometerPath } from '@/i18n/routes';
+import { getRiskSummary } from '@/lib/risk-summary';
+import { fmtDate } from '@/lib/format';
 
 interface Props {
   lang: Lang;
@@ -9,6 +11,8 @@ interface Props {
 }
 const { lang, wide = true } = Astro.props;
 const t = translator(common, lang);
+const risk = getRiskSummary();
+const dataLine = risk ? t('footer.dataAsOf', { date: fmtDate(risk.asOf, lang) }) : t('footer.data');
 ---
 
 <footer class:list={['footer', wide ? 'container' : 'container-module']}>
@@ -24,7 +28,7 @@ const t = translator(common, lang);
   </div>
   <div class="footer-row">
     <span>{t('footer.credits')}</span>
-    <span>{t('footer.data')}</span>
+    <span data-data-as-of={risk?.asOf}>{dataLine}</span>
   </div>
 </footer>
 
