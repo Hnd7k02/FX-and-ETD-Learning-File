@@ -40,6 +40,16 @@ describe('module 09 quiz', () => {
     const c2 = quiz.checks['2'];
     expect(c2.options[c2.correct]!.label.de).toContain(fmtRate(M09.levWorse));
     const c4 = quiz.checks['4'];
-    expect(c4.options[c4.correct]!.label.en).toContain(fmtRate(M09.carryForward));
+    expect(c4.options[c4.correct]!.label.en).toContain(fmtRate(M09.carryForward, 'USD/CHF', 5));
+  });
+
+  it('q1: the whole pips shown in the explanation add up', () => {
+    const fwdLoss = Math.round(Math.abs(M09.s1FwdDownPips));
+    const premium = Math.round(M09.callPremiumPips);
+    const q1 = quiz.quiz[0]!;
+    const right = q1.options[q1.correct]!;
+    expect(right.label.de).toContain(`${fwdLoss - premium} Pips besser`);
+    expect(right.explain.de).toContain(`${fwdLoss} Pips`);
+    expect(right.explain.de).toContain(`${premium} Pips`);
   });
 });

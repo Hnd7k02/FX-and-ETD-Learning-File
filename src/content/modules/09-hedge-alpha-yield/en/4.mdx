@@ -16,7 +16,7 @@ For hedgers the same discount is a question of cost and benefit. The importer bu
 
 ### Discount certificate: long USD plus short call
 
-A discount certificate (generic) buys the dollar at a discount. In return the gain ends at a cap. In building blocks: long USD plus a sold USD call at the cap <Num of="m09.yStrike" />. The certificate costs <Num of="m09.certPrice" /> per dollar, that is <Num of="m09.certDiscount" /> less than spot. Two things sit in the discount: the USD interest you do not receive, <Num of="m09.carryPips" /> pips (with shares it would be the dividend), and the call premium of <Num of="m09.yCall" /> pips. Together that is <Num of="m09.yCushion" /> pips. The break-even is the price carried forward at the CHF rate. Because that rate is <Num of="ex.rd" /> here, it is the price itself, <Num of="m09.yBe" />.
+A discount certificate (generic) buys the dollar at a discount. In return the gain ends at a cap. In building blocks: long USD plus a sold USD call at the cap <Num of="m09.yStrike" />. The certificate costs <Num of="m09.certPrice" /> per dollar, that is <Num of="m09.certDiscount" /> less than spot. Two things sit in the discount: the USD interest you do not receive, <Num of="m09.certUsdInterest" /> pips (with shares it would be the dividend), and the call premium of <Num of="m09.yCall" /> pips. Together that is <Num of="m09.certDiscountPips" /> pips. The break-even is the price carried forward at the CHF rate. Because that rate is <Num of="ex.rd" /> here, it is the price itself, <Num of="m09.yBe" />.
 
 ### Dual currency: the same curve, packaged differently
 

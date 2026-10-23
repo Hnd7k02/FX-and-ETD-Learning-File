@@ -15,8 +15,6 @@ const rate = (x: number) => fmtRate(x);
 
 /* ---------- numbers ---------- */
 const s1Down = rate(M.s1Down);
-const fwdDown = pips(M.s1FwdDownPips, true);
-const callDown = pips(M.s1CallDownPips, true);
 /** From the whole pips shown in the explanation, so the difference can be recomputed. */
 const callBetter = pips(Math.round(M.s1CallDownPips) - Math.round(M.s1FwdDownPips));
 const premium = pips(M.callPremiumPips);
@@ -31,7 +29,8 @@ const fwdCost = chf(M.costDown.forward);
 const levDiff = chf(M.costDown.leveraged - M.costDown.forward, true);
 const levBetter = pips(M.levBetterPips);
 
-const carryFwd = rate(M.carryForward);
+/** Money-market forward with 5 decimals, as in module 02 and section 4. */
+const carryFwd = fmtRate(M.carryForward, 'USD/CHF', 5);
 const spot = rate(M.spot);
 const carryPips = pips(M.carryPips);
 const yCushion = pips(M.yCushionPips);
@@ -74,12 +73,12 @@ const check1: QuizQuestion = {
     },
     {
       label: {
-        de: 'Wer zuerst handelt, bekommt den besseren Forward',
-        en: 'Whoever trades first gets the better forward',
+        de: 'Der Kurs: Das Produkt mit dem besten Strike passt zu beiden',
+        en: 'The rate: the product with the best strike suits both',
       },
       explain: {
-        de: 'Der Forward folgt aus Spot und Zinsen (Zinsparität), nicht aus der Reihenfolge der Kunden.',
-        en: 'The forward follows from spot and interest rates (interest rate parity), not from the order in which clients trade.',
+        de: 'Der beste Strike ist mit verkauften Optionen bezahlt. Für den Importeur kann er zur Überabsicherung werden, für die Anlegerin zum gehebelten Verlust. Zuerst zählt, ob jemand ein Risiko loswerden oder eingehen will.',
+        en: 'The best strike is paid for with sold options. For the importer it can turn into an over-hedge, for the investor into a leveraged loss. What counts first is whether someone wants to get rid of a risk or take one.',
       },
     },
     {
@@ -88,8 +87,8 @@ const check1: QuizQuestion = {
         en: 'Nothing: the same view means the same product',
       },
       explain: {
-        de: 'Für den Importeur wäre ein TARF eine Überabsicherung, für die Anlegerin ein Forward eine offene Position. Das Bedürfnis macht den Unterschied.',
-        en: 'For the importer a TARF would be an over-hedge; for the investor a forward is an open position. The need makes the difference.',
+        de: 'Für den Importeur kann ein TARF zur Überabsicherung werden, wenn er unter dem Strike die doppelte Menge kauft. Für die Anlegerin ist ein Forward eine offene Position. Das Bedürfnis macht den Unterschied.',
+        en: 'For the importer a TARF can turn into an over-hedge when he buys twice the amount below the strike. For the investor a forward is an open position. The need makes the difference.',
       },
     },
   ],
@@ -155,8 +154,8 @@ const check3: QuizQuestion = {
     {
       label: { de: 'Coupon · Direkt: TPF', en: 'Coupon · direct: TPF' },
       explain: {
-        de: 'Der TPF zahlt Coupons für eine Richtung: über dem Strike. Ein steigender Dollar stört ihn nicht. Für ein Band ist das der falsche Schnitt.',
-        en: 'The TPF pays coupons for one direction: above the strike. A rising dollar does not bother it. For a band it is the wrong cut.',
+        de: 'Der TPF zahlt Coupons für eine Richtung: Fixing über dem Strike. Ein steigender Dollar stört ihn nicht. Die Obergrenze des Bands nutzt er also gar nicht. Für eine Range-Sicht ist der RTPF gebaut.',
+        en: 'The TPF pays coupons for one direction: a fixing above the strike. A rising dollar does not bother it, so it makes no use of the band’s upper edge. The RTPF is built for a range view.',
       },
     },
     {
@@ -227,8 +226,8 @@ const q1: QuizQuestion = {
         en: `The call is ${callBetter.en} pips better`,
       },
       explain: {
-        de: `Richtig. Der Forward kostet ${fwdDown.de} Pips, weil der Importeur günstiger hätte kaufen können. Der Call verfällt wertlos und kostet nur die Prämie, ${callDown.de} Pips.`,
-        en: `Correct. The forward costs ${fwdDown.en} pips because the importer could have bought more cheaply. The call expires worthless and costs only the premium, ${callDown.en} pips.`,
+        de: `Richtig. Der Forward kostet ihn ${fwdLoss.de} Pips, weil er günstiger hätte kaufen können. Der Call verfällt wertlos und kostet nur die Prämie, ${premium.de} Pips. Die Differenz: ${callBetter.de} Pips.`,
+        en: `Correct. The forward costs him ${fwdLoss.en} pips because he could have bought more cheaply. The call expires worthless and costs only the premium, ${premium.en} pips. The difference: ${callBetter.en} pips.`,
       },
     },
     {

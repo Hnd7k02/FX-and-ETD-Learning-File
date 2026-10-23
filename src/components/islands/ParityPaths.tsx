@@ -705,7 +705,8 @@ export default function ParityPaths({ lang }: ParityPathsProps): JSX.Element {
               <b>{t('pp.cont.title')}</b>
               <span>
                 <span class="math pp-formula">
-                  <i>S</i> · exp((<i>r</i>
+                  {/* math notation, not UI text */}
+                  <i>S</i> · {'exp'}((<i>r</i>
                   <sub>CHF</sub> − <i>r</i>
                   <sub>USD</sub>) · <i>t</i>)
                 </span>
