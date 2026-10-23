@@ -161,8 +161,8 @@ describe('point 4: carry notionals', () => {
       );
       expect(src).toContain(
         lang === 'de'
-          ? 'Forward, Break-even und Pips bleiben gleich.'
-          : 'The forward, the break-even and the pips stay the same.',
+          ? 'Forward, Break-even und der Abschlag pro Dollar bei Fälligkeit bleiben gleich.'
+          : 'The forward, the break-even and the discount per dollar at maturity stay the same.',
       );
       // the importer's 69.39 pips are the money-market forward discount (09.2 uses the
       // continuous forward), and the paragraph keeps one precision for the same quantity

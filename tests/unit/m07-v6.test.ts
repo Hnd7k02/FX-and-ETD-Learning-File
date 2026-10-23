@@ -458,7 +458,7 @@ describe('point 9: texts', () => {
     const gap = paragraph(
       lang,
       4,
-      lang === 'de' ? 'Alle Formeln dieses Moduls' : 'Every formula in this module',
+      lang === 'de' ? 'Die Bewertungsformeln dieses Moduls' : 'The pricing formulas in this module',
     );
     expect(gap).toMatch(
       lang === 'de'

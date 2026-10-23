@@ -39,7 +39,7 @@ The window is a compromise. It costs <Num of="m07.windowExtraChf" /> more than t
 
 ### Gap risk: the franc shock
 
-Every formula in this module assumes that the rate moves continuously, without jumps. With continuous monitoring it then meets a barrier exactly at its level, never beyond it. Like constant vol, the continuous rate is an assumption of the model, not part of the [risk-neutral measure](/en/glossary/#term-risk-neutral). On <Fact id="m07-floor-end" /> it did not hold. Since <Fact id="m07-floor-start" />, the Swiss National Bank had enforced a minimum exchange rate of <Fact id="m07-floor" /> francs per euro. On that day it discontinued it and lowered the interest rate on sight deposits to <Fact id="m05-snb-2015-rate" />.
+The pricing formulas in this module and the simulation assume that the rate moves continuously, without jumps. With continuous monitoring it then meets a barrier exactly at its level, never beyond it. Parities such as knock-out + knock-in = vanilla, by contrast, hold on every path, even across a jump. Like constant vol, the continuous rate is an assumption of the model, not part of the [risk-neutral measure](/en/glossary/#term-risk-neutral). On <Fact id="m07-floor-end" /> it did not hold. Since <Fact id="m07-floor-start" />, the Swiss National Bank had enforced a minimum exchange rate of <Fact id="m07-floor" /> francs per euro. On that day it discontinued it and lowered the interest rate on sight deposits above the exemption threshold to <Fact id="m05-snb-2015-rate" />.
 
 The ECB fixing for EUR/CHF was <Num of="m07.gapBefore" /> the day before and <Num of="m07.gapShock" /> on the day: <Num of="m07.gapDayMove" /> from one fixing to the next. In this series there is not a single rate in between. The ECB publishes its reference rates for information purposes only. They are not tradable prices. The replay below is therefore a hypothetical scenario with daily ECB reference rates. It shows the order of magnitude, not the rates at which trades were done that day. The stop, the put and the barriers in it are assumed examples, not historical trades.
 
@@ -57,7 +57,7 @@ Suppose an exporter with euro income, the mirror image of our importer, fears a 
 
 - A barrier is a condition, not protection. Check which scenarios it cuts away.
 - Reverse knock-outs disappear where the option would be worth the most.
-- A stop needs a tradable price at the stop level to be filled there. A barrier needs no price at its level: if the rate jumps past it, it is triggered all the same. In a gap the rate jumps over every level at once: the stop is filled at the next tradable price, the knock-outs are extinguished under their terms, without any trade. The barrier itself needs no continuous rate. Only its pricing formulas and the hedging based on them assume one. That is why the formulas underestimate gap risk.
+- A stop needs a tradable price at the stop level to be filled there. A barrier needs no price at its level: if the rate jumps past it, it is triggered all the same. In a gap the rate jumps over every level between the last and the next price at once: the stop is filled at the next tradable price, the knock-outs are extinguished under their terms, without any trade. The barrier itself needs no continuous rate. Only its pricing formulas and the hedging based on them assume one. That is why the formulas underestimate gap risk.
 - Read the term sheet: observation period, type of monitoring, reference rate, and who determines the barrier event.
 
 </Callout>

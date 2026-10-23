@@ -44,7 +44,7 @@ The call reacts to both rates, mainly through the forward <i>F</i> = <i>S</i> ·
 
 In the example, one percentage point more on the CHF rate lifts the forward by about <Num of="m05.fwdPerPct" /> pips. That is worth <Num of="m05.rhoFwdEffect" /> to the call. At the same time the payoff is discounted more heavily, which accounts for <Num of="m05.rhoDiscount" />. Net, ρ<sub>d</sub> = <Num of="ex.rhoDChf" /> per +1%. For the USD rate only the forward channel acts: ρ<sub>f</sub> = <Num of="ex.rhoFChf" /> per +1%. Rho grows with maturity: for one year and the same strike it reaches <Num of="m05.rhoD1y" /> and <Num of="m05.rhoF1y" />.
 
-The CHF rate can be negative, by the way. In <Fact id="m05-snb-2015-month" /> the Swiss National Bank cut the rate on sight deposits to <Fact id="m05-snb-2015-rate" />, and only in <Fact id="m05-snb-2022-month" /> did its policy rate turn positive again. That is why the CHF slider in the lab reaches below zero.
+The CHF rate can be negative, by the way. In <Fact id="m05-snb-2015-month" /> the Swiss National Bank cut the rate on sight deposits above the exemption threshold to <Fact id="m05-snb-2015-rate" />, and only in <Fact id="m05-snb-2022-month" /> did its policy rate turn positive again. That is why the CHF slider in the lab reaches below zero.
 
 <GreeksLabFigure mode="rho" caption="Drag the CHF rate or the USD rate, with the slider or the dot itself. At the top the price rises with the CHF rate; below it falls with the USD rate. When both rates are equal, the forward sits exactly at spot." />
 

@@ -11,7 +11,7 @@ URL (no links to copies of books; statements are paraphrased, never copied).
 
 - Titel: Euro foreign exchange reference rates
 - Herausgeber: Europäische Zentralbank (EZB) / European Central Bank
-- Datum: laufend, an jedem Arbeitstag um ca. 16:00 MEZ / every working day around 16:00 CET
+- Datum: laufend, an Arbeitstagen um ca. 16:00 MEZ / on working days around 16:00 CET
 - URL: https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html
 - Belegt: Datenquelle des Riskometers (EUR/CHF, EUR/USD direkt; USD/CHF und USD/JPY als Kreuzkurse); Referenzkurse dienen nur Informationszwecken.
 

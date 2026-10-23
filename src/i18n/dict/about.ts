@@ -23,7 +23,7 @@ export const about = defineDict({
     'about.what.p2':
       'Der rote Faden: Alles wird auf den Forward heruntergebrochen. Ein Call ist ein Forward mit Knick, ein Zero-Cost Collar ein Forward mit Spielraum, ein Accumulator eine Serie von Forwards mit Hebel und Knock-out.',
     'about.what.p3':
-      'Jede Zahl kommt live aus einem getesteten Rechenkern; nichts ist abgetippt. Das Riskometer zeigt echte Schwankungen aus offiziellen Referenzkursen.',
+      'Jede Zahl kommt aus einem getesteten Rechenkern oder aus Daten mit Quelle; keine Beispielzahl ist abgetippt. Das Riskometer zeigt echte Schwankungen aus offiziellen Referenzkursen.',
     'about.what.notH': 'Was es nicht ist',
     'about.what.not1': 'keine Anlageberatung',
     'about.what.not2': 'keine Handelsempfehlungen',
@@ -86,14 +86,14 @@ export const about = defineDict({
       'Europäische Digitals (Cash-or-Nothing), die acht Single-Barrier-Typen nach Reiner-Rubinstein mit stetiger Beobachtung, One-Touch und No-Touch sowie der Double No-Touch als Reihenformel. Die In-Out-Parität dient als Test.',
     'about.models.mc.h': 'Monte Carlo für pfadabhängige Produkte',
     'about.models.mc.p':
-      'Window Barrier, Accumulator, Decumulator, TARF, Pivot TARF, TPF und RTPF haben keine geschlossene Formel. Das Tool simuliert Kurspfade als geometrische Brownsche Bewegung mit Drift r_d − r_f in Tagesschritten.',
+      'Window Barrier, Accumulator und Decumulator haben eine geschlossene Formel nur bei stetiger Beobachtung; beobachtet der Vertrag täglich oder an den Fixings, gibt es keine exakte. TARF, Pivot TARF, TPF und RTPF haben wegen des Targets gar keine. Das Tool simuliert Kurspfade als geometrische Brownsche Bewegung mit Drift r_d − r_f in Tagesschritten.',
     'about.models.mc.seed': 'Seed-basierter Zufallsgenerator: Jedes Ergebnis ist reproduzierbar.',
     'about.models.mc.anti':
       'Antithetische Pfade: Zu jedem Zufallszug Z läuft auch −Z. Das senkt den Standardfehler.',
     'about.models.mc.bgk':
       'Die Simulation beobachtet einmal pro Tag. Für den Vergleich mit stetigen Formeln verschiebt sie die Barriere nach Broadie-Glasserman-Kou; die Konstante 0.5826 ist −ζ(½)/√(2π).',
     'about.models.mc.out':
-      'Faire Strikes und Coupons rechnet ein Skript beim Build und speichert sie mit Pfadanzahl und Standardfehler. Interaktive Szenarien laufen in einem Web Worker.',
+      'Faire Strikes und Coupons rechnet ein eigenes Skript vorab (von Hand gestartet, nicht bei jedem Build) und speichert sie mit Pfadanzahl und Standardfehler. Interaktive Szenarien rechnet die Seite direkt im Browser, in kleinen Paketen.',
     'about.models.normal':
       'Die Normalverteilung N(x) rechnet der Kern mit doppelter Genauigkeit (Fehler unter 1e−14), damit die Tests gegen eine unabhängige Referenz bis auf 1e−10 stimmen.',
 
@@ -102,7 +102,7 @@ export const about = defineDict({
       'Das Riskometer misst, wie stark ein Währungspaar im letzten Monat bis zum Datenstand geschwankt hat, und ordnet das in seine eigene Geschichte seit {since} ein.',
     'about.risk.step1.h': 'EZB-Referenzkurse',
     'about.risk.step1.p':
-      'Die EZB veröffentlicht sie an jedem Arbeitstag um ca. 16:00 MEZ. Der Release-Workflow holt sie über die ECB Data Portal API: EUR/CHF, EUR/USD und EUR/JPY.',
+      'Die EZB veröffentlicht sie an Arbeitstagen um ca. 16:00 MEZ. Der Release-Workflow holt sie über die ECB Data Portal API: EUR/CHF, EUR/USD und EUR/JPY.',
     'about.risk.step2.h': 'Paare und Kreuzkurse',
     'about.risk.step2.p':
       'EUR/CHF und EUR/USD kommen direkt von der EZB. Die beiden Dollar-Paare entstehen als Kreuzkurse.',
@@ -132,7 +132,7 @@ export const about = defineDict({
     'about.risk.gauge':
       'Tacho: fünf gleich breite Segmente. Die Nadel steht bei Segmentindex plus Anteil innerhalb der Stufe, gemessen in Perzentilen; Extrem reicht bis zum historischen Maximum.',
     'about.risk.events':
-      'Ereignisse: Kursbewegung und Vola-Spitze rechnet das Build-Skript aus den Daten; die Spitze ist das Maximum von {before} Handelstagen vor bis {after} Handelstagen nach dem Ereignis.',
+      'Ereignisse: Kursbewegung und Vola-Spitze rechnet das Build-Skript aus den Daten; die Spitze ist standardmässig das Maximum von {before} Handelstagen vor bis {after} Handelstagen nach dem Ereignis. Folgt kurz darauf eine andere Marktunruhe, ist das Fenster kürzer, damit sie nicht mitzählt.',
     'about.risk.snapshot':
       'Eingefrorener Datenstand: Die Datei enthält die Daten vom letzten Abruf und lädt keine neuen nach. Neue Daten kommen nur mit einem neuen Release, also mit einer neuen Datei. Das Datum dieses Stands steht im Riskometer und in der Fusszeile jeder Seite.',
     'about.risk.update':
@@ -208,7 +208,7 @@ export const about = defineDict({
     'about.what.p2':
       'The common thread: everything is reduced to the forward. A call is a forward with a kink, a zero-cost collar a forward with room to move, an accumulator a series of forwards with leverage and a knock-out.',
     'about.what.p3':
-      'Every number comes live from a tested calculation core; nothing is typed in. The Riskometer shows real market swings from official reference rates.',
+      'Every number comes from a tested calculation core or from sourced data; no example number is typed in. The Riskometer shows real market swings from official reference rates.',
     'about.what.notH': 'What it is not',
     'about.what.not1': 'not investment advice',
     'about.what.not2': 'no trading recommendations',
@@ -272,14 +272,14 @@ export const about = defineDict({
       'European digitals (cash-or-nothing), the eight single-barrier types after Reiner-Rubinstein with continuous monitoring, one-touch and no-touch, and the double no-touch as a series formula. In-out parity serves as a test.',
     'about.models.mc.h': 'Monte Carlo for path-dependent products',
     'about.models.mc.p':
-      'Window barriers, accumulators, decumulators, TARFs, pivot TARFs, TPFs and RTPFs have no closed formula. The tool simulates rate paths as geometric Brownian motion with drift r_d − r_f in daily steps.',
+      'Window barriers, accumulators and decumulators have a closed formula only with continuous monitoring; if the contract observes daily or at the fixings, there is no exact one. TARFs, pivot TARFs, TPFs and RTPFs have none at all because of the target. The tool simulates rate paths as geometric Brownian motion with drift r_d − r_f in daily steps.',
     'about.models.mc.seed': 'Seeded random number generator: every result is reproducible.',
     'about.models.mc.anti':
       'Antithetic paths: for every random draw Z the path with −Z runs as well. This lowers the standard error.',
     'about.models.mc.bgk':
       'The simulation observes once a day. To compare with continuous formulas it shifts the barrier after Broadie-Glasserman-Kou; the constant 0.5826 is −ζ(½)/√(2π).',
     'about.models.mc.out':
-      'Fair strikes and coupons are computed by a script at build time and stored with the number of paths and the standard error. Interactive scenarios run in a Web Worker.',
+      'Fair strikes and coupons are computed in advance by a separate script (started by hand, not on every build) and stored with the number of paths and the standard error. Interactive scenarios run directly in the page, in small chunks.',
     'about.models.normal':
       'The core computes the normal distribution N(x) in double precision (error below 1e−14), so the tests match an independent reference down to 1e−10.',
 
@@ -318,7 +318,7 @@ export const about = defineDict({
     'about.risk.gauge':
       'Gauge: five segments of equal width. The needle sits at the segment index plus the share within the level, measured in percentiles; Extreme runs up to the historical maximum.',
     'about.risk.events':
-      'Events: the move and the volatility peak are computed by the build script from the data; the peak is the maximum from {before} trading days before to {after} trading days after the event.',
+      'Events: the move and the volatility peak are computed by the build script from the data; by default the peak is the maximum from {before} trading days before to {after} trading days after the event. If other market turmoil follows soon after, the window is shorter so that it does not count.',
     'about.risk.snapshot':
       'Frozen data snapshot: the file contains the data from the last fetch and never loads new data. New data only comes with a new release, that is, with a new file. The date of this snapshot is shown in the Riskometer and in the footer of every page.',
     'about.risk.update':

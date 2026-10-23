@@ -54,6 +54,7 @@ Subject-matter corrections only; the mechanics stay. DE and EN together, every n
 - **Sources:** `hull-2012` (ISBN, chapters), `bis-2016-cip`, `jensen-1968`, `jewitt-2015` (further reading only); D-50 extended: publishers and authors allowed in sources, books by ISBN, no links to copies.
 - **Guards:** `RETIRED_V6` in the content lint (56 old wordings, DE and EN, in every text file, the module registry, the loading text and the README); unit tests per point (`tests/unit/*-v6.test.ts`). `OFFLINE_VERSION` 6, copy `release/forward-first-v6.html`.
 - **Data:** not updated. `npm run data:fetch` could not reach the ECB from the sandbox (proxy 403); the data date stays 14.09.2026.
+- **Independent audit (D-63):** six auditors and a skeptic per finding; nine confirmed findings fixed (vega of exotics, model-free parities across jumps, barrier option price, cross-currency basis in 03.4, risk-neutral label in quiz 09, quiz 08 coupon, About methodology on Monte Carlo and closed forms), plus clear nits.
 
 ## Current state
 
@@ -94,3 +95,4 @@ Subject-matter corrections only; the mechanics stay. DE and EN together, every n
 20. **About page model texts:** «Garman-Kohlhagen» and «Monte Carlo» on the About page do not list the model assumptions (constant vol, lognormal, no jumps); the glossary entry «Risikoneutral» does. Add them there too?
 21. **iPad Files app (D-62 vs D-13):** Review 2 found that the Files app preview runs no JavaScript; D-13's device test ran a local test file with inline JavaScript in the Files app. How do you open the file on the iPad (preview, «Open in», another app)? The loading text now says what to do; CLAUDE.md, D-13 and the master prompt still name the Files app as the iPad target.
 22. **Cross-currency basis:** the texts name the basis but show no number (no sourced USD/CHF basis value). Add a sourced figure or keep it qualitative?
+23. **Monte Carlo fair coupons (D-63):** an independent high-precision recomputation gives about 772.7 pips (TPF) and 806–807 pips (RTPF), against 775.37 ± 0.97 and 810.54 ± 1.61 from the stored run (seed 20261022, 1 Mio. paths). Re-run `npm run data:mc` with more paths (e.g. 4 Mio.)? The contractual coupons, coupons in CHF and maximum gains would change with it.

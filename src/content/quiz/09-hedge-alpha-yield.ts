@@ -401,8 +401,8 @@ const q4: QuizQuestion = {
         en: 'Nothing, the larger cushion is free',
       },
       explain: {
-        de: 'Im Modell ist der erwartete Mehrertrag beider Ideen gegenüber dem Festgeld null. Mehr Puffer muss also etwas kosten: den Gewinn über dem Strike.',
-        en: 'In the model the expected extra return of both ideas over the deposit is zero. More cushion must therefore cost something: the gain above the strike.',
+        de: 'Risikoneutral, keine Prognose: Der erwartete Mehrertrag beider Ideen gegenüber dem Festgeld ist null. Mehr Puffer muss also etwas kosten: den Gewinn über dem Strike.',
+        en: 'Risk-neutral, not a forecast: the expected extra return of both ideas over the deposit is zero. More cushion must therefore cost something: the gain above the strike.',
       },
     },
   ],

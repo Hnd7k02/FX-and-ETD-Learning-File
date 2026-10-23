@@ -871,8 +871,8 @@ export const GLOSSARY: GlossaryEntry[] = [
     term: { de: 'Synthetischer Forward', en: 'Synthetic forward' },
     aliases: ['Synthetic', 'Long Call Short Put'],
     def: {
-      de: 'Long Call plus Short Put zum selben Strike. Die Kombination verhält sich wie ein Forward zum Strike: Forward-Delta 1, Spot-Delta e^(−rf T).',
-      en: 'A long call plus a short put at the same strike. Together they behave like a forward at the strike: forward delta 1, spot delta e^(−rf T).',
+      de: 'Long Call plus Short Put zum selben Strike und Verfall. Die Kombination verhält sich wie ein Forward zum Strike: Forward-Delta 1, Spot-Delta e^(−rf T).',
+      en: 'A long call plus a short put at the same strike and expiry. Together they behave like a forward at the strike: forward delta 1, spot delta e^(−rf T).',
     },
     module: '04-vanilla-options',
     section: '4',
@@ -921,8 +921,8 @@ export const GLOSSARY: GlossaryEntry[] = [
     term: { de: 'Vega', en: 'Vega' },
     aliases: ['ν', 'Vola-Sensitivität'],
     def: {
-      de: 'Wie stark sich der Optionswert ändert, wenn die Vola um einen Punkt steigt. Gekaufte Optionen haben positives Vega, am grössten nahe am Forward.',
-      en: 'How much the option value changes when volatility rises by one point. Bought options have positive vega, largest near the forward.',
+      de: 'Wie stark sich der Optionswert ändert, wenn die Vola um einen Punkt steigt. Gekaufte Vanilla Optionen haben positives Vega, am grössten nahe am Forward; der Käufer eines Double No-Touch ist dagegen short Vega.',
+      en: 'How much the option value changes when volatility rises by one point. Bought vanilla options have positive vega, largest near the forward; the buyer of a double no-touch, by contrast, is short vega.',
     },
     module: '05-greeks',
     section: '3',
@@ -1154,8 +1154,8 @@ export const GLOSSARY: GlossaryEntry[] = [
     term: { de: 'Barrier-Option', en: 'Barrier option' },
     aliases: ['Barriere', 'Barrier', 'Schwelle'],
     def: {
-      de: 'Eine Option, die erst entsteht oder verschwindet, wenn der Kurs eine Schwelle berührt. Weil sie seltener zahlt, ist sie ohne Rebate günstiger als die Vanilla Option.',
-      en: 'An option that comes alive or disappears when the rate touches a level. Because it pays out less often, it is cheaper than the vanilla option when there is no rebate.',
+      de: 'Eine Option, die erst entsteht oder verschwindet, wenn der Kurs eine Schwelle berührt. Ohne Rebate ist sie nie teurer als die Vanilla Option und meist günstiger, weil sie in manchen Szenarien nicht zahlt.',
+      en: 'An option that comes alive or disappears when the rate touches a level. Without a rebate it is never dearer than the vanilla option and usually cheaper, because it does not pay out in some scenarios.',
     },
     module: '07-barrier-binary',
     section: '1',

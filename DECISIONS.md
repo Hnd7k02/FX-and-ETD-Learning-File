@@ -488,7 +488,7 @@ Format: `D-xx · date · origin`, then question, decision, reasoning. Origin is 
 **Methodik: eingefrorener Datenstand, Update nur von Hand (Punkt 6)**
 
 **Question:** The About page still described a GitHub Action that fetched rates on weekdays at 15:30 UTC; since D-13 the release workflow is manual and the file holds a frozen snapshot.
-**Decision:** About (DE/EN) describes the real process: the workflow «Release» has no schedule and runs only when started; it fetches the ECB rates, validates them with the rules and constants of `src/lib/data/validate.ts` (filled in from there: last value at most 5 bank days old at the time of the fetch, absolute daily log return below 10 % with documented exception, dates valid, ascending, unique, not in the future, no stored date missing), runs the checks, builds and tests the file. A new bullet says the file is a frozen snapshot; its date is shown in the Riskometer and in every footer. Labels that read «heute» for a frozen value now say «Letzter Stand», «zuletzt», «Stufe zum Datenstand» (EN "latest reading", "level at the data date"). The ECB publishes «an jedem Arbeitstag um ca. 16:00 MEZ». Test: no text claims an automatic or daily update. Data were not updated: `npm run data:fetch` could not reach the ECB from the sandbox (proxy 403), so the data date stays 14.09.2026; Dario runs the Release workflow with the ECB fetch.
+**Decision:** About (DE/EN) describes the real process: the workflow «Release» has no schedule and runs only when started; it fetches the ECB rates, validates them with the rules and constants of `src/lib/data/validate.ts` (filled in from there: last value at most 5 bank days old at the time of the fetch, absolute daily log return below 10 % with documented exception, dates valid, ascending, unique, not in the future, no stored date missing), runs the checks, builds and tests the file. A new bullet says the file is a frozen snapshot; its date is shown in the Riskometer and in every footer. Labels that read «heute» for a frozen value now say «Letzter Stand», «zuletzt», «Stufe zum Datenstand» (EN "latest reading", "level at the data date"). The ECB publishes «an Arbeitstagen um ca. 16:00 MEZ» (on working days, without claiming every single one). Test: no text claims an automatic or daily update. Data were not updated: `npm run data:fetch` could not reach the ECB from the sandbox (proxy 403), so the data date stays 14.09.2026; Dario runs the Release workflow with the ECB fetch.
 **Reasoning:** The methodology must describe what the file really is.
 
 ## D-57 · 2026-10-23 · Review 2, 23.10.2026
@@ -540,3 +540,23 @@ Format: `D-xx · date · origin`, then question, decision, reasoning. Origin is 
 **Reasoning:** A silent «wird geladen» gives no hint; the text now says what to do.
 
 Wordings retired by D-51 to D-62 are guarded in both languages by `RETIRED_V6` in `tests/unit/content-lint.test.ts`.
+
+## D-63 · 2026-10-23 · Review 2, 23.10.2026
+
+**Unabhängige Fachprüfung nach Version 6**
+
+**Question:** Review 2 asks for at least 95 % correct theory. Do the texts around the twelve points hold up as well?
+**Decision:** Six independent auditors read the final texts (DE and EN) by topic and recomputed the numbers; every finding went to a skeptic who tried to refute it. Nine findings were confirmed and fixed, none refuted:
+
+- Glossary vega: positive vega holds for bought vanilla options; a bought double no-touch is short vega (as 07.3 says).
+- 07.4: the pricing formulas and the simulation assume a continuous rate; parities such as knock-out + knock-in = vanilla hold on every path, also across a jump. The risk box says a gap skips the levels between the last and the next price.
+- Glossary barrier option: without a rebate never dearer than the vanilla and usually cheaper (a knock-in can cost the same).
+- 03.4: the cross-currency basis is the gap between swap funding and the money market; it sits in FX swaps and CCS alike, so these two stay about equally expensive. The basis is quoted as a spread «Auf- oder Abschlag».
+- Quiz 09: the zero expected excess return is «risikoneutral, keine Prognose» (D-46).
+- Quiz 08: 285 pips is the coupon without target and without the interest differential.
+- About: the fair values are computed in advance by a separate script started by hand, not at build time; interactive Monte Carlo runs in the page in small chunks (no Web Worker in the file, `worker-src 'none'`); window barriers, accumulators and decumulators have closed forms only with continuous monitoring, the target products none; the event window is shorter when other market turmoil follows (D-31).
+- Clear nits fixed too: SNB rate «über dem Freibetrag» (source `snb-2015-01-15`) in 05.4 and 07.4, synthetic forward «zum selben Strike und Verfall», 09.3 risk box «Produkte für eine Sicht», 09.4 «der Abschlag pro Dollar bei Fälligkeit», ECB «an Arbeitstagen» in DE as in EN, home fallback «mit dem nächsten Release», «Jede Zahl kommt aus einem getesteten Rechenkern oder aus Daten mit Quelle», README (CSP and Monte Carlo), English PC line in the release notes.
+- Old wordings join `RETIRED_V6`.
+
+Not changed: the Monte Carlo fair coupons. An auditor's high-precision recomputation gives about 772.7 pips (TPF) and 806–807 pips (RTPF), against 775.37 ± 0.97 and 810.54 ± 1.61 from the stored run (seed 20261022, 1 Mio. paths). No statement is wrong, but the interval of the stored run does not cover the recomputation; open question in PROGRESS.
+**Reasoning:** The texts around the corrected points must meet the same standard as the points themselves.

@@ -154,7 +154,7 @@ const FORBIDDEN_NAMES = [
 ];
 
 /**
- * Wordings retired in Version 6 (Review 2, DECISIONS D-51 to D-62), DE and EN, by point. They
+ * Wordings retired in Version 6 (Review 2, DECISIONS D-51 to D-63), DE and EN, by point. They
  * must not come back in a section text, quiz, dictionary, component, the glossary, the module
  * registry, the loading text of the offline file or the README.
  */
@@ -215,6 +215,22 @@ const RETIRED_V6: [point: string, phrase: string][] = [
   ['12 loading text', 'If nothing appears'],
   ['in-out parity', 'Eine der beiden lebt am Ende immer'],
   ['in-out parity', 'One of the two is always alive'],
+  ['audit vega', 'Gekaufte Optionen haben positives Vega'],
+  ['audit vega', 'Bought options have positive vega'],
+  ['audit barrier', 'Alle Formeln dieses Moduls'],
+  ['audit barrier', 'Every formula in this module'],
+  ['audit barrier', 'Weil sie seltener zahlt, ist sie ohne Rebate günstiger'],
+  ['audit barrier', 'Because it pays out less often, it is cheaper'],
+  ['audit basis', 'die beiden Wege nicht immer gleich teuer'],
+  ['audit basis', 'the two routes are not always equally expensive'],
+  ['audit method', 'Interaktive Szenarien laufen in einem Web Worker'],
+  ['audit method', 'Interactive scenarios run in a Web Worker'],
+  ['audit method', 'Monte Carlo im Web Worker'],
+  ['audit method', 'Monte Carlo in a web worker'],
+  ['audit method', 'rechnet ein Skript beim Build'],
+  ['audit method', 'computed by a script at build time'],
+  ['audit method', 'mit dem nächsten Build'],
+  ['audit method', 'with the next build'],
 ];
 const RETIRED_V6_FILES = [
   ...textFiles,

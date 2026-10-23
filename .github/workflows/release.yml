@@ -85,7 +85,7 @@ jobs:
             echo "- Grösse / size: ${SIZE} KB"
             echo "- Branch: ${GITHUB_REF_NAME} · Commit: $(git rev-parse --short HEAD)"
             echo
-            echo "Arbeits-PC: herunterladen, Doppelklick, öffnet in Chrome oder Edge."
+            echo "Arbeits-PC: herunterladen, Doppelklick, öffnet in Chrome oder Edge. / Work PC: download, double-click, it opens in Chrome or Edge."
             echo "iPad: herunterladen, in der Dateien-App antippen. Bleibt nur der Ladetext stehen, führt diese Ansicht kein JavaScript aus: dann am Computer in Chrome, Edge oder Safari öffnen. / iPad: download, tap it in the Files app. If only the loading text stays, that view runs no JavaScript: open the file on a computer in Chrome, Edge or Safari."
             echo
             echo "Nur zu Bildungszwecken. Keine Anlageberatung. / For educational purposes only. Not investment advice."

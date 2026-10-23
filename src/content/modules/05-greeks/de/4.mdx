@@ -44,7 +44,7 @@ Der Call reagiert auf beide Zinsen, und zwar vor allem über den Forward <i>F</i
 
 Im Beispiel hebt ein Prozent mehr CHF-Zins den Forward um rund <Num of="m05.fwdPerPct" /> Pips. Das bringt dem Call <Num of="m05.rhoFwdEffect" />. Gleichzeitig wird die Auszahlung stärker abgezinst, das macht <Num of="m05.rhoDiscount" /> aus. Netto ist ρ<sub>d</sub> = <Num of="ex.rhoDChf" /> je +1 %. Beim USD-Zins wirkt nur der Forward: ρ<sub>f</sub> = <Num of="ex.rhoFChf" /> je +1 %. Rho wächst mit der Laufzeit: Bei einem Jahr und gleichem Strike sind es <Num of="m05.rhoD1y" /> und <Num of="m05.rhoF1y" />.
 
-Der CHF-Zins kann übrigens auch negativ sein. Im <Fact id="m05-snb-2015-month" /> senkte die Nationalbank den Zins auf Sichtguthaben auf <Fact id="m05-snb-2015-rate" />, erst im <Fact id="m05-snb-2022-month" /> wurde der Leitzins wieder positiv. Darum reicht der CHF-Regler im Labor unter null.
+Der CHF-Zins kann übrigens auch negativ sein. Im <Fact id="m05-snb-2015-month" /> senkte die Nationalbank den Zins auf Sichtguthaben über dem Freibetrag auf <Fact id="m05-snb-2015-rate" />, erst im <Fact id="m05-snb-2022-month" /> wurde der Leitzins wieder positiv. Darum reicht der CHF-Regler im Labor unter null.
 
 <GreeksLabFigure mode="rho" caption="Zieh am CHF-Zins oder am USD-Zins, mit dem Regler oder direkt am Punkt. Oben steigt der Preis mit dem CHF-Zins, unten fällt er mit dem USD-Zins. Sind beide Zinsen gleich, liegt der Forward genau beim Spot." />
 

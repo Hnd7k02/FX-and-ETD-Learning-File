@@ -100,14 +100,14 @@ describe('point 6: no automatic or daily update is claimed', () => {
 
   it('the Riskometer footnote says the time is when the ECB publishes, not when the file updates', () => {
     expect(riskometer.de['rk.footData']).toContain(
-      'EZB-Referenzkurse, veröffentlicht an jedem Arbeitstag um ca. 16:00 MEZ;',
+      'EZB-Referenzkurse, veröffentlicht an Arbeitstagen um ca. 16:00 MEZ;',
     );
     expect(riskometer.en['rk.footData']).toContain(
       'ECB reference rates, published on working days around 16:00 CET;',
     );
     // «werktags» includes Saturday in German; the ECB publishes on working days (Mon–Fri)
     expect(about.de['about.risk.step1.p']).toContain(
-      'Die EZB veröffentlicht sie an jedem Arbeitstag um ca. 16:00 MEZ.',
+      'Die EZB veröffentlicht sie an Arbeitstagen um ca. 16:00 MEZ.',
     );
     expect(about.en['about.risk.step1.p']).toContain(
       'The ECB publishes them on working days around 16:00 CET.',

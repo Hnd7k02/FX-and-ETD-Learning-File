@@ -333,8 +333,8 @@ const q3: QuizQuestion = {
         en: `Because the strike ${tpfK} is set relative to the spot (${tpfVsSpot.en}), while the forward falls by ${tpfDrop.en} pips to ${tpfFwdEnd}`,
       },
       explain: {
-        de: `Richtig. Für die späten Fixings liegt der Forward unter dem Strike. Die verkauften Puts sind darum viel wert, und ihre Prämie bezahlt den Coupon. Ohne Target wären es ${tpfNoTarget.de} Pips, ohne Zinsdifferenz nur ${tpfNoDrift.de} Pips.`,
-        en: `Correct. For the late fixings the forward lies below the strike. The sold puts are therefore worth a lot, and their premium pays for the coupon. Without a target it would be ${tpfNoTarget.en} pips, without the interest-rate differential only ${tpfNoDrift.en} pips.`,
+        de: `Richtig. Für die späten Fixings liegt der Forward unter dem Strike. Die verkauften Puts sind darum viel wert, und ihre Prämie bezahlt den Coupon. Ohne Target wären es ${tpfNoTarget.de} Pips, ohne Target und ohne Zinsdifferenz nur ${tpfNoDrift.de} Pips.`,
+        en: `Correct. For the late fixings the forward lies below the strike. The sold puts are therefore worth a lot, and their premium pays for the coupon. Without a target it would be ${tpfNoTarget.en} pips, without a target and without the interest-rate differential only ${tpfNoDrift.en} pips.`,
       },
     },
     {

@@ -52,7 +52,7 @@ export const riskometer = defineDict({
     'rk.colDate': 'Datum',
     'rk.colLevel': 'Stufe',
     'rk.footData':
-      'Daten: EZB-Referenzkurse, veröffentlicht an jedem Arbeitstag um ca. 16:00 MEZ; USD/CHF und USD/JPY als Kreuzkurse über den Euro.',
+      'Daten: EZB-Referenzkurse, veröffentlicht an Arbeitstagen um ca. 16:00 MEZ; USD/CHF und USD/JPY als Kreuzkurse über den Euro.',
     'rk.footMethod':
       'Realisierte Vola: Standardabweichung von {window} täglichen Log-Renditen (Mittelwert 0), annualisiert mit √{ann}, im Chart als Wochenwerte. Stufen nach Perzentilen aller Tageswerte seit {year}, je Paar: {levels}.',
     'rk.footLevels':
