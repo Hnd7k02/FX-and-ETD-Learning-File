@@ -2,7 +2,7 @@
 
 **An interactive learning tool for the FX market — from spot and forwards to options, the six Greeks and structured products. Everything is reduced to the forward.**
 
-German with English technical terms, fully switchable to English. Every number on screen is calculated live by a tested calculation core; a Riskometer shows real market swings from ECB reference rates.
+German with English technical terms, fully switchable to English. Every number on screen comes from a tested calculation core or from sourced data; a Riskometer shows real market swings from ECB reference rates.
 
 **One offline file.** Forward First ships as a single `forward-first.html` (about 1.6 MB) that runs without a network connection: double-click it on a PC (Chrome or Edge) or open it in the iPad Files app. No hosting, no login, no tracking. Download it from the [latest release](../../releases/latest).
 
@@ -53,7 +53,7 @@ src/data/fx/         generated JSON (Riskometer, Monte Carlo fair values)
 docs/                master prompt, design references, content guide, reference checks
 ```
 
-**Single-file build.** `npm run build` runs the Astro build, then `scripts/build-offline.ts` packs every pre-rendered page (gzip + Base64), one esbuild bundle with the router and all Preact islands, the CSS and the font subsets (as data URIs) into `release/forward-first.html`. Navigation uses hash routes with the same paths as the site (`#/module/05-greeks/2/`). A Content-Security-Policy (`default-src 'none'`, inline scripts without a hash since D-41, `worker-src 'none'`, `connect-src 'none'`) guarantees that the file makes no network request. Monte Carlo always runs in small chunks on the main thread; View Transitions for the station → module morph are used where the browser supports them. See D-13, D-40 and D-41.
+**Single-file build.** `npm run build` runs the Astro build, then `scripts/build-offline.ts` packs every pre-rendered page (gzip + Base64), one esbuild bundle with the router and all Preact islands, the CSS and the font subsets (as data URIs) into `release/forward-first.html`. Navigation uses hash routes with the same paths as the site (`#/module/05-greeks/2/`). A Content-Security-Policy (`default-src 'none'`, inline scripts without a hash since D-41, `worker-src 'none'`, `connect-src 'none'`) guarantees that the file makes no network request. Monte Carlo always runs on the main thread, never in a Web Worker (the live valuation of an adjusted parameter in small chunks); View Transitions for the station → module morph are used where the browser supports them. See D-13, D-40 and D-41.
 
 **Number integrity.** Texts never contain typed-in example values: `<Num of="ex.callChf" />` renders "CHF 12’669" from the core. Historical facts go through `<Fact id="…" />` and must have an entry in `src/content/sources.md`. A content lint fails the build otherwise.
 

@@ -93,7 +93,7 @@ export const about = defineDict({
     'about.models.mc.bgk':
       'Die Simulation beobachtet einmal pro Tag. Für den Vergleich mit stetigen Formeln verschiebt sie die Barriere nach Broadie-Glasserman-Kou; die Konstante 0.5826 ist −ζ(½)/√(2π).',
     'about.models.mc.out':
-      'Faire Strikes und Coupons rechnet ein eigenes Skript vorab (von Hand gestartet, nicht bei jedem Build) und speichert sie mit Pfadanzahl und Standardfehler. Interaktive Szenarien rechnet die Seite direkt im Browser, in kleinen Paketen.',
+      'Faire Strikes und Coupons rechnet ein eigenes Skript vorab (von Hand gestartet, nicht beim Build) und speichert sie mit Pfadanzahl und Standardfehler. Den Monte-Carlo-Wert eines verstellten Parameters rechnet die Seite direkt im Browser, in kleinen Paketen.',
     'about.models.normal':
       'Die Normalverteilung N(x) rechnet der Kern mit doppelter Genauigkeit (Fehler unter 1e−14), damit die Tests gegen eine unabhängige Referenz bis auf 1e−10 stimmen.',
 
@@ -279,7 +279,7 @@ export const about = defineDict({
     'about.models.mc.bgk':
       'The simulation observes once a day. To compare with continuous formulas it shifts the barrier after Broadie-Glasserman-Kou; the constant 0.5826 is −ζ(½)/√(2π).',
     'about.models.mc.out':
-      'Fair strikes and coupons are computed in advance by a separate script (started by hand, not on every build) and stored with the number of paths and the standard error. Interactive scenarios run directly in the page, in small chunks.',
+      'Fair strikes and coupons are computed in advance by a separate script (started by hand, not during the build) and stored with the number of paths and the standard error. The page computes the Monte Carlo value of an adjusted parameter directly in the browser, in small chunks.',
     'about.models.normal':
       'The core computes the normal distribution N(x) in double precision (error below 1e−14), so the tests match an independent reference down to 1e−10.',
 

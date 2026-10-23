@@ -231,6 +231,10 @@ const RETIRED_V6: [point: string, phrase: string][] = [
   ['audit method', 'computed by a script at build time'],
   ['audit method', 'mit dem nächsten Build'],
   ['audit method', 'with the next build'],
+  ['audit method', 'Jede Zahl live gerechnet'],
+  ['audit method', 'Every number calculated live'],
+  ['audit method', 'nicht bei jedem Build'],
+  ['audit method', 'not on every build'],
 ];
 const RETIRED_V6_FILES = [
   ...textFiles,

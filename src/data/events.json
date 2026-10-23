@@ -133,8 +133,8 @@
       "en": "15 January 2015"
     },
     "what": {
-      "de": "Die SNB hebt den Mindestkurs von 1.20 Franken pro Euro auf und senkt den Zins auf Sichtguthaben auf −0.75 %. Der Franken wertet am selben Tag massiv auf.",
-      "en": "The SNB discontinues the minimum exchange rate of CHF 1.20 per euro and cuts the interest rate on sight deposits to −0.75%. The franc soars the same day."
+      "de": "Die SNB hebt den Mindestkurs von 1.20 Franken pro Euro auf und senkt den Zins auf Sichtguthaben über dem Freibetrag auf −0.75 %. Der Franken wertet am selben Tag massiv auf.",
+      "en": "The SNB discontinues the minimum exchange rate of CHF 1.20 per euro and cuts the interest rate on sight deposits above the exemption threshold to −0.75%. The franc soars the same day."
     },
     "pairNote": {
       "EUR/CHF": {

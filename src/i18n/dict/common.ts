@@ -6,7 +6,7 @@ export const common = defineDict({
     'site.name': 'Forward First',
     'site.tagline': 'FX vom Spot bis zur Struktur',
     'site.description':
-      'Ein interaktives Lerntool für den Devisenmarkt: Spot, Forward, FX Swap, Optionen, Greeks und strukturierte Produkte. Jede Zahl live gerechnet.',
+      'Ein interaktives Lerntool für den Devisenmarkt: Spot, Forward, FX Swap, Optionen, Greeks und strukturierte Produkte. Jede Zahl aus einem getesteten Rechenkern oder aus Daten mit Quelle.',
     'a11y.skip': 'Zum Inhalt springen',
     'a11y.mainNav': 'Hauptnavigation',
     'a11y.language': 'Sprache',
@@ -79,7 +79,7 @@ export const common = defineDict({
     'site.name': 'Forward First',
     'site.tagline': 'FX from spot to structures',
     'site.description':
-      'An interactive learning tool for the FX market: spot, forwards, FX swaps, options, the Greeks and structured products. Every number calculated live.',
+      'An interactive learning tool for the FX market: spot, forwards, FX swaps, options, the Greeks and structured products. Every number from a tested calculation core or sourced data.',
     'a11y.skip': 'Skip to content',
     'a11y.mainNav': 'Main navigation',
     'a11y.language': 'Language',
