@@ -112,10 +112,3 @@ export function pathAt(path: readonly number[], pos: number): number {
   const k = pos - i;
   return path[i]! + (path[i + 1]! - path[i]!) * k;
 }
-
-/** The locked swap rate line from (0, S) to (days, F): the rate fixed for each date. */
-export function swapLineAt(near: number, far: number, days: number, day: number): number {
-  if (days <= 0) return near;
-  const k = Math.max(0, Math.min(1, day / days));
-  return near + (far - near) * k;
-}

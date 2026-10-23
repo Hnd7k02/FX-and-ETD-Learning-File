@@ -13,14 +13,7 @@ import {
   tourAt,
 } from '@/lib/m03/roll';
 import { fitCentre, innerTicks, stepTicks, textWidth } from '@/lib/m03/text';
-import {
-  EXAMPLE_MARKET as M,
-  pathAt,
-  roundTripChf,
-  spotPath,
-  swapLineAt,
-  tripSwap,
-} from '@/lib/m03/trip';
+import { EXAMPLE_MARKET as M, pathAt, roundTripChf, spotPath, tripSwap } from '@/lib/m03/trip';
 
 const N = E.notional;
 
@@ -97,9 +90,6 @@ describe('trip (section 1): buy USD for one month', () => {
     expect(pathAt(p, 1.25)).toBe(2.5);
     expect(pathAt(p, 9)).toBe(4);
     expect(pathAt([], 0)).toBeNaN();
-    expect(swapLineAt(0.8, 0.79, 30, 15)).toBeCloseTo(0.795, 12);
-    expect(swapLineAt(0.8, 0.79, 30, 60)).toBe(0.79);
-    expect(swapLineAt(0.8, 0.79, 0, 5)).toBe(0.8);
   });
 });
 
