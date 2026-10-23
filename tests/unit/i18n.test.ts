@@ -88,6 +88,8 @@ describe('no hard-coded UI strings in islands', () => {
     // JSX text between tags that contains a word of 3+ letters (umlauts included)
     const offenders = [...src.matchAll(/>([^<>{}\n]*[A-Za-zÄÖÜäöüß]{3,}[^<>{}\n]*)</g)]
       .map((m) => m[1]!.trim())
+      // code between a ">" and "<" comparison on one line is not JSX text
+      .filter((s) => !/&&|\|\||=>|[=!]==?|\?\s|;/.test(s))
       .filter((s) => s && !/^(?:[A-Z]{1,4}\/[A-Z]{1,4}|USD|CHF|EUR|JPY|ATMF|ITM|OTM)$/.test(s));
     expect(offenders, `hard-coded text in ${f}`).toEqual([]);
   });
