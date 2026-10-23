@@ -24,7 +24,7 @@ In the example the franc pays <Num of="ex.rd" /> interest and the dollar <Num of
 - **USD/CHF stays at <Num of="ex.spot" />.** He changes the dollars back. His result: <Num of="m01.carryPnlFlat" />.
 - **USD/CHF falls to <Num of="m01.stDown" />.** He gets too few francs back. His result: <Num of="m01.carryPnlDown" />. The interest advantage is gone, and a great deal more.
 
-The break-even rate is <Num of="m01.carryBreakEven" />. That is exactly the forward from module 02. If the investor hedges the dollars with a forward, no profit is left: the forward already prices in the interest rate differential. The carry trade only earns money if the rate falls by less than the forward implies.
+The break-even rate is <Num of="m01.carryBreakEven" />. That is exactly the forward from module 02, in the money-market convention. If the investor hedges the dollars with a forward, no profit is left: the forward already contains the interest rate differential. So the carry trade only earns money if USD/CHF ends above the forward. For our importer that is the good news: with a forward he buys more cheaply than at spot.
 
 <Callout variant="bad" title="When carry goes wrong">
 
@@ -34,7 +34,7 @@ Carry trades often run smoothly for a long time and then turn quickly. In a cris
 
 ### Roles can flip
 
-After the US tariff announcements of <Fact id="m01-tariff-date" /> markets were very turbulent. Yet the dollar lost value. According to the ECB reference rates, USD/CHF fell from <Num of="m01.apr25UsdChfStart" /> to <Num of="m01.apr25UsdChfLow" /> by the low of the month, a move of <Num of="m01.apr25UsdChfPct" />. Over the same period EUR/USD rose from <Num of="m01.apr25EurUsdStart" /> to <Num of="m01.apr25EurUsdHigh" />. The franc played its part; the dollar did not behave like a safe haven in this phase. Roles are tendencies, not laws.
+After the US tariff announcements of <Fact id="m01-tariff-date" /> markets were very turbulent. Yet the dollar lost value. In the ECB reference rates, USD/CHF fell from <Num of="m01.apr25UsdChfStart" /> to <Num of="m01.apr25UsdChfLow" /> by the low of the month, a fall of <Num of="m01.apr25UsdChfFall" />. The ECB does not publish a USD/CHF rate; it is a cross rate of EUR/CHF and EUR/USD (section 3). Over the same period EUR/USD rose from <Num of="m01.apr25EurUsdStart" /> to <Num of="m01.apr25EurUsdHigh" />. The franc played its part; the dollar did not behave like a safe haven in this phase. Roles are tendencies, not laws.
 
 <Derivation title="Derivation: profit and break-even of a carry trade">
 
@@ -59,7 +59,7 @@ This is the forward formula with the quote currency on top and the base currency
 
 <Desk title="Reading currencies in groups">
 
-On the desk you rarely think in a single pair. If equities fall while the franc and the yen rise together, it is a risk-off day. If AUD, NZD and NOK rise with commodity prices, the mood is good. The rates calendar shows when each central bank decides: risk events are to be expected on those days.
+On the desk you rarely think in a single pair. If equities fall while the franc and the yen rise together, it is a risk-off day. If AUD, NZD and NOK rise with commodity prices, the mood is good. The calendar of central bank meetings shows when each central bank decides: risk events are to be expected on those days.
 
 For Swiss companies EUR/CHF is often just as important as USD/CHF, because a large part of Swiss trade is with the euro area.
 

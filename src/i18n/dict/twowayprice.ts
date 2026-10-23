@@ -47,7 +47,7 @@ export const twowayprice = defineDict({
     'note.wider':
       'Der Spread ist auf {pips} Pips gewachsen. Der Importeur zahlt jetzt {half} statt {base}.',
     'note.wide':
-      'Mehrere Treiber kommen zusammen: {pips} Pips. Der Market Maker trägt jetzt viel mehr Risiko und lässt sich das bezahlen: {half} statt {base}, {factor}-mal so viel.',
+      'Mehrere Treiber kommen zusammen: {pips} Pips. Der Market Maker trägt jetzt viel mehr Risiko und lässt sich das bezahlen: {half} statt {base}, {factor}-\u2060mal so viel.',
     schematic: 'Schematische Werte zum Lernen, keine Marktdaten.',
   },
   en: {

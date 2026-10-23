@@ -129,10 +129,21 @@ export default function SpotExposure({ lang }: SpotExposureProps): JSX.Element {
     blockRects.push({ y: top, h, part });
   }
   const up = dirSign > 0;
-  // annotation bracket beside the column: left of it in the right half of the plot
-  const annotLeft = x > (L.left + L.width - L.right) / 2;
+  // Annotation in the corner the cost line never crosses (it rises from bottom left to top
+  // right): dollar up → bracket left of the column, text above its top, ending at the column;
+  // dollar down → bracket right of the column, text below its bottom, or above its top when
+  // the band label leaves no room below.
+  const annotLeft = up;
   const annotTick = annotLeft ? 5 : -5;
   const annotX = annotLeft ? x - L.block / 2 - 8 : x + L.block / 2 + 8;
+  const lineGap = L.font + 5;
+  const textX = annotX + (annotLeft ? 2 : -2);
+  const roomBelow = yCost + 8 + L.font + lineGap + L.font + 10 <= L.plotBottom - 8;
+  const firstBaseline = up
+    ? yCost - 10 - lineGap
+    : roomBelow
+      ? Math.max(yCost + 8 + L.font, y0 + 2 * L.font + 14)
+      : y0 - 10 - lineGap;
   const bfShown = Math.round(shown.bigFigures * 100) / 100;
   const annotBf = t(Math.abs(bfShown) === 1 ? 'annotBfOne' : 'annotBf', {
     bf: fmtNumber(bfShown, lang, {
@@ -201,21 +212,6 @@ export default function SpotExposure({ lang }: SpotExposureProps): JSX.Element {
               >
                 {t('y')}
               </text>
-              <text
-                x={bandMid}
-                y={L.plotBottom - 8}
-                style={{
-                  fontSize: fs,
-                  fontWeight: 600,
-                  fill: 'var(--ff-muted)',
-                  textAnchor: 'middle',
-                  paintOrder: 'stroke',
-                  stroke: 'var(--ff-surface-2)',
-                  strokeWidth: 4,
-                }}
-              >
-                {bandLabel}
-              </text>
               {/* today: vertical spot line and horizontal cost line */}
               <path
                 d={`M${sx(S0).toFixed(1)},${L.top}V${L.plotBottom}`}
@@ -236,19 +232,19 @@ export default function SpotExposure({ lang }: SpotExposureProps): JSX.Element {
                 }}
               />
               <text
-                x={L.width - L.right}
-                y={y0 + L.font + 6}
+                x={bandMid}
+                y={L.plotBottom - 8}
                 style={{
                   fontSize: fs,
                   fontWeight: 600,
-                  fill: 'var(--ff-ink-2)',
-                  textAnchor: 'end',
+                  fill: 'var(--ff-muted)',
+                  textAnchor: 'middle',
                   paintOrder: 'stroke',
-                  stroke: '#fff',
+                  stroke: 'var(--ff-surface-2)',
                   strokeWidth: 4,
                 }}
               >
-                {t('today', { today })}
+                {bandLabel}
               </text>
               {/* cost line N · S */}
               <path
@@ -277,7 +273,7 @@ export default function SpotExposure({ lang }: SpotExposureProps): JSX.Element {
                         strokeDasharray: b.part ? '3 2' : undefined,
                       }}
                     />
-                    {!b.part && b.h >= 14 && (
+                    {!b.part && b.h >= 14 && Math.abs(b.y + b.h / 2 - yCost) > 12 && (
                       <text
                         x={x}
                         y={b.y + b.h / 2 + 5}
@@ -303,8 +299,8 @@ export default function SpotExposure({ lang }: SpotExposureProps): JSX.Element {
                     style={{ fill: 'none', stroke: blockStroke, strokeWidth: 1.5 }}
                   />
                   <text
-                    x={annotX + (annotLeft ? -8 : 8)}
-                    y={(y0 + yCost) / 2 - 2}
+                    x={textX}
+                    y={firstBaseline}
                     style={{
                       fontSize: fs,
                       fontWeight: 800,
@@ -315,10 +311,10 @@ export default function SpotExposure({ lang }: SpotExposureProps): JSX.Element {
                       strokeWidth: 4,
                     }}
                   >
-                    <tspan x={annotX + (annotLeft ? -8 : 8)}>{annotBf}</tspan>
+                    <tspan x={textX}>{annotBf}</tspan>
                     <tspan
-                      x={annotX + (annotLeft ? -8 : 8)}
-                      dy={L.font + 5}
+                      x={textX}
+                      dy={lineGap}
                       style={{ fontFamily: 'var(--ff-font-mono)' }}
                     >
                       {chf(shown.diff, true)}
@@ -341,6 +337,22 @@ export default function SpotExposure({ lang }: SpotExposureProps): JSX.Element {
                   strokeDasharray: '2 3',
                 }}
               />
+              {/* labels on top of the reference lines (their halo breaks the dashes) */}
+              <text
+                x={L.width - L.right}
+                y={y0 + L.font + 6}
+                style={{
+                  fontSize: fs,
+                  fontWeight: 600,
+                  fill: 'var(--ff-ink-2)',
+                  textAnchor: 'end',
+                  paintOrder: 'stroke',
+                  stroke: '#fff',
+                  strokeWidth: 4,
+                }}
+              >
+                {t('today', { today })}
+              </text>
               {/* drag surface: horizontal drags move the rate, vertical swipes still scroll */}
               <rect
                 x={L.left}

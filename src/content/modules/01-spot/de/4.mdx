@@ -24,7 +24,7 @@ Im Beispiel zahlt der Franken <Num of="ex.rd" /> Zins, der Dollar <Num of="ex.rf
 - **USD/CHF bleibt bei <Num of="ex.spot" />.** Er tauscht die Dollars zurück. Sein Ergebnis: <Num of="m01.carryPnlFlat" />.
 - **USD/CHF fällt auf <Num of="m01.stDown" />.** Er erhält zu wenig Franken zurück. Sein Ergebnis: <Num of="m01.carryPnlDown" />. Der Zinsvorteil ist weg, und noch viel mehr.
 
-Die Gewinnschwelle liegt bei <Num of="m01.carryBreakEven" />. Das ist genau der Forward aus Modul 02. Sichert der Anleger die Dollars mit einem Forward ab, bleibt kein Gewinn übrig: Der Forward preist die Zinsdifferenz schon ein. Der Carry Trade verdient nur, wenn der Kurs weniger fällt, als der Forward es vorsieht.
+Die Gewinnschwelle liegt bei <Num of="m01.carryBreakEven" />. Das ist genau der Forward aus Modul 02, in der Geldmarkt-Konvention. Sichert der Anleger die Dollars mit einem Forward ab, bleibt kein Gewinn übrig: Der Forward enthält die Zinsdifferenz schon. Der Carry Trade verdient also nur, wenn USD/CHF am Ende über dem Forward liegt. Für unseren Importeur ist das die gute Nachricht: Er kauft per Forward günstiger als zum Spot.
 
 <Callout variant="bad" title="Wann Carry schiefgeht">
 
@@ -34,7 +34,7 @@ Carry Trades laufen oft lange gut und kippen dann schnell. In einer Krise wollen
 
 ### Rollen können kippen
 
-Nach den US-Zollankündigungen vom <Fact id="m01-tariff-date" /> waren die Märkte sehr unruhig. Trotzdem verlor der Dollar an Wert. Laut EZB-Referenzkursen fiel USD/CHF bis zum Tief des Monats von <Num of="m01.apr25UsdChfStart" /> auf <Num of="m01.apr25UsdChfLow" />, also um <Num of="m01.apr25UsdChfPct" />. EUR/USD stieg im gleichen Zeitraum von <Num of="m01.apr25EurUsdStart" /> auf <Num of="m01.apr25EurUsdHigh" />. Der Franken spielte seine Rolle, der Dollar verhielt sich in dieser Phase nicht wie ein Safe Haven. Rollen sind Tendenzen, keine Gesetze.
+Nach den US-Zollankündigungen vom <Fact id="m01-tariff-date" /> waren die Märkte sehr unruhig. Trotzdem verlor der Dollar an Wert. In den EZB-Referenzkursen fiel USD/CHF bis zum Tief des Monats von <Num of="m01.apr25UsdChfStart" /> auf <Num of="m01.apr25UsdChfLow" />, also um <Num of="m01.apr25UsdChfFall" />. Die EZB stellt keinen USD/CHF-Kurs, er ist ein Kreuzkurs aus EUR/CHF und EUR/USD (Abschnitt 3). EUR/USD stieg im gleichen Zeitraum von <Num of="m01.apr25EurUsdStart" /> auf <Num of="m01.apr25EurUsdHigh" />. Der Franken spielte seine Rolle, der Dollar verhielt sich in dieser Phase nicht wie ein Safe Haven. Rollen sind Tendenzen, keine Gesetze.
 
 <Derivation title="Herleitung: Gewinn und Gewinnschwelle eines Carry Trades">
 
@@ -59,7 +59,7 @@ Das ist die Formel des Forwards mit der Quote-Währung oben und der Base-Währun
 
 <Desk title="Währungen in Gruppen lesen">
 
-Am Desk denkt man selten in einem einzelnen Paar. Fällt der Aktienmarkt und steigen Franken und Yen gleichzeitig, ist das ein Risk-off-Tag. Steigen AUD, NZD und NOK mit den Rohstoffpreisen, ist die Stimmung gut. Der Zinskalender zeigt, wann welche Zentralbank entscheidet: An diesen Tagen ist mit Risk Events zu rechnen.
+Am Desk denkt man selten in einem einzelnen Paar. Fällt der Aktienmarkt und steigen Franken und Yen gleichzeitig, ist das ein Risk-off-Tag. Steigen AUD, NZD und NOK mit den Rohstoffpreisen, ist die Stimmung gut. Der Kalender der Zentralbanksitzungen zeigt, wann welche Zentralbank entscheidet: An diesen Tagen ist mit Risk Events zu rechnen.
 
 Für Schweizer Firmen ist EUR/CHF oft genauso wichtig wie USD/CHF, denn ein grosser Teil des Schweizer Handels läuft mit dem Euroraum.
 

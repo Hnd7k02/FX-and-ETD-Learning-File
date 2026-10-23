@@ -175,40 +175,40 @@ const check3: QuizQuestion = {
 const check4: QuizQuestion = {
   id: 'm01-c4',
   prompt: {
-    de: 'Welche dieser Währungen gilt als typische Rohstoffwährung?',
-    en: 'Which of these currencies is a typical commodity currency?',
+    de: 'Der Ölpreis steigt stark, die Stimmung an den Märkten ist gut. Welche dieser Währungen wertet dann typischerweise auf?',
+    en: 'The oil price rises sharply and markets are in a good mood. Which of these currencies typically appreciates?',
   },
   options: [
     {
       label: { de: 'CHF', en: 'CHF' },
       mono: true,
       explain: {
-        de: 'Der Franken gilt als Safe Haven und als Funding-Währung, nicht als Rohstoffwährung.',
-        en: 'The franc counts as a safe haven and a funding currency, not as a commodity currency.',
+        de: 'Der Franken ist Safe Haven und Funding-Währung. In guter Stimmung ist er eher weniger gefragt, mit dem Ölpreis hat er wenig zu tun.',
+        en: 'The franc is a safe haven and a funding currency. In a good mood it tends to be less in demand, and it has little to do with the oil price.',
       },
     },
     {
       label: { de: 'NOK', en: 'NOK' },
       mono: true,
       explain: {
-        de: 'Richtig. Norwegen exportiert viel Öl und Gas. Die Krone folgt darum oft den Energiepreisen.',
-        en: 'Correct. Norway exports a lot of oil and gas, so the krone often follows energy prices.',
+        de: 'Richtig. Norwegen exportiert viel Öl und Gas. Die Krone ist eine Rohstoffwährung und folgt darum oft den Energiepreisen.',
+        en: 'Correct. Norway exports a lot of oil and gas. The krone is a commodity currency and often follows energy prices.',
       },
     },
     {
       label: { de: 'JPY', en: 'JPY' },
       mono: true,
       explain: {
-        de: 'Japan importiert viele Rohstoffe. Der Yen gilt als Safe Haven und Funding-Währung.',
-        en: 'Japan imports many commodities. The yen counts as a safe haven and a funding currency.',
+        de: 'Japan importiert viel Energie, ein teurer Ölpreis belastet eher. Dazu ist der Yen Funding-Währung: In guter Stimmung wird er für Carry Trades verkauft.',
+        en: 'Japan imports a lot of energy, so expensive oil tends to weigh on it. The yen is also a funding currency: in a good mood it is sold to fund carry trades.',
       },
     },
     {
       label: { de: 'EUR', en: 'EUR' },
       mono: true,
       explain: {
-        de: 'Der Euro ist eine grosse Reservewährung. Seine Treiber sind vor allem EZB, Wachstum und Inflation im Euroraum.',
-        en: 'The euro is a major reserve currency. Its main drivers are the ECB, growth and inflation in the euro area.',
+        de: 'Der Euro ist eine grosse Reservewährung ohne Rohstoffrolle. Seine Treiber sind vor allem EZB, Wachstum und Inflation im Euroraum.',
+        en: 'The euro is a major reserve currency without a commodity role. Its main drivers are the ECB, growth and inflation in the euro area.',
       },
     },
   ],
@@ -323,8 +323,8 @@ const q3: QuizQuestion = {
         en: 'Nothing: the rates are inside the band, every round trip only costs spread.',
       },
       explain: {
-        de: `Über den Dollar kostet ein Euro höchstens ${fmtRate(tri.impliedAsk, 'EUR/CHF', 5)} (Ask · Ask). Direkt bekommst du ${fmtRate(qt.eurchf.bid, 'EUR/CHF')}. Der direkte Bid liegt über dem Band.`,
-        en: `Via the dollar a euro costs at most ${fmtRate(tri.impliedAsk, 'EUR/CHF', 5)} (ask · ask). Directly you get ${fmtRate(qt.eurchf.bid, 'EUR/CHF')}. The direct bid is above the band.`,
+        de: `Über den Dollar kaufst du einen Euro für ${fmtRate(tri.impliedAsk, 'EUR/CHF', 5)} (Ask · Ask). Direkt verkaufst du ihn für ${fmtRate(qt.eurchf.bid, 'EUR/CHF')}. Der direkte Bid liegt über dem Band, also bringt die Rundreise Geld.`,
+        en: `Via the dollar you buy a euro for ${fmtRate(tri.impliedAsk, 'EUR/CHF', 5)} (ask · ask). Directly you sell it for ${fmtRate(qt.eurchf.bid, 'EUR/CHF')}. The direct bid is above the band, so the round trip makes money.`,
       },
     },
     {
@@ -390,8 +390,8 @@ const q4: QuizQuestion = {
         en: 'Never: the interest is certain.',
       },
       explain: {
-        de: `Der Zins ist sicher, der Kurs nicht. Fällt USD/CHF auf ${rate(SC.stDown)}, verliert er ${money(M01.carry.usdEnd * SC.stDown - carry.chfDebt, E.quote, true).de}.`,
-        en: `The interest is certain, the rate is not. If USD/CHF falls to ${rate(SC.stDown)}, he loses ${money(M01.carry.usdEnd * SC.stDown - carry.chfDebt, E.quote, true).en}.`,
+        de: `Der Zins ist sicher, der Kurs nicht. Fällt USD/CHF auf ${rate(SC.stDown)}, verliert er ${money(carry.chfDebt - carry.usdEnd * SC.stDown).de}.`,
+        en: `The interest is certain, the rate is not. If USD/CHF falls to ${rate(SC.stDown)}, he loses ${money(carry.chfDebt - carry.usdEnd * SC.stDown).en}.`,
       },
     },
   ],

@@ -79,6 +79,13 @@ export default function TwoWayPrice({ lang }: TwoWayPriceProps): JSX.Element {
   const ticks: number[] = [];
   for (let p = -HALF; p <= HALF; p += 2) ticks.push(p);
   const labelled = [-HALF + 4, 0, HALF - 4];
+  // Bid/ask labels sit outside the band; when the band is too wide for that (phones, many
+  // drivers on), they move inside, above the band, so they never leave the SVG.
+  const bidText = `${t('bid')} ${fmtRate(q.bid, PAIR)}`;
+  const askText = `${t('ask')} ${fmtRate(q.ask, PAIR)}`;
+  const textW = (str: string) => str.length * fs * 0.62;
+  const bidOutside = xb - 6 - textW(bidText) >= 0;
+  const askOutside = xa + 6 + textW(askText) <= W;
 
   const toggle = (d: SpreadDriver) => setOn((o) => ({ ...o, [d]: !o[d] }));
 
@@ -176,28 +183,28 @@ export default function TwoWayPrice({ lang }: TwoWayPriceProps): JSX.Element {
                 style={{ stroke: 'var(--ff-ink)', strokeWidth: 1.5, strokeDasharray: '2 2' }}
               />
               <text
-                x={xb - 6}
+                x={bidOutside ? xb - 6 : xb + 2}
                 y={axisY - 18}
                 style={{
                   fontSize: `${fs}px`,
                   fontWeight: 700,
                   fill: 'var(--ff-ink)',
-                  textAnchor: 'end',
+                  textAnchor: bidOutside ? 'end' : 'start',
                 }}
               >
-                {t('bid')} {fmtRate(q.bid, PAIR)}
+                {bidText}
               </text>
               <text
-                x={xa + 6}
+                x={askOutside ? xa + 6 : xa - 2}
                 y={axisY - 18}
                 style={{
                   fontSize: `${fs}px`,
                   fontWeight: 700,
                   fill: 'var(--ff-ink)',
-                  textAnchor: 'start',
+                  textAnchor: askOutside ? 'start' : 'end',
                 }}
               >
-                {t('ask')} {fmtRate(q.ask, PAIR)}
+                {askText}
               </text>
               {labelled.map((p) => (
                 <text
