@@ -2,25 +2,27 @@ import CarryCushionFigure from '@/components/figures/CarryCushionFigure.astro';
 
 {/* 09 Hedge, alpha, yield · Section 4 · Yield and carry. Numbers only via <Num />, registry src/lib/nums/m09.ts. */}
 
-The investor has francs in his account. In the example the CHF money market pays <Num of="ex.rd" />, the dollar <Num of="ex.rf" />. So why not simply buy dollars? Because extra interest is never free. Whoever wants more takes on a risk. Three routes show this, and they can be built from one another.
+The investor has francs in his account. In the example the CHF money market pays <Num of="ex.rd" />, the dollar <Num of="ex.rf" />. So why not simply buy dollars? Because extra interest is never free. Whoever wants more takes on a risk. Three routes show this. They build on one another.
 
 ### Carry: earning the interest differential
 
 The investor buys USD at spot and deposits them at the USD rate. In <Num of="m09.yMonths" /> months he earns an interest differential of <Num of="m09.carryChf" /> on USD 1m, that is <Num of="m09.carryPips" /> pips. At the end he changes the dollars back at the rate at expiry. If the dollar falls by more than these pips, the head start is gone.
 
-The break-even is exactly the forward, <Num of="m09.carryFwd" />. That is no coincidence: the forward discount from [module 02](/en/module/02-forward/3/) is the interest differential. Economically, a carry trade is a bought forward. For the importer the same forward is a hedge; for the investor it is an open dollar position. The need makes the difference.
+The break-even is exactly the money-market forward from [module 02](/en/module/02-forward/3/), <Num of="m09.carryFwd" digits={5} />. That is no coincidence: the forward discount is the interest differential. Economically, a carry trade is a bought forward. For the importer the same forward is a hedge; for the investor it is an open dollar position. The need makes the difference.
+
+For hedgers the same discount is a question of cost and benefit. The importer buys forward <Num of="m09.carryPips" /> pips below spot, <Num of="m09.carryChf" /> on USD 1m: carry works for him. An exporter who sells dollars forward receives exactly that much less: for him, hedging costs carry. That tempts him to put the hedge off. But whoever waits carries the full currency risk to save <Num of="m09.carryPips" /> pips. A typical move over 3 months is <Num of="m09.sigmaPips" /> pips.
 
 <CarryCushionFigure caption="Three yield ideas on one axis. Click from carry to the discount certificate and to dual currency, drag the rate at expiry or play the tenor." />
 
 ### Discount certificate: long USD plus short call
 
-A discount certificate (generic) buys the dollar at a discount. In return the gain ends at a cap. In building blocks: long USD plus a sold USD call at the cap <Num of="m09.yStrike" />. The certificate costs <Num of="m09.certPrice" /> per dollar, that is <Num of="m09.certDiscount" /> less than spot. Two things sit in the discount: the USD interest you do not receive (with shares it would be the dividend) and the call premium of <Num of="m09.yCall" /> pips. The break-even is the price carried forward at the CHF rate, here <Num of="m09.yBe" />.
+A discount certificate (generic) buys the dollar at a discount. In return the gain ends at a cap. In building blocks: long USD plus a sold USD call at the cap <Num of="m09.yStrike" />. The certificate costs <Num of="m09.certPrice" /> per dollar, that is <Num of="m09.certDiscount" /> less than spot. Two things sit in the discount: the USD interest you do not receive, <Num of="m09.carryPips" /> pips (with shares it would be the dividend), and the call premium of <Num of="m09.yCall" /> pips. Together that is <Num of="m09.yCushion" /> pips. The break-even is the price carried forward at the CHF rate. Because that rate is <Num of="ex.rd" /> here, it is the price itself, <Num of="m09.yBe" />.
 
 ### Dual currency: the same curve, packaged differently
 
 The dual currency investment from [module 08](/en/module/08-structured-products/4/) is a CHF deposit plus a sold USD put at the strike <Num of="m09.yStrike" />. For <Num of="m09.yMonths" /> months it pays <Num of="m09.dciYield" /> p.a. instead of <Num of="ex.rd" />. If the dollar falls below the strike, you receive USD instead of francs.
 
-Because of put-call parity this is the same curve as the discount certificate: the same break-even, the same cap, the same risk. Only the packaging differs. Dual currency pays you the premium as interest; the certificate deducts it from the price.
+Because of put-call parity this is, per dollar of exposure, the same curve as the discount certificate: the same break-even, the same cap, the same risk. Only the packaging differs. Dual currency pays you the premium as interest; the certificate deducts it from the price.
 
 ### Worked example: cushion against risk
 
@@ -28,17 +30,17 @@ Because of put-call parity this is the same curve as the discount certificate: t
 
 | | Carry | Discount certificate = dual currency |
 | --- | --- | --- |
-| Break-even | <Num of="m09.carryFwd" /> | <Num of="m09.yBe" /> |
+| Break-even | <Num of="m09.carryFwd" digits={5} /> | <Num of="m09.yBe" /> |
 | Cushion from spot | <Num of="m09.carryPips" /> pips | <Num of="m09.yCushion" /> pips |
 | Largest extra return | open | <Num of="m09.yMaxChf" /> |
 | Dollar <Num of="m09.yDownMove" />, <Num of="m09.yDown" /> | <Num of="m09.carryDownChf" /> | <Num of="m09.dciDownChf" /> |
-| Loss against the deposit in the model | <Num of="m09.carryPLoss" /> | <Num of="m09.yPLoss" /> |
+| Probability of a loss against the deposit (model) | <Num of="m09.carryPLoss" /> | <Num of="m09.yPLoss" /> |
 
 The sold option buys you cushion: <Num of="m09.yCushion" /> instead of <Num of="m09.carryPips" /> pips. In return you give up everything above the cap. And even the larger cushion is smaller than a typical move over <Num of="m09.yMonths" /> months, <Num of="m09.sigmaPips" /> pips (one standard deviation in the model).
 
 <Callout variant="bad" title="When it goes wrong: the dollar falls">
 
-With carry you lose every pip below the forward, with no floor. With dual currency and the discount certificate you receive dollars below the strike that are worth less than what you put in. The cushion only softens the loss. How quickly carry trades can turn was shown by the carry unwind whose stress peaked on <Fact id="m09-carry-peak" />: leveraged positions were unwound and amplified the market move. The [Riskometer](/en/riskometer/?pair=USDJPY&event=carry-2024) shows how volatility jumped.
+With carry you lose every pip below the forward, with no floor. With dual currency and the discount certificate you receive dollars below the strike that are worth less than what you put in. The cushion only softens the loss. August 2024 showed how quickly carry trades can turn. Carry trades, funded mainly in yen, were unwound. Market stress peaked on <Fact id="m09-carry-peak" />, and the unwinding of leveraged positions amplified the move. The [Riskometer](/en/riskometer/?pair=USDJPY&event=carry-2024) shows how volatility jumped.
 
 </Callout>
 
@@ -63,7 +65,7 @@ With carry you lose every pip below the forward, with no floor. With dual curren
 
 The break-even is at <i>K</i> − <i>P</i>/DF<sub>CHF</sub> = <Num of="m09.yBe" />, the largest extra return at <i>N</i> · <i>P</i>/DF<sub>CHF</sub> = <Num of="m09.yMaxChf" />.
 
-**3. No free lunch.** In the model E[<i>S</i><sub><i>T</i></sub>] = <i>F</i>. So the expected extra return of all three ideas over the deposit is zero. The extra interest is a premium for a risk, not a return for nothing.
+**3. No free lunch.** In the risk-neutral model E[<i>S</i><sub><i>T</i></sub>] = <i>F</i>. So the expected extra return of all three ideas over the deposit is zero. The extra interest is a premium for a risk, not a return for nothing.
 
 **4. Time.** The cushion grows roughly with the tenor, <i>S</i> · (<i>r</i><sub>USD</sub> − <i>r</i><sub>CHF</sub>) · τ. A typical move grows only with its square root, <i>S</i> · σ · √<i>T</i>. After 1 month it is <Num of="m09.carry1" /> against <Num of="m09.sigma1" /> pips, after 12 months <Num of="m09.carry12" /> against <Num of="m09.sigma12" /> pips. The cushion catches up but stays smaller.
 
