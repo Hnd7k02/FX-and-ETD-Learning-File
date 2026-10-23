@@ -157,8 +157,8 @@ const check3: QuizQuestion = {
         en: 'Exactly at spot; forward points only exist when rates are equal.',
       },
       explain: {
-        de: 'Umgekehrt: Bei gleichen Zinsen sind die Points null. Jeder Zinsunterschied erzeugt Points.',
-        en: 'The other way round: with equal rates the points are zero. Every rate differential creates points.',
+        de: 'Umgekehrt: In der Zinsparität sind die Points bei gleichen Zinsen null, und jeder Zinsunterschied erzeugt Points.',
+        en: 'The other way round: under interest rate parity the points are zero with equal rates, and every rate differential creates points.',
       },
     },
     {
@@ -167,8 +167,8 @@ const check3: QuizQuestion = {
         en: 'It depends on whether the market expects a stronger dollar.',
       },
       explain: {
-        de: 'Nein. Der Forward folgt allein aus Spot und Zinsen. Er ist keine Prognose. Bei höherem CHF-Zins liegt er über dem Spot.',
-        en: 'No. The forward follows from spot and interest rates alone. It is not a forecast. With a higher CHF rate it is above spot.',
+        de: 'Nein. Der Forward folgt aus Spot und Zinsen, nicht aus einer Erwartung. Am Markt kommt die Cross-Currency Basis dazu. In der Zinsparität liegt er bei höherem CHF-Zins über dem Spot.',
+        en: 'No. The forward follows from spot and interest rates, not from an expectation. In the market the cross-currency basis also plays a part. Under interest rate parity it is above spot when the CHF rate is higher.',
       },
     },
   ],
@@ -320,8 +320,8 @@ const q3: QuizQuestion = {
         en: 'The market expects the dollar to stand that low in a year.',
       },
       explain: {
-        de: 'Nein. Ein Forward ist keine Prognose. Er folgt allein aus Spot und Zinsen. Wo der Kurs in einem Jahr steht, weiss niemand.',
-        en: 'No. A forward is not a forecast. It follows from spot and interest rates alone. Nobody knows where the rate will be in a year.',
+        de: 'Nein. Ein Forward ist keine Prognose. Er folgt aus Spot und Zinsen, am Markt dazu aus der Cross-Currency Basis. Wo der Kurs in einem Jahr steht, weiss niemand.',
+        en: 'No. A forward is not a forecast. It follows from spot and interest rates, plus the cross-currency basis in the market. Nobody knows where the rate will be in a year.',
       },
     },
     {
@@ -330,8 +330,8 @@ const q3: QuizQuestion = {
         en: 'The USD rate is higher than the CHF rate; the discount offsets that.',
       },
       explain: {
-        de: `Richtig. Wer Dollars hält, verdient ${rf.de} statt ${rd.de}. Der Forward liegt genau um diesen Vorteil tiefer: Forward = Spot + Cost − Benefit.`,
-        en: `Correct. Holding dollars earns ${rf.en} instead of ${rd.en}. The forward is lower by exactly that advantage: forward = spot + cost − benefit.`,
+        de: `Richtig. Wer Dollars hält, verdient ${rf.de} statt ${rd.de}. Der Forward liegt um diesen Vorteil tiefer (Zinsparität): Forward = Spot + Cost − Benefit.`,
+        en: `Correct. Holding dollars earns ${rf.en} instead of ${rd.en}. The forward is lower by that advantage (interest rate parity): forward = spot + cost − benefit.`,
       },
     },
     {
@@ -350,8 +350,8 @@ const q3: QuizQuestion = {
         en: 'The bank grants the client a discount for the long term.',
       },
       explain: {
-        de: 'Nein, das ist kein Rabatt. Der Abschlag ist der Zinsunterschied zwischen USD und CHF über ein Jahr.',
-        en: 'No, it is not a rebate. The discount is the interest rate differential between USD and CHF over one year.',
+        de: 'Nein, das ist kein Rabatt. Der Abschlag kommt aus dem Zinsunterschied zwischen USD und CHF über ein Jahr.',
+        en: 'No, it is not a rebate. The discount comes from the interest rate differential between USD and CHF over one year.',
       },
     },
   ],

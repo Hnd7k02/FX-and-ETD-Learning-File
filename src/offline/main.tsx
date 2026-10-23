@@ -2,8 +2,9 @@
  * Runtime of the offline file forward-first.html (DECISIONS D-13).
  *
  * One HTML file, opened over file:// on the work PC (Chrome/Edge) and in the iPad Files app
- * (WebKit). The Astro build pre-renders every page; scripts/build-offline.ts packs their main
- * content (gzip + base64) into the file. This runtime:
+ * (WebKit). A view that runs no JavaScript shows only the loading text, which says what to do
+ * (scripts/build-offline.ts). The Astro build pre-renders every page; scripts/build-offline.ts
+ * packs their main content (gzip + base64) into the file. This runtime:
  * - routes by hash (#/module/05-greeks/2/, #/riskometer/?pair=EURUSD, #/glossar/#term-pip),
  * - swaps the page content (inside a View Transition where supported),
  * - renders the Preact islands of the page (the same components as the web build),

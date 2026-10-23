@@ -45,7 +45,7 @@ export const forwardcurve = defineDict({
       'Beide Zinsen sind gleich. Cost und Benefit heben sich auf: Forward = Spot, keine Forward Points.',
     'fc.aha.title': 'Ein Forward ist keine Prognose',
     'fc.aha.text':
-      'Du hast nur die Zinsen verschoben, und die Forward Points sehen ganz anders aus. Niemand hat seine Meinung über den Dollar geändert. Der Forward ist Spot plus Zinsen, keine Vorhersage.',
+      'Du hast nur die Zinsen verschoben, und die Forward Points sehen ganz anders aus. Niemand hat seine Meinung über den Dollar geändert. Der Forward folgt aus Spot und Zinsen, nicht aus einer Vorhersage.',
     'fc.aria':
       'Forward Points USD/CHF je Laufzeit bei Zins CHF {rd} und Zins USD {rf}: {list}. Gewählt {tenor}: Forward {fwd}.',
     'fc.ariaItem': '{tenor} {points} Pips',
@@ -100,7 +100,7 @@ export const forwardcurve = defineDict({
       'Both rates are equal. Cost and benefit cancel out: forward = spot, no forward points.',
     'fc.aha.title': 'A forward is not a forecast',
     'fc.aha.text':
-      'You only moved the interest rates, and the forward points look completely different. Nobody changed their view on the dollar. The forward is spot plus interest, not a prediction.',
+      'You only moved the interest rates, and the forward points look completely different. Nobody changed their view on the dollar. The forward follows from spot and interest rates, not from a prediction.',
     'fc.aria':
       'USD/CHF forward points by tenor with a CHF rate of {rd} and a USD rate of {rf}: {list}. Selected {tenor}: forward {fwd}.',
     'fc.ariaItem': '{tenor} {points} pips',

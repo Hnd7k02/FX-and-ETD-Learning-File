@@ -4,15 +4,15 @@ import GreeksLabFigure from '@/components/figures/GreeksLabFigure.astro';
 
 Delta sagt, wie viel der Call gewinnt, wenn USD/CHF ein kleines Stück steigt. Bei einem Delta von 0.50 bewegt sich der Optionswert etwa halb so stark wie der Kurs.
 
-Gamma sagt, wie schnell sich dieses Delta selbst verändert. Weit aus dem Geld ist Delta fast null, tief im Geld fast eins. Dazwischen, nahe ATMF, wo der Forward beim Strike liegt, ändert es sich am schnellsten: Dort ist Gamma am grössten.
+Gamma sagt, wie schnell sich dieses Delta selbst verändert. Weit aus dem Geld ist Delta fast null. Tief im Geld läuft das Forward-Delta gegen 1, das Spot-Delta gegen <i>e</i><sup>−<i>r</i><sub>f</sub><i>T</i></sup> ≈ <Num of="m05.spotDeltaLimit" />. Dazwischen ändert sich Delta am schnellsten, dort ist Gamma am grössten. Das genaue Maximum in Abhängigkeit vom Spot liegt bei <i>d</i><sub>1</sub> = −σ√<i>T</i> (Herleitung unten). Als Faustregel gilt: Gamma ist am grössten, wenn der Forward nahe am Strike liegt, also nahe ATMF.
 
 Für den Importeur heisst das: Sein Call über <Num of="ex.notional" /> verhält sich heute wie ein Forward über etwa die Hälfte des Betrags. Steigt der Dollar, wächst dieser Anteil, fällt er, schrumpft er. Genau diese Anpassung misst Gamma. Sie ist der Grund, warum eine Option mehr kann als ein halber Forward.
 
 <GreeksLabFigure mode="delta-gamma" caption="Zieh am Spot-Regler oder direkt am schwarzen Punkt: Die schwarze Tangente oben hat die Steigung Delta, die Tangente unten die Steigung Gamma." />
 
-Probier drei Dinge im Labor. Zieh den Spot ganz nach rechts: Delta läuft gegen eins, der Call wird zum Forward. Zieh ihn nach links: Delta fällt gegen null. Verkürze dann die Laufzeit auf wenige Wochen: Die Delta-Kurve wird zur steilen Stufe, und Gamma schiesst in die Höhe.
+Probier drei Dinge im Labor. Zieh den Spot ganz nach rechts: Das Spot-Delta steigt gegen <i>e</i><sup>−<i>r</i><sub>f</sub><i>T</i></sup> ≈ <Num of="m05.spotDeltaLimit" />. Genau so gross ist das Spot-Delta eines Forwards: Der Call wird zum Forward. Das Forward-Delta läuft gegen 1. Zieh ihn nach links: Delta fällt gegen null. Verkürze dann die Laufzeit auf wenige Wochen: Die Delta-Kurve wird zur steilen Stufe, und Gamma schiesst in die Höhe.
 
-Achte dabei auf zwei Details. Beide führen zurück zum Forward. Die steilste Stelle der Delta-Kurve liegt nicht an der Strike-Linie, sondern weiter rechts, nahe beim heutigen Spot von <Num of="ex.spot" />. Erst dort liegt der Forward am Strike, denn die Forward Points betragen <Num of="ex.fwdPoints" /> Pips. Und tief im Geld verläuft die Preiskurve sogar unter der gestrichelten Auszahlung bei Verfall. Der Call rechnet mit dem Forward, nicht mit dem Spot. Gegen den Spot gemessen ist sein Zeitwert dort negativ. Das ist weder eine negative Prämie noch eine Arbitrage: Der USD-Zins liegt über dem CHF-Zins, darum liegt der Forward unter dem Spot, und eine europäische Option kannst du nicht vorzeitig ausüben ([Modul 04](/module/04-vanilla-options/3/)).
+Achte dabei auf zwei Details. Beide führen zurück zum Forward. Im Beispiel liegt die steilste Stelle der Delta-Kurve nicht an der Strike-Linie, sondern weiter rechts, bei Spot <Num of="m05.gammaPeakSpot" />, nahe beim heutigen Spot von <Num of="ex.spot" />. Beim heutigen Spot liegt der Forward am Strike, denn die Forward Points betragen <Num of="ex.fwdPoints" /> Pips. Im Maximum selbst liegt der Forward rund <Num of="m05.gammaPeakFwdPips" /> Pips unter dem Strike; die Herleitung unten zeigt, warum. Und tief im Geld verläuft die Preiskurve sogar unter der gestrichelten Auszahlung bei Verfall. Der Call rechnet mit dem Forward, nicht mit dem Spot. Gegen den Spot gemessen ist sein Zeitwert dort negativ. Das ist weder eine negative Prämie noch eine Arbitrage: Der USD-Zins liegt über dem CHF-Zins, darum liegt der Forward unter dem Spot, und eine europäische Option kannst du nicht vorzeitig ausüben ([Modul 04](/module/04-vanilla-options/3/)).
 
 ### Delta und Gamma im Beispiel
 
@@ -36,7 +36,7 @@ Das Labor zeigt das Spot-Delta <Num of="m05.delta" />: Pro Dollar Nominal verhä
 
 </Callout>
 
-<Derivation title="Herleitung in vier Schritten">
+<Derivation title="Herleitung in fünf Schritten">
 
 **1.** Delta ist die Steigung der Preiskurve, also die erste Ableitung des Preises nach dem Spot.
 
@@ -52,7 +52,13 @@ Das Labor zeigt das Spot-Delta <Num of="m05.delta" />: Pro Dollar Nominal verhä
 
 **4.** Einsetzen der Beispielwerte (<i>S</i> = <Num of="ex.spot" />, σ = <Num of="ex.vol" />, <i>T</i> = <Num of="m05.T" />, <i>r</i><sub>f</sub> = <Num of="ex.rf" />, <i>d</i><sub>1</sub> ≈ <Num of="m05.d1" />) liefert Γ = <Num of="m05.gamma" />, den Wert aus dem Rechenbeispiel oben. Gamma hat die Einheit «Delta pro Kurseinheit»: Pro 0.01 Kursbewegung ändert sich Delta um rund <Num of="m05.deltaChangeApprox" digits={2} sign={false} />.
 
-Warum Gamma am Strike am grössten ist, sieht man an der Formel: φ(<i>d</i><sub>1</sub>) ist eine Glockenkurve mit dem Maximum bei <i>d</i><sub>1</sub> = 0, also dort, wo der Forward nahe am Strike liegt. Und weil √<i>T</i> im Nenner steht, wird Gamma am Strike umso grösser, je kürzer die Laufzeit ist.
+**5.** Wo ist Gamma am grössten? Über dem Spot betrachtet, wie im Labor, hängen zwei Teile von <i>S</i> ab: φ(<i>d</i><sub>1</sub>) im Zähler und <i>S</i> im Nenner. Setz die Ableitung null. Du brauchst φ′(<i>x</i>) = −<i>x</i> · φ(<i>x</i>) und ∂<i>d</i><sub>1</sub>/∂<i>S</i> aus Schritt 3:
+
+<Formula><span>∂Γ / ∂<i>S</i> = −(Γ / <i>S</i>) · [<i>d</i><sub>1</sub> / (σ√<i>T</i>) + 1] = 0</span><span>⇒ <i>d</i><sub>1</sub> = −σ√<i>T</i>, also <i>F</i> = <i>K</i> · <i>e</i><sup>−1.5 σ²<i>T</i></sup></span></Formula>
+
+Das Maximum liegt also etwas links von <i>d</i><sub>1</sub> = 0, denn der Faktor 1/<i>S</i> zieht es zu tieferen Kursen. Im Beispiel liegt es bei Spot <Num of="m05.gammaPeakSpot" /> mit Γ = <Num of="m05.gammaPeak" />. Bei <i>d</i><sub>1</sub> = 0, also bei Spot <Num of="m05.spotD1Zero" />, sind es <Num of="m05.gammaD1Zero" />, beim heutigen Spot <Num of="m05.gamma" />. Im Beispiel sind die Unterschiede klein. Mit längerer Laufzeit und höherer Vola wächst der Abstand des Maximums von ATMF mit σ²<i>T</i>. Die Kurve wird dabei aber flacher, und Gamma bei ATMF bleibt nahe am Höchstwert. Darum reicht als Faustregel: Gamma ist am grössten, wenn der Forward nahe am Strike liegt. Über dem Strike betrachtet hängt übrigens nur φ(<i>d</i><sub>1</sub>) von <i>K</i> ab; dort liegt das Maximum genau bei <i>d</i><sub>1</sub> = 0.
+
+Und weil √<i>T</i> im Nenner steht, wird Gamma nahe ATMF umso grösser, je kürzer die Laufzeit ist.
 
 </Derivation>
 
@@ -68,6 +74,6 @@ Break-even pro Tag: σ · <i>S</i> / √365 = <Num of="ex.spot" /> · <Num of="e
 
 <Takeaway>
 
-Delta ist die Steigung, Gamma die Krümmung. Nahe ATMF, wo der Forward beim Strike liegt, ist Gamma am grössten, und genau dort kostet jeder Tag am meisten Zeitwert.
+Delta ist die Steigung, Gamma die Krümmung. Als Faustregel ist Gamma am grössten, wenn der Forward nahe am Strike liegt. Dort ist auch der Gamma-Anteil des Thetas am grössten, der eigentliche Zeitwertverlust.
 
 </Takeaway>

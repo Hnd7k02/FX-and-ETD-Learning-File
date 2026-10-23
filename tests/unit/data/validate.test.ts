@@ -9,7 +9,7 @@ import {
   validate,
 } from '@/lib/data/validate';
 
-/** The seed snapshot (D-15); later fixings appended by the daily job are not part of these tests. */
+/** The seed snapshot (D-15); later fixings appended by a manual Release run are not part of these tests. */
 const SEED = parseRawCsv(readFileSync('data/raw/ecb-eur-reference.csv', 'utf8')).filter(
   (r) => r.date <= '2026-09-14',
 );
@@ -134,7 +134,7 @@ describe('seed data (data/raw, 1999-01-04 … 2026-09-14)', () => {
     for (const m of big) expect(Math.abs(m.logReturn)).toBeLessThan(0.085);
   });
 
-  it('is reported as stale on 22.10.2026 (the daily job refreshes it)', () => {
+  it('is reported as stale on 22.10.2026 (a manual Release run refreshes it)', () => {
     const errs = validate(SEED, { today: '2026-10-22' });
     expect(errs.map((e) => e.rule)).toEqual(['stale']);
     expect(errs[0]!.message).toMatch(/28 bank days/);

@@ -7,7 +7,7 @@ Acht Module lang hast du Bausteine gesammelt: Spot, Forward, Swap, Optionen, Gre
 Drei Personen schauen auf denselben Kurs, USD/CHF <Num of="ex.spot" />:
 
 - **Der Importeur** muss in 3 Monaten USD 1 Mio. bezahlen. Er will Planbarkeit. Sein Bedürfnis heisst **Hedge**.
-- **Eine Anlegerin mit Marktsicht** glaubt nicht an einen schwachen Dollar. Sie will aus dieser Sicht Geld machen: **Alpha**.
+- **Eine Anlegerin mit Marktsicht** glaubt nicht an einen schwachen Dollar. Mit dieser Sicht will sie besser abschneiden als die Referenz, der Forward bzw. der Geldmarkt. Sie sucht **Alpha**.
 - **Ein Anleger mit Franken auf dem Konto** will mehr als den CHF-Zins von <Num of="ex.rd" />. Er sucht **Yield**.
 
 Das Bedürfnis entscheidet, welches Risiko überhaupt erwünscht ist. Der Importeur hat schon ein Risiko: Er ist short USD. Er will es loswerden. Die Anlegerin will ein Risiko eingehen, aber nur das, auf das sie setzt. Der Anleger nimmt etwas Risiko in Kauf, um mehr Zins zu bekommen.
@@ -33,7 +33,7 @@ Keines der beiden ist «besser». Der Forward ist ideal, wenn die Sicht stimmt. 
 
 <Derivation title="Herleitung: Warum kein Produkt den Forward gratis schlägt">
 
-**1.** Unter dem risikoneutralen Mass landet der Kurs bei Verfall im Mittel genau beim Forward. Das folgt allein aus der Zinsparität ([Modul 02](/module/02-forward/2/)); Vola und Verteilung spielen dafür keine Rolle. Es ist eine Preisregel, keine Prognose.
+**1.** Unter dem risikoneutralen Mass landet der Kurs bei Verfall im Mittel genau beim Forward. Das folgt aus der Arbitragefreiheit zwischen Spot, Geldmarkt und Forward (Zinsparität, [Modul 02](/module/02-forward/2/)); Vola und Verteilung spielen dafür keine Rolle. Es ist eine Preisregel, keine Prognose.
 
 <Formula>E[<i>S</i><sub><i>T</i></sub>] = <i>F</i> = <Num of="ex.forward" digits={4} /></Formula>
 

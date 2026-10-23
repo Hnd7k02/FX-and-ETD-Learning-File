@@ -242,8 +242,8 @@ export const MODULES: ModuleDef[] = [
         title: { de: 'Vega', en: 'Vega' },
         short: { de: 'Vega', en: 'Vega' },
         teaser: {
-          de: 'Wie stark die Prämie auf die Vola reagiert, und warum Vega bei ATMF am grössten ist.',
-          en: 'How strongly the premium reacts to volatility, and why vega peaks at ATMF.',
+          de: 'Wie stark die Prämie auf die Vola reagiert, und warum Vega nahe ATMF am grössten ist.',
+          en: 'How strongly the premium reacts to volatility, and why vega peaks near ATMF.',
         },
       },
       {

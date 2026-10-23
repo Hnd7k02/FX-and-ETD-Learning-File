@@ -36,7 +36,10 @@ const tarfLoss = chf(M.tarfImpliedLoss);
 /** "about CHF 84’000" in the answer label: the implied loss rounded to thousands. */
 const tarfLossRound = chf(Math.round(Math.abs(M.tarfImpliedLoss) / 1000) * 1000);
 const tarfWorst = chf(M.tarfWorst);
+/** Contractual coupon (paid per fixing); the fair coupon only with its standard error. */
 const tpfCoupon = pips(M.tpfCouponPips);
+const tpfFair = pips(M.tpfFairCouponPips, 2);
+const tpfSe = pips(M.tpfSePips, 2);
 const tpfDrop = pips(M.tpfFwdDropPips, 0);
 const tpfFwdEnd = rate(M.tpfFwdEnd);
 const tpfK = rate(M.tpfStrike);
@@ -148,8 +151,8 @@ const check3: QuizQuestion = {
     {
       label: { de: 'Den Gewinn', en: 'The gain' },
       explain: {
-        de: `Richtig. Mehr als ${tarfTarget.de} gewinnst du nicht. Verluste zählen nicht aufs Target, sie laufen mit doppelter Menge weiter.`,
-        en: `Correct. You cannot gain more than ${tarfTarget.en}. Losses do not count towards the target; they run on with twice the amount.`,
+        de: `Richtig. Mehr als ${tarfTarget.de} gewinnst du nicht: Am Fixing, das das Target erreicht, zählt nur noch der Rest bis zum Target. Verluste zählen nicht aufs Target, sie laufen mit doppelter Menge weiter.`,
+        en: `Correct. You cannot gain more than ${tarfTarget.en}: on the fixing that reaches the target, only what is left to the target counts. Losses do not count towards the target; they run on with twice the amount.`,
       },
     },
     {
@@ -310,8 +313,8 @@ const q2: QuizQuestion = {
 const q3: QuizQuestion = {
   id: 'm08-q3',
   prompt: {
-    de: `Warum ist der faire TPF-Coupon mit ${tpfCoupon.de} Pips pro Fixing so gross?`,
-    en: `Why is the fair TPF coupon of ${tpfCoupon.en} pips per fixing so large?`,
+    de: `Warum ist der TPF-Coupon mit ${tpfCoupon.de} Pips pro Fixing so gross?`,
+    en: `Why is the TPF coupon of ${tpfCoupon.en} pips per fixing so large?`,
   },
   options: [
     {
@@ -350,8 +353,8 @@ const q3: QuizQuestion = {
         en: 'Because the target makes the coupon smaller',
       },
       explain: {
-        de: `Umgekehrt: Das Target streicht die Coupons der guten Szenarien, darum steigt der faire Coupon von ${tpfNoTarget.de} auf ${tpfCoupon.de} Pips.`,
-        en: `The other way round: the target cancels the coupons of the good scenarios, so the fair coupon rises from ${tpfNoTarget.en} to ${tpfCoupon.en} pips.`,
+        de: `Umgekehrt: Das Target streicht die Coupons der guten Szenarien. Ohne Target wären ${tpfNoTarget.de} Pips fair. Mit Target beträgt der faire Coupon (Monte Carlo) ${tpfFair.de} ± ${tpfSe.de} Pips (Standardfehler), vertraglich gerundet ${tpfCoupon.de} Pips.`,
+        en: `The other way round: the target cancels the coupons of the good scenarios. Without a target ${tpfNoTarget.en} pips would be fair. With the target the fair coupon (Monte Carlo) is ${tpfFair.en} ± ${tpfSe.en} pips (standard error), ${tpfCoupon.en} pips after rounding in the contract.`,
       },
     },
   ],

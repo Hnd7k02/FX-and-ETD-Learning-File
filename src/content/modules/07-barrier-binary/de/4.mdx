@@ -35,11 +35,11 @@ Das Fenster ist ein Kompromiss. Es kostet <Num of="m07.windowExtraChf" /> mehr a
 
 </Derivation>
 
-**Double Barrier.** Zwei Barrieren, eine oben, eine unten: Die Option verschwindet (Double Knock-out) oder entsteht (Double Knock-in), sobald eine der beiden berührt wird. Ihr digitaler Verwandter ist der Double No-Touch aus Abschnitt 3. Je enger der Korridor, desto billiger, und desto wahrscheinlicher das Aus.
+**Double Barrier.** Zwei Barrieren, eine oben, eine unten: Die Option verschwindet (Double Knock-out) oder entsteht (Double Knock-in), sobald eine der beiden berührt wird. Je enger der Korridor, desto billiger der Double Knock-out und desto wahrscheinlicher das Aus. Der Double Knock-in wird dagegen teurer: Dasselbe Ereignis lässt ihn häufiger entstehen. Ohne Rebate ergeben Double Knock-out und Double Knock-in mit gleichen Barrieren, gleichem Strike und gleichem Verfall zusammen den Vanilla (In-Out-Parität, Abschnitt 2). Der digitale Verwandte des Double Knock-out ist der Double No-Touch aus Abschnitt 3: Auch er wird billiger, je enger der Korridor.
 
 ### Gap-Risiko: Der Frankenschock
 
-Alle Formeln dieses Moduls gehen davon aus, dass der Kurs stetig läuft. Um eine Barriere zu durchqueren, muss er jeden Kurs dazwischen einmal erreichen, und dort kann jemand handeln. Das ist eine Annahme des Modells, wie die konstante Vola, und nicht Teil des [risikoneutralen Masses](/glossar/#term-risk-neutral). Am <Fact id="m07-floor-end" /> galt sie nicht. Die Schweizerische Nationalbank hatte seit dem <Fact id="m07-floor-start" /> einen Mindestkurs von <Fact id="m07-floor" /> Franken pro Euro durchgesetzt. An diesem Tag hob sie ihn auf und senkte den Zins auf Sichtguthaben auf <Fact id="m05-snb-2015-rate" />.
+Alle Formeln dieses Moduls gehen davon aus, dass der Kurs stetig läuft, ohne Sprünge. Bei stetiger Beobachtung trifft er eine Barriere dann genau auf ihrem Niveau, nie dahinter. Der stetige Kurs ist eine Annahme des Modells, wie die konstante Vola, und nicht Teil des [risikoneutralen Masses](/glossar/#term-risk-neutral). Am <Fact id="m07-floor-end" /> galt sie nicht. Die Schweizerische Nationalbank hatte seit dem <Fact id="m07-floor-start" /> einen Mindestkurs von <Fact id="m07-floor" /> Franken pro Euro durchgesetzt. An diesem Tag hob sie ihn auf und senkte den Zins auf Sichtguthaben auf <Fact id="m05-snb-2015-rate" />.
 
 Das EZB-Fixing für EUR/CHF lag am Vortag bei <Num of="m07.gapBefore" />, an diesem Tag bei <Num of="m07.gapShock" />: <Num of="m07.gapDayMove" /> von einem Fixing zum nächsten. Dazwischen liegt in dieser Reihe kein einziger Kurs. Die EZB veröffentlicht ihre Referenzkurse nur zu Informationszwecken. Sie sind keine handelbaren Preise. Das Replay unten ist darum ein hypothetisches Szenario mit täglichen EZB-Referenzkursen. Es zeigt die Grössenordnung, nicht die Kurse, zu denen an diesem Tag gehandelt wurde. Stop, Put und Barrieren darin sind angenommene Beispiele, keine historischen Geschäfte.
 
@@ -49,7 +49,7 @@ Ein Stop-Loss, der EUR bei <Num of="m07.gapStop" /> verkaufen soll, wird zum nä
 
 <Callout variant="bad" title="Verlustszenario: der Reverse Knock-out">
 
-Nimm an, ein Exporteur mit Euro-Einnahmen, das Spiegelbild unseres Importeurs, fürchtet einen starken Franken. Er kauft einen EUR Put mit Strike <Num of="m07.gapPutStrike" />. Um Prämie zu sparen, versieht er ihn mit einem Knock-out unter dem Mindestkurs. Das ist ein Reverse Knock-out (Abschnitt 2): Die Barriere liegt im Geld. Ob sie bei <Num of="m07.gapKoHigh" /> oder bei <Num of="m07.gapKoLow" /> liegt, spielt keine Rolle. Ein Knock-out ist keine Transaktion zum Barrierenkurs: Die Option erlischt nach den angenommenen Bedingungen. Im Szenario sind das: Beobachtung einmal täglich gegen das EZB-Fixing, kein Rebate. Dann knocken alle <Num of="m07.gapKoCount" /> Varianten mit demselben Fixing aus. Bei stetiger Beobachtung zählt der erste Kurs jenseits der Barriere, nach den Regeln im Term Sheet. Gemessen am Fixing ginge mit dem Knock-out ein innerer Wert von <Num of="m07.gapPutLostChf" /> verloren, genau in dem Moment, für den der Schutz gedacht war. Hätte die Option ein Rebate (Abschnitt 2), wäre das eine eigene Zahlung, die gesondert neben diesem Betrag stünde.
+Nimm an, ein Exporteur mit Euro-Einnahmen, das Spiegelbild unseres Importeurs, fürchtet einen starken Franken. Er kauft einen EUR Put mit Strike <Num of="m07.gapPutStrike" />. Um Prämie zu sparen, versieht er ihn mit einem Knock-out unter dem Mindestkurs. Das ist ein Reverse Knock-out (Abschnitt 2): Die Barriere liegt im Geld. Ob sie bei <Num of="m07.gapKoHigh" /> oder bei <Num of="m07.gapKoLow" /> liegt, spielt keine Rolle. Ein Knock-out ist keine Transaktion zum Barrierenkurs: Die Option erlischt nach den angenommenen Bedingungen. Im Szenario sind das: Beobachtung einmal täglich gegen das EZB-Fixing, kein Rebate. Dann knocken alle <Num of="m07.gapKoCount" /> Varianten mit demselben Fixing aus. Bei stetiger Beobachtung zählt der erste Kurs auf oder jenseits der Barriere, nach den Regeln im Term Sheet. Nach einem Sprung liegt er dahinter. Gemessen am Fixing ginge mit dem Knock-out ein innerer Wert von <Num of="m07.gapPutLostChf" /> verloren, genau in dem Moment, für den der Schutz gedacht war. Hätte die Option ein Rebate (Abschnitt 2), wäre das eine eigene Zahlung, die gesondert neben diesem Betrag stünde.
 
 </Callout>
 
@@ -57,7 +57,7 @@ Nimm an, ein Exporteur mit Euro-Einnahmen, das Spiegelbild unseres Importeurs, f
 
 - Eine Barriere ist eine Bedingung, keine Absicherung. Prüf, welche Szenarien sie wegschneidet.
 - Reverse Knock-outs verschwinden dort, wo die Option am meisten wert wäre.
-- Stops setzen einen handelbaren Markt voraus, Barrieren einen stetigen Kursverlauf. Bei einem Gap springt der Kurs über alle Niveaus auf einmal: Der Stop wird zum nächsten handelbaren Kurs ausgeführt, die Knock-outs erlöschen nach ihren Bedingungen, ohne dass gehandelt wird.
+- Ein Stop braucht einen handelbaren Kurs am Stop-Niveau, um dort ausgeführt zu werden. Eine Barriere braucht keinen Kurs an ihrem Niveau: Springt der Kurs über sie hinweg, ist sie trotzdem ausgelöst. Bei einem Gap springt der Kurs über alle Niveaus auf einmal: Der Stop wird zum nächsten handelbaren Kurs ausgeführt, die Knock-outs erlöschen nach ihren Bedingungen, ohne dass gehandelt wird. Die Barriere selbst braucht keinen stetigen Kurs. Den setzen nur ihre Bewertungsformeln und das Hedging nach diesen Formeln voraus. Darum unterschätzen die Formeln Gap-Risiken.
 - Lies im Term Sheet: Beobachtungszeitraum, Beobachtungsart, Referenzkurs und wer das Barrieren-Ereignis feststellt.
 
 </Callout>
@@ -74,6 +74,6 @@ Strukturierte Produkte bauen genau diese Bausteine ein. Im Accumulator aus Modul
 
 <Takeaway>
 
-Stops und Barrieren setzen voraus, dass der Kurs stetig läuft. Springt er, durchbricht er alle Niveaus auf einmal. Der Stop wird zum nächsten handelbaren Kurs ausgeführt. Beim Knock-out wird nichts gehandelt: Die Option erlischt nach ihren Bedingungen.
+Ein Stop braucht einen handelbaren Kurs am Stop-Niveau, um dort ausgeführt zu werden. Bei einem Sprung wird er erst zum nächsten handelbaren Kurs ausgeführt. Eine Barriere braucht keinen solchen Kurs: Springt der Kurs über sie hinweg, ist sie trotzdem ausgelöst. Beim Knock-out wird dabei nichts gehandelt, die Option erlischt nach ihren Bedingungen. Die Barriere selbst braucht auch keinen stetigen Kurs. Den setzen nur ihre Bewertungsformeln und das Hedging nach diesen Formeln voraus. Darum unterschätzen die Formeln Gap-Risiken.
 
 </Takeaway>

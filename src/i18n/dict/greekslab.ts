@@ -80,7 +80,7 @@ export const greekslab = defineDict({
 
     'gl.aha.gammaPeak.t': 'Gamma am grössten',
     'gl.aha.gammaPeak.d': 'Delta kippt hier am schnellsten',
-    'gl.aha.deltaHigh.t': 'Delta Richtung 1',
+    'gl.aha.deltaHigh.t': 'Forward-Delta gegen 1',
     'gl.aha.deltaHigh.d': 'Der Call wird zum Forward',
     'gl.aha.deltaLow.t': 'Delta Richtung 0',
     'gl.aha.deltaLow.d': 'Der Call reagiert kaum noch',
@@ -192,7 +192,7 @@ export const greekslab = defineDict({
 
     'gl.aha.gammaPeak.t': 'Gamma at its peak',
     'gl.aha.gammaPeak.d': 'Delta turns fastest here',
-    'gl.aha.deltaHigh.t': 'Delta towards 1',
+    'gl.aha.deltaHigh.t': 'Forward delta nears 1',
     'gl.aha.deltaHigh.d': 'The call becomes a forward',
     'gl.aha.deltaLow.t': 'Delta towards 0',
     'gl.aha.deltaLow.d': 'The call barely reacts',

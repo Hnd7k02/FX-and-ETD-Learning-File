@@ -245,7 +245,7 @@ describe('layout and scales', () => {
     expect(placeTags([tag(120), tag(100)])).toEqual([1, 0]);
     // same x but far apart vertically: no lift
     expect(placeTags([tag(100, 100), tag(100, 200)])).toEqual([0, 0]);
-    // the fixed "Heute" tag pushes a neighbour up
+    // the fixed "Zuletzt" (latest) tag pushes a neighbour up
     expect(placeTags([tag(100)], [{ x: 120, y: 105, w: 78, h: 21 }])).toEqual([1]);
     expect(placeTags([tag(100)], [{ x: 300, y: 105, w: 78, h: 21 }])).toEqual([0]);
     expect(placeTags([])).toEqual([]);

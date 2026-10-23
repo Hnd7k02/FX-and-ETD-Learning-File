@@ -308,8 +308,8 @@ const c2: QuizQuestion = {
         en: 'They become zero because the two directions cancel out.',
       },
       explain: {
-        de: 'Nein. Null wären sie nur bei gleichen Zinsen in CHF und USD.',
-        en: 'No. They would only be zero if CHF and USD rates were equal.',
+        de: 'Nein. Beide Richtungen nutzen dieselben Points. Ohne Basis wären sie bei gleichen Zinsen in CHF und USD null.',
+        en: 'No. Both directions use the same points. Without a basis they would be zero if CHF and USD rates were equal.',
       },
     },
   ],

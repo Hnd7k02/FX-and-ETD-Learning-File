@@ -99,10 +99,10 @@ export const about = defineDict({
 
     'about.risk.h': 'Riskometer: Daten und Methode',
     'about.risk.lead':
-      'Das Riskometer misst, wie stark ein Währungspaar gerade schwankt, und ordnet das in seine eigene Geschichte seit {since} ein.',
+      'Das Riskometer misst, wie stark ein Währungspaar im letzten Monat bis zum Datenstand geschwankt hat, und ordnet das in seine eigene Geschichte seit {since} ein.',
     'about.risk.step1.h': 'EZB-Referenzkurse',
     'about.risk.step1.p':
-      'Werktags um ca. 16:00 MEZ, abgerufen über die ECB Data Portal API: EUR/CHF, EUR/USD und EUR/JPY.',
+      'Die EZB veröffentlicht sie an jedem Arbeitstag um ca. 16:00 MEZ. Der Release-Workflow holt sie über die ECB Data Portal API: EUR/CHF, EUR/USD und EUR/JPY.',
     'about.risk.step2.h': 'Paare und Kreuzkurse',
     'about.risk.step2.p':
       'EUR/CHF und EUR/USD kommen direkt von der EZB. Die beiden Dollar-Paare entstehen als Kreuzkurse.',
@@ -113,7 +113,7 @@ export const about = defineDict({
       '{window} Log-Renditen ({fixings} Fixings), Mittelwert 0, annualisiert mit √{ann}, in %.',
     'about.risk.step5.h': 'Perzentil und Stufe',
     'about.risk.step5.p':
-      'Rang des heutigen Werts unter allen Tageswerten seit {since}, je Paar separat. Daraus folgt eine von fünf Stufen.',
+      'Rang des letzten Tageswerts unter allen Tageswerten seit {since}, je Paar separat. Daraus folgt eine von fünf Stufen.',
     'about.risk.levelsH': 'Fünf Stufen, festgelegt über Perzentile',
     'about.risk.levelsCaption':
       'Unter P{p1} ruhig, ab P{p4} extrem. Der Anteil zeigt, wie viele Handelstage seit {since} in die Stufe fallen.',
@@ -133,8 +133,10 @@ export const about = defineDict({
       'Tacho: fünf gleich breite Segmente. Die Nadel steht bei Segmentindex plus Anteil innerhalb der Stufe, gemessen in Perzentilen; Extrem reicht bis zum historischen Maximum.',
     'about.risk.events':
       'Ereignisse: Kursbewegung und Vola-Spitze rechnet das Build-Skript aus den Daten; die Spitze ist das Maximum von {before} Handelstagen vor bis {after} Handelstagen nach dem Ereignis.',
+    'about.risk.snapshot':
+      'Eingefrorener Datenstand: Die Datei enthält die Daten vom letzten Abruf und lädt keine neuen nach. Neue Daten kommen nur mit einem neuen Release, also mit einer neuen Datei. Das Datum dieses Stands steht im Riskometer und in der Fusszeile jeder Seite.',
     'about.risk.update':
-      'Update: Eine GitHub Action holt die Kurse werktags um 15:30 UTC, prüft sie (aufsteigende Daten, keine Duplikate, Kurse über null, letzter Wert höchstens fünf Bankarbeitstage alt, tägliche Log-Rendite unter 10 % mit dokumentierter Ausnahme), rechnet neu, testet und baut die Seite. Nur wenn sich Daten ändern, entsteht ein Commit.',
+      'Update von Hand: Der GitHub-Workflow «Release» hat keinen Zeitplan. Er läuft nur, wenn ihn jemand startet. Standardmässig holt er zuerst die EZB-Kurse, prüft sie und rechnet das Riskometer neu. Die Prüfung verlangt: jedes Datum gültig, streng aufsteigend und nur einmal, jeder Kurs über null, kein Datum in der Zukunft, letzter Wert beim Abruf höchstens {maxAge} Bankarbeitstage (Mo–Fr) alt, Betrag der täglichen Log-Rendite je Paar unter {maxJump} mit dokumentierter Ausnahme, kein bisher gespeichertes Datum fehlt. Dann führt er Typprüfung, Lint und Unit-Tests aus, baut die Datei und testet sie in Chromium und WebKit. Scheitert einer dieser Schritte, bricht er ab, bevor Daten committet oder ein Release veröffentlicht wird. Nur geänderte Daten ergeben einen Commit. Am Ende veröffentlicht er die Datei als GitHub Release.',
     'about.risk.caveat':
       'Die EZB veröffentlicht Referenzkurse nur zu Informationszwecken. Das Riskometer ist eine Lernhilfe, kein Risikomodell.',
     'about.risk.asOf': 'Datenstand: {date}',
@@ -283,10 +285,10 @@ export const about = defineDict({
 
     'about.risk.h': 'Riskometer: data and method',
     'about.risk.lead':
-      'The Riskometer measures how much a currency pair is swinging right now and places it in its own history since {since}.',
+      'The Riskometer measures how much a currency pair swung in the month up to the data date and places it in its own history since {since}.',
     'about.risk.step1.h': 'ECB reference rates',
     'about.risk.step1.p':
-      'On working days around 16:00 CET, fetched via the ECB Data Portal API: EUR/CHF, EUR/USD and EUR/JPY.',
+      'The ECB publishes them on working days around 16:00 CET. The release workflow fetches them via the ECB Data Portal API: EUR/CHF, EUR/USD and EUR/JPY.',
     'about.risk.step2.h': 'Pairs and crosses',
     'about.risk.step2.p':
       'EUR/CHF and EUR/USD come straight from the ECB. The two dollar pairs are derived as cross rates.',
@@ -297,7 +299,7 @@ export const about = defineDict({
       '{window} log returns ({fixings} fixings), zero mean, annualised with √{ann}, in %.',
     'about.risk.step5.h': 'Percentile and level',
     'about.risk.step5.p':
-      'Rank of today’s value among all daily values since {since}, for each pair separately. This gives one of five levels.',
+      'Rank of the latest daily value among all daily values since {since}, for each pair separately. This gives one of five levels.',
     'about.risk.levelsH': 'Five levels, set by percentiles',
     'about.risk.levelsCaption':
       'Below P{p1} calm, from P{p4} extreme. The share shows how many trading days since {since} fall into each level.',
@@ -317,8 +319,10 @@ export const about = defineDict({
       'Gauge: five segments of equal width. The needle sits at the segment index plus the share within the level, measured in percentiles; Extreme runs up to the historical maximum.',
     'about.risk.events':
       'Events: the move and the volatility peak are computed by the build script from the data; the peak is the maximum from {before} trading days before to {after} trading days after the event.',
+    'about.risk.snapshot':
+      'Frozen data snapshot: the file contains the data from the last fetch and never loads new data. New data only comes with a new release, that is, with a new file. The date of this snapshot is shown in the Riskometer and in the footer of every page.',
     'about.risk.update':
-      'Updates: a GitHub Action fetches the rates on weekdays at 15:30 UTC, validates them (ascending dates, no duplicates, rates above zero, last value at most five business days old, daily log return below 10% with a documented exception), recalculates, tests and builds the site. A commit is only made when the data changes.',
+      'Updates by hand: the GitHub workflow “Release” has no schedule. It only runs when someone starts it. By default it first fetches the ECB rates, validates them and recalculates the Riskometer. The validation requires: every date valid, strictly ascending and present once, every rate above zero, no date in the future, last value at most {maxAge} business days (Mon–Fri) old at the time of the fetch, absolute daily log return per pair below {maxJump} with a documented exception, no previously stored date missing. Then it runs type checks, lint and unit tests, builds the file and tests it in Chromium and WebKit. If any of these steps fails, it stops before data is committed or a release is published. Only changed data leads to a commit. At the end it publishes the file as a GitHub Release.',
     'about.risk.caveat':
       'The ECB publishes reference rates for information purposes only. The Riskometer is a learning aid, not a risk model.',
     'about.risk.asOf': 'Data as of {date}',

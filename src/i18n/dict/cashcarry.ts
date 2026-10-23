@@ -64,9 +64,9 @@ export const cashcarry = defineDict({
       'Fair: Zieh den Forward vom fairen Wert weg oder tipp einen eigenen Kurs ein.',
     'cc.aha.title': 'Die Lücke schliesst sich',
     'cc.aha.text':
-      'Viele machen denselben Trade: Sie verkaufen den teuren Forward und kaufen den billigen Weg. Der Forward wird billiger, bis kein Gewinn mehr bleibt. Darum steht er im Markt beim fairen Wert.',
+      'Viele machen denselben Trade: Sie verkaufen den teuren Forward und kaufen den billigen Weg. Der Forward wird billiger, bis kein Gewinn mehr bleibt. Darum steht er im Markt nahe beim fairen Wert.',
     'cc.aha.textCheap':
-      'Viele machen denselben Trade: Sie kaufen den billigen Forward und verkaufen den teuren Weg. Der Forward wird teurer, bis kein Gewinn mehr bleibt. Darum steht er im Markt beim fairen Wert.',
+      'Viele machen denselben Trade: Sie kaufen den billigen Forward und verkaufen den teuren Weg. Der Forward wird teurer, bis kein Gewinn mehr bleibt. Darum steht er im Markt nahe beim fairen Wert.',
     'cc.aria': 'Forward im Markt {market}, fairer Forward {fair}, Abweichung {pips} Pips. {result}',
     'cc.ariaProfit': 'Cash and Carry bringt bei Fälligkeit {profit}.',
     'cc.ariaNone': 'Keine Arbitrage.',
@@ -133,9 +133,9 @@ export const cashcarry = defineDict({
     'cc.insight.none': 'Fair: drag the forward away from the fair value or type your own rate.',
     'cc.aha.title': 'The gap closes',
     'cc.aha.text':
-      'Many traders do the same trade: they sell the dear forward and buy the cheap route. The forward falls until no profit is left. That is why the market keeps it at the fair value.',
+      'Many traders do the same trade: they sell the dear forward and buy the cheap route. The forward falls until no profit is left. That is why the market keeps it close to the fair value.',
     'cc.aha.textCheap':
-      'Many traders do the same trade: they buy the cheap forward and sell the dear route. The forward rises until no profit is left. That is why the market keeps it at the fair value.',
+      'Many traders do the same trade: they buy the cheap forward and sell the dear route. The forward rises until no profit is left. That is why the market keeps it close to the fair value.',
     'cc.aria': 'Market forward {market}, fair forward {fair}, mispricing {pips} pips. {result}',
     'cc.ariaProfit': 'Cash and carry earns {profit} at maturity.',
     'cc.ariaNone': 'No arbitrage.',

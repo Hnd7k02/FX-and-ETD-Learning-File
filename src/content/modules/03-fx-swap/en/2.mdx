@@ -15,7 +15,7 @@ The direction is named after the near leg in the base currency. **Buy/sell USD**
 
 A swap has two rates. But only their **difference** is traded: the **swap points**, far rate minus near rate, in pips. Whether the spot is a few pips higher or lower hardly matters. Both legs move together.
 
-Where does the difference come from? The far rate is the fair forward from module 02. So the swap points are exactly the **forward points**. They reflect the interest differential between CHF and USD over the term. If the USD rate is higher, the far rate lies below spot: a discount. If the CHF rate is higher, a premium.
+Where does the difference come from? The far rate is the forward from module 02. So the swap points are exactly the **forward points**. They reflect the interest differential between CHF and USD over the term, and in the market the cross-currency basis as well (section 4). If the USD rate is higher, the far rate lies below spot: a discount. If the CHF rate is higher, a premium.
 
 ### Worked example: buy/sell USD 1m for 3 months
 
@@ -44,7 +44,7 @@ Subtract <i>S</i> and put everything over one denominator:
   <i>F</i> − <i>S</i> = <i>S</i> · (<i>r</i><sub>CHF</sub> − <i>r</i><sub>USD</sub>) · <i>t</i> / (1 + <i>r</i><sub>USD</sub> · <i>t</i>)
 </Formula>
 
-The sign depends only on the interest differential. For short tenors the denominator is almost 1. Then the rule of thumb is
+In this formula the sign depends only on the interest differential. For short tenors the denominator is almost 1. Then the rule of thumb is
 
 <Formula>
   <i>F</i> − <i>S</i> ≈ <i>S</i> · (<i>r</i><sub>CHF</sub> − <i>r</i><sub>USD</sub>) · <i>t</i>
@@ -52,7 +52,7 @@ The sign depends only on the interest differential. For short tenors the denomin
 
 In the example: spot <Num of="ex.spot" />, interest differential <Num of="m03.diff" />, <i>t</i> = <Num of="ex.mmDays" />/360. The rule of thumb gives <Num of="m03.approxPoints" /> pips; exactly, it is <Num of="ex.fwdPointsMM" /> pips. The denominator makes the difference.
 
-Conversely, from spot, swap points and the USD rate you can back out the CHF rate. That is why swap points are also called the implied interest differential: whoever does a swap borrows one currency and lends the other.
+Conversely, from spot, swap points and the USD rate you can back out the CHF rate. That is why swap points are also called the implied interest differential: whoever does a swap borrows one currency and lends the other. If the rate backed out this way differs from the money-market rate, that is the cross-currency basis (section 4).
 
 </Derivation>
 
@@ -66,6 +66,6 @@ A swap dealer therefore has hardly any FX risk, but interest rate risk: if CHF o
 
 <Takeaway>
 
-An FX swap is two deals in opposite directions for the same amount. Its price is the swap points, and they equal the forward points: the interest differential over the term.
+An FX swap is two deals in opposite directions for the same amount. Its price is the swap points, and they equal the forward points: the implied interest differential over the term, including the cross-currency basis in the market.
 
 </Takeaway>

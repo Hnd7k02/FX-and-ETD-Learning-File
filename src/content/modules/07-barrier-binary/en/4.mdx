@@ -35,11 +35,11 @@ The window is a compromise. It costs <Num of="m07.windowExtraChf" /> more than t
 
 </Derivation>
 
-**Double barrier.** Two barriers, one above and one below: the option vanishes (double knock-out) or comes to life (double knock-in) as soon as either is touched. Its digital relative is the double no-touch from section 3. The narrower the corridor, the cheaper the option, and the likelier the end.
+**Double barrier.** Two barriers, one above and one below: the option vanishes (double knock-out) or comes to life (double knock-in) as soon as either is touched. The narrower the corridor, the cheaper the double knock-out and the likelier the end. The double knock-in, by contrast, gets dearer: the same event brings it to life more often. Without a rebate, a double knock-out and a double knock-in with the same barriers, strike and expiry add up to the vanilla (in-out parity, section 2). The digital relative of the double knock-out is the double no-touch from section 3: it, too, gets cheaper the narrower the corridor.
 
 ### Gap risk: the franc shock
 
-Every formula in this module assumes that the rate moves continuously. To cross a barrier it must pass through every rate in between once, and someone can trade there. Like constant vol, that is an assumption of the model, not part of the [risk-neutral measure](/en/glossary/#term-risk-neutral). On <Fact id="m07-floor-end" /> it did not hold. Since <Fact id="m07-floor-start" />, the Swiss National Bank had enforced a minimum exchange rate of <Fact id="m07-floor" /> francs per euro. On that day it discontinued it and lowered the interest rate on sight deposits to <Fact id="m05-snb-2015-rate" />.
+Every formula in this module assumes that the rate moves continuously, without jumps. With continuous monitoring it then meets a barrier exactly at its level, never beyond it. Like constant vol, the continuous rate is an assumption of the model, not part of the [risk-neutral measure](/en/glossary/#term-risk-neutral). On <Fact id="m07-floor-end" /> it did not hold. Since <Fact id="m07-floor-start" />, the Swiss National Bank had enforced a minimum exchange rate of <Fact id="m07-floor" /> francs per euro. On that day it discontinued it and lowered the interest rate on sight deposits to <Fact id="m05-snb-2015-rate" />.
 
 The ECB fixing for EUR/CHF was <Num of="m07.gapBefore" /> the day before and <Num of="m07.gapShock" /> on the day: <Num of="m07.gapDayMove" /> from one fixing to the next. In this series there is not a single rate in between. The ECB publishes its reference rates for information purposes only. They are not tradable prices. The replay below is therefore a hypothetical scenario with daily ECB reference rates. It shows the order of magnitude, not the rates at which trades were done that day. The stop, the put and the barriers in it are assumed examples, not historical trades.
 
@@ -49,7 +49,7 @@ A stop-loss meant to sell EUR at <Num of="m07.gapStop" /> is filled at the next 
 
 <Callout variant="bad" title="Loss scenario: the reverse knock-out">
 
-Suppose an exporter with euro income, the mirror image of our importer, fears a strong franc. He buys a EUR put with a strike of <Num of="m07.gapPutStrike" />. To save premium, he adds a knock-out below the minimum rate. That is a reverse knock-out (section 2): the barrier is in the money. Whether it sits at <Num of="m07.gapKoHigh" /> or at <Num of="m07.gapKoLow" /> makes no difference. A knock-out is not a transaction at the barrier rate: the option is extinguished under the assumed terms. In the scenario these are: observation once a day against the ECB fixing, no rebate. Then all <Num of="m07.gapKoCount" /> variants knock out on the same fixing. With continuous observation, the first rate beyond the barrier counts, under the rules in the term sheet. Measured at the fixing, the knock-out would wipe out intrinsic value of <Num of="m07.gapPutLostChf" />, at exactly the moment the protection was meant for. If the option had a rebate (section 2), that would be a payment of its own, shown separately next to this amount.
+Suppose an exporter with euro income, the mirror image of our importer, fears a strong franc. He buys a EUR put with a strike of <Num of="m07.gapPutStrike" />. To save premium, he adds a knock-out below the minimum rate. That is a reverse knock-out (section 2): the barrier is in the money. Whether it sits at <Num of="m07.gapKoHigh" /> or at <Num of="m07.gapKoLow" /> makes no difference. A knock-out is not a transaction at the barrier rate: the option is extinguished under the assumed terms. In the scenario these are: observation once a day against the ECB fixing, no rebate. Then all <Num of="m07.gapKoCount" /> variants knock out on the same fixing. With continuous observation, the first rate at or beyond the barrier counts, under the rules in the term sheet. After a jump it lies beyond the barrier. Measured at the fixing, the knock-out would wipe out intrinsic value of <Num of="m07.gapPutLostChf" />, at exactly the moment the protection was meant for. If the option had a rebate (section 2), that would be a payment of its own, shown separately next to this amount.
 
 </Callout>
 
@@ -57,7 +57,7 @@ Suppose an exporter with euro income, the mirror image of our importer, fears a 
 
 - A barrier is a condition, not protection. Check which scenarios it cuts away.
 - Reverse knock-outs disappear where the option would be worth the most.
-- Stops assume a market you can trade in, barriers a rate that moves continuously. In a gap the rate jumps over every level at once: the stop is filled at the next tradable price, the knock-outs are extinguished under their terms, without any trade.
+- A stop needs a tradable price at the stop level to be filled there. A barrier needs no price at its level: if the rate jumps past it, it is triggered all the same. In a gap the rate jumps over every level at once: the stop is filled at the next tradable price, the knock-outs are extinguished under their terms, without any trade. The barrier itself needs no continuous rate. Only its pricing formulas and the hedging based on them assume one. That is why the formulas underestimate gap risk.
 - Read the term sheet: observation period, type of monitoring, reference rate, and who determines the barrier event.
 
 </Callout>
@@ -74,6 +74,6 @@ Structured products build in exactly these building blocks. The accumulator in m
 
 <Takeaway>
 
-Stops and barriers assume that the rate moves continuously. If it jumps, it breaks through every level at once. The stop is filled at the next tradable price. A knock-out trades nothing: the option is extinguished under its terms.
+A stop needs a tradable price at the stop level to be filled there. In a jump it is only filled at the next tradable price. A barrier needs no such price: if the rate jumps past it, it is triggered all the same. A knock-out trades nothing in the process; the option is extinguished under its terms. The barrier itself needs no continuous rate either. Only its pricing formulas and the hedging based on them assume one. That is why the formulas underestimate gap risk.
 
 </Takeaway>

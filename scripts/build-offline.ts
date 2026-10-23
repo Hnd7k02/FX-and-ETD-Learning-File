@@ -422,7 +422,7 @@ async function main(): Promise<void> {
     'Forward First: ein interaktives Lerntool für den Devisenmarkt. Offline-Datei, nur zu Bildungszwecken.',
   );
   const loading = htmlAscii(
-    `Forward First ${versionLabel} wird geladen … Falls nichts erscheint: Datei in Chrome, Edge oder Safari öffnen und JavaScript erlauben. / Loading … If nothing appears, open the file in Chrome, Edge or Safari with JavaScript enabled.`,
+    `Forward First ${versionLabel} wird geladen … Bleibt nur dieser Text stehen (ohne gelben Diagnose-Kasten), führt diese Ansicht kein JavaScript aus, zum Beispiel die Vorschau der iPad-Dateien-App. Öffne die Datei in Chrome, Edge oder Safari am Computer und erlaube JavaScript. / Loading … If only this text stays on screen (no yellow diagnostics box), this view does not run JavaScript, for example the preview of the iPad Files app. Open the file in Chrome, Edge or Safari on a computer, with JavaScript allowed.`,
   );
 
   const html = `<!doctype html>

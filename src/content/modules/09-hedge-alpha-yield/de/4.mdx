@@ -6,11 +6,11 @@ Der Anleger hat Franken auf dem Konto. Der CHF-Geldmarkt bringt im Beispiel <Num
 
 ### Carry: den Zinsvorsprung verdienen
 
-Der Anleger kauft USD am Spot und legt sie zum USD-Zins an. In <Num of="m09.yMonths" /> Monaten verdient er auf USD 1 Mio. einen Zinsvorsprung von <Num of="m09.carryChf" />, also <Num of="m09.carryPips" /> Pips. Am Ende tauscht er die Dollars zum Kurs bei Verfall zurück. Fällt der Dollar um mehr als diese Pips, ist der Vorsprung weg.
+Der Anleger kauft USD am Spot und legt sie zum USD-Zins an. Für USD 1 Mio. bei Fälligkeit kauft er heute <Num of="m09.carryUsdToday" /> und legt sie <Num of="m09.yMonths" /> Monate an. Bleibt der Kurs gleich, ist sein Zinsvorsprung <Num of="m09.carryChf" />. Das ist genau der Forward-Abschlag: <Num of="m09.carryPipsExact" /> Pips auf USD 1 Mio. Kauft er heute USD 1 Mio. wie in [Modul 01](/module/01-spot/4/), sind es <Num of="m09.carryChfStart" />, weil er mehr Dollars anlegt. Am Ende tauscht er die Dollars zum Kurs bei Verfall zurück. Fällt der Dollar um mehr als diese Pips, ist der Vorsprung weg. Das gilt für beide Beträge.
 
 Der Break-even ist genau der Geldmarkt-Forward aus [Modul 02](/module/02-forward/3/), <Num of="m09.carryFwd" digits={5} />. Das ist kein Zufall: Der Forward-Abschlag ist der Zinsvorsprung. Ein Carry-Trade ist wirtschaftlich ein gekaufter Forward. Für den Importeur ist derselbe Forward ein Hedge, für den Anleger eine offene Dollar-Position. Das Bedürfnis macht den Unterschied.
 
-Für Hedger ist derselbe Abschlag eine Kosten-Nutzen-Frage. Der Importeur kauft auf Termin <Num of="m09.carryPips" /> Pips günstiger als am Spot, auf USD 1 Mio. also <Num of="m09.carryChf" />. Der Carry arbeitet für ihn. Ein Exporteur, der Dollars auf Termin verkauft, erhält genau so viel weniger. Für ihn kostet die Absicherung Carry. Das verführt dazu, den Hedge aufzuschieben. Doch wer wartet, trägt das volle Kursrisiko, um <Num of="m09.carryPips" /> Pips zu sparen. Eine typische Bewegung über 3 Monate beträgt <Num of="m09.sigmaPips" /> Pips.
+Für Hedger ist derselbe Abschlag eine Kosten-Nutzen-Frage. Zum Geldmarkt-Forward kauft der Importeur <Num of="m09.carryPipsExact" /> Pips günstiger als am Spot, auf seine USD 1 Mio. bei Fälligkeit also <Num of="m09.carryChf" />. Der Carry arbeitet für ihn. Ein Exporteur, der Dollars auf Termin verkauft, erhält genau so viel weniger. Für ihn kostet die Absicherung Carry. Das verführt dazu, den Hedge aufzuschieben. Doch wer wartet, trägt das volle Kursrisiko, um <Num of="m09.carryPipsExact" /> Pips zu sparen. Eine typische Bewegung über 3 Monate beträgt <Num of="m09.sigmaPips" /> Pips.
 
 <CarryCushionFigure caption="Drei Yield-Ideen auf einer Achse. Klick dich vom Carry zum Discount-Zertifikat und zur Dual Currency, zieh den Kurs bei Verfall oder spiel die Laufzeit ab." />
 
@@ -55,9 +55,15 @@ Beim Carry verlierst du ab dem Forward jeden Pip, ohne weiteren Puffer und ohne 
 
 <Derivation title="Herleitung: Carry, Cap und kein Free Lunch">
 
-**1. Carry.** Geldmarkt Act/360, τ = Tage/360. Du kaufst heute so viele Dollars, dass mit Zins am Ende genau USD 1 Mio. da sind. Gegenüber dem Festgeld mit demselben Betrag bleibt bei Verfall:
+**1. Carry.** Geldmarkt Act/360, τ = Tage/360. Du kaufst heute so viele Dollars, dass mit Zins am Ende genau <i>N</i> = USD 1 Mio. da sind, also <i>N</i> / (1 + <i>r</i><sub>USD</sub> τ). Gegenüber dem Festgeld mit demselben Betrag bleibt bei Verfall:
 
 <Formula><span>Ergebnis = <i>N</i> · (<i>S</i><sub><i>T</i></sub> − <i>F</i>)</span><span><i>F</i> = <i>S</i> · (1 + <i>r</i><sub>CHF</sub> τ) / (1 + <i>r</i><sub>USD</sub> τ)</span></Formula>
+
+Bei unverändertem Kurs, <i>S</i><sub><i>T</i></sub> = <i>S</i>, ist das der Zinsvorsprung:
+
+<Formula><i>N</i> · (<i>S</i> − <i>F</i>) = <i>S</i> · <i>N</i> / (1 + <i>r</i><sub>USD</sub> τ) · (<i>r</i><sub>USD</sub> − <i>r</i><sub>CHF</sub>) · τ</Formula>
+
+Also der USD-Zins auf die heute gekauften Dollars, zum Spot bewertet, minus der CHF-Zins auf die eingesetzten Franken. Weil der CHF-Zins hier <Num of="ex.rd" /> ist, bleibt nur der USD-Zins: <Num of="m09.carryChf" />. Mit USD 1 Mio. heute statt bei Fälligkeit sind alle Beträge und damit der Zinsvorsprung um den Faktor 1 + <i>r</i><sub>USD</sub> τ grösser: <Num of="m09.carryChfStart" /> wie in Modul 01. Forward, Break-even und Pips bleiben gleich.
 
 **2. Discount-Zertifikat und Dual Currency.** Mit DF = 1/(1 + <i>r</i> τ) und der Put-Call-Parität <i>C</i> − <i>P</i> = <i>S</i> · DF<sub>USD</sub> − <i>K</i> · DF<sub>CHF</sub> wird aus «Carry plus Short Call» genau «Festgeld plus Short Put»:
 

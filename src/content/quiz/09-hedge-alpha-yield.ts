@@ -58,8 +58,8 @@ const check1: QuizQuestion = {
         en: 'The need: he wants to get rid of a risk, she wants to take one',
       },
       explain: {
-        de: 'Richtig. Der Importeur ist schon short USD und sucht einen Hedge. Die Anlegerin hat kein Risiko und sucht Alpha. Erst danach filtert die Sicht.',
-        en: 'Correct. The importer is already short USD and looks for a hedge. The investor has no risk and looks for alpha. Only then does the view filter.',
+        de: 'Richtig. Der Importeur ist schon short USD und sucht einen Hedge. Die Anlegerin hat kein Risiko, das sie absichern müsste. Sie will mit ihrer Sicht besser abschneiden als die Referenz, der Forward bzw. der Geldmarkt: Sie sucht Alpha. Erst danach filtert die Sicht.',
+        en: 'Correct. The importer is already short USD and looks for a hedge. The investor has no risk that needs hedging. She wants to use her view to beat a benchmark, the forward or the money market: she looks for alpha. Only then does the view filter.',
       },
     },
     {
@@ -155,8 +155,8 @@ const check3: QuizQuestion = {
     {
       label: { de: 'Coupon · Direkt: TPF', en: 'Coupon · direct: TPF' },
       explain: {
-        de: 'Der TPF zahlt Coupons für eine Richtung: Fixing über dem Strike. Ein steigender Dollar stört ihn nicht. Die Obergrenze des Bands nutzt er also gar nicht. Für eine Range-Sicht ist der RTPF gebaut.',
-        en: 'The TPF pays coupons for one direction: a fixing above the strike. A rising dollar does not bother it, so it makes no use of the band’s upper edge. The RTPF is built for a range view.',
+        de: 'Der TPF zahlt Coupons für eine Richtung: Fixing auf oder über dem Strike. Ein steigender Dollar stört ihn nicht. Die Obergrenze des Bands nutzt er also gar nicht. Für eine Range-Sicht ist der RTPF gebaut.',
+        en: 'The TPF pays coupons for one direction: a fixing at or above the strike. A rising dollar does not bother it, so it makes no use of the band’s upper edge. The RTPF is built for a range view.',
       },
     },
     {
@@ -187,8 +187,8 @@ const check4: QuizQuestion = {
     {
       label: { de: `Beim Forward, ${carryFwd}`, en: `At the forward, ${carryFwd}` },
       explain: {
-        de: `Richtig. Der Zinsvorsprung von ${carryPips.de} Pips ist genau der Forward-Abschlag. Fällt der Dollar unter den Forward, ist er aufgebraucht.`,
-        en: `Correct. The interest differential of ${carryPips.en} pips is exactly the forward discount. If the dollar falls below the forward, it is used up.`,
+        de: `Richtig. Der Zinsvorsprung von ${carryPips.de} Pips ist genau der Forward-Abschlag (Zinsparität). Fällt der Dollar unter den Forward, ist er aufgebraucht.`,
+        en: `Correct. The interest differential of ${carryPips.en} pips is exactly the forward discount (interest rate parity). If the dollar falls below the forward, it is used up.`,
       },
     },
     {

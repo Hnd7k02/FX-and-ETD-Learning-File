@@ -19,6 +19,8 @@ const gamma = fmtNumber(M05.gamma, 'en', { digits: 2 });
 const delta = fmtNumber(M05.delta, 'en', { digits: 3 });
 const deltaUp = fmtNumber(M05.deltaUp, 'en', { digits: 2 });
 const dChange = num(M05.deltaChangeApprox, 3, true);
+/** e^(−rf T): the spot delta of the call deep in the money (and of a forward). */
+const dLimit = num(M05.spotDeltaLimit, 3);
 const vol = both((l) => fmtPct(E.vol, l, 0));
 const volUp = both((l) => fmtPct(E.vol + 0.01, l, 0));
 const rf = both((l) => fmtPct(E.rf, l, 1));
@@ -110,8 +112,8 @@ const check2: QuizQuestion = {
       label: num(M05.gamma * 0.1, 3, true),
       mono: true,
       explain: {
-        de: `Zehnmal zu viel: Das wäre die Änderung für 0.1000, also zehn Big Figures. Delta kann ohnehin nie über 1 steigen. Richtig ist ${gamma} · 0.01 ≈ ${dChange.de}.`,
-        en: `Ten times too much: that would be the change for 0.1000, ten big figures. Delta can never exceed 1 anyway. The right answer is ${gamma} · 0.01 ≈ ${dChange.en}.`,
+        de: `Zehnmal zu viel: Das wäre die Änderung für 0.1000, also zehn Big Figures. Das Spot-Delta des Calls bleibt ohnehin immer zwischen 0 und e^(−rf T) ≈ ${dLimit.de}. Richtig ist ${gamma} · 0.01 ≈ ${dChange.de}.`,
+        en: `Ten times too much: that would be the change for 0.1000, ten big figures. The call's spot delta always stays between 0 and e^(−rf T) ≈ ${dLimit.en} anyway. The right answer is ${gamma} · 0.01 ≈ ${dChange.en}.`,
       },
     },
   ],
@@ -212,8 +214,8 @@ const q1: QuizQuestion = {
       label: chf(10 * 1e-4 * E.notional),
       mono: true,
       explain: {
-        de: `Das wäre der Gewinn eines Forwards über USD 1 Mio., also Delta 1. Der Call hat Delta ${delta} und gewinnt etwa die Hälfte: ${pnl10.de}.`,
-        en: `That would be the gain on a forward over USD 1m, i.e. delta 1. The call has delta ${delta} and gains about half: ${pnl10.en}.`,
+        de: `Das wäre der Gewinn einer Spot-Position über USD 1 Mio., also Delta 1. Der Call hat Delta ${delta} und gewinnt etwa die Hälfte: ${pnl10.de}.`,
+        en: `That would be the gain on a spot position of USD 1m, i.e. delta 1. The call has delta ${delta} and gains about half: ${pnl10.en}.`,
       },
     },
     {

@@ -24,7 +24,7 @@ test.describe('riskometer page', () => {
     await expect(page.locator('.rk-gauge')).toHaveAttribute('aria-label', /Tacho: Stufe/);
     await expect(page.locator('.rk-svg')).toHaveAttribute('aria-label', /EUR\/CHF/);
     await expect(page.locator('#rk-chart-summary')).toContainText(/Höchstwert/);
-    await expect(page.locator('.rk-today-tag')).toContainText('Heute');
+    await expect(page.locator('.rk-today-tag')).toContainText('Zuletzt');
     await expect(page.locator('footer')).toContainText('Nur zu Bildungszwecken');
     await expect(page.locator('.rk-foot')).toContainText('√252');
   });

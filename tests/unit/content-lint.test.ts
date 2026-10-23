@@ -3,7 +3,8 @@
  * - every <Num of> exists in the number registry,
  * - every <Fact id> exists and its source is listed in sources.md,
  * - no forbidden terms (bank names, "garantiert", "risikolos" outside arbitrage/rates),
- * - no typed-in example or reference values outside <Num>.
+ * - no typed-in example or reference values outside <Num>,
+ * - no wording retired in Version 6 (RETIRED_V6, Review 2).
  */
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
@@ -150,6 +151,76 @@ const FORBIDDEN_NAMES = [
   'Bank of America',
   'Nomura',
   'Mizuho',
+];
+
+/**
+ * Wordings retired in Version 6 (Review 2, DECISIONS D-51 to D-62), DE and EN, by point. They
+ * must not come back in a section text, quiz, dictionary, component, the glossary, the module
+ * registry, the loading text of the offline file or the README.
+ */
+const RETIRED_V6: [point: string, phrase: string][] = [
+  ['1 double knock-in', 'Je enger der Korridor, desto billiger, und'],
+  ['1 double knock-in', 'The narrower the corridor, the cheaper the option,'],
+  ['2 gamma peak', 'Warum Gamma am Strike am grössten ist'],
+  ['2 gamma peak', 'also shows why gamma peaks at the strike'],
+  ['2 gamma peak', 'wird Gamma am Strike umso grösser'],
+  ['2 gamma peak', 'gamma at the strike grows'],
+  ['2 gamma peak', 'Vega bei ATMF am grössten'],
+  ['2 gamma peak', 'vega peaks at ATMF'],
+  ['3 alpha', 'einen Ertrag, der aus einer Marktsicht kommt'],
+  ['3 alpha', 'a return that comes from a market view'],
+  ['3 alpha', 'Sicht Geld machen'],
+  ['3 alpha', 'make money from that view'],
+  ['3 alpha', 'make money from her view'],
+  ['6 methodology', 'werktags um 15:30'],
+  ['6 methodology', 'Eine GitHub Action holt'],
+  ['6 methodology', '15:30 UTC'],
+  ['6 methodology', 'weekdays at 15:30'],
+  ['6 methodology', 'Riskometer heute'],
+  ['6 methodology', 'Riskometer today'],
+  ['7 interest parity', 'allein aus Spot und Zinsen'],
+  ['7 interest parity', 'Die Ursache ist allein der Zinsunterschied'],
+  ['7 interest parity', 'spiegeln nur den Zinsunterschied'],
+  ['7 interest parity', 'allein aus der Zinsparität'],
+  ['7 interest parity', 'immer mit Abschlag'],
+  ['7 interest parity', 'hält der Markt die Parität im Normalfall eng ein'],
+  ['7 interest parity', 'spot and interest rates alone'],
+  ['7 interest parity', 'The only cause is the interest rate differential'],
+  ['7 interest parity', 'points only reflect'],
+  ['7 interest parity', 'interest-rate parity alone'],
+  ['7 interest parity', 'always trades at a forward discount'],
+  ['7 interest parity', 'the market normally keeps parity tight'],
+  ['8 last TARF fixing', 'Der letzte Gewinn wird so gekappt'],
+  ['8 last TARF fixing', 'The last gain is capped'],
+  ['9 barrier and jump', 'setzen voraus, dass der Kurs stetig'],
+  ['9 barrier and jump', 'Stops und Barrieren setzen voraus'],
+  ['9 barrier and jump', 'Barrieren einen stetigen Kursverlauf'],
+  ['9 barrier and jump', 'Auch Barrieren werden übersprungen'],
+  ['9 barrier and jump', 'und dort kann jemand handeln'],
+  ['9 barrier and jump', 'Stops and barriers assume'],
+  ['9 barrier and jump', 'barriers a rate that moves continuously'],
+  ['9 barrier and jump', 'Barriers are jumped over too'],
+  ['9 barrier and jump', 'and someone can trade there'],
+  ['10 spot delta', 'Delta läuft gegen eins'],
+  ['10 spot delta', 'im Geld fast eins'],
+  ['10 spot delta', 'Delta kann ohnehin nie über 1 steigen'],
+  ['10 spot delta', 'mit einem Delta von etwa 1'],
+  ['10 spot delta', 'delta heads towards one'],
+  ['10 spot delta', 'in the money close to one'],
+  ['10 spot delta', 'Delta can never exceed 1'],
+  ['10 spot delta', 'with a delta of about 1'],
+  ['11 vega hedge', 'nur mit anderen Optionen'],
+  ['11 vega hedge', 'can only be hedged with other options'],
+  ['12 loading text', 'Falls nichts erscheint'],
+  ['12 loading text', 'If nothing appears'],
+  ['in-out parity', 'Eine der beiden lebt am Ende immer'],
+  ['in-out parity', 'One of the two is always alive'],
+];
+const RETIRED_V6_FILES = [
+  ...textFiles,
+  join(ROOT, 'src/data/modules.ts'),
+  join(ROOT, 'scripts/build-offline.ts'),
+  join(ROOT, 'README.md'),
 ];
 
 /** Values from the running example and the reference table that must come from <Num>. */
@@ -349,6 +420,22 @@ describe('content lint', () => {
     }
     const sources = readFileSync(join(ROOT, 'src/content/sources.md'), 'utf8');
     for (const publisher of ['(EZB)', '(SNB)', '(BIZ)']) expect(sources).toContain(publisher);
+  });
+
+  it('guards the Version 6 wordings in both languages and in every text file', () => {
+    expect(RETIRED_V6_FILES.length).toBeGreaterThan(150);
+    for (const f of RETIRED_V6_FILES) expect(existsSync(f), f).toBe(true);
+    const points = new Set(RETIRED_V6.map(([p]) => p.split(' ')[0]));
+    for (const p of ['1', '2', '3', '6', '7', '8', '9', '10', '11', '12']) {
+      expect(points.has(p), `point ${p}`).toBe(true);
+    }
+  });
+
+  it.each(RETIRED_V6)('retired in Version 6 (point %s): «%s»', (_point, phrase) => {
+    const hits = RETIRED_V6_FILES.filter((f) => readFileSync(f, 'utf8').includes(phrase)).map((f) =>
+      relative(ROOT, f),
+    );
+    expect(hits).toEqual([]);
   });
 
   it.each(textFiles.map((f) => [relative(ROOT, f), f]))(

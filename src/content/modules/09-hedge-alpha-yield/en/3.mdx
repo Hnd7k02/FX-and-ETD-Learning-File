@@ -1,9 +1,11 @@
 import ProductMatrixFigure from '@/components/figures/ProductMatrixFigure.astro';
 import PathSimulatorFigure from '@/components/figures/PathSimulatorFigure.astro';
 
-{/* 09 Hedge, alpha, yield · Section 3 · Alpha. Numbers only via <Num />, registry src/lib/nums/m09.ts. */}
+{/* 09 Hedge, alpha, yield · Section 3 · Alpha. Numbers only via <Num />, registry src/lib/nums/m09.ts. Alpha as risk-adjusted excess return: source jensen-1968 in src/content/sources.md. */}
 
-The investor has a view: the dollar will not fall much over the next few months. She has no risk that needs hedging. She wants to make money from her view. This is called **alpha**: a return that comes from a market view.
+The investor has a view: the dollar will not fall much over the next few months. She has no risk that needs hedging. She wants to use her view to earn more than a benchmark.
+
+In finance theory, **alpha** is the excess return over a benchmark, adjusted for risk. Only what goes beyond the reward for the risk taken counts. Here the benchmark is the forward or the money market: anyone with a view wants more than this reference. Only the comparison shows whether that becomes alpha. A gain from a rising dollar is at first just the result of the dollar position.
 
 Before choosing a product, she answers two questions.
 
@@ -21,10 +23,10 @@ Two questions with two answers each give four boxes and four product families:
 
 ### Worked example: four boxes, one pattern
 
-All products come from [module 08](/en/module/08-structured-products/1/), with the strike or coupon solved so that they are worth zero at inception (Monte Carlo with <Num of="m09.paths" /> paths). They run over <Num of="m09.fixings" /> monthly fixings of <Num of="m09.structNotional" /> each, the accumulator over <Num of="m09.accFixings" /> weeks of <Num of="m09.accNotional" /> each.
+All products come from [module 08](/en/module/08-structured-products/1/), with the strike or coupon solved so that they are worth zero at inception (Monte Carlo with <Num of="m09.paths" /> paths). As there, the contract rounds the coupons to <Num of="m09.couponQuote" /> pips. The products run over <Num of="m09.fixings" /> monthly fixings of <Num of="m09.structNotional" /> each, the accumulator over <Num of="m09.accFixings" /> weeks of <Num of="m09.accNotional" /> each.
 
-- **Coupon direct, TPF:** <Num of="m09.tpfCoupon" /> pips per fixing, so <Num of="m09.tpfCouponChf" />, as long as the fixing is above <Num of="m09.tpfStrike" />. After <Num of="m09.tpfTargetCoupons" /> coupons it ends.
-- **Coupon range, RTPF:** <Num of="m09.rtpfCoupon" /> pips per fixing as long as the fixing is between <Num of="m09.rtpfLower" /> and <Num of="m09.rtpfUpper" />.
+- **Coupon direct, TPF:** <Num of="m09.tpfCoupon" /> pips per fixing, so <Num of="m09.tpfCouponChf" />, as long as the fixing is at or above <Num of="m09.tpfStrike" />. After <Num of="m09.tpfTargetCoupons" /> coupons it ends.
+- **Coupon range, RTPF:** <Num of="m09.rtpfCoupon" /> pips per fixing, so <Num of="m09.rtpfCouponChf" />, as long as the fixing is between <Num of="m09.rtpfLower" /> and <Num of="m09.rtpfUpper" />.
 - **Strike direct, TARF:** buys at <Num of="m09.tarfStrike" />, <Num of="m09.tarfBetter" /> pips below the forward at the average fixing date. It ends at a gain of <Num of="m09.tarfTarget" /> pips.
 - **Strike direct, accumulator:** buys at <Num of="m09.accStrike" />, <Num of="m09.accBetter" /> pips below the forward at the average fixing date, with a knock-out at <Num of="m09.accBarrier" />.
 - **Strike range, pivot TARF:** if the fixing is below the pivot <Num of="m09.pivPivot" />, she buys at <Num of="m09.pivLower" />. If it is above, she sells at <Num of="m09.pivUpper" />. Target <Num of="m09.pivTarget" /> pips.
@@ -40,7 +42,7 @@ The pattern is the same everywhere. The gain is capped: by a target, a knock-out
 
 <Callout variant="bad" title="When it goes wrong: the view is wrong">
 
-If the dollar falls sharply, every fixing lands on the wrong side. The products then run to maturity, with double the amount. In the worst of the <Num of="m09.paths" /> simulated paths the TPF ends at <Num of="m09.tpfWorst" />, the RTPF at <Num of="m09.rtpfWorst" />, the TARF at <Num of="m09.tarfWorst" />, the pivot TARF at <Num of="m09.pivWorst" /> and the accumulator at <Num of="m09.accWorst" />. The TPF, by contrast, can gain at most <Num of="m09.tpfMaxChf" />: <Num of="m09.tpfTargetCoupons" /> coupons. And the worst simulated path is not a limit. An even worse one is possible.
+If the dollar falls sharply, every fixing lands on the wrong side. The products then run to maturity, with double the amount. In the worst of the <Num of="m09.paths" /> simulated paths the TPF ends at <Num of="m09.tpfWorst" />, the RTPF at <Num of="m09.rtpfWorst" />, the TARF at <Num of="m09.tarfWorst" />, the pivot TARF at <Num of="m09.pivWorst" /> and the accumulator at <Num of="m09.accWorst" />. The TPF, by contrast, can gain at most <Num of="m09.tpfMaxChf" />: <Num of="m09.tpfTargetCoupons" /> coupons of <Num of="m09.tpfCouponChf" />. For the RTPF it is at most <Num of="m09.rtpfMaxChf" />. And the worst simulated path is not a limit. An even worse one is possible.
 
 </Callout>
 
@@ -83,6 +85,6 @@ A strike product delivers currency. It suits someone who buys the dollars anyway
 
 <Takeaway>
 
-Alpha products turn a view into a coupon or a better strike. They are paid for with sold options. The gain is capped; there is no built-in stop for the loss.
+Products for a view turn it into a coupon or a better strike. They are paid for with sold options. The gain is capped; there is no built-in stop for the loss. Alpha is only what remains after the comparison with the forward or the money market, adjusted for risk.
 
 </Takeaway>

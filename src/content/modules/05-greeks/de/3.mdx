@@ -52,7 +52,7 @@ Im Labor bleibt der Strike bei <Num of="ex.strike" />. Schieb dort die Laufzeit 
 
 **4.** Für den Put gilt dasselbe Vega. Die Put-Call-Parität <i>C</i> − <i>P</i> = <i>e</i><sup>−<i>r</i><sub>d</sub><i>T</i></sup> · (<i>F</i> − <i>K</i>) hängt nicht von der Vola ab, also haben Call und Put dieselbe Ableitung nach σ.
 
-Wo genau liegt das Maximum? Über dem Strike betrachtet bei <i>d</i><sub>1</sub> = 0. Über dem Spot betrachtet, wie im Labor, bei <i>d</i><sub>2</sub> = 0, also bei Spot <Num of="m05.vegaPeakSpot" />. Beides liegt nur wenige Pips neben ATMF.
+Wo genau liegt das Maximum? Über dem Strike betrachtet bei <i>d</i><sub>1</sub> = 0. Über dem Spot betrachtet, wie im Labor, zieht der Faktor <i>S</i> das Maximum etwas nach rechts: ν = <i>S</i> · <i>e</i><sup>−<i>r</i><sub>f</sub><i>T</i></sup> · φ(<i>d</i><sub>1</sub>) · √<i>T</i> ist am grössten bei <i>d</i><sub>1</sub> = +σ√<i>T</i>, also bei <i>d</i><sub>2</sub> = 0, im Beispiel bei Spot <Num of="m05.vegaPeakSpot" />. Beides liegt nur wenige Pips neben ATMF. Bei Gamma steht <i>S</i> dagegen im Nenner, darum liegt sein Maximum in Abhängigkeit vom Spot spiegelbildlich bei <i>d</i><sub>1</sub> = −σ√<i>T</i> (Abschnitt 2).
 
 </Derivation>
 
@@ -60,7 +60,7 @@ Wo genau liegt das Maximum? Über dem Strike betrachtet bei <i>d</i><sub>1</sub>
 
 Optionen werden in Vola gehandelt, nicht in Franken. Händler quotieren eine implizite Vola, die Prämie folgt aus dem Modell. Vega ist die Brücke zwischen beiden Welten: Ein Vola-Punkt auf dem Call des Importeurs ist <Num of="ex.vegaChf" /> wert.
 
-Vega lässt sich nur mit anderen Optionen absichern. Spot und Forwards haben kein Vega. Weil kurze und lange Laufzeiten unterschiedlich reagieren, wird Vega meist je Laufzeit getrennt geführt. Wer long Vega ist, gewinnt, wenn der Markt nervös wird. Wie stark die tatsächlichen Schwankungen in Krisen zunehmen, zeigt das [Riskometer](/riskometer/) mit der realisierten Vola.
+Mit Spot und Forwards lässt sich Vega nicht absichern, sie haben kein Vega. Am FX-Desk nimmt man dafür andere Optionen, seltener Volatilitäts- oder Varianz-Swaps. Weil kurze und lange Laufzeiten unterschiedlich reagieren, wird Vega meist je Laufzeit getrennt geführt. Wer long Vega ist, gewinnt, wenn der Markt nervös wird. Wie stark die tatsächlichen Schwankungen in Krisen zunehmen, zeigt das [Riskometer](/riskometer/) mit der realisierten Vola.
 
 </Desk>
 

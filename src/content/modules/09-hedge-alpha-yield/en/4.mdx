@@ -6,11 +6,11 @@ The investor has francs in his account. In the example the CHF money market pays
 
 ### Carry: earning the interest differential
 
-The investor buys USD at spot and deposits them at the USD rate. In <Num of="m09.yMonths" /> months he earns an interest differential of <Num of="m09.carryChf" /> on USD 1m, that is <Num of="m09.carryPips" /> pips. At the end he changes the dollars back at the rate at expiry. If the dollar falls by more than these pips, the head start is gone.
+The investor buys USD at spot and deposits them at the USD rate. For USD 1m at maturity he buys <Num of="m09.carryUsdToday" /> today and deposits them for <Num of="m09.yMonths" /> months. If the rate stays the same, his interest differential is <Num of="m09.carryChf" />. That is exactly the forward discount: <Num of="m09.carryPipsExact" /> pips on USD 1m. If he buys USD 1m today, as in [module 01](/en/module/01-spot/4/), it is <Num of="m09.carryChfStart" />, because he deposits more dollars. At the end he changes the dollars back at the rate at expiry. If the dollar falls by more than these pips, the head start is gone. That holds for both amounts.
 
 The break-even is exactly the money-market forward from [module 02](/en/module/02-forward/3/), <Num of="m09.carryFwd" digits={5} />. That is no coincidence: the forward discount is the interest differential. Economically, a carry trade is a bought forward. For the importer the same forward is a hedge; for the investor it is an open dollar position. The need makes the difference.
 
-For hedgers the same discount is a question of cost and benefit. The importer buys forward <Num of="m09.carryPips" /> pips below spot, <Num of="m09.carryChf" /> on USD 1m: carry works for him. An exporter who sells dollars forward receives exactly that much less: for him, hedging costs carry. That tempts him to put the hedge off. But whoever waits carries the full currency risk to save <Num of="m09.carryPips" /> pips. A typical move over 3 months is <Num of="m09.sigmaPips" /> pips.
+For hedgers the same discount is a question of cost and benefit. At the money-market forward the importer buys <Num of="m09.carryPipsExact" /> pips below spot, <Num of="m09.carryChf" /> on his USD 1m at maturity: carry works for him. An exporter who sells dollars forward receives exactly that much less: for him, hedging costs carry. That tempts him to put the hedge off. But whoever waits carries the full currency risk to save <Num of="m09.carryPipsExact" /> pips. A typical move over 3 months is <Num of="m09.sigmaPips" /> pips.
 
 <CarryCushionFigure caption="Three yield ideas on one axis. Click from carry to the discount certificate and to dual currency, drag the rate at expiry or play the tenor." />
 
@@ -55,9 +55,15 @@ With carry you lose every pip below the forward, with no further cushion and no 
 
 <Derivation title="Derivation: carry, cap and no free lunch">
 
-**1. Carry.** Money market Act/360, τ = days/360. Today you buy just enough dollars to have exactly USD 1m with interest at the end. Against a deposit of the same amount, at expiry you are left with:
+**1. Carry.** Money market Act/360, τ = days/360. Today you buy just enough dollars to have exactly <i>N</i> = USD 1m with interest at the end, that is <i>N</i> / (1 + <i>r</i><sub>USD</sub> τ). Against a deposit of the same amount, at expiry you are left with:
 
 <Formula><span>result = <i>N</i> · (<i>S</i><sub><i>T</i></sub> − <i>F</i>)</span><span><i>F</i> = <i>S</i> · (1 + <i>r</i><sub>CHF</sub> τ) / (1 + <i>r</i><sub>USD</sub> τ)</span></Formula>
+
+At an unchanged rate, <i>S</i><sub><i>T</i></sub> = <i>S</i>, this is the interest differential:
+
+<Formula><i>N</i> · (<i>S</i> − <i>F</i>) = <i>S</i> · <i>N</i> / (1 + <i>r</i><sub>USD</sub> τ) · (<i>r</i><sub>USD</sub> − <i>r</i><sub>CHF</sub>) · τ</Formula>
+
+So it is the USD interest on the dollars bought today, valued at spot, minus the CHF interest on the francs put in. Because the CHF rate is <Num of="ex.rd" /> here, only the USD interest remains: <Num of="m09.carryChf" />. With USD 1m today instead of at maturity, every amount, and so the interest differential, is larger by the factor 1 + <i>r</i><sub>USD</sub> τ: <Num of="m09.carryChfStart" /> as in module 01. The forward, the break-even and the pips stay the same.
 
 **2. Discount certificate and dual currency.** With DF = 1/(1 + <i>r</i> τ) and put-call parity <i>C</i> − <i>P</i> = <i>S</i> · DF<sub>USD</sub> − <i>K</i> · DF<sub>CHF</sub>, ‘carry plus short call’ becomes exactly ‘deposit plus short put’:
 

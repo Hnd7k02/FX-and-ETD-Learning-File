@@ -110,6 +110,9 @@ test.describe('transport', () => {
         `id="ff-loading"[^>]*>Forward First ${VERSION} \\(\\d{2}\\.\\d{2}\\.\\d{4}\\) wird geladen`,
       ).test(text),
     ).toBe(true);
+    // a view without JavaScript (the iPad Files preview) shows only this text: it says why (DE, EN)
+    expect(text).toContain('zum Beispiel die Vorschau der iPad-Dateien-App.');
+    expect(text).toContain('for example the preview of the iPad Files app.');
     const copy = join(dirname(FILE), versionedFileName());
     expect(sha256(copy)).toBe(sha256(FILE));
 

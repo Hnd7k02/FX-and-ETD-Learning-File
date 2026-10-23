@@ -1,9 +1,11 @@
 import ProductMatrixFigure from '@/components/figures/ProductMatrixFigure.astro';
 import PathSimulatorFigure from '@/components/figures/PathSimulatorFigure.astro';
 
-{/* 09 Hedge, Alpha, Yield · Abschnitt 3 · Alpha. Zahlen nur über <Num />, Registry src/lib/nums/m09.ts. */}
+{/* 09 Hedge, Alpha, Yield · Abschnitt 3 · Alpha. Zahlen nur über <Num />, Registry src/lib/nums/m09.ts. Alpha als risikobereinigter Mehrertrag: Quelle jensen-1968 in src/content/sources.md. */}
 
-Die Anlegerin hat eine Sicht: Der Dollar fällt in den nächsten Monaten nicht stark. Sie hat kein Risiko, das sie absichern müsste. Sie will aus ihrer Sicht Geld machen. Das nennt man **Alpha**: einen Ertrag, der aus einer Marktsicht kommt.
+Die Anlegerin hat eine Sicht: Der Dollar fällt in den nächsten Monaten nicht stark. Sie hat kein Risiko, das sie absichern müsste. Mit ihrer Sicht will sie mehr verdienen als eine Referenz.
+
+In der Finanztheorie ist **Alpha** der Mehrertrag gegenüber einem Vergleichsmassstab, risikobereinigt. Es zählt also nur, was über die Entschädigung für das eingegangene Risiko hinausgeht. Hier ist der Vergleichsmassstab der Forward bzw. der Geldmarkt: Wer eine Sicht hat, will mehr als diese Referenz. Ob daraus Alpha wird, zeigt erst der Vergleich. Ein Gewinn aus einem steigenden Dollar ist zunächst nur das Ergebnis der Dollar-Position.
 
 Bevor sie ein Produkt wählt, beantwortet sie zwei Fragen.
 
@@ -21,10 +23,10 @@ Zwei Fragen mit je zwei Antworten ergeben vier Felder und vier Produktfamilien:
 
 ### Rechenbeispiel: vier Felder, ein Muster
 
-Alle Produkte stammen aus [Modul 08](/module/08-structured-products/1/), mit Strike oder Coupon so gelöst, dass sie beim Abschluss null wert sind (Monte Carlo mit <Num of="m09.paths" /> Pfaden). Sie laufen über <Num of="m09.fixings" /> Monats-Fixings auf je <Num of="m09.structNotional" />, der Accumulator über <Num of="m09.accFixings" /> Wochen auf je <Num of="m09.accNotional" />.
+Alle Produkte stammen aus [Modul 08](/module/08-structured-products/1/), mit Strike oder Coupon so gelöst, dass sie beim Abschluss null wert sind (Monte Carlo mit <Num of="m09.paths" /> Pfaden). Die Coupons sind wie dort vertraglich auf <Num of="m09.couponQuote" /> Pips gerundet. Die Produkte laufen über <Num of="m09.fixings" /> Monats-Fixings auf je <Num of="m09.structNotional" />, der Accumulator über <Num of="m09.accFixings" /> Wochen auf je <Num of="m09.accNotional" />.
 
-- **Coupon direkt, TPF:** <Num of="m09.tpfCoupon" /> Pips je Fixing, also <Num of="m09.tpfCouponChf" />, solange das Fixing über <Num of="m09.tpfStrike" /> liegt. Nach <Num of="m09.tpfTargetCoupons" /> Coupons ist Schluss.
-- **Coupon Range, RTPF:** <Num of="m09.rtpfCoupon" /> Pips je Fixing, solange das Fixing zwischen <Num of="m09.rtpfLower" /> und <Num of="m09.rtpfUpper" /> liegt.
+- **Coupon direkt, TPF:** <Num of="m09.tpfCoupon" /> Pips je Fixing, also <Num of="m09.tpfCouponChf" />, solange das Fixing auf oder über <Num of="m09.tpfStrike" /> liegt. Nach <Num of="m09.tpfTargetCoupons" /> Coupons ist Schluss.
+- **Coupon Range, RTPF:** <Num of="m09.rtpfCoupon" /> Pips je Fixing, also <Num of="m09.rtpfCouponChf" />, solange das Fixing zwischen <Num of="m09.rtpfLower" /> und <Num of="m09.rtpfUpper" /> liegt.
 - **Strike direkt, TARF:** Kauf zu <Num of="m09.tarfStrike" />, <Num of="m09.tarfBetter" /> Pips unter dem Forward am mittleren Fixing-Tag. Bei <Num of="m09.tarfTarget" /> Pips Gewinn endet er.
 - **Strike direkt, Accumulator:** Kauf zu <Num of="m09.accStrike" />, <Num of="m09.accBetter" /> Pips unter dem Forward am mittleren Fixing-Tag, mit Knock-out bei <Num of="m09.accBarrier" />.
 - **Strike Range, Pivot TARF:** Liegt das Fixing unter dem Pivot <Num of="m09.pivPivot" />, kauft sie zu <Num of="m09.pivLower" />. Liegt es darüber, verkauft sie zu <Num of="m09.pivUpper" />. Target <Num of="m09.pivTarget" /> Pips.
@@ -40,7 +42,7 @@ Das Muster ist überall gleich. Der Gewinn ist begrenzt: durch ein Target, einen
 
 <Callout variant="bad" title="Wann geht es schief: Die Sicht ist falsch">
 
-Fällt der Dollar deutlich, liegen alle Fixings auf der falschen Seite. Die Produkte laufen dann bis zum Ende, mit doppelter Menge. Im schlechtesten der <Num of="m09.paths" /> simulierten Pfade endet der TPF bei <Num of="m09.tpfWorst" />, der RTPF bei <Num of="m09.rtpfWorst" />, der TARF bei <Num of="m09.tarfWorst" />, der Pivot TARF bei <Num of="m09.pivWorst" /> und der Accumulator bei <Num of="m09.accWorst" />. Gewinnen kann der TPF dagegen höchstens <Num of="m09.tpfMaxChf" />: <Num of="m09.tpfTargetCoupons" /> Coupons. Und der schlechteste simulierte Pfad ist keine Grenze. Ein noch schlechterer ist möglich.
+Fällt der Dollar deutlich, liegen alle Fixings auf der falschen Seite. Die Produkte laufen dann bis zum Ende, mit doppelter Menge. Im schlechtesten der <Num of="m09.paths" /> simulierten Pfade endet der TPF bei <Num of="m09.tpfWorst" />, der RTPF bei <Num of="m09.rtpfWorst" />, der TARF bei <Num of="m09.tarfWorst" />, der Pivot TARF bei <Num of="m09.pivWorst" /> und der Accumulator bei <Num of="m09.accWorst" />. Gewinnen kann der TPF dagegen höchstens <Num of="m09.tpfMaxChf" />: <Num of="m09.tpfTargetCoupons" /> Coupons zu <Num of="m09.tpfCouponChf" />. Beim RTPF sind es höchstens <Num of="m09.rtpfMaxChf" />. Und der schlechteste simulierte Pfad ist keine Grenze. Ein noch schlechterer ist möglich.
 
 </Callout>
 
@@ -83,6 +85,6 @@ Ein Strike-Produkt liefert Devisen. Es passt zu jemandem, der die Dollars ohnehi
 
 <Takeaway>
 
-Alpha-Produkte verwandeln eine Sicht in einen Coupon oder einen besseren Strike. Bezahlt wird mit verkauften Optionen. Der Gewinn ist gedeckelt, für den Verlust gibt es keinen eingebauten Stopp.
+Produkte für eine Sicht verwandeln diese in einen Coupon oder einen besseren Strike. Bezahlt wird mit verkauften Optionen. Der Gewinn ist gedeckelt, für den Verlust gibt es keinen eingebauten Stopp. Alpha ist erst, was nach dem Vergleich mit dem Forward bzw. dem Geldmarkt bleibt, risikobereinigt.
 
 </Takeaway>

@@ -7,10 +7,11 @@ A TARF (target redemption forward) is a series of forwards at a better strike th
 
 On every fixing:
 
-- **Fixing above the strike:** you buy <Num of="m08.tarfNotional" /> at the strike. The gain per dollar counts towards the **target** of <Num of="m08.tarfTargetPips" /> pips. Once it is reached, the TARF ends. The last gain is capped so that the sum is exactly the target.
+- **Fixing above the strike, target not yet reached:** you buy <Num of="m08.tarfNotional" /> at the strike. The gain per dollar, fixing minus strike, counts towards the **target** of <Num of="m08.tarfTargetPips" /> pips.
+- **Fixing that reaches the target:** you buy the full notional of <Num of="m08.tarfNotional" />, but at an adjusted rate: the fixing minus what is left to the target. What is left is the target minus the gains counted so far. So exactly that remainder counts on this fixing, the sum is exactly the target, and the TARF ends. The adjusted rate lies between the strike and the fixing. In the market there are variants, such as the full gain on the last fixing or no payment; the term sheet decides.
 - **Fixing below the strike:** you buy twice the amount at the strike. This loss does **not** count towards the target.
 
-In building blocks: per fixing, a bought call and two sold puts at the strike, plus the target as a knock-out rule. You cannot gain more than <Num of="m08.tarfTargetChf" /> (<Num of="m08.tarfTargetPips" /> pips on <Num of="m08.tarfNotional" />). You can lose much more.
+In building blocks: per fixing, a bought call and two sold puts at the strike, plus the target as a knock-out rule. With the adjusted rate on the last fixing you gain at most <Num of="m08.tarfTargetChf" /> (<Num of="m08.tarfTargetPips" /> pips on <Num of="m08.tarfNotional" />). You can lose much more.
 
 <PathSimulatorFigure
   products={['tarf', 'pivotTarf']}
@@ -34,7 +35,7 @@ If things go well, the TARF ends after a few fixings with a capped gain. Precise
 
 ### Pivot TARF: two strikes around a pivot
 
-The pivot TARF bets that the rate stays within a band. Around the pivot <Num of="m08.pivPivot" /> lie two strikes: <Num of="m08.pivK1" /> and <Num of="m08.pivK2" />, each <Num of="m08.pivWidth" /> pips away (standard error <Num of="m08.pivSe" /> pips). Below the pivot you buy at <Num of="m08.pivK1" />, above it you sell at <Num of="m08.pivK2" />. Both bring a gain as long as the fixing is between the strikes. Outside them you trade twice the amount at a loss. The target is <Num of="m08.pivTargetPips" /> pips, that is <Num of="m08.pivTargetChf" />. For the importer this is no longer a hedge: the fixing decides whether he buys or sells dollars.
+The pivot TARF bets that the rate stays within a band. Around the pivot <Num of="m08.pivPivot" /> lie two strikes: <Num of="m08.pivK1" /> and <Num of="m08.pivK2" />, each <Num of="m08.pivWidth" /> pips away (standard error <Num of="m08.pivSe" /> pips). Below the pivot you buy at <Num of="m08.pivK1" />, above it you sell at <Num of="m08.pivK2" />. Both bring a gain as long as the fixing is between the strikes. Outside them you trade twice the amount at a loss. The target is <Num of="m08.pivTargetPips" /> pips, that is <Num of="m08.pivTargetChf" />. On the fixing that reaches the target, the same rule applies as for the TARF: you trade the full notional at an adjusted rate. If you buy, it is the fixing minus what is left to the target; if you sell, it is the fixing plus that remainder. Either way it lies between the fixing and the strike. For the importer this is no longer a hedge: the fixing decides whether he buys or sells dollars.
 
 <StructureBlocksFigure
   products={['pivotTarf']}

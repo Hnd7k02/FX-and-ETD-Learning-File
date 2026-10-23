@@ -125,7 +125,9 @@ test.describe('home page', () => {
     await page.goto('/');
     const card = page.locator('[data-risk]');
     await expect(card).toHaveAttribute('href', /\/riskometer\/$/);
-    await expect(page.getByRole('link', { name: /Riskometer (heute|today)/ })).toBeVisible();
+    await expect(
+      page.getByRole('link', { name: /Riskometer, (letzter Stand|latest reading)/ }),
+    ).toBeVisible();
     await expect(card.locator('.level')).not.toHaveText('');
   });
 

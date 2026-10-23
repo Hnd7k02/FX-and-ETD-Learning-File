@@ -52,7 +52,7 @@ In the lab the strike stays at <Num of="ex.strike" />. Push the time to expiry t
 
 **4.** The put has the same vega. Put-call parity <i>C</i> − <i>P</i> = <i>e</i><sup>−<i>r</i><sub>d</sub><i>T</i></sup> · (<i>F</i> − <i>K</i>) does not depend on volatility, so call and put share the same derivative with respect to σ.
 
-Where exactly is the peak? Across strikes it sits at <i>d</i><sub>1</sub> = 0. Across spot, as in the lab, it sits at <i>d</i><sub>2</sub> = 0, i.e. at spot <Num of="m05.vegaPeakSpot" />. Both are only a few pips away from ATMF.
+Where exactly is the peak? Across strikes it sits at <i>d</i><sub>1</sub> = 0. Across spot, as in the lab, the factor <i>S</i> pulls the peak slightly to the right: ν = <i>S</i> · <i>e</i><sup>−<i>r</i><sub>f</sub><i>T</i></sup> · φ(<i>d</i><sub>1</sub>) · √<i>T</i> is largest at <i>d</i><sub>1</sub> = +σ√<i>T</i>, i.e. at <i>d</i><sub>2</sub> = 0, in the example at spot <Num of="m05.vegaPeakSpot" />. Both are only a few pips away from ATMF. For gamma, by contrast, <i>S</i> sits in the denominator, so its peak across spot mirrors this at <i>d</i><sub>1</sub> = −σ√<i>T</i> (section 2).
 
 </Derivation>
 
@@ -60,7 +60,7 @@ Where exactly is the peak? Across strikes it sits at <i>d</i><sub>1</sub> = 0. A
 
 Options trade in volatility, not in francs. Dealers quote an implied volatility, and the premium follows from the model. Vega is the bridge between the two: one vol point on the importer's call is worth <Num of="ex.vegaChf" />.
 
-Vega can only be hedged with other options. Spot and forwards have no vega. Because short and long expiries react differently, vega is usually managed bucket by bucket across maturities. A desk that is long vega gains when the market turns nervous. How much the actual swings grow in a crisis is shown by the [Riskometer](/en/riskometer/), with realised volatility.
+Vega cannot be hedged with spot or forwards: they have no vega. On an FX desk other options do that job, less often volatility or variance swaps. Because short and long expiries react differently, vega is usually managed bucket by bucket across maturities. A desk that is long vega gains when the market turns nervous. How much the actual swings grow in a crisis is shown by the [Riskometer](/en/riskometer/), with realised volatility.
 
 </Desk>
 

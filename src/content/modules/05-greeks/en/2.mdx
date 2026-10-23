@@ -4,15 +4,15 @@ import GreeksLabFigure from '@/components/figures/GreeksLabFigure.astro';
 
 Delta tells you how much the call gains when USD/CHF rises a little. With a delta of 0.50 the option's value moves about half as much as the rate.
 
-Gamma tells you how quickly that delta itself changes. Far out of the money delta is close to zero, deep in the money close to one. In between, near ATMF, where the forward sits at the strike, it changes fastest: that is where gamma is largest.
+Gamma tells you how quickly that delta itself changes. Far out of the money delta is close to zero. Deep in the money the forward delta heads towards 1 and the spot delta towards <i>e</i><sup>−<i>r</i><sub>f</sub><i>T</i></sup> ≈ <Num of="m05.spotDeltaLimit" />. In between, delta changes fastest, and that is where gamma is largest. Across spot, the exact peak sits at <i>d</i><sub>1</sub> = −σ√<i>T</i> (derivation below). As a rule of thumb, gamma is largest when the forward is close to the strike, i.e. near ATMF.
 
 For the importer this means: his call on <Num of="ex.notional" /> behaves today like a forward on roughly half the amount. If the dollar rises, that share grows; if it falls, it shrinks. Gamma measures exactly this adjustment. It is the reason an option can do more than half a forward.
 
 <GreeksLabFigure mode="delta-gamma" caption="Drag the spot slider or the black dot itself: the black tangent at the top has slope delta, the tangent below has slope gamma." />
 
-Try three things in the lab. Drag spot all the way to the right: delta heads towards one and the call turns into a forward. Drag it to the left: delta falls towards zero. Then shorten the time to expiry to a few weeks: the delta curve becomes a steep step, and gamma shoots up.
+Try three things in the lab. Drag spot all the way to the right: the spot delta rises towards <i>e</i><sup>−<i>r</i><sub>f</sub><i>T</i></sup> ≈ <Num of="m05.spotDeltaLimit" />. That is exactly the spot delta of a forward: the call turns into a forward. The forward delta heads towards 1. Drag it to the left: delta falls towards zero. Then shorten the time to expiry to a few weeks: the delta curve becomes a steep step, and gamma shoots up.
 
-Watch two details while you do. Both lead back to the forward. The steepest point of the delta curve is not at the strike line but further right, close to today's spot of <Num of="ex.spot" />. Only there does the forward sit at the strike, because the forward points are <Num of="ex.fwdPoints" /> pips. And deep in the money the price curve even runs below the dashed payoff at expiry. The call works with the forward, not with spot. Measured against spot, its time value there is negative. That is neither a negative premium nor an arbitrage: the USD rate is above the CHF rate, so the forward sits below spot, and you cannot exercise a European option early ([module 04](/en/module/04-vanilla-options/3/)).
+Watch two details while you do. Both lead back to the forward. In the example, the steepest point of the delta curve is not at the strike line but further right, at spot <Num of="m05.gammaPeakSpot" />, close to today's spot of <Num of="ex.spot" />. At today's spot the forward sits at the strike, because the forward points are <Num of="ex.fwdPoints" /> pips. At the peak itself the forward is about <Num of="m05.gammaPeakFwdPips" /> pips below the strike; the derivation below shows why. And deep in the money the price curve even runs below the dashed payoff at expiry. The call works with the forward, not with spot. Measured against spot, its time value there is negative. That is neither a negative premium nor an arbitrage: the USD rate is above the CHF rate, so the forward sits below spot, and you cannot exercise a European option early ([module 04](/en/module/04-vanilla-options/3/)).
 
 ### Delta and gamma in the example
 
@@ -36,7 +36,7 @@ The lab shows the spot delta <Num of="m05.delta" />: per dollar of notional, the
 
 </Callout>
 
-<Derivation title="Derivation in four steps">
+<Derivation title="Derivation in five steps">
 
 **1.** Delta is the slope of the price curve, the first derivative of the price with respect to spot.
 
@@ -52,7 +52,13 @@ The lab shows the spot delta <Num of="m05.delta" />: per dollar of notional, the
 
 **4.** Plugging in the example (<i>S</i> = <Num of="ex.spot" />, σ = <Num of="ex.vol" />, <i>T</i> = <Num of="m05.T" />, <i>r</i><sub>f</sub> = <Num of="ex.rf" />, <i>d</i><sub>1</sub> ≈ <Num of="m05.d1" />) gives Γ = <Num of="m05.gamma" />, the value from the worked example above. Gamma is measured in "delta per unit of spot": for every 0.01 move, delta changes by about <Num of="m05.deltaChangeApprox" digits={2} sign={false} />.
 
-The formula also shows why gamma peaks at the strike: φ(<i>d</i><sub>1</sub>) is a bell curve with its maximum at <i>d</i><sub>1</sub> = 0, where the forward is close to the strike. And because √<i>T</i> sits in the denominator, gamma at the strike grows as expiry draws nearer.
+**5.** Where is gamma largest? Across spot, as in the lab, two parts depend on <i>S</i>: φ(<i>d</i><sub>1</sub>) in the numerator and <i>S</i> in the denominator. Set the derivative to zero. You need φ′(<i>x</i>) = −<i>x</i> · φ(<i>x</i>) and ∂<i>d</i><sub>1</sub>/∂<i>S</i> from step 3:
+
+<Formula><span>∂Γ / ∂<i>S</i> = −(Γ / <i>S</i>) · [<i>d</i><sub>1</sub> / (σ√<i>T</i>) + 1] = 0</span><span>⇒ <i>d</i><sub>1</sub> = −σ√<i>T</i>, i.e. <i>F</i> = <i>K</i> · <i>e</i><sup>−1.5 σ²<i>T</i></sup></span></Formula>
+
+So the peak sits slightly to the left of <i>d</i><sub>1</sub> = 0, because the factor 1/<i>S</i> pulls it towards lower rates. In the example it lies at spot <Num of="m05.gammaPeakSpot" /> with Γ = <Num of="m05.gammaPeak" />. At <i>d</i><sub>1</sub> = 0, i.e. at spot <Num of="m05.spotD1Zero" />, gamma is <Num of="m05.gammaD1Zero" />, and at today's spot <Num of="m05.gamma" />. In the example the differences are small. With longer expiries and higher vol, the gap between the peak and ATMF grows with σ²<i>T</i>. But the curve flattens at the same time, and gamma at ATMF stays close to its peak value. That is why the rule of thumb works: gamma is largest when the forward is close to the strike. Across strikes, by the way, only φ(<i>d</i><sub>1</sub>) depends on <i>K</i>; there the peak sits exactly at <i>d</i><sub>1</sub> = 0.
+
+And because √<i>T</i> sits in the denominator, gamma near ATMF grows as expiry draws nearer.
 
 </Derivation>
 
@@ -68,6 +74,6 @@ Break-even per day: σ · <i>S</i> / √365 = <Num of="ex.spot" /> · <Num of="e
 
 <Takeaway>
 
-Delta is the slope, gamma the curvature. Gamma peaks near ATMF, where the forward sits at the strike, and that is exactly where each day costs the most time value.
+Delta is the slope, gamma the curvature. As a rule of thumb, gamma is largest when the forward is close to the strike. That is also where the gamma share of theta, the actual loss of time value, is largest.
 
 </Takeaway>

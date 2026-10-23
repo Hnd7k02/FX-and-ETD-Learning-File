@@ -187,8 +187,8 @@ const check4: QuizQuestion = {
           en: 'The fixing jumped over the level; the series has no rate in between',
         },
         explain: {
-          de: 'Richtig. In einem Gap wird ein Stop zum nächsten handelbaren Kurs ausgeführt, und der liegt weit hinter dem Stop-Niveau. Das Szenario nimmt dafür vereinfacht das nächste Fixing an; EZB-Referenzkurse sind keine handelbaren Preise. Auch Barrieren werden übersprungen. Ein Knock-out ist aber keine Transaktion: Die Option erlischt nach den angenommenen Bedingungen.',
-          en: 'Correct. In a gap a stop is filled at the next tradable price, and that lies far beyond the stop level. As a simplification, the scenario assumes the next fixing instead; ECB reference rates are not tradable prices. Barriers are jumped over too. But a knock-out is not a transaction: the option is extinguished under the assumed terms.',
+          de: 'Richtig. In einem Gap wird ein Stop zum nächsten handelbaren Kurs ausgeführt, und der liegt weit hinter dem Stop-Niveau. Das Szenario nimmt dafür vereinfacht das nächste Fixing an; EZB-Referenzkurse sind keine handelbaren Preise. Eine Barriere braucht dagegen keinen handelbaren Kurs an ihrem Niveau: Springt das Fixing über sie hinweg, ist sie trotzdem ausgelöst. Ein Knock-out ist dabei keine Transaktion: Die Option erlischt nach den angenommenen Bedingungen.',
+          en: 'Correct. In a gap a stop is filled at the next tradable price, and that lies far beyond the stop level. As a simplification, the scenario assumes the next fixing instead; ECB reference rates are not tradable prices. A barrier, by contrast, needs no tradable price at its level: if the fixing jumps past it, it is triggered all the same. A knock-out is not a transaction here: the option is extinguished under the assumed terms.',
         },
       },
       {

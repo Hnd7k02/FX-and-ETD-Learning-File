@@ -130,21 +130,26 @@ describe('risk-neutral: measure and model assumptions (point 13)', () => {
     expect(CENTRED_MODEL.test(sub)).toBe(false);
   });
 
-  it.each(LANGS)('09/1 grounds E[S_T] = F in interest-rate parity, not in step 3 (%s)', (lang) => {
-    const blocks = mdx('09-hedge-alpha-yield/{l}/1.mdx', lang).split(/\n[ \t]*\n/);
-    const step1 = blocks.find((b) => b.startsWith('**1.**'));
-    const step3 = blocks.find((b) => b.startsWith('**3.**'));
-    expect(step1).toBeDefined();
-    expect(step3).toBeDefined();
-    expect(step1).toMatch(
-      lang === 'de'
-        ? /folgt allein aus der Zinsparität \(\[Modul 02\]\(\/module\/02-forward\/2\/\)\)/
-        : /follows from interest-rate parity alone \(\[module 02\]\(\/en\/module\/02-forward\/2\/\)\)/,
-    );
-    // step 3 derives the zero value of the forward from steps 1 and 2; step 1 must not use it
-    expect(step1).not.toMatch(/nichts kostet|kostet heute nichts|costs nothing|costing nothing/);
-    expect(step3).toMatch(lang === 'de' ? /also den Wert null/ : /so its value is zero/);
-  });
+  it.each(LANGS)(
+    '09/1 grounds E[S_T] = F in no-arbitrage (interest rate parity), not in step 3 (%s)',
+    (lang) => {
+      const blocks = mdx('09-hedge-alpha-yield/{l}/1.mdx', lang).split(/\n[ \t]*\n/);
+      const step1 = blocks.find((b) => b.startsWith('**1.**'));
+      const step3 = blocks.find((b) => b.startsWith('**3.**'));
+      expect(step1).toBeDefined();
+      expect(step3).toBeDefined();
+      expect(step1).toMatch(
+        lang === 'de'
+          ? /folgt aus der Arbitragefreiheit zwischen Spot, Geldmarkt und Forward \(Zinsparität, \[Modul 02\]\(\/module\/02-forward\/2\/\)\)/
+          : /follows from the absence of arbitrage between spot, money market and forward \(interest rate parity, \[module 02\]\(\/en\/module\/02-forward\/2\/\)\)/,
+      );
+      // the market forward carries the basis as well: no «parity alone» claim (final review)
+      expect(step1).not.toMatch(/allein aus der Zinsparität|parity alone/);
+      // step 3 derives the zero value of the forward from steps 1 and 2; step 1 must not use it
+      expect(step1).not.toMatch(/nichts kostet|kostet heute nichts|costs nothing|costing nothing/);
+      expect(step3).toMatch(lang === 'de' ? /also den Wert null/ : /so its value is zero/);
+    },
+  );
 
   it.each(LANGS)('no text calls the measure a model (%s)', (lang) => {
     const files = [

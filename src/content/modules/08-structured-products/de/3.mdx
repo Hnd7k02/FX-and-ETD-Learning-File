@@ -7,10 +7,11 @@ Ein TARF (Target Redemption Forward) ist eine Serie von Forwards zu einem besser
 
 An jedem Fixing gilt:
 
-- **Fixing über dem Strike:** Du kaufst <Num of="m08.tarfNotional" /> zum Strike. Der Gewinn pro Dollar zählt aufs **Target** von <Num of="m08.tarfTargetPips" /> Pips. Ist es erreicht, endet der TARF. Der letzte Gewinn wird so gekappt, dass die Summe genau das Target ist.
+- **Fixing über dem Strike, Target noch nicht erreicht:** Du kaufst <Num of="m08.tarfNotional" /> zum Strike. Der Gewinn pro Dollar, Fixing minus Strike, zählt aufs **Target** von <Num of="m08.tarfTargetPips" /> Pips.
+- **Fixing, das das Target erreicht:** Du kaufst das volle Nominal von <Num of="m08.tarfNotional" />, aber zu einem angepassten Kurs: Fixing minus Rest bis zum Target. Der Rest ist das Target minus die bisher gezählten Gewinne. So zählt an diesem Fixing genau der Rest, die Summe ist genau das Target, und der TARF endet. Der angepasste Kurs liegt zwischen Strike und Fixing. Am Markt gibt es Varianten, etwa der volle Gewinn am letzten Fixing oder keine Zahlung; massgebend ist das Term Sheet.
 - **Fixing unter dem Strike:** Du kaufst die doppelte Menge zum Strike. Dieser Verlust zählt **nicht** aufs Target.
 
-In Bausteinen: pro Fixing ein gekaufter Call und zwei verkaufte Puts zum Strike, dazu das Target als Knock-out-Regel. Mehr als <Num of="m08.tarfTargetChf" /> (<Num of="m08.tarfTargetPips" /> Pips auf <Num of="m08.tarfNotional" />) kannst du nicht gewinnen. Verlieren kannst du viel mehr.
+In Bausteinen: pro Fixing ein gekaufter Call und zwei verkaufte Puts zum Strike, dazu das Target als Knock-out-Regel. Mit dem angepassten Kurs am letzten Fixing gewinnst du höchstens <Num of="m08.tarfTargetChf" /> (<Num of="m08.tarfTargetPips" /> Pips auf <Num of="m08.tarfNotional" />). Verlieren kannst du viel mehr.
 
 <PathSimulatorFigure
   products={['tarf', 'pivotTarf']}
@@ -34,7 +35,7 @@ Läuft es gut, endet der TARF nach wenigen Fixings mit einem gekappten Gewinn. A
 
 ### Pivot TARF: zwei Strikes um einen Pivot
 
-Der Pivot TARF wettet darauf, dass der Kurs in einem Band bleibt. Um den Pivot <Num of="m08.pivPivot" /> liegen zwei Strikes: <Num of="m08.pivK1" /> und <Num of="m08.pivK2" />, je <Num of="m08.pivWidth" /> Pips entfernt (Standardfehler <Num of="m08.pivSe" /> Pips). Unter dem Pivot kaufst du zu <Num of="m08.pivK1" />, darüber verkaufst du zu <Num of="m08.pivK2" />. Beides bringt Gewinn, solange das Fixing zwischen den Strikes liegt. Ausserhalb handelst du die doppelte Menge mit Verlust. Das Target ist <Num of="m08.pivTargetPips" /> Pips, also <Num of="m08.pivTargetChf" />. Für den Importeur ist das kein Hedge mehr: Ob er Dollars kauft oder verkauft, entscheidet das Fixing.
+Der Pivot TARF wettet darauf, dass der Kurs in einem Band bleibt. Um den Pivot <Num of="m08.pivPivot" /> liegen zwei Strikes: <Num of="m08.pivK1" /> und <Num of="m08.pivK2" />, je <Num of="m08.pivWidth" /> Pips entfernt (Standardfehler <Num of="m08.pivSe" /> Pips). Unter dem Pivot kaufst du zu <Num of="m08.pivK1" />, darüber verkaufst du zu <Num of="m08.pivK2" />. Beides bringt Gewinn, solange das Fixing zwischen den Strikes liegt. Ausserhalb handelst du die doppelte Menge mit Verlust. Das Target ist <Num of="m08.pivTargetPips" /> Pips, also <Num of="m08.pivTargetChf" />. Am Fixing, das das Target erreicht, gilt dieselbe Regel wie beim TARF: Du handelst das volle Nominal zu einem angepassten Kurs. Kaufst du, ist er Fixing minus Rest bis zum Target; verkaufst du, ist er Fixing plus Rest. Beide Male liegt er zwischen Fixing und Strike. Für den Importeur ist das kein Hedge mehr: Ob er Dollars kauft oder verkauft, entscheidet das Fixing.
 
 <StructureBlocksFigure
   products={['pivotTarf']}

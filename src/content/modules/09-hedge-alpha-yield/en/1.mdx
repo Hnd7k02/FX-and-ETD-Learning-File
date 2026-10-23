@@ -7,7 +7,7 @@ For eight modules you have been collecting building blocks: spot, forward, swap,
 Three people look at the same rate, USD/CHF <Num of="ex.spot" />:
 
 - **The importer** has to pay USD 1m in 3 months. He wants certainty. His need is a **hedge**.
-- **An investor with a market view** does not believe in a weak dollar. She wants to make money from that view: **alpha**.
+- **An investor with a market view** does not believe in a weak dollar. She wants to use that view to beat a benchmark, the forward or the money market. She is looking for **alpha**.
 - **An investor with francs in his account** wants more than the CHF rate of <Num of="ex.rd" />. He is looking for **yield**.
 
 The need decides which risk is wanted at all. The importer already has a risk: he is short USD. He wants to get rid of it. The investor with a view wants to take a risk, but only the one she is betting on. The yield investor accepts some risk in return for more interest.
@@ -33,7 +33,7 @@ Neither is ‘better’. The forward is ideal if the view is right. The call is 
 
 <Derivation title="Derivation: why no product beats the forward for free">
 
-**1.** Under the risk-neutral measure the rate at expiry ends up, on average, exactly at the forward. This follows from interest-rate parity alone ([module 02](/en/module/02-forward/2/)); vol and the distribution play no role here. It is a pricing rule, not a forecast.
+**1.** Under the risk-neutral measure the rate at expiry ends up, on average, exactly at the forward. This follows from the absence of arbitrage between spot, money market and forward (interest rate parity, [module 02](/en/module/02-forward/2/)); vol and the distribution play no role here. It is a pricing rule, not a forecast.
 
 <Formula>E[<i>S</i><sub><i>T</i></sub>] = <i>F</i> = <Num of="ex.forward" digits={4} /></Formula>
 

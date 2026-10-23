@@ -31,7 +31,7 @@ export const gapreplay = defineDict({
       'Ein Fixing trifft alle Niveaus. Annahme: Stop zu {v} ausgeführt, {n} Knock-outs nach den Bedingungen erloschen.',
     'gr.table': 'Stop und Barrieren unter dem Markt (hypothetisch, je {notional})',
     'gr.tableSub':
-      'Annahmen: Der Stop-Loss (Verkauf EUR) gilt zum ersten Fixing jenseits des Niveaus als ausgeführt. Put-KO: EUR Put / CHF Call, Strike {k}, Barriere täglich gegen das Fixing beobachtet, kein Rebate.',
+      'Annahmen: Der Stop-Loss (Verkauf EUR) gilt zum ersten Fixing auf oder jenseits des Niveaus als ausgeführt. Put-KO: EUR Put / CHF Call, Strike {k}, Barriere täglich gegen das Fixing beobachtet, kein Rebate.',
     'gr.col.order': 'Typ',
     'gr.col.level': 'Niveau',
     'gr.col.fill': 'Fixing',
@@ -48,7 +48,7 @@ export const gapreplay = defineDict({
     'gr.row.low': 'Tiefstes Fixing im Fenster',
     'gr.row.lowSub': 'am {date}',
     'gr.note':
-      'EZB-Referenzkurse entstehen einmal pro Arbeitstag ({time}). Die EZB veröffentlicht sie nur zu Informationszwecken, sie sind keine handelbaren Preise. Was zwischen zwei Fixings gehandelt wurde, zeigt diese Reihe nicht. Annahmen des Szenarios: Der Stop gilt zum ersten Fixing jenseits des Niveaus als ausgeführt. Ein Knock-out ist keine Transaktion: Die Option erlischt nach den angenommenen Bedingungen (tägliche Beobachtung gegen das Fixing). Die Optionen haben kein Rebate. Stop und Barrieren sind Beispiele, keine Marktdaten und keine historischen Geschäfte.',
+      'EZB-Referenzkurse entstehen einmal pro Arbeitstag ({time}). Die EZB veröffentlicht sie nur zu Informationszwecken, sie sind keine handelbaren Preise. Was zwischen zwei Fixings gehandelt wurde, zeigt diese Reihe nicht. Annahmen des Szenarios: Der Stop gilt zum ersten Fixing auf oder jenseits des Niveaus als ausgeführt. Ein Knock-out ist keine Transaktion: Die Option erlischt nach den angenommenen Bedingungen (tägliche Beobachtung gegen das Fixing). Die Optionen haben kein Rebate. Stop und Barrieren sind Beispiele, keine Marktdaten und keine historischen Geschäfte.',
     'gr.link': 'Frankenschock im Riskometer ansehen',
     'gr.summary': '{date}: EUR/CHF {rate}. {status}',
     'gr.status.before':
@@ -82,7 +82,7 @@ export const gapreplay = defineDict({
       'One fixing hits every level. Assumed: stop filled at {v}, {n} knock-outs extinguished under their terms.',
     'gr.table': 'Stop and barriers below the market (hypothetical, {notional} each)',
     'gr.tableSub':
-      'Assumptions: the stop-loss (sell EUR) counts as filled at the first fixing beyond the level. Put KO: EUR put / CHF call, strike {k}, barrier observed daily against the fixing, no rebate.',
+      'Assumptions: the stop-loss (sell EUR) counts as filled at the first fixing at or beyond the level. Put KO: EUR put / CHF call, strike {k}, barrier observed daily against the fixing, no rebate.',
     'gr.col.order': 'Type',
     'gr.col.level': 'Level',
     'gr.col.fill': 'Fixing',
@@ -99,7 +99,7 @@ export const gapreplay = defineDict({
     'gr.row.low': 'Lowest fixing in the window',
     'gr.row.lowSub': 'on {date}',
     'gr.note':
-      'ECB reference rates are set once per business day ({time}). The ECB publishes them for information purposes only; they are not tradable prices. What traded between two fixings is not in this series. Assumptions of the scenario: the stop counts as filled at the first fixing beyond the level. A knock-out is not a transaction: the option is extinguished under the assumed terms (daily observation against the fixing). The options have no rebate. The stop and the barriers are examples, not market data and not historical trades.',
+      'ECB reference rates are set once per business day ({time}). The ECB publishes them for information purposes only; they are not tradable prices. What traded between two fixings is not in this series. Assumptions of the scenario: the stop counts as filled at the first fixing at or beyond the level. A knock-out is not a transaction: the option is extinguished under the assumed terms (daily observation against the fixing). The options have no rebate. The stop and the barriers are examples, not market data and not historical trades.',
     'gr.link': 'See the franc shock in the Riskometer',
     'gr.summary': '{date}: EUR/CHF {rate}. {status}',
     'gr.status.before':

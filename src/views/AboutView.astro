@@ -2,7 +2,8 @@
 /**
  * About & Methodology page (DE /ueber/, EN /en/about/).
  * Every number comes from the calculation core (src/lib/fx), the Riskometer data
- * (src/data/fx/riskometer.json, if built) or the source files (src/content/sources*.md).
+ * (src/data/fx/riskometer.json, if built), the data validation (src/lib/data/validate.ts) or the
+ * source files (src/content/sources*.md).
  */
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import ArrowIcon from '@/components/layout/ArrowIcon.astro';
@@ -30,6 +31,7 @@ import {
   pipSize,
 } from '@/lib/format';
 import { collectSources, inlineSegments, splitBilingual, urlHost } from '@/lib/sources';
+import { MAX_ABS_LOG_RETURN, MAX_AGE_BANK_DAYS } from '@/lib/data/validate';
 
 interface Props {
   lang: Lang;
@@ -725,7 +727,13 @@ const sid = (i: number) => toc[i]!.id;
               <li>{t('about.risk.chart', { since: sinceYear })}</li>
               <li>{t('about.risk.gauge')}</li>
               <li>{t('about.risk.events', { before: method.before, after: method.after })}</li>
-              <li>{t('about.risk.update')}</li>
+              <li>{t('about.risk.snapshot')}</li>
+              <li>
+                {t('about.risk.update', {
+                  maxAge: MAX_AGE_BANK_DAYS,
+                  maxJump: fmtPct(MAX_ABS_LOG_RETURN, lang, 0),
+                })}
+              </li>
             </ul>
             <p class="ab-small">{t('about.risk.caveat')}</p>
           </div>

@@ -58,7 +58,7 @@ A word on units: theta counts the time that passes. It is −∂<i>V</i>/∂<i>T
 
 An options desk holds thousands of positions. Nobody looks at each one. The Greeks are added up instead: delta in USD, vega in CHF per vol point, theta per day. That way a whole book can be read in a handful of numbers.
 
-Each Greek has its own tool. Delta is hedged with spot or forwards: against small moves, the importer's call behaves like a spot position of <Num of="m05.deltaUsd" />. Vega can only be hedged with other options, because spot and forwards have no vega. Theta cannot be hedged on its own: whoever wants less theta sells options and gives up gamma with them. Most of theta is the price the buyer pays for gamma (section 4).
+Each Greek has its own tool. Delta is hedged with spot or forwards: against small moves, the importer's call behaves like a spot position of <Num of="m05.deltaUsd" />. Vega cannot be hedged with spot or forwards: they have no vega. On an FX desk other options do that job, less often volatility or variance swaps. Theta cannot be hedged on its own: whoever wants less theta sells options and gives up gamma with them. Most of theta is the price the buyer pays for gamma (section 4).
 
 </Desk>
 

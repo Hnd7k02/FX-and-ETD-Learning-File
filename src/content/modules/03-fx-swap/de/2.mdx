@@ -15,7 +15,7 @@ Die Richtung benennt man nach dem Near Leg in der Base-Währung. **Buy/Sell USD*
 
 Ein Swap hat zwei Kurse. Gehandelt wird aber nur ihre **Differenz**: die **Swap Points**, Far-Kurs minus Near-Kurs, in Pips. Ob der Spot dabei ein paar Pips höher oder tiefer liegt, spielt kaum eine Rolle. Beide Legs verschieben sich gemeinsam.
 
-Woher kommt die Differenz? Der Far-Kurs ist der faire Forward aus Modul 02. Darum sind die Swap Points genau die **Forward Points**. Sie spiegeln die Zinsdifferenz zwischen CHF und USD über die Laufzeit. Ist der USD-Zins höher, liegt der Far-Kurs unter dem Spot: ein Abschlag. Ist der CHF-Zins höher, ein Aufschlag.
+Woher kommt die Differenz? Der Far-Kurs ist der Forward aus Modul 02. Darum sind die Swap Points genau die **Forward Points**. Sie spiegeln die Zinsdifferenz zwischen CHF und USD über die Laufzeit, am Markt dazu die Cross-Currency Basis (Abschnitt 4). Ist der USD-Zins höher, liegt der Far-Kurs unter dem Spot: ein Abschlag. Ist der CHF-Zins höher, ein Aufschlag.
 
 ### Rechenbeispiel: Buy/Sell USD 1 Mio. über 3 Monate
 
@@ -44,7 +44,7 @@ Zieh <i>S</i> ab und bring alles auf einen Bruch:
   <i>F</i> − <i>S</i> = <i>S</i> · (<i>r</i><sub>CHF</sub> − <i>r</i><sub>USD</sub>) · <i>t</i> / (1 + <i>r</i><sub>USD</sub> · <i>t</i>)
 </Formula>
 
-Das Vorzeichen hängt nur an der Zinsdifferenz. Für kurze Laufzeiten ist der Nenner fast 1. Dann gilt die Faustregel
+In dieser Formel hängt das Vorzeichen nur an der Zinsdifferenz. Für kurze Laufzeiten ist der Nenner fast 1. Dann gilt die Faustregel
 
 <Formula>
   <i>F</i> − <i>S</i> ≈ <i>S</i> · (<i>r</i><sub>CHF</sub> − <i>r</i><sub>USD</sub>) · <i>t</i>
@@ -52,7 +52,7 @@ Das Vorzeichen hängt nur an der Zinsdifferenz. Für kurze Laufzeiten ist der Ne
 
 Im Beispiel: Spot <Num of="ex.spot" />, Zinsdifferenz <Num of="m03.diff" />, <i>t</i> = <Num of="ex.mmDays" />/360. Die Faustregel ergibt <Num of="m03.approxPoints" /> Pips, exakt sind es <Num of="ex.fwdPointsMM" /> Pips. Der Nenner macht den Unterschied.
 
-Umgekehrt kannst du aus Spot, Swap Points und dem USD-Zins den CHF-Zins zurückrechnen. Darum nennt man die Swap Points auch implizite Zinsdifferenz: Wer einen Swap macht, leiht die eine Währung und verleiht die andere.
+Umgekehrt kannst du aus Spot, Swap Points und dem USD-Zins den CHF-Zins zurückrechnen. Darum nennt man die Swap Points auch implizite Zinsdifferenz: Wer einen Swap macht, leiht die eine Währung und verleiht die andere. Weicht der so berechnete Zins vom Geldmarktzins ab, ist das die Cross-Currency Basis (Abschnitt 4).
 
 </Derivation>
 
@@ -66,6 +66,6 @@ Ein Swap-Händler hat darum kaum Kursrisiko, aber Zinsrisiko: Ändern sich die Z
 
 <Takeaway>
 
-Ein FX Swap sind zwei Geschäfte in Gegenrichtung über denselben Betrag. Sein Preis sind die Swap Points, und die entsprechen den Forward Points: der Zinsdifferenz über die Laufzeit.
+Ein FX Swap sind zwei Geschäfte in Gegenrichtung über denselben Betrag. Sein Preis sind die Swap Points, und die entsprechen den Forward Points: der impliziten Zinsdifferenz über die Laufzeit, am Markt inklusive Cross-Currency Basis.
 
 </Takeaway>

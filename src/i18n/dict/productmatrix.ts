@@ -112,7 +112,7 @@ export const productmatrix = defineDict({
     'pm.p.tpf.name': 'TPF',
     'pm.p.tpf.blocks': 'Je Fixing ein Digital-Coupon, bezahlt mit 2 × Short Put',
     'pm.p.tpf.use':
-      'Coupon, solange das Fixing über dem Strike liegt. Darunter zahlst du die doppelte Differenz.',
+      'Coupon, solange das Fixing auf oder über dem Strike liegt. Darunter zahlst du die doppelte Differenz.',
     'pm.p.rtpf.name': 'RTPF',
     'pm.p.rtpf.blocks': 'Je Fixing ein Range-Coupon, bezahlt mit 2 × Short Put und 2 × Short Call',
     'pm.p.rtpf.use':
@@ -321,7 +321,7 @@ export const productmatrix = defineDict({
     'pm.p.tpf.name': 'TPF',
     'pm.p.tpf.blocks': 'Per fixing a digital coupon, paid for with 2 × short put',
     'pm.p.tpf.use':
-      'A coupon while the fixing is above the strike. Below it you pay twice the difference.',
+      'A coupon while the fixing is at or above the strike. Below it you pay twice the difference.',
     'pm.p.rtpf.name': 'RTPF',
     'pm.p.rtpf.blocks': 'Per fixing a range coupon, paid for with 2 × short put and 2 × short call',
     'pm.p.rtpf.use':
