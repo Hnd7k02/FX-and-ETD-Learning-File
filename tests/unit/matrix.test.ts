@@ -175,14 +175,19 @@ describe('profiles and key numbers', () => {
   it('computes the one-fixing profiles of the structured products', () => {
     const { strike: Kt } = p.tarf;
     expect(productResult('tarf', Kt + 0.01, p)).toBeCloseTo(0.01, 12);
+    expect(productResult('tarf', Kt + p.tarf.target + 0.02, p)).toBeCloseTo(p.tarf.target, 12);
     expect(productResult('tarf', Kt - 0.01, p)).toBeCloseTo(-0.02, 12);
     const { strike: Ka, barrier: B } = p.accumulator;
     expect(productResult('accumulator', B + 0.001, p)).toBe(0);
     expect(productResult('accumulator', Ka + 0.01, p)).toBeCloseTo(0.01, 12);
     expect(productResult('accumulator', Ka - 0.01, p)).toBeCloseTo(-0.02, 12);
     const v = p.pivotTarf;
-    expect(productResult('pivotTarf', v.pivot, p)).toBeCloseTo(v.pivot - v.lower, 12);
-    expect(productResult('pivotTarf', v.pivot + 0.01, p)).toBeCloseTo(v.upper - v.pivot - 0.01, 12);
+    expect(productResult('pivotTarf', v.pivot, p)).toBeCloseTo(
+      Math.min(v.pivot - v.lower, v.target),
+      12,
+    );
+    expect(productResult('pivotTarf', v.upper - 0.01, p)).toBeCloseTo(0.01, 12);
+    expect(productResult('pivotTarf', v.lower + 0.01, p)).toBeCloseTo(0.01, 12);
     expect(productResult('pivotTarf', v.lower - 0.01, p)).toBeCloseTo(-0.02, 12);
     expect(productResult('pivotTarf', v.upper + 0.01, p)).toBeCloseTo(-0.02, 12);
     expect(productResult('tpf', p.tpf.strike, p)).toBe(p.tpf.coupon);
@@ -237,11 +242,14 @@ describe('profiles and key numbers', () => {
 
   it('finds the best and worst product of a cell at a rate at expiry', () => {
     const up = cellSpreadAt({ need: 'hedge', view: 'up' }, 0.84, p)!;
-    expect(up.best).toBe('forward');
-    expect(up.worst).toBe('call');
+    expect(up.best).toEqual(['forward', 'spot']);
+    expect(up.worst).toEqual(['call']);
     expect(up.bestPips).toBeGreaterThan(up.worstPips);
     const down = cellSpreadAt({ need: 'hedge', view: 'down' }, 0.73, p)!;
-    expect(down.best).toBe('call');
+    expect(down.best).toEqual(['call']);
+    const y = cellSpreadAt({ need: 'yield', view: 'up' }, 0.84, p)!;
+    expect(y.worst).toEqual(['discount', 'dci']);
+    expect(cellSpreadAt({ need: 'yield', view: 'up' }, y.bestPips, p)).not.toBeUndefined();
     expect(cellSpreadAt({ need: 'alpha', view: 'coupon-direct' }, S, p)).toBeNull();
   });
 

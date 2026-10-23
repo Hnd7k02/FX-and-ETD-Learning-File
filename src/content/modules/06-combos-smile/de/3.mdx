@@ -34,7 +34,7 @@ Der Seagull des Importeurs (Calls <Num of="m06.sgK1" /> und <Num of="m06.sgK2" /
 | Butterfly | <Num of="m06.flyVegaChf" /> | <Num of="m06.flyShockChf" /> |
 | Seagull | <Num of="m06.sgVegaChf" /> | <Num of="m06.sgShockChf" /> |
 
-Die rechte Spalte ist neu bewertet, nicht einfach Vega mal zwei. Vega ändert sich nämlich selbst mit der Vola, das ist Volga aus [Modul 05](/module/05-greeks/4/). Optionen aus dem Geld gewinnen dabei Vega dazu. Darum gewinnt der Strangle etwas mehr, als Vega allein sagt. Der Seagull mit seinen zwei verkauften Optionen aus dem Geld verliert etwas mehr.
+Die rechte Spalte ist neu bewertet, nicht einfach Vega mal <Num of="m06.shockPts" />. Vega ändert sich nämlich selbst mit der Vola, das ist Volga aus [Modul 05](/module/05-greeks/4/). Optionen aus dem Geld gewinnen dabei Vega dazu. Darum gewinnt der Strangle etwas mehr, als Vega allein sagt. Der Seagull mit seinen zwei verkauften Optionen aus dem Geld verliert etwas mehr.
 
 <Callout variant="warn" title="Wann der Seagull schmerzt">
 
@@ -52,7 +52,7 @@ Steigt USD/CHF bei Verfall über <Num of="m06.sgK2" />, endet der Schutz: Der Im
 
 <Formula variant="accent"><span>Straddle ≈ √(2/π) · σ√<i>T</i> · <i>F</i> · <i>DF</i><sub>d</sub></span></Formula>
 
-**3.** Im Beispiel ist <i>DF</i><sub>d</sub> = <Num of="m06.discountRate" />, denn der CHF-Zins ist <Num of="ex.rd" />. Also: <Num of="m06.sqrt2pi" /> · <Num of="m06.sigmaSqrtT" /> · <Num of="ex.forward" digits={4} /> ergibt <Num of="m06.straddleApproxPips" /> Pips. Exakt, mit Black-76 und <i>K</i> = <i>F</i>, sind es <Num of="m06.straddleAtFPips" /> Pips. Der Straddle im Labor liegt am DNS-Strike, einen Hauch über dem Forward, und kostet <Num of="m06.straddlePips" /> Pips.
+**3.** Im Beispiel ist <i>DF</i><sub>d</sub> = <Num of="m06.discountRate" />, denn der CHF-Zins ist <Num of="ex.rd" />. Also: <Num of="m06.sqrt2pi" /> · <Num of="m06.sigmaSqrtT" /> · <Num of="ex.forward" digits={4} /> ergibt <Num of="m06.straddleApproxPips" /> Pips. Exakt, mit Black-76 und <i>K</i> = <i>F</i>, sind es <Num of="m06.straddleAtFPips" /> Pips. Der Straddle im Labor liegt am Strike des delta-neutralen Straddles, einen Hauch über dem Forward, und kostet <Num of="m06.straddlePips" /> Pips.
 
 **4.** Was bedeutet das? Ist <i>F</i><sub>T</sub> normalverteilt um <i>F</i> mit Standardabweichung σ√<i>T</i> · <i>F</i>, ist die erwartete absolute Bewegung genau √(2/π) · σ√<i>T</i> · <i>F</i>. Der Straddle kostet also ungefähr die Bewegung, die der Markt erwartet. Darum ist die nötige Bewegung von <Num of="m06.straddleMovePct" /> fast genau √(2/π) · σ√<i>T</i> = <Num of="m06.expMovePct" />. Kaufen lohnt sich, wenn du mit grösseren Ausschlägen rechnest, als die implizite Vola einpreist.
 

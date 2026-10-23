@@ -134,6 +134,8 @@ export default function SpotExposure({ lang }: SpotExposureProps): JSX.Element {
   // dollar down → bracket right of the column, text below its bottom, or above its top when
   // the band label leaves no room below.
   const annotLeft = up;
+  // "today" label below the dashed cost line, on the side away from the column
+  const todayLeft = dirSign >= 0;
   const annotTick = annotLeft ? 5 : -5;
   const annotX = annotLeft ? x - L.block / 2 - 8 : x + L.block / 2 + 8;
   const lineGap = L.font + 5;
@@ -329,7 +331,7 @@ export default function SpotExposure({ lang }: SpotExposureProps): JSX.Element {
                 style={{ fill: 'var(--ff-short)', stroke: '#fff', strokeWidth: 2.5 }}
               />
               <path
-                d={`M${x.toFixed(1)},${(yCost + 8).toFixed(1)}V${L.rail}`}
+                d={`M${x.toFixed(1)},${(up ? y0 + 2 : yCost + 8).toFixed(1)}V${L.rail}`}
                 style={{
                   fill: 'none',
                   stroke: 'var(--ff-ink)',
@@ -339,13 +341,13 @@ export default function SpotExposure({ lang }: SpotExposureProps): JSX.Element {
               />
               {/* labels on top of the reference lines (their halo breaks the dashes) */}
               <text
-                x={L.width - L.right}
+                x={todayLeft ? L.left + 4 : L.width - L.right}
                 y={y0 + L.font + 6}
                 style={{
                   fontSize: fs,
                   fontWeight: 600,
                   fill: 'var(--ff-ink-2)',
-                  textAnchor: 'end',
+                  textAnchor: todayLeft ? 'start' : 'end',
                   paintOrder: 'stroke',
                   stroke: '#fff',
                   strokeWidth: 4,

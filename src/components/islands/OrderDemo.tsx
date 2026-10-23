@@ -108,6 +108,8 @@ export default function OrderDemo({ lang }: OrderDemoProps): JSX.Element {
   );
   const dayNames = t('days').split(',');
 
+  /** Comparison with the market order on day 1, in words (no signed amounts in prose). */
+  const cmpKey = Math.abs(vsMarket) <= 0.5 ? 'cmpSame' : vsMarket > 0 ? 'cmpMore' : 'cmpLess';
   let noteKey:
     | 'note.market'
     | 'note.limitFilled'
@@ -127,7 +129,7 @@ export default function OrderDemo({ lang }: OrderDemoProps): JSX.Element {
   const note = t(noteKey, {
     rate: rate(fill.price),
     level: level === null ? '' : rate(level),
-    diff: chf(vsMarket, true),
+    diff: t(cmpKey, { chf: chf(Math.abs(vsMarket)) }),
     friday: rate(path.ask[C.weekendAt - 1]!),
     monday: rate(path.ask[C.weekendAt]!),
     pips: fmtNumber(fill.slippagePips, lang),
@@ -403,7 +405,11 @@ export default function OrderDemo({ lang }: OrderDemoProps): JSX.Element {
             {type !== 'market' && (
               <StatRow
                 label={t('rowSlip')}
-                value={t('pipsValue', { pips: fmtNumber(fill.slippagePips, lang, { sign: true }) })}
+                value={
+                  fill.filled
+                    ? t('pipsValue', { pips: fmtNumber(fill.slippagePips, lang, { sign: true }) })
+                    : '–'
+                }
                 highlight={fill.slippagePips > 0.5}
               />
             )}

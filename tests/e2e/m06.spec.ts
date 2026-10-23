@@ -110,6 +110,9 @@ test('hedge shaper: blocks build collar and seagull; slider and drag move the ra
   await expect(hs.locator('[data-block="sellPut"]')).toHaveAttribute('aria-pressed', 'true');
   await hs.locator('[data-block="sellCall"]').click();
   await expect(hs).toHaveAttribute('data-structure', 'seagull');
+  // the seagull's put finances the call spread; the cap only holds up to the sold call
+  await expect(hs.locator('[data-aha]')).toContainText('Call-Spread');
+  await expect(hs.locator('[data-summary]')).toContainText('darüber Markt minus');
   await hs.locator('[data-block="sellPut"]').click();
   await expect(hs).toHaveAttribute('data-structure', 'call-spread');
   await expect(hs).toHaveAttribute('data-zero-cost', 'false');

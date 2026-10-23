@@ -13,6 +13,7 @@
 import type { JSX } from 'preact';
 import { useEffect, useId, useMemo, useRef, useState } from 'preact/hooks';
 import { AxisX, GridY } from '@/components/ui/Chart';
+import { Legend } from '@/components/ui/Legend';
 import { Slider } from '@/components/ui/Slider';
 import {
   useElementWidth,
@@ -119,19 +120,6 @@ const halo = {
   strokeWidth: 4,
   strokeLinejoin: 'round' as const,
 };
-
-/** Spreads label y positions so they keep `gap` apart, within [lo, hi]. */
-function spreadLabels(ys: number[], gap: number, lo: number, hi: number): number[] {
-  const order = ys.map((y, i) => ({ y, i })).sort((a, b) => a.y - b.y);
-  const out = order.map((o) => clamp(o.y, lo, hi));
-  for (let k = 1; k < out.length; k++) out[k] = Math.max(out[k]!, out[k - 1]! + gap);
-  const over = out.length ? out[out.length - 1]! - hi : 0;
-  if (over > 0) for (let k = 0; k < out.length; k++) out[k] = out[k]! - over;
-  for (let k = out.length - 2; k >= 0; k--) out[k] = Math.min(out[k]!, out[k + 1]! - gap);
-  const res = new Array<number>(ys.length);
-  order.forEach((o, k) => (res[o.i] = out[k]!));
-  return res;
-}
 
 function ArrowGlyph({ view }: { view: DirViewId }): JSX.Element {
   const d =
@@ -265,13 +253,16 @@ export default function ProductMatrix(props: ProductMatrixProps): JSX.Element {
       ? t('pm.same', { a: t(`pm.p.${g[0]!}.name`), b: t(`pm.p.${g[1]!}.name`) })
       : t(`pm.p.${g[0]!}.name`);
 
-  /* curve labels at the right end */
-  const labelXs = sx(range[1]) - 6;
-  const labelYs = spreadLabels(
-    curves.map((ys) => sy(ys[ys.length - 1]!) - 8),
-    L.font + 5,
+  /* label of the highlighted curve: right end, above the line, inside the plot */
+  const labelX = sx(range[1]) - 6;
+  const hlYs = curves[hlGroup];
+  /* falling to the right: below the line, otherwise above it (the line never crosses the text) */
+  const endY = sy(hlYs ? hlYs[hlYs.length - 1]! : 0);
+  const prevY = sy(hlYs ? hlYs[Math.max(0, hlYs.length - 8)]! : 0);
+  const labelY = clamp(
+    endY > prevY + 0.5 ? endY + L.font + 8 : endY - 9,
     L.top + L.font,
-    L.plotBottom - 4,
+    L.plotBottom - 6,
   );
 
   /* dots at S_T: tweened y per group */
@@ -485,13 +476,33 @@ export default function ProductMatrix(props: ProductMatrixProps): JSX.Element {
         </div>
       </div>
 
-      <p class="pm-note" aria-live="polite" data-note key={`note-${cellKey}`}>
-        {t(`pm.cell.${cellKey}` as Parameters<typeof t>[0])}
-      </p>
+      <div class="pm-note-row" aria-live="polite">
+        <p class="pm-note" data-note key={`note-${cellKey}`}>
+          {t(`pm.cell.${cellKey}` as Parameters<typeof t>[0])}
+        </p>
+        {aha && (
+          <p class="pm-aha" data-aha key={`aha-${cellKey}`}>
+            <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+              <path
+                d="M8 1.5L9.6 6.4L14.5 8L9.6 9.6L8 14.5L6.4 9.6L1.5 8L6.4 6.4Z"
+                style={{ fill: 'currentColor' }}
+              />
+            </svg>
+            <span>{aha}</span>
+          </p>
+        )}
+      </div>
 
       {/* ---------- chart and ranking ---------- */}
       <div class="ff-lab pm-lab">
         <div class="ff-lab-main">
+          <Legend
+            items={groups.map((g, gi) => ({
+              label: groupName(g),
+              color: gi === hlGroup ? 'var(--ff-forward)' : 'var(--ff-ref)',
+              width: gi === hlGroup ? 3 : 2,
+            }))}
+          />
           <div ref={box}>
             <svg
               ref={svgRef}
@@ -566,24 +577,25 @@ export default function ProductMatrix(props: ProductMatrixProps): JSX.Element {
                 )}
               </g>
 
-              {/* curve labels at the right end */}
-              {groups.map((g, gi) => (
+              {/* direct label of the highlighted curve at the right end */}
+              {groups[hlGroup] && (
                 <text
-                  key={`l${gi}`}
-                  x={labelXs}
-                  y={labelYs[gi]}
+                  key={`l-${cellKey}-${hlGroup}`}
+                  x={labelX}
+                  y={labelY}
                   class="pm-label"
+                  data-label
                   style={{
                     fontSize: fs,
-                    fontWeight: gi === hlGroup ? 800 : 600,
-                    fill: gi === hlGroup ? 'var(--ff-ink)' : 'var(--ff-muted)',
+                    fontWeight: 800,
+                    fill: 'var(--ff-ink)',
                     textAnchor: 'end',
                     ...halo,
                   }}
                 >
-                  {groupName(g)}
+                  {groupName(groups[hlGroup]!)}
                 </text>
-              ))}
+              )}
 
               {/* "not limited" where the highlighted curve leaves the chart */}
               {clipMarks.map((cx, i) => {
@@ -610,24 +622,6 @@ export default function ProductMatrix(props: ProductMatrixProps): JSX.Element {
                   </g>
                 );
               })}
-
-              {aha && (
-                <text
-                  key={`aha-${cellKey}`}
-                  class="pm-aha"
-                  data-aha
-                  x={L.left + 8}
-                  y={L.top + L.font + 4}
-                  style={{
-                    fontSize: `${L.font + 1}px`,
-                    fontWeight: 800,
-                    fill: 'var(--ff-apply-text)',
-                    ...halo,
-                  }}
-                >
-                  {aha}
-                </text>
-              )}
 
               {/* marker at S_T */}
               <path
@@ -730,8 +724,8 @@ export default function ProductMatrix(props: ProductMatrixProps): JSX.Element {
             {products.map((id, i) => {
               const has = results[i] !== null;
               const gi = groups.findIndex((g) => g.includes(id));
-              const isBest = spread?.best === id;
-              const isWorst = spread?.worst === id;
+              const isBest = !!spread?.best.includes(id);
+              const isWorst = !!spread?.worst.includes(id);
               return (
                 <button
                   key={`${cellKey}-${id}`}
@@ -853,7 +847,7 @@ export default function ProductMatrix(props: ProductMatrixProps): JSX.Element {
                 )}
                 <a class="pm-link" href={modulePath(lang, def.link.slug, def.link.section)}>
                   {t('pm.link', { n: m.n, s: def.link.section })}
-                  <span aria-hidden="true"> →</span>
+                  <span aria-hidden="true">{' →'}</span>
                 </a>
               </div>
             </li>

@@ -18,9 +18,10 @@
  * - yield: a CHF investor wants more than the CHF money market for 1 to 3 months.
  *
  * Profiles ("shape"): result at expiry per USD in CHF per USD (one fixing for the multi-fixing
- * products) as a function of S_T, from the holder's point of view, with the parameters of the
- * running example and the precomputed fair strikes/coupons of module 08 (Monte Carlo). Orders
- * (limit, stop) have no fixed profile: they only become a spot trade when the level trades.
+ * products, the gain of a TARF / pivot TARF fixing capped at the target) as a function of S_T,
+ * from the holder's point of view, with the parameters of the running example and the
+ * precomputed fair strikes/coupons of module 08 (Monte Carlo). Orders (limit, stop) have no
+ * fixed profile: they only become a spot trade when the level trades.
  */
 import { EXAMPLE, EXAMPLE_FORWARD } from '@/lib/fx/example';
 import { MC_PRODUCTS, fairProduct } from '@/lib/fx/mc/fair';
@@ -420,8 +421,9 @@ export interface MatrixParams {
   hedge: HedgeSetup;
   yields: CarryView;
   accumulator: { strike: number; barrier: number; forward: number };
-  tarf: { strike: number; forward: number };
-  pivotTarf: { pivot: number; lower: number; upper: number };
+  /** target: the largest gain counted per fixing (the last gain is capped to the target). */
+  tarf: { strike: number; forward: number; target: number };
+  pivotTarf: { pivot: number; lower: number; upper: number; target: number };
   tpf: { strike: number; coupon: number };
   rtpf: { lower: number; upper: number; coupon: number };
 }
@@ -449,8 +451,13 @@ export function matrixParams(): MatrixParams {
       strikeBelow: yp.strikeBelow,
     }),
     accumulator: { strike: acc.strike, barrier: acc.barrier, forward: P.accumulator.forwardAvg },
-    tarf: { strike: tarf.strike, forward: P.tarf.forwardAvg },
-    pivotTarf: { pivot: piv.pivot, lower: piv.lowerStrike, upper: piv.upperStrike },
+    tarf: { strike: tarf.strike, forward: P.tarf.forwardAvg, target: tarf.target },
+    pivotTarf: {
+      pivot: piv.pivot,
+      lower: piv.lowerStrike,
+      upper: piv.upperStrike,
+      target: piv.target,
+    },
     tpf: { strike: tpf.strike, coupon: tpf.coupon },
     rtpf: { lower: rtpf.lower, upper: rtpf.upper, coupon: rtpf.coupon },
   };
@@ -559,14 +566,14 @@ export function productResult(id: ProductId, ST: number, p: MatrixParams): numbe
       return ST >= K ? ST - K : 2 * (ST - K);
     }
     case 'tarf': {
-      const K = p.tarf.strike;
-      return ST >= K ? ST - K : 2 * (ST - K);
+      const { strike: K, target } = p.tarf;
+      return ST >= K ? Math.min(ST - K, target) : 2 * (ST - K);
     }
     case 'pivotTarf': {
-      const { pivot: P, lower: K1, upper: K2 } = p.pivotTarf;
+      const { pivot: P, lower: K1, upper: K2, target } = p.pivotTarf;
       if (ST <= K1) return 2 * (ST - K1);
-      if (ST <= P) return ST - K1;
-      if (ST < K2) return K2 - ST;
+      if (ST <= P) return Math.min(ST - K1, target);
+      if (ST < K2) return Math.min(K2 - ST, target);
       return 2 * (K2 - ST);
     }
     case 'tpf': {
@@ -610,6 +617,9 @@ export function matrixGrid(p: MatrixParams, n: number = M09_CONFIG.matrix.sample
     p.accumulator.strike,
     p.accumulator.barrier,
     p.tarf.strike,
+    p.tarf.strike + p.tarf.target,
+    p.pivotTarf.lower + p.pivotTarf.target,
+    p.pivotTarf.upper - p.pivotTarf.target,
     p.pivotTarf.lower,
     p.pivotTarf.pivot,
     p.pivotTarf.upper,
@@ -667,25 +677,28 @@ export function initialMatrixFixing(): number {
 }
 
 /**
- * Best and worst product of a cell at S_T (orders excluded), for the "same view, different
- * result" readout. Null when fewer than two products have a profile.
+ * Best and worst products of a cell at S_T (orders excluded; ties share the tag), for the "same
+ * view, different result" readout. Null when fewer than two products have a profile or all
+ * results are equal.
  */
 export function cellSpreadAt(
   cell: Cell,
   ST: number,
   p: MatrixParams,
-): { best: ProductId; worst: ProductId; bestPips: number; worstPips: number } | null {
+): { best: ProductId[]; worst: ProductId[]; bestPips: number; worstPips: number } | null {
   const rows = cellProducts(cell)
     .map((id) => ({ id, r: productResult(id, ST, p) }))
     .filter((x): x is { id: ProductId; r: number } => x.r !== null);
   if (rows.length < 2) return null;
-  let best = rows[0]!;
-  let worst = rows[0]!;
-  for (const x of rows) {
-    if (x.r > best.r + 1e-12) best = x;
-    if (x.r < worst.r - 1e-12) worst = x;
-  }
-  return { best: best.id, worst: worst.id, bestPips: best.r / PIP, worstPips: worst.r / PIP };
+  const hi = Math.max(...rows.map((x) => x.r));
+  const lo = Math.min(...rows.map((x) => x.r));
+  if (hi - lo < 1e-9) return null;
+  return {
+    best: rows.filter((x) => hi - x.r < 1e-9).map((x) => x.id),
+    worst: rows.filter((x) => x.r - lo < 1e-9).map((x) => x.id),
+    bestPips: hi / PIP,
+    worstPips: lo / PIP,
+  };
 }
 
 /**

@@ -51,10 +51,13 @@ export default function TriangularArbitrage({ lang }: TriangularArbitrageProps):
   const labelW = Math.ceil(15 * fs * 0.62) + 4;
 
   // ---------- triangle ----------
-  const H = compact ? 250 : 290;
+  // On phones the slanted edges are too steep for labels beside them: the two quotes move to
+  // the top corners and the triangle moves down to make room.
+  const topPad = compact ? 36 : 0;
+  const H = (compact ? 250 : 290) + topPad;
   const R = compact ? 24 : 28;
   const pos: Record<Ccy, [number, number]> = {
-    EUR: [W / 2, R + 22],
+    EUR: [W / 2, R + 22 + topPad],
     USD: [W * (compact ? 0.17 : 0.2), H - R - 30],
     CHF: [W * (compact ? 0.83 : 0.8), H - R - 30],
   };
@@ -231,16 +234,16 @@ export default function TriangularArbitrage({ lang }: TriangularArbitrageProps):
               return (
                 <g>
                   {lbl(
-                    Math.max(lx - 14, labelW),
-                    ly - 4,
-                    'end',
+                    compact ? 2 : Math.max(lx - 14, labelW),
+                    compact ? fs + 2 : ly - 4,
+                    compact ? 'start' : 'end',
                     t('eurusd'),
                     quoteText(q.eurusd.bid, q.eurusd.ask, mids.eurusd),
                   )}
                   {lbl(
-                    Math.min(rx2 + 14, W - labelW),
-                    ry - 4,
-                    'start',
+                    compact ? W - 2 : Math.min(rx2 + 14, W - labelW),
+                    compact ? fs + 2 : ry - 4,
+                    compact ? 'end' : 'start',
                     'EUR/CHF',
                     quoteText(q.eurchf.bid, q.eurchf.ask, mids.eurchf),
                     t('direct'),

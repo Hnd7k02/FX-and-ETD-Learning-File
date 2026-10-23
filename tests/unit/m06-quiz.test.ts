@@ -63,7 +63,8 @@ describe('m06 numbers', () => {
   });
 
   it('displayed smile price differences are the differences of the displayed prices', () => {
-    const d = (k: string) => Number(formatNum(nums[k]!, 'en').replace(/[+,]/g, '').replace('−', '-'));
+    const d = (k: string) =>
+      Number(formatNum(nums[k]!, 'en').replace(/[+,]/g, '').replace('−', '-'));
     expect(d('m06.put25SmilePips') - d('m06.put25FlatPips')).toBeCloseTo(d('m06.put25DiffPips'), 6);
     expect(d('m06.call25SmilePips') - d('m06.call25FlatPips')).toBeCloseTo(
       d('m06.call25DiffPips'),

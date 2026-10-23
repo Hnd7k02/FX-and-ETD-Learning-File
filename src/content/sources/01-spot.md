@@ -4,13 +4,20 @@ Facts of module 01 are registered in `src/content/facts/m01.ts`. Everything else
 is either computed (running example, schematic teaching models in `src/lib/m01`, ECB reference
 rates in `data/raw/ecb-eur-reference.csv`) or textbook knowledge and market convention (T+2,
 USD/CAD T+1, pips and big figures, session times as a schematic, central bank names, roles of
-currencies as tendencies).
+currencies as tendencies). The remark in section 2 that reference rates such as the ECB's are
+daily snapshots, and the note in section 4 that the ECB publishes no USD/CHF rate (it is a cross
+of EUR/CHF and EUR/USD), rest on `ecb-reference-rates` in `src/content/sources.md`.
 
 Verification (23.10.2026): bis.org cannot be opened from the build sandbox (network policy,
 "CONNECT tunnel failed, 403"; WebFetch: host not found). The statements below were checked with
 several web searches whose results quote the bis.org pages listed (press release, statistical
 release `rpfx25_fx.htm`, Quarterly Review December 2025). Please open the URLs once from a normal
 browser before publishing (open question in the module report).
+
+Review (23.10.2026): a second web search again returned the BIS press release p250930 with the
+dollar on one side of 89 % of all trades and the franc as the sixth most traded currency; the
+final turnover of USD 9.5 trillion (Quarterly Review December 2025) could not be re-opened from
+the sandbox either.
 
 ## bis-press-2025-09-30
 
