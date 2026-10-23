@@ -83,6 +83,9 @@ function layoutFor(w: number) {
   };
 }
 
+/** True if lo < v < hi. */
+const inside = (v: number, lo: number, hi: number): boolean => v > lo && v < hi;
+
 /** Deterministic horizontal jitter of strip dots (px). */
 const jitter = (i: number) => (((i * 37) % 11) - 5) * 1.3;
 
@@ -130,10 +133,10 @@ export default function HedgeOutcome({ lang }: HedgeOutcomeProps): JSX.Element {
   const xF = sx(F);
 
   const yTicks = niceTicks(H.yDomain[0], H.yDomain[1], L.compact ? 4 : 5).filter(
-    (v) => v > H.yDomain[0] && v < H.yDomain[1],
+    (v) => inside(v, H.yDomain[0], H.yDomain[1]),
   );
   const xTicks = niceTicks(H.stRange[0], H.stRange[1], L.compact ? 4 : 6).filter(
-    (v) => v > H.stRange[0] + 1e-9 && v < H.stRange[1] - 1e-9,
+    (v) => inside(v, H.stRange[0] + 1e-9, H.stRange[1] - 1e-9),
   );
 
   // Verdict bracket label: right of the guide, or left near the strip.

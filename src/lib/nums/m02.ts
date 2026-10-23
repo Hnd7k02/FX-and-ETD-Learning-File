@@ -148,6 +148,12 @@ export const nums: NumTable = {
   // Section 3: forward points and carry
   'm02.costPips': { value: p3m.costPips, kind: 'pips', note: 'Cost: CHF financing, 3M' },
   'm02.benefitPips': { value: p3m.benefitPips, kind: 'pips', note: 'Benefit: USD interest, 3M' },
+  'm02.pointsRate': {
+    value: p3m.points * PIP,
+    kind: 'rate',
+    digits: FD,
+    note: 'Forward points 3M in rate units (F − S), signed',
+  },
   'm02.cost': { value: p3m.costPips * PIP, kind: 'rate', digits: FD },
   'm02.benefit': { value: p3m.benefitPips * PIP, kind: 'rate', digits: FD },
   'm02.pointsApprox': {

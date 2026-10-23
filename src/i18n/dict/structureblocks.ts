@@ -25,9 +25,9 @@ export const structureblocks = defineDict({
     'sb.pause': 'Pause',
     'sb.blocks': 'Bausteine zeigen',
     'sb.text.forward.buy':
-      'Ein Forward: Du kaufst {n} zu {f}. Gewinn und Verlust sind gleich gross, es gibt keine Prämie. In Bausteinen: ein gekaufter Call und ein verkaufter Put zum selben Strike.',
+      'Ein Forward: Du kaufst {n} zu {f}. Gewinn und Verlust wachsen gleich schnell, es gibt keine Prämie. In Bausteinen: ein gekaufter Call und ein verkaufter Put zum selben Strike.',
     'sb.text.forward.sell':
-      'Ein Forward: Du verkaufst {n} zu {f}. Gewinn und Verlust sind gleich gross, es gibt keine Prämie. In Bausteinen: ein gekaufter Put und ein verkaufter Call zum selben Strike.',
+      'Ein Forward: Du verkaufst {n} zu {f}. Gewinn und Verlust wachsen gleich schnell, es gibt keine Prämie. In Bausteinen: ein gekaufter Put und ein verkaufter Call zum selben Strike.',
     'sb.text.leveraged.buy':
       'Du verkaufst einen zweiten Put. Seine Prämie bezahlt einen besseren Strike: {k}, {d} Pips unter dem Forward. Dafür kaufst du unter dem Strike die doppelte Menge.',
     'sb.text.leveraged.sell':
@@ -92,9 +92,9 @@ export const structureblocks = defineDict({
     'sb.pause': 'Pause',
     'sb.blocks': 'Show building blocks',
     'sb.text.forward.buy':
-      'A forward: you buy {n} at {f}. Gain and loss are equally large and there is no premium. In building blocks: a bought call and a sold put at the same strike.',
+      'A forward: you buy {n} at {f}. Gains and losses grow at the same speed and there is no premium. In building blocks: a bought call and a sold put at the same strike.',
     'sb.text.forward.sell':
-      'A forward: you sell {n} at {f}. Gain and loss are equally large and there is no premium. In building blocks: a bought put and a sold call at the same strike.',
+      'A forward: you sell {n} at {f}. Gains and losses grow at the same speed and there is no premium. In building blocks: a bought put and a sold call at the same strike.',
     'sb.text.leveraged.buy':
       'You sell a second put. Its premium pays for a better strike: {k}, {d} pips below the forward. In return you buy twice the amount below the strike.',
     'sb.text.leveraged.sell':

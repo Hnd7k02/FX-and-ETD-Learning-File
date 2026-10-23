@@ -30,7 +30,6 @@ In building blocks: the TPF is a bought digital call that pays the coupon, paid 
 
 - **TPF sideways:** <Num of="m08.tpfTargetCoupons" /> coupons, then the TPF ends. Result <Num of="m08.tpfSidePnl" />, the maximum.
 - **RTPF in a trend up:** <Num of="m08.rtpfUpCoupons" /> coupons (<Num of="m08.rtpfUpReceived" />), then the rate breaks out of the range. Result <Num of="m08.rtpfUpPnl" />.
-- **TPF in a trend down:** see the box below.
 
 <Callout variant="bad" title="When it goes wrong: the fixing stays on the wrong side">
 
@@ -54,7 +53,7 @@ At maturity a single fixing decides. If it is at or above the strike, you get yo
 
 <DciCalculatorFigure caption="Drag the rate at maturity: below the strike your capital is converted, below the break-even you do worse than with a deposit. Move the strike closer to spot: more interest, more conversion." />
 
-In the example the break-even is <Num of="m08.dciBreakEven" />. At a fixing of <Num of="m08.dciFixing" /> the dollars plus interest are worth <Num of="m08.dciOutValue" />, <Num of="m08.dciOutDiff" /> against the deposit. The strike lies only <Num of="m08.dciStrikeVsFwdAbs" /> pips below the forward of <Num of="m08.dciForward" />. In the model the capital is converted in <Num of="m08.dciPConv" /> of cases. That is not a forecast but the price of the risk.
+In the example the break-even is <Num of="m08.dciBreakEven" />. At a fixing of <Num of="m08.dciFixing" /> the dollars plus interest are worth <Num of="m08.dciOutValue" />, <Num of="m08.dciOutDiff" /> against the deposit. The strike lies only <Num of="m08.dciStrikeVsFwdAbs" /> pips below the forward of <Num of="m08.dciForward" />. In the model the capital is converted in <Num of="m08.dciPConv" /> of cases: not a forecast, but the price of the risk.
 
 <Callout variant="bad" title="When it goes wrong: dual currency">
 
@@ -80,7 +79,7 @@ This gives <Num of="m08.tpfCouponNoTarget" /> pips (RTPF: <Num of="m08.rtpfCoupo
 
 <Desk title="Reading coupon products">
 
-Three numbers belong on every term sheet: the maximum gain (coupon times target), the loss per pip on the wrong side (twice the notional) and the distance of the strike to the forward, not to the spot. For dual currency there is a fourth: how large is the loss on conversion if the rate ends <Num of="m08.dciFixBelow" /> below the strike? In the example <Num of="m08.dciOutDiff" />. With a tenor of 3 months you earn more interest in francs (<Num of="m08.dci3Interest" />) but less per year (<Num of="m08.dci3Yield" /> p.a.): an option's time value grows more slowly than its tenor ([module 05](/en/module/05-greeks/3/)). And the dollar has more time to fall. Where dual currency fits as an investment is the subject of [module 09](/en/module/09-hedge-alpha-yield/4/).
+Three numbers belong on every term sheet: the maximum gain (coupon times target), the loss per pip on the wrong side (twice the notional) and the distance of the strike to the forward, not to the spot. For dual currency there is a fourth: the loss on conversion if the rate ends <Num of="m08.dciFixBelow" /> below the strike (above: <Num of="m08.dciOutDiff" />). With a tenor of 3 months you earn more interest in francs (<Num of="m08.dci3Interest" />) but less per year (<Num of="m08.dci3Yield" /> p.a.): an option's time value grows more slowly than its tenor ([module 05](/en/module/05-greeks/3/)). And the dollar has more time to fall. Where dual currency fits as an investment is the subject of [module 09](/en/module/09-hedge-alpha-yield/4/).
 
 </Desk>
 

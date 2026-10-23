@@ -30,7 +30,6 @@ In Bausteinen: Der TPF ist ein gekaufter Digital-Call, der den Coupon zahlt, bez
 
 - **TPF seitwärts:** <Num of="m08.tpfTargetCoupons" /> Coupons, dann endet der TPF. Ergebnis <Num of="m08.tpfSidePnl" />, das Maximum.
 - **RTPF bei Trend auf:** <Num of="m08.rtpfUpCoupons" /> Coupons (<Num of="m08.rtpfUpReceived" />), dann bricht der Kurs aus der Range aus. Ergebnis <Num of="m08.rtpfUpPnl" />.
-- **TPF bei Trend ab:** siehe den Kasten unten.
 
 <Callout variant="bad" title="Wann geht es schief: Das Fixing bleibt auf der falschen Seite">
 
@@ -54,7 +53,7 @@ Bei Verfall entscheidet ein einziges Fixing. Liegt es auf oder über dem Strike,
 
 <DciCalculatorFigure caption="Zieh den Kurs bei Verfall: Unter dem Strike tauschst du, unter dem Break-even fährst du schlechter als mit Festgeld. Verkürz den Abstand zum Spot: mehr Zins, mehr Umtausch." />
 
-Im Beispiel liegt der Break-even bei <Num of="m08.dciBreakEven" />. Bei einem Fixing von <Num of="m08.dciFixing" /> sind die Dollars plus Zins <Num of="m08.dciOutValue" /> wert, <Num of="m08.dciOutDiff" /> gegenüber dem Festgeld. Der Strike liegt nur <Num of="m08.dciStrikeVsFwdAbs" /> Pips unter dem Forward von <Num of="m08.dciForward" />. Im Modell wird in <Num of="m08.dciPConv" /> der Fälle umgetauscht. Das ist keine Prognose, sondern der Preis des Risikos.
+Im Beispiel liegt der Break-even bei <Num of="m08.dciBreakEven" />. Bei einem Fixing von <Num of="m08.dciFixing" /> sind die Dollars plus Zins <Num of="m08.dciOutValue" /> wert, <Num of="m08.dciOutDiff" /> gegenüber dem Festgeld. Der Strike liegt nur <Num of="m08.dciStrikeVsFwdAbs" /> Pips unter dem Forward von <Num of="m08.dciForward" />. Im Modell wird in <Num of="m08.dciPConv" /> der Fälle umgetauscht: keine Prognose, sondern der Preis des Risikos.
 
 <Callout variant="bad" title="Wann geht es schief: Dual Currency">
 
@@ -80,7 +79,7 @@ Das ergibt <Num of="m08.tpfCouponNoTarget" /> Pips (RTPF: <Num of="m08.rtpfCoupo
 
 <Desk title="Coupon-Produkte richtig lesen">
 
-Drei Zahlen gehören auf jedes Termsheet: der maximale Gewinn (Coupon mal Target), der Verlust pro Pip auf der falschen Seite (zweimal das Nominal) und der Abstand des Strikes zum Forward, nicht zum Spot. Bei Dual Currency kommt eine vierte dazu: Wie gross ist der Verlust bei einem Umtausch, wenn der Kurs <Num of="m08.dciFixBelow" /> unter dem Strike steht? Im Beispiel <Num of="m08.dciOutDiff" />. Mit 3 Monaten Laufzeit gibt es mehr Zins in Franken (<Num of="m08.dci3Interest" />), pro Jahr aber weniger (<Num of="m08.dci3Yield" /> p.a.): Der Zeitwert einer Option wächst langsamer als die Laufzeit ([Modul 05](/module/05-greeks/3/)). Und der Dollar hat mehr Zeit, zu fallen. Wo Dual Currency als Anlage hinpasst, zeigt [Modul 09](/module/09-hedge-alpha-yield/4/).
+Drei Zahlen gehören auf jedes Termsheet: der maximale Gewinn (Coupon mal Target), der Verlust pro Pip auf der falschen Seite (zweimal das Nominal) und der Abstand des Strikes zum Forward, nicht zum Spot. Bei Dual Currency kommt eine vierte dazu: der Verlust bei einem Umtausch, wenn der Kurs <Num of="m08.dciFixBelow" /> unter dem Strike steht (oben <Num of="m08.dciOutDiff" />). Mit 3 Monaten Laufzeit gibt es mehr Zins in Franken (<Num of="m08.dci3Interest" />), pro Jahr aber weniger (<Num of="m08.dci3Yield" /> p.a.): Der Zeitwert einer Option wächst langsamer als die Laufzeit ([Modul 05](/module/05-greeks/3/)). Und der Dollar hat mehr Zeit, zu fallen. Wo Dual Currency als Anlage hinpasst, zeigt [Modul 09](/module/09-hedge-alpha-yield/4/).
 
 </Desk>
 

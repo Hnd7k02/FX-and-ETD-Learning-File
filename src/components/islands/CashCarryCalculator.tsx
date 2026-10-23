@@ -94,7 +94,7 @@ export default function CashCarryCalculator({ lang }: CashCarryCalculatorProps):
     : play.started && !play.done
       ? Math.ceil(play.pos)
       : order.length;
-  const revealed = (key: CarryStep['key']) => order.indexOf(key) < shown;
+  const revealed = (key: CarryStep['key']) => shown > order.indexOf(key);
   const activeKey = play.playing ? order[Math.min(order.length - 1, shown - 1)] : undefined;
 
   const setMarket = (v: number, fromUser = true) => {

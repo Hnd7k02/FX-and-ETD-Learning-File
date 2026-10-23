@@ -84,6 +84,13 @@ test.describe('module 08 · structured products', () => {
     await setRange(sb, 'Fixing', 0.83);
     await expect(readout).not.toHaveText(atStep3);
     await expect(readout).toContainText('Knock-out');
+
+    // TARF: the target caps the gain of one fixing (500 pips on USD 100’000 = CHF 5’000)
+    await sb.locator('.sb-chip', { hasText: 'TARF' }).click();
+    await sb.locator('[data-step-btn="3"]').click();
+    await expect(sb).toHaveAttribute('data-step', '3');
+    await setRange(sb, 'Fixing', 0.86);
+    await expect(readout).toContainText('TARF CHF +5’000');
   });
 
   test('path simulator: scenarios, scrub, play and the drag twins change the outcome', async ({

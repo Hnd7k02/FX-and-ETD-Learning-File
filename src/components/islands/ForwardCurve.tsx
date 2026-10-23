@@ -61,6 +61,9 @@ const COLOR = {
   points: 'var(--ff-forward)',
 } as const;
 
+/** True if lo < v < hi. */
+const inside = (v: number, lo: number, hi: number): boolean => v > lo && v < hi;
+
 function layoutFor(w: number) {
   const width = Math.max(300, Math.round(w));
   const compact = width < 560;
@@ -120,7 +123,7 @@ export default function ForwardCurve({ lang }: ForwardCurveProps): JSX.Element {
   const xs = TENORS.map((tn) => sx(tn.days));
   const keep = new Set(visibleLabels(xs, L.font * 2.6));
   const yTicks = niceTicks(dom[0], dom[1], L.compact ? 4 : 6).filter(
-    (v) => v >= dom[0] && v <= dom[1],
+    (v) => inside(v, dom[0] - 1e-9, dom[1] + 1e-9),
   );
 
   const netLine = linePath([
@@ -218,7 +221,7 @@ export default function ForwardCurve({ lang }: ForwardCurveProps): JSX.Element {
                 ticks={yTicks}
                 x0={L.left}
                 x1={L.width - L.right}
-                format={(v) => (Math.abs(v) < 1e-9 ? t('fc.spot') : fmtPips(v, lang, 0, true))}
+                format={(v) => (1e-9 > Math.abs(v) ? t('fc.spot') : fmtPips(v, lang, 0, true))}
                 fontSize={L.font}
               />
               {!L.compact && (

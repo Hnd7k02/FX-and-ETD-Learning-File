@@ -2,7 +2,7 @@ import ForwardCurveFigure from '@/components/figures/ForwardCurveFigure.astro';
 
 {/* 02 Forward · Abschnitt 3 · Forward Points und Carry. Zahlen nur über <Num />, Register src/lib/nums/ex.ts und m02.ts. */}
 
-Im Markt nennt dir niemand den Forward als ganzen Kurs. Man nennt die **Forward Points**: den Abstand zum Spot in Pips. Für 3 Monate sind das im Beispiel <Num of="ex.fwdPointsMM" /> Pips. Den Forward rechnest du selbst: Spot plus Points, <Num of="ex.spot" /> − 0.00694 = <Num of="m02.fwd" />. Der Grund ist praktisch: Der Spot bewegt sich ständig, die Points kaum. So bleibt eine Quote länger gültig.
+Im Markt nennt dir niemand den Forward als ganzen Kurs. Man nennt die **Forward Points**: den Abstand zum Spot in Pips. Für 3 Monate sind das im Beispiel <Num of="ex.fwdPointsMM" /> Pips. Den Forward rechnest du selbst: Spot plus Points, <Num of="ex.spot" /> + (<Num of="m02.pointsRate" />) = <Num of="m02.fwd" />. Der Grund ist praktisch: Der Spot bewegt sich ständig, die Points ändern sich viel langsamer. So bleibt eine Quote länger gültig.
 
 ### Aufschlag und Abschlag
 
@@ -35,7 +35,7 @@ Und wenn sich ein Zins ändert? Steigt der CHF-Zins auf <Num of="m02.whatIfRd" /
 
 Der 1-Jahres-Forward steht bei <Num of="m02.fwd1Y" />, <Num of="m02.points1YAbs" /> Pips unter dem Spot. Heisst das, der Markt erwartet einen schwächeren Dollar? Nein. Der Forward folgt allein aus Spot und Zinsen. Tausch in der Grafik die beiden Zinsen: Die Points springen ins Plus, obwohl niemand seine Meinung über den Dollar geändert hat.
 
-Wer den Dollar mit dem höheren Zins hält, verdient diesen Zinsvorteil, den **Carry**. Im Forward ist er schon eingepreist. Ob der Kurs in einem Jahr höher oder tiefer steht, weiss niemand. Auf diese Lücke zwischen Forward und späterem Kurs setzt der Carry Trade (Modul 09).
+Wer den Dollar mit dem höheren Zins hält, verdient diesen Zinsvorteil, den **Carry**. Im Forward ist er schon eingepreist. Ob der Kurs in einem Jahr höher oder tiefer steht, weiss niemand. Carry als Abwägung von Kosten und Nutzen ist ein Thema von Modul 09.
 
 <Callout variant="note" title="Contango ist kein FX-Begriff">
 

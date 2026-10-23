@@ -1,0 +1,76 @@
+import ForwardCurveFigure from '@/components/figures/ForwardCurveFigure.astro';
+
+{/* 02 Forward · Section 3 · Forward points and carry. Numbers only via <Num />, registries src/lib/nums/ex.ts and m02.ts. */}
+
+In the market nobody quotes you the forward as a full rate. They quote the **forward points**: the distance from spot in pips. For 3 months they are <Num of="ex.fwdPointsMM" /> pips in the example. You work out the forward yourself: spot plus points, <Num of="ex.spot" /> + (<Num of="m02.pointsRate" />) = <Num of="m02.fwd" />. The reason is practical: spot moves all the time, the points change much more slowly. So a quote stays valid for longer.
+
+### Premium and discount
+
+If the forward is below spot, the base currency trades at a **discount**. If it is above, at a **premium**. In USD/CHF the dollar is the base. Because its interest rate is higher, it trades at a forward discount. The franc, as the mirror image, trades at a premium.
+
+For the importer the discount is welcome: with the forward he pays <Num of="m02.belowSpotChf" /> less than at today's spot. It is not a gift. Had he bought the dollars today, he would have earned the USD interest himself until payment day.
+
+### Forward = spot + cost − benefit
+
+A simple rule sums this up. Imagine you do not buy the dollars forward but today, and hold them until payment day:
+
+- **Cost:** you have to finance the purchase price today. That costs the rate of the quote currency, here CHF.
+- **Benefit:** you hold the dollars and earn their interest. That is the rate of the base currency, here USD.
+
+The forward nets the two. In the example the cost is <Num of="m02.cost" /> (CHF rate <Num of="ex.rd" />) and the benefit is <Num of="m02.benefit" /> (USD rate <Num of="ex.rf" />). So:
+
+<Formula variant="accent"><i>F</i> = <Num of="ex.spot" /> + <Num of="m02.cost" /> − <Num of="m02.benefit" /> = <Num of="m02.fwd" /></Formula>
+
+<ForwardCurveFigure caption="For each tenor: cost upwards (orange), benefit downwards (blue); the black dot is what remains, the forward points. Swap the rates and watch what happens to the points." />
+
+### Longer tenor, more points
+
+The points grow almost in line with time: 1 week <Num of="m02.points1W" />, 1 month <Num of="m02.points1M" />, 3 months <Num of="ex.fwdPointsMM" />, 6 months <Num of="m02.points6M" />, 1 year <Num of="m02.points1Y" /> pips. A rule of thumb is usually enough: points ≈ spot · rate differential · term. For 3 months it gives <Num of="m02.pointsApprox" /> pips, close to the exact value.
+
+Annualised, the forward sits <Num of="m02.premPa" /> below spot. That is almost exactly the CHF minus USD rate differential of <Num of="m02.rateDiff" />.
+
+And if a rate changes? If the CHF rate rises to <Num of="m02.whatIfRd" />, a cost of <Num of="m02.whatIfCostPips" /> pips is added. The 3-month points shrink to <Num of="m02.whatIfPoints" />, and the forward rises to <Num of="m02.whatIfFwd" />. Spot has not moved at all.
+
+### A forward is not a forecast
+
+The 1-year forward stands at <Num of="m02.fwd1Y" />, <Num of="m02.points1YAbs" /> pips below spot. Does that mean the market expects a weaker dollar? No. The forward follows from spot and interest rates alone. Swap the two rates in the chart: the points jump above zero, although nobody has changed their view on the dollar.
+
+Whoever holds the dollar with its higher rate earns that rate advantage, the **carry**. In the forward it is already priced in. Whether the rate will be higher or lower in a year, nobody knows. Carry as a weighing of costs and benefits is a topic of module 09.
+
+<Callout variant="note" title="Contango is not an FX term">
+
+For commodities, a futures price above the spot price is called contango, one below it backwardation. Storage costs play a part there too. In FX we say forward premium and forward discount. The only cause is the interest rate differential.
+
+</Callout>
+
+<Derivation title="Derivation: cost and benefit exactly">
+
+Rearranging <i>F</i> = <i>S</i> · (1 + <i>r</i><sub>CHF</sub> · <i>t</i>) / (1 + <i>r</i><sub>USD</sub> · <i>t</i>) gives
+
+<Formula>
+  <span><i>F</i> − <i>S</i> = <i>S</i> · (<i>r</i><sub>CHF</sub> − <i>r</i><sub>USD</sub>) · <i>t</i> / (1 + <i>r</i><sub>USD</sub> · <i>t</i>)</span>
+  <span>Cost = <i>S</i> · <i>r</i><sub>CHF</sub> · <i>t</i> / (1 + <i>r</i><sub>USD</sub> · <i>t</i>)</span>
+  <span>Benefit = <i>S</i> · <i>r</i><sub>USD</sub> · <i>t</i> / (1 + <i>r</i><sub>USD</sub> · <i>t</i>)</span>
+</Formula>
+
+Both parts are divided by 1 + <i>r</i><sub>USD</sub> · <i>t</i>. The reason: for USD 1 on payment day you only need 1 / (1 + <i>r</i><sub>USD</sub> · <i>t</i>) dollars today (section 2). With <i>t</i> = <Num of="m02.t" /> this gives a cost of <Num of="m02.cost" /> and a benefit of <Num of="m02.benefit" />.
+
+**Rule of thumb.** Drop the denominator and <i>F</i> − <i>S</i> ≈ <i>S</i> · (<i>r</i><sub>CHF</sub> − <i>r</i><sub>USD</sub>) · <i>t</i> = <Num of="m02.pointsApprox" /> pips remains. The error grows with the rate and the term.
+
+**Annualised.** (<i>F</i> / <i>S</i> − 1) · 360 / days = (<i>r</i><sub>CHF</sub> − <i>r</i><sub>USD</sub>) / (1 + <i>r</i><sub>USD</sub> · <i>t</i>) = <Num of="m02.premPa" />.
+
+</Derivation>
+
+<Desk title="How points are quoted">
+
+Like spot, forward points have a bid and an offer. Dealers quote only the pips, without a sign. If the first number is larger than the second, you subtract the points from spot: a discount. If it is smaller, you add them: a premium.
+
+Standard tenors are 1W, 1M, 2M, 3M, 6M, 9M and 1Y. For dates in between (broken dates) you interpolate between the neighbours.
+
+</Desk>
+
+<Takeaway>
+
+Forward = spot + cost − benefit: the cost is the rate of the quote currency (CHF), the benefit the rate of the base currency (USD). Forward points only reflect the interest rate differential. A forward is not a forecast.
+
+</Takeaway>

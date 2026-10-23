@@ -56,9 +56,9 @@ export const cashcarry = defineDict({
     'cc.row.gap': 'Abweichung',
     'cc.row.gapSub': 'Markt minus fair',
     'cc.insight.rich':
-      'Der Forward ist zu teuer. Also verkaufst du USD forward und baust die Gegenseite billig nach: CHF leihen, USD spot kaufen, USD anlegen. Heute fliesst netto kein Geld, bei Fälligkeit bleiben {profit}.',
+      'Der Forward ist zu teuer. Also verkaufst du USD forward und kaufst sie über den Geldmarkt zum fairen Kurs: CHF leihen, USD spot kaufen, USD anlegen. Heute fliesst netto kein Geld, bei Fälligkeit bleiben {profit}.',
     'cc.insight.cheap':
-      'Der Forward ist zu billig. Also kaufst du USD forward und baust die Gegenseite teuer nach: USD leihen, spot verkaufen, CHF anlegen. Heute fliesst netto kein Geld, bei Fälligkeit bleiben {profit}.',
+      'Der Forward ist zu billig. Also kaufst du USD forward und verkaufst sie über den Geldmarkt zum fairen Kurs: USD leihen, spot verkaufen, CHF anlegen. Heute fliesst netto kein Geld, bei Fälligkeit bleiben {profit}.',
     'cc.insight.none':
       'Fair: Zieh den Forward vom fairen Wert weg oder tipp einen eigenen Kurs ein.',
     'cc.aha.title': 'Die Lücke schliesst sich',
@@ -125,9 +125,9 @@ export const cashcarry = defineDict({
     'cc.row.gap': 'Mispricing',
     'cc.row.gapSub': 'market minus fair',
     'cc.insight.rich':
-      'The forward is too dear. So you sell USD forward and build the other side cheaply: borrow CHF, buy USD spot, invest the USD. No net cash moves today; at maturity {profit} is left over.',
+      'The forward is too dear. So you sell USD forward and buy them through the money market at the fair rate: borrow CHF, buy USD spot, invest the USD. No net cash moves today; at maturity {profit} is left over.',
     'cc.insight.cheap':
-      'The forward is too cheap. So you buy USD forward and build the other side dearly: borrow USD, sell it spot, invest the CHF. No net cash moves today; at maturity {profit} is left over.',
+      'The forward is too cheap. So you buy USD forward and sell them through the money market at the fair rate: borrow USD, sell it spot, invest the CHF. No net cash moves today; at maturity {profit} is left over.',
     'cc.insight.none': 'Fair: drag the forward away from the fair value or type your own rate.',
     'cc.aha.title': 'The gap closes',
     'cc.aha.text':
