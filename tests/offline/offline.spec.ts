@@ -287,23 +287,19 @@ test.describe('touch', () => {
     await open('/module/07-barrier-binary/1/');
     await expect(page.locator('.m7-hitband, .m7-handle').first()).toBeAttached();
     const result = await page.evaluate(() => {
-      if (!('ontouchstart' in window) || typeof Touch === 'undefined') return 'no-touch';
+      if (!('ontouchstart' in window)) return 'no-touch';
       const handle = [...document.querySelectorAll('svg *')].find(
         (el) => (el as SVGElement).ownerSVGElement && getComputedStyle(el).touchAction === 'none',
       );
       const text = document.querySelector('#main p');
       if (!handle || !text) return 'missing';
+      // WebKit does not allow `new Touch()` in scripts: a plain event of the same type with a
+      // one-finger touch list reaches the same listener.
       const fire = (target: Element) => {
-        const t = new Touch({ identifier: 1, target, clientX: 10, clientY: 10 });
-        const ev = new TouchEvent('touchstart', {
-          touches: [t],
-          targetTouches: [t],
-          changedTouches: [t],
-          bubbles: true,
-          cancelable: true,
-        });
+        const ev = new Event('touchstart', { bubbles: true, cancelable: true });
+        Object.defineProperty(ev, 'touches', { value: [{ identifier: 1 }] });
         target.dispatchEvent(ev);
-        target.dispatchEvent(new TouchEvent('touchend', { bubbles: true }));
+        target.dispatchEvent(new Event('touchend', { bubbles: true }));
         return ev.defaultPrevented;
       };
       return `${fire(handle)}/${fire(text)}`;
