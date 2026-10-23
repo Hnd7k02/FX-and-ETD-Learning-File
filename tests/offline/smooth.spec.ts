@@ -216,6 +216,30 @@ test('an endless animation that appears with the last input is no movement (tria
   expectSettledWithinTwoFrames(rec, 'triangular arbitrage opens');
 });
 
+test.describe('a slider at either end still drags (session clock follows the Zurich clock)', () => {
+  // Late in the evening the hour slider sits at its maximum, just after midnight at its minimum.
+  // A press exactly on the edge of the slider box missed the input, so the drag moved nothing.
+  for (const [when, iso] of [
+    ['23:40 Zurich, maximum', '2026-10-23T21:40:00Z'],
+    ['00:01 Zurich, minimum', '2026-10-23T22:01:00Z'],
+  ] as const) {
+    test(when, async ({ page, open }) => {
+      await page.clock.setFixedTime(new Date(iso));
+      await open('/module/01-spot/2/');
+      const slider = page.locator('input[type="range"][id^="sc-"]').first();
+      await slider.scrollIntoViewIfNeeded();
+      const before = await slider.inputValue();
+      expect([await slider.getAttribute('min'), await slider.getAttribute('max')]).toContain(
+        before,
+      );
+      const rec = await record(page, slider, () => dragSlider(page, slider));
+      expect(await slider.inputValue()).not.toBe(before);
+      expect(distinctStates(rec)).toBeGreaterThan(5);
+      expectSettledWithinTwoFrames(rec, `session clock (${when})`);
+    });
+  }
+});
+
 /** Reads the shown parity (pips) and the rendered bar widths of the barrier lab. */
 async function shownParity(page: Page) {
   return page.locator('[data-parity]').evaluate((el) => {

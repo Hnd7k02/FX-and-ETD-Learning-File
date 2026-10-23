@@ -298,7 +298,11 @@ export async function dragSlider(page: Page, slider: Locator, steps = 30): Promi
   const max = Number((await slider.getAttribute('max')) ?? 100);
   const k = max > min ? (value - min) / (max - min) : 0.5;
   const direction = k > 0.5 ? -1 : 1;
-  const x0 = box.x + k * box.width;
+  // A point on the thumb: its centre runs from half a thumb inside the left edge to half a thumb
+  // inside the right edge. At the ends (the session clock sits at its maximum late in the
+  // evening) a press exactly on the edge of the box misses the input and the drag moves nothing.
+  const inset = Math.min(10, box.width / 4);
+  const x0 = box.x + inset + k * (box.width - 2 * inset);
   const y = box.y + box.height / 2;
   await page.mouse.move(x0, y);
   await page.mouse.down();
