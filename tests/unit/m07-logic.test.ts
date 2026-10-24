@@ -65,6 +65,9 @@ import { M07, nums } from '@/lib/nums/m07';
 const { spot: S, rd, rf, vol, T } = M07_CONFIG.market;
 const K = M07_CONFIG.strike;
 
+/** Daily-monitored double no-touch, exact (docs/reference/xcheck/dnt_grid_check.py), CHF. */
+const DNT_DAILY_EXACT_CHF = 41_824.6;
+
 describe('m07 config', () => {
   it('rounds to the slider grid and mirrors the barriers around the spot', () => {
     expect(onGrid(0.82401)).toBe(0.824);
@@ -472,10 +475,12 @@ describe('m07 numbers', () => {
     expect(M07.otHitRd).toBeGreaterThan(M07.otExpRd);
     expect(M07.dntVolUp).toBeLessThan(M07.dnt);
     expect(M07.dntVolDown).toBeGreaterThan(M07.dnt);
-    // the closed form with BGK-shifted barriers matches the daily Monte Carlo
-    expect(Math.abs(M07.dntMc.pv - (M07.dntMc.compare.continuousBgk ?? 0))).toBeLessThan(
-      3 * M07.dntMc.stdErr,
-    );
+    // the daily Monte Carlo matches the exact daily value (probability grid,
+    // docs/reference/xcheck/dnt_grid_check.py); the BGK-shifted closed form is about 0.3 % high
+    expect(Math.abs(M07.dntMc.pv - DNT_DAILY_EXACT_CHF)).toBeLessThan(3 * M07.dntMc.stdErr);
+    expect(
+      Math.abs((M07.dntMc.compare.continuousBgk ?? 0) - DNT_DAILY_EXACT_CHF) / DNT_DAILY_EXACT_CHF,
+    ).toBeLessThan(0.005);
     // window barrier between the full-period knock-out and the vanilla
     expect(M07.uocFull91 * 1e6).toBeLessThan(M07.window.pv);
     expect(M07.window.pv).toBeLessThan(M07.window.compare.vanilla ?? 0);

@@ -75,10 +75,14 @@ export const MC_CONFIG = {
     /** Paths for interactive valuations in the Web Worker (fast, SE a few pips). */
     interactivePaths: 20_000,
     /**
-     * Paths for scripts/precompute-mc.ts: 1’000’000 (500’000 antithetic pairs) gives standard
-     * errors of 0.2–0.5 pips on the strikes in about 25 s. 200’000 runs in 5 s with 0.5–1.1 pips.
+     * Paths for scripts/precompute-mc.ts: 4’000’000 (2’000’000 antithetic pairs) gives standard
+     * errors of 0.1–0.35 pips on the strikes and about 0.5 (TPF) / 0.8 (RTPF) pips on the
+     * coupons in about 2 minutes; the weekly set holds 26 fixings × 4 Mio. doubles ≈ 830 MB.
+     * Up to Version 6, 1’000’000 paths ran in 25 s with 0.2–0.5 pips on the strikes but
+     * 0.97 / 1.61 pips on the coupons, and that run sat 2.5 / 2.3 standard errors above the
+     * exact coupons (found in Review 3; 4’000’000 since Version 7, D-66).
      */
-    precomputePaths: 1_000_000,
+    precomputePaths: 4_000_000,
     /**
      * Broadie-Glasserman-Kou constant β = −ζ(½)/√(2π) ≈ 0.5826: a barrier monitored every
      * Δt behaves like a continuous barrier shifted away from the spot by e^(±β σ √Δt).

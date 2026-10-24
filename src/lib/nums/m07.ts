@@ -273,7 +273,7 @@ export const nums: NumTable = {
   'm07.volDown': { value: vol - dbump, kind: 'pct', digits: 0 },
   'm07.dntVolUpChf': { value: dntVolUp * P, kind: 'money' },
   'm07.dntVolDownChf': { value: dntVolDown * P, kind: 'money' },
-  'm07.dntMcChf': { value: dntMc.pv, kind: 'money', note: 'MC, daily fixings, 1 Mio. paths' },
+  'm07.dntMcChf': { value: dntMc.pv, kind: 'money', note: 'MC, daily fixings, 4 Mio. paths' },
   'm07.dntMcSe': { value: dntMc.stdErr, kind: 'money' },
   'm07.dntBgkChf': {
     value: dntMc.compare?.continuousBgk ?? Number.NaN,

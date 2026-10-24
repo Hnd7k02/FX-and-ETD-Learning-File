@@ -19,6 +19,9 @@ import * as mc from '@/lib/fx/mc';
 
 const ZERO_COST = Object.keys(SOLVED_PARAM) as ZeroCostKind[];
 
+/** Daily-monitored double no-touch, exact (docs/reference/xcheck/dnt_grid_check.py), CHF. */
+const DNT_DAILY_EXACT_CHF = 41_824.6;
+
 describe('mc-products.json', () => {
   it('was generated with the current market, paths and seed', () => {
     expect(MC_PRODUCTS.market).toEqual(DEFAULT_MARKET);
@@ -75,9 +78,15 @@ describe('mc-products.json', () => {
     }
   });
 
-  it('double no-touch by Monte Carlo agrees with the BGK-shifted closed form', () => {
+  it('double no-touch by Monte Carlo agrees with the exact daily value; BGK is close', () => {
     const d = MC_PRODUCTS.products.doubleNoTouch;
-    expect(Math.abs(d.pv - d.compare.continuousBgk!)).toBeLessThan(3 * d.stdErr);
+    // Exact daily-monitored value from a probability grid (docs/reference/xcheck/dnt_grid_check.py,
+    // Richardson limit CHF 41’824.6). The BGK-shifted closed form is an approximation about
+    // 0.3 % high; with 4 Mio. paths the standard error (about CHF 30) is smaller than that gap.
+    expect(Math.abs(d.pv - DNT_DAILY_EXACT_CHF)).toBeLessThan(3 * d.stdErr);
+    expect(
+      Math.abs(d.compare.continuousBgk! - DNT_DAILY_EXACT_CHF) / DNT_DAILY_EXACT_CHF,
+    ).toBeLessThan(0.005);
     expect(MC_PRODUCTS.products.windowBarrier.pv).toBeLessThan(
       MC_PRODUCTS.products.windowBarrier.compare.vanilla!,
     );

@@ -221,8 +221,9 @@ describe('point 4: carry notionals', () => {
 
 describe('point 5: contractual coupon everywhere, fair coupon only ± standard error', () => {
   const kinds = [
-    { kind: 'tpf' as const, coupon: 775.4, chf: 7_754, max: 46_524, fair: 775.37, se: 0.97 },
-    { kind: 'rtpf' as const, coupon: 810.5, chf: 8_105, max: 48_630, fair: 810.54, se: 1.61 },
+    // Version 7: 4 Mio. paths (seed 20261022); the RTPF fair coupon 808.15 rounds half up to 808.2
+    { kind: 'tpf' as const, coupon: 773.7, chf: 7_737, max: 46_422, fair: 773.72, se: 0.49 },
+    { kind: 'rtpf' as const, coupon: 808.2, chf: 8_082, max: 48_492, fair: 808.15, se: 0.8 },
   ];
 
   it.each(kinds)('$kind: check values (coupon, CHF per fixing, maximum gain)', (c) => {
@@ -294,8 +295,8 @@ describe('point 5: contractual coupon everywhere, fair coupon only ± standard e
     expect(Math.abs(contract - fair)).toBeLessThan(se);
     expect(contract).not.toBe(fair);
     const key = k === 'tpf' ? 'm08.tpfFairCoupon' : 'm08.rtpfFairCoupon';
-    expect(de(n08, key)).toBe(String(c.fair));
-    expect(de(n08, `m08.${k}Se`)).toBe(String(c.se));
+    expect(de(n08, key)).toBe(c.fair.toFixed(2));
+    expect(de(n08, `m08.${k}Se`)).toBe(c.se.toFixed(2));
   });
 
   it('the fair coupon appears in the texts only as «fairer Coupon (Monte Carlo) ± Standardfehler»', () => {

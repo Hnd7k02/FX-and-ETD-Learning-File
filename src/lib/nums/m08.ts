@@ -2,7 +2,7 @@
  * Numbers of module 08 (structured products) for <Num of="m08.…" /> and the quiz. Nothing is
  * typed in:
  * - fair strikes, coupons, the pivot width, standard errors and the Monte Carlo statistics come
- *   from src/data/fx/mc-products.json (1’000’000 paths, `npm run data:mc`, D-28/D-29),
+ *   from src/data/fx/mc-products.json (4’000’000 paths, `npm run data:mc`, D-28/D-29),
  * - the closed-form steps of the "better rate" story from src/lib/structures.ts,
  * - every scenario number from the path simulator logic (src/lib/pathsim.ts) with the same
  *   settings the figures use (MC_CONFIG.scenarios and PATHSIM_CONFIG.presets),

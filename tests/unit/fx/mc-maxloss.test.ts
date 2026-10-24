@@ -82,24 +82,24 @@ const C = (n: string) => `CHF\u00a0${n}`;
 const shown = (chf: number, lang: Lang) => formatNum({ value: chf, kind: 'money' }, lang);
 
 describe('maxLoss: typed per side, check values (CHF against the market)', () => {
-  it('accumulator: 26 × 2 × 40’000 × fair strike → CHF 1’609’922, upwards no loss', () => {
+  it('accumulator: 26 × 2 × 40’000 × fair strike → CHF 1’609’878, upwards no loss', () => {
     const p = M08_PRODUCTS.accumulator;
     const b = maxLoss(p);
     expect(b.down.kind).toBe('finite');
     expect(finiteChf(b.down)).toBeCloseTo(26 * 2 * 40_000 * p.strike, 6);
-    expect(finiteChf(b.down)).toBeCloseTo(1_609_922, -1);
-    expect(shown(finiteChf(b.down), 'de')).toBe(C('1’609’922'));
-    expect(shown(finiteChf(b.down), 'en')).toBe(C('1,609,922'));
+    expect(finiteChf(b.down)).toBeCloseTo(1_609_878, -1);
+    expect(shown(finiteChf(b.down), 'de')).toBe(C('1’609’878'));
+    expect(shown(finiteChf(b.down), 'en')).toBe(C('1,609,878'));
     expect(b.up).toEqual({ kind: 'finite', chf: 0 });
     expect(b.kind).toBe('finite');
   });
 
-  it('TARF CHF 1’804’296 and TPF CHF 1’872’000: finite on both sides', () => {
+  it('TARF CHF 1’804’349 and TPF CHF 1’872’000: finite on both sides', () => {
     const tarf = maxLoss(M08_PRODUCTS.tarf);
     expect(finiteChf(tarf.down)).toBeCloseTo(12 * 2 * 100_000 * M08_PRODUCTS.tarf.strike, 6);
-    expect(finiteChf(tarf.down)).toBeCloseTo(1_804_296, -1);
-    expect(shown(finiteChf(tarf.down), 'de')).toBe(C('1’804’296'));
-    expect(shown(finiteChf(tarf.down), 'en')).toBe(C('1,804,296'));
+    expect(finiteChf(tarf.down)).toBeCloseTo(1_804_349, -1);
+    expect(shown(finiteChf(tarf.down), 'de')).toBe(C('1’804’349'));
+    expect(shown(finiteChf(tarf.down), 'en')).toBe(C('1,804,349'));
     expect([tarf.up, tarf.kind]).toEqual([{ kind: 'finite', chf: 0 }, 'finite']);
     const tpf = maxLoss(M08_PRODUCTS.tpf);
     expect(finiteChf(tpf.down)).toBeCloseTo(12 * 2 * 100_000 * M08_PRODUCTS.tpf.strike, 6);
@@ -109,13 +109,13 @@ describe('maxLoss: typed per side, check values (CHF against the market)', () =>
     expect([tpf.up, tpf.kind]).toEqual([{ kind: 'finite', chf: 0 }, 'finite']);
   });
 
-  it('pivot TARF CHF 1’800’595 and RTPF CHF 1’852’800 downwards, unbounded upwards', () => {
+  it('pivot TARF CHF 1’800’770 and RTPF CHF 1’852’800 downwards, unbounded upwards', () => {
     const piv = M08_PRODUCTS.pivotTarf;
     const bp = maxLoss(piv);
     expect(finiteChf(bp.down)).toBeCloseTo(12 * 2 * 100_000 * piv.lowerStrike, 6);
-    expect(finiteChf(bp.down)).toBeCloseTo(1_800_595, -1);
-    expect(shown(finiteChf(bp.down), 'de')).toBe(C('1’800’595'));
-    expect(shown(finiteChf(bp.down), 'en')).toBe(C('1,800,595'));
+    expect(finiteChf(bp.down)).toBeCloseTo(1_800_770, -1);
+    expect(shown(finiteChf(bp.down), 'de')).toBe(C('1’800’770'));
+    expect(shown(finiteChf(bp.down), 'en')).toBe(C('1,800,770'));
     expect([bp.downLevel, bp.upLevel]).toEqual([piv.lowerStrike, piv.upperStrike]);
     expect([bp.up, bp.kind]).toEqual([{ kind: 'unbounded' }, 'unbounded']);
     const rtpf = M08_PRODUCTS.rtpf;
@@ -250,13 +250,13 @@ describe('the kernels reach the bound (same products as the app)', () => {
 describe('number registry (m08, m09)', () => {
   it('registers the check values as CHF amounts, shown in de and en', () => {
     const cases: Array<[typeof n08, string, number, string, string]> = [
-      [n08, 'm08.accMaxLoss', 1_609_922, C('1’609’922'), C('1,609,922')],
-      [n08, 'm08.tarfMaxLoss', 1_804_296, C('1’804’296'), C('1,804,296')],
-      [n08, 'm08.pivMaxLossDown', 1_800_595, C('1’800’595'), C('1,800,595')],
+      [n08, 'm08.accMaxLoss', 1_609_878, C('1’609’878'), C('1,609,878')],
+      [n08, 'm08.tarfMaxLoss', 1_804_349, C('1’804’349'), C('1,804,349')],
+      [n08, 'm08.pivMaxLossDown', 1_800_770, C('1’800’770'), C('1,800,770')],
       [n08, 'm08.tpfMaxLoss', 1_872_000, C('1’872’000'), C('1,872,000')],
       [n08, 'm08.rtpfMaxLossDown', 1_852_800, C('1’852’800'), C('1,852,800')],
-      [n09, 'm09.accMaxLoss', 1_609_922, C('1’609’922'), C('1,609,922')],
-      [n09, 'm09.tarfMaxLoss', 1_804_296, C('1’804’296'), C('1,804,296')],
+      [n09, 'm09.accMaxLoss', 1_609_878, C('1’609’878'), C('1,609,878')],
+      [n09, 'm09.tarfMaxLoss', 1_804_349, C('1’804’349'), C('1,804,349')],
       [n09, 'm09.tpfMaxLoss', 1_872_000, C('1’872’000'), C('1,872,000')],
     ];
     for (const [table, key, chf, de, en] of cases) {

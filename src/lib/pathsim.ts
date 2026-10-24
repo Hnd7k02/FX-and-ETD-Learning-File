@@ -102,8 +102,8 @@ export const PATHSIM_CONFIG = {
   /**
    * Quote step of the fair TPF / RTPF coupon in CHF per USD: 0.1 pip = CHF 1 per fixing on
    * USD 100’000. The simulator and the module texts use the quoted coupon, so "coupon × number
-   * of coupons" adds up exactly on screen (CHF 7’754 × 6 = CHF 46’524). The rounding moves the
-   * coupon by at most 0.05 pip, far inside its Monte Carlo standard error (about 1 pip). Choice.
+   * of coupons" adds up exactly on screen (CHF 7’737 × 6 = CHF 46’422). The rounding moves the
+   * coupon by at most 0.05 pip, far inside its Monte Carlo standard error (0.5–0.8 pip). Choice.
    */
   couponQuoteStep: 0.00001,
 } as const;
@@ -167,10 +167,16 @@ export function paramOverrides<K extends SimKind>(kind: K, value: number): Produ
   return { strike: value } as ProductOverrides<K>;
 }
 
-/** A coupon rounded to the quote step (PATHSIM_CONFIG.couponQuoteStep). */
+/**
+ * A coupon rounded to the quote step (PATHSIM_CONFIG.couponQuoteStep), half up. The quotient
+ * is cleaned of binary noise first: the stored fair coupon has 6 decimals, so it can sit
+ * exactly on a half step (0.080815 / 0.00001 = 8081.4999999999990905 in floating point, which
+ * Math.round alone would turn into 808.1 instead of 808.2 pips).
+ */
 export function quoteCoupon(coupon: number): number {
   const step = PATHSIM_CONFIG.couponQuoteStep;
-  return Number((Math.round(coupon / step) * step).toFixed(8));
+  const steps = Number((coupon / step).toFixed(6));
+  return Number((Math.round(steps) * step).toFixed(8));
 }
 
 /**

@@ -52,6 +52,16 @@ describe('pathsim: products and parameters', () => {
     expect(isScenario('crash')).toBe(false);
   });
 
+  it('quoteCoupon rounds half up to 0.1 pip, also on a binary half step (check values)', () => {
+    // 0.080815 / 0.00001 = 8081.4999999999990905 in floating point: cleaned first, then rounded
+    expect(quoteCoupon(0.080815)).toBe(0.08082);
+    expect(quoteCoupon(0.0808149)).toBe(0.08081);
+    expect(quoteCoupon(0.077372)).toBe(0.07737);
+    expect(quoteCoupon(0.0773721)).toBe(0.07737);
+    expect(quoteCoupon(0.077375)).toBe(0.07738);
+    expect(quoteCoupon(0)).toBe(0);
+  });
+
   it('uses the fair parameter from mc-products.json by default', () => {
     for (const k of KINDS) {
       const p = simProduct(k);

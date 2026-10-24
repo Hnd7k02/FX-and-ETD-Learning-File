@@ -191,7 +191,7 @@ export const M07_CONFIG = {
     riskometerEvent: 'chf-shock-2015',
   },
 
-  /** Section 4: the window barrier of the Monte Carlo engine (precomputed, 1 Mio. paths). */
+  /** Section 4: the window barrier of the Monte Carlo engine (precomputed, MC_CONFIG.engine.precomputePaths). */
   window: {
     startDay: WINDOW.windowStartDay,
     endDay: WINDOW.windowEndDay,
