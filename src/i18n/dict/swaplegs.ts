@@ -54,7 +54,7 @@ export const swaplegs = defineDict({
     'sl.eq.exact': 'Exakt',
     'sl.eq.approx': 'Faustregel S · (r CHF − r USD) · t',
     'sl.eq.text':
-      'Der Far-Kurs ist der Forward aus Modul 02. Die Swap Points sind also die Forward Points: die Zinsdifferenz von {diff} über {days} Tage.',
+      'Der Far-Kurs ist der Forward aus Modul 02. Beim Swap per Spot sind die Swap Points also die Forward Points: die Zinsdifferenz von {diff} über {days} Tage.',
     'sl.aha.flat.title': 'Gleiche Zinsen, gleicher Kurs.',
     'sl.aha.flat':
       'Ohne Zinsdifferenz gibt es nichts auszugleichen: Near und Far Leg laufen zum selben Kurs.',
@@ -121,7 +121,7 @@ export const swaplegs = defineDict({
     'sl.eq.exact': 'Exact',
     'sl.eq.approx': 'Rule of thumb S · (r CHF − r USD) · t',
     'sl.eq.text':
-      'The far rate is the forward from module 02. So the swap points are the forward points: the interest differential of {diff} over {days} days.',
+      'The far rate is the forward from module 02. For a spot-start swap the swap points are therefore the forward points: the interest differential of {diff} over {days} days.',
     'sl.aha.flat.title': 'Equal rates, equal prices.',
     'sl.aha.flat':
       'With no interest differential there is nothing to compensate: the near and far legs trade at the same rate.',

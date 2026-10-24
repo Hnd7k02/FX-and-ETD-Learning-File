@@ -7,7 +7,7 @@ The importer knows his hedge from module 04: a USD call struck at the forward, <
 A barrier is a rate level that is watched throughout the life of the option. If USD/CHF touches it, something final happens:
 
 - **Knock-out:** the option disappears. Whatever the rate does afterwards no longer matters.
-- **Knock-in:** the option only comes into existence now. Before, it does not exist; afterwards it is an ordinary vanilla.
+- **Knock-in:** the option only comes into existence now. Before, you only hold a claim to it, but the contract already has value. Afterwards it is an ordinary vanilla.
 
 Both make the option cheaper. You no longer buy every scenario, only some of them. The more scenarios the barrier cuts away, and the more valuable those scenarios would be, the bigger the discount.
 

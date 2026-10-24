@@ -963,8 +963,8 @@ export const GLOSSARY: GlossaryEntry[] = [
       'premium adjustment',
     ],
     def: {
-      de: 'Delta abzüglich der Prämie, wenn die Prämie in der Basiswährung bezahlt wird. Die Prämie selbst ist dann eine Position in dieser Währung.',
-      en: 'Delta minus the premium when the premium is paid in the base currency; the premium itself is then a position in that currency.',
+      de: 'Spot-Delta abzüglich der Prämie, wenn die Prämie in der Basiswährung bezahlt wird, beides pro Einheit Nominal: Δ_pa = Δ_Spot − V/S. Die Prämie ist dann selbst eine Position in dieser Währung; welche Konvention gilt, hängt vom Währungspaar ab.',
+      en: 'Spot delta minus the premium when the premium is paid in the base currency, both per unit of notional: Δ_pa = Δ_Spot − V/S. The premium is then itself a position in that currency; which convention applies depends on the currency pair.',
     },
     module: '05-greeks',
     section: '4',
