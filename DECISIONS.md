@@ -561,3 +561,70 @@ Wordings retired by D-51 to D-62 are guarded in both languages by `RETIRED_V6` i
 
 Not changed: the Monte Carlo fair coupons. An auditor's high-precision recomputation gives about 772.7 pips (TPF) and 806–807 pips (RTPF), against 775.37 ± 0.97 and 810.54 ± 1.61 from the stored run (seed 20261022, 1 Mio. paths). No statement is wrong, but the interval of the stored run does not cover the recomputation; open question in PROGRESS.
 **Reasoning:** The texts around the corrected points must meet the same standard as the points themselves.
+
+## D-64 · 2026-10-24 · Review 3, 24.10.2026
+
+**Sechs zu absolute Schlussfolgerungen (Block A)**
+
+**Question:** A third review found six conclusions and takeaways that were true only in the example or under an unstated condition. Tables and calculations were right; only the sentences drawn from them were too absolute.
+**Decision:** Corrected in DE and EN, with the texts' numbers from the core (new keys in `m06`, `m07`, `m09`; teaching choices in one config object each, D-22):
+
+- A1 · 06.1: «ohne Absicherung» and the forward are yardsticks, not limits. In the two scenarios every structure lies between them; close to forward and strike a structure with a premium costs more than both. Example at 0.7950 (`M06_SCENARIOS.stMid`): unhedged CHF 795’000, forward CHF 793’031, call incl. premium CHF 804’528, call spread CHF 802’468; the call is dearer than both between F − premium (0.7835) and K + premium (0.8095), the call spread between 0.7856 and 0.8075. Collar and seagull are zero cost and stay between. Tests: in the band call and spread > max(unhedged, forward); collar and seagull between both on a rate grid.
+- A2 · 09.1: neither forward nor call is «better». A slightly weaker dollar still favours the forward; the call pays off only below F − premium (`m09.callBeatsFwd` 0.7804, −2.45 % vs spot; at 0.7900, `mildDownPips` 100: forward −30 pips, call −127 pips). The threshold is shown with «rund» because it comes from the unrounded forward 0.79303 (0.7930 − 127 pips would read 0.7803). Test: forward better above the threshold, call below.
+- A3 · glossary «Theta»: how the option value changes when a day passes; for the buyer usually negative (time value, the gamma share, the price of gamma); in FX the interest carry comes on top and can dominate deep in the money, then theta is positive (as 05.4 already said). Tests: `thetaSplit` × USD 1 Mio. per day, call 0.7930 −69.33 / +38.66 / −30.67, call 0.7730 −55.79 / +56.67 / +0.88, call 0.7500 −25.49 / +70.07 / +44.58, call 0.7000 −0.50 / +75.98 / +75.48; gamma share + carry = theta.
+- A4 · 01.2: spot, forwards and FX swaps trade mostly OTC; there is no central place and no single closing price; reference rates are snapshots, not tradable rates; currency futures and options on them trade on exchanges with standardised contracts; the tool covers the OTC market. Takeaway «läuft überwiegend OTC». No size of the exchange share, no exchange name in the learning text (tested); sources `bis-xtd` and, as a primary document, an exchange rulebook (`cme-rulebook-254a`, source entry only, D-50).
+- A5 · 07.3: a digital is at best a partial hedge: a fixed amount whether the extra cost is small or large, not a proportional hedge, and the premium comes on top. Shown: net after premium CHF 50’759; extra cost vs the strike CHF 27’000 at 0.8200 and CHF 107’000 at 0.9000 (`M07_CONFIG.touch.digitalScenarios` +2.5 % / +12.5 %). The break-even 0.843759 is a test value only; the text never says a rate is «genau gedeckt».
+- A6 · 08.2 takeaway: an accumulator beats the forward as long as the fixings lie between 2K − F (`m08.accBreakLev`) and the barrier (`m08.accBarrier`): calm markets and moderate moves; a sharp rise ends it early, a sharp fall buys twice the amount above the market. Convention as in the module: forward at the average fixing day. Test from the core (`productResult`): advantage per fixing (F − K)·N between K and B, (S − 2K + F)·N below K, sign change exactly at 2K − F; with the forward of a single fixing day the lower end lies between 0.7485 (first) and 0.7618 (last fixing). The quiz question («am ehesten … Der Markt bleibt ruhig») stays.
+- Guard `RETIRED_V7` in the content lint: the 14 old phrases (DE and EN) must not come back.
+
+**Reasoning:** A conclusion that holds only in the two scenarios of a table must say so; the learner otherwise generalises it.
+
+## D-65 · 2026-10-24 · Review 3, 24.10.2026
+
+**Glossar «Prämienadjustiertes Delta» und acht Prüfhinweise (Block B)**
+
+**Question:** The review called the premium-adjusted delta entry wrong and listed eight further places.
+**Decision:** The code and formula are right (Δ_pa = Δ_Spot − V/S = (K/S)·e^(−r_d·T)·N(d2) for the call, test to 1e-12 for call and put); only the unit was missing. The entry now says: spot delta minus the premium when the premium is paid in the base currency, both per unit of notional; the premium is then itself a position in that currency; the convention depends on the pair. The review's sentence «the premium amount itself is not simply subtracted from delta» is wrong and was not adopted (sources `bossens-2010`, `wystup-2018-greeks`). The eight hints, each checked in code and text:
+
+| Hint                    | Place                       | Classification                                                                                                                                                                         |
+| ----------------------- | --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| B1 Market order         | 01.3, glossary              | bewusst unverändert: the bullet mirrors the limit-order bullet, Hull and the SEC describe it the same way; the no-trading case is shown two paragraphs below (weekend gap)             |
+| B2 Cross-currency basis | 02.2                        | angepasst: «Formel mit Referenzzinsen gleicher Laufzeit» / «reference rates of the same tenor» (`bis-2016-cip`)                                                                        |
+| B3 Swap points          | 03.2, swap-legs figure      | angepasst: «Beginnt der Swap per Spot, sind die Swap Points genau die Forward Points» (the glossary stays general: far minus near); the figure text says the same (`bis-2008-fxswaps`) |
+| B4 Gamma against theta  | 05.4 takeaway               | angepasst: «Im Modell verdient der delta-gehedgte Call nur an Tagen …» (constant vol, daily delta hedge, no costs; `derman-2007`); formulas unchanged                                  |
+| B5 Butterfly            | 06.3 heading                | angepasst: «Butterfly und Seagull: im Beispiel short Vola» (holds with the spot near the body)                                                                                         |
+| B6 Knock-in             | 07.1                        | angepasst: «Vorher hast du nur die Anwartschaft darauf, der Vertrag hat aber schon einen Wert.» (`lyuu-barrier`); the glossary entry stays as Hull words it                            |
+| B7 Alpha                | 09.1, 09.3, glossary        | bewusst unverändert: defined risk-adjusted since Version 6 (D-53)                                                                                                                      |
+| B8 Riskometer vola      | `vol.ts`, Riskometer, About | bewusst unverändert: code and texts say «Mittelwert 0» and compute it that way                                                                                                         |
+
+None was «nicht verifizierbar». Tests in `tests/unit/v7-b.test.ts`.
+**Reasoning:** A definition without its unit reads as a different formula; the hints were sharpened where a qualifier makes the statement exact and left where the text was already right.
+
+## D-66 · 2026-10-24 · Review 3, 24.10.2026
+
+**Monte Carlo mit 4 Mio. Pfaden; Coupons von TPF und RTPF (Block C)**
+
+**Question:** The stored fair coupons (seed 20261022, 1 Mio. paths) sat 2.5 and 2.3 standard errors above an exact grid computation (TPF 775.37 ± 0.97 vs 772.91 pips, RTPF 810.54 ± 1.61 vs 806.86 pips). Engine bias or sampling noise?
+**Decision:** Sampling noise, one seed for all products (common random numbers): an engine control without target (targetCoupons = 12) lands within 3 standard errors of the closed form (1 Mio. paths +2.27 / +2.13 SE, 4 Mio. +1.71 / +1.53 SE), and 24 other seeds average 772.76 ± 0.21 and 806.63 ± 0.32 pips (review). Therefore:
+
+- `MC_CONFIG.engine.precomputePaths` 1’000’000 → 4’000’000, seed unchanged 20261022; `npm run data:mc` runs about 2 minutes and needs about 830 MB for the weekly set. The 1 Mio. run is reproduced byte-identically (except `generatedAt`) before the change.
+- Acceptance only with evidence: every product within 3 new standard errors of an independent reference (exact or 16 Mio. paths): accumulator 0.773980 ± 0.11 pips (ref 0.773992, −1.1 SE), decumulator 0.816949 ± 0.13 (0.816928, +1.7), TARF 0.751812 ± 0.25 (0.751839, −1.1), pivot TARF half-width 0.049679 ± 0.34 (0.049658, +0.6), TPF 773.72 ± 0.49 pips (772.91, +1.7), RTPF 808.15 ± 0.80 (806.86, +1.6), window barrier CHF 8’609 ± 6 (8’611, −0.3), double no-touch CHF 41’846 ± 30 (41’824, +0.7). Cross-check on fresh paths (seed 7031989, 2 Mio.): every zero-cost product with its contractual parameters prices to zero within 2 SE.
+- Contractual coupons: TPF 773.7 pips = CHF 7’737 per fixing, at most 6 × CHF 7’737 = CHF 46’422; RTPF 808.2 pips = CHF 8’082, at most CHF 48’492 (modules 08 and 09, matrix, building blocks, simulator, quiz; D-26). The rounding (0.02 / 0.05 pip) stays far inside the standard error. `quoteCoupon` rounds half up to 0.1 pip and cleans binary noise first: 0.080815 / 0.00001 = 8081.4999999999990905 in floating point, so plain `Math.round` gave 808.1 for the shown 808.15 (direct unit tests). TARF P(target) stays 94.4 %.
+- Independent grid computations in `docs/reference/xcheck/`: `tpf_grid_check.py` (probability mass of ln S, state = coupons paid, exact Gaussian transition per fixing; TPF 772.91, RTPF 806.86 pips; control without target equals the closed form to 0.01 pip) and `dnt_grid_check.py` (daily double no-touch, Richardson limit CHF 41’824.6).
+- The BGK-shifted closed form of the double no-touch is an approximation 0.3 % above the exact daily value; at 1 Mio. paths the gap hid inside the standard error, at 4 Mio. paths it is 3.5 SE. The unit tests now compare the Monte Carlo against the exact daily value (3 SE) and require the BGK form only within 0.5 % of it. Texts unchanged (07.2 says «fast wie eine stetige»).
+- PROGRESS: question 23 resolved, question 4 (D-29) updated to the new coupons. Max-loss check values follow the strikes (accumulator CHF 1’609’878, TARF 1’804’349, pivot TARF 1’800’770).
+
+**Reasoning:** More paths with the same seed remove the noise without choosing a seed to hit a number; the independent references make the acceptance a test, not a judgement.
+
+## D-67 · 2026-10-24 · Review 3, 24.10.2026
+
+**Version 7: Reproduzierbarkeit, Quiz-Parität, Quellen**
+
+**Decision:**
+
+- Version 6 stays reproducible: commit `36ffffa` with `SOURCE_DATE_EPOCH=1792792699` builds `release/forward-first-v6.html` byte-identically (1’757’756 bytes, SHA-256 `cad08ded…f61a6`, verified before Version 7 started). Version 7 records its own epoch in PROGRESS.
+- New test `tests/unit/quiz-parity.test.ts`: in all 72 quiz questions (9 modules × 4 graded + 4 checks) the German and English prompt, option labels and explanations carry the same numbers, as a multiset and in order, with a minimal, documented normaliser (Swiss and English thousands separators, «8 %» / «8%», «1 Mio.» / «1m», typographic signs, dates to ISO, identifiers such as d1 excluded); three fields whose translation moves a clause are listed explicitly and must really be reordered. The same `correct` index alone was not enough.
+- Sources of Version 7 are literature references: `bis-xtd` (mandatory for A4), `cme-rulebook-254a` (primary document, D-50), `oic-option-strategies`, `seco-kmu-fx`, `sec-cftc-2013-binary`, `hkma-2011-accumulator`, `ifec-2022-accumulators`, `bossens-2010`, `wystup-2018-greeks`, `kwok-mafs5030-hw4`, `bis-2008-fxswaps`, `derman-2007`, `lyuu-barrier`; `hull-2012` lists the chapters used. No link to a copy of a book; no TPF or RTPF number is attributed to Hull. The URLs come from the review; they could not be fetched from the sandbox.
+- `OFFLINE_VERSION` 7, copy `release/forward-first-v7.html`.
+
+**Reasoning:** A delivered file must be rebuildable from its commit; a quiz that shows different numbers in the two languages would pass every other test.

@@ -23,7 +23,7 @@ URL (no links to copies of books; statements are paraphrased, never copied).
 - Herausgeber: John C. Hull; Pearson
 - Datum: 2012
 - ISBN: 978-0-13-216494-8
-- Belegt: Lehrbuchwissen, sinngemäss wiedergegeben (kein Buchtext übernommen). Kapitel «Determination of Forward and Futures Prices»: gedeckte Zinsparität bei Währungen, der Forward folgt aus Spot und den beiden Zinsen (Modul 02.3). Kapitel «The Greek Letters»: Delta eines Forward-Kontrakts e^(−r_f·T); Greeks für ein Asset mit Rendite q, bei Währungen q = r_f (Modul 05.2, 05.3); die Lage des Gamma- und des Vega-Maximums ist aus diesen Formeln hergeleitet. Kapitel «Exotic Options»: Barrier-Optionen und In-Out-Parität (Modul 07.4); Volatility und Variance Swaps (Modul 05.1, 05.3).
+- Belegt: Lehrbuchwissen, sinngemäss wiedergegeben (kein Buchtext übernommen). Version 7: Kapitel «Introduction» (Absichern mit Forward oder Option, Modul 09.1), «Mechanics of Futures Markets» (Währungsfutures werden an Börsen gehandelt, Modul 01.2), «Trading Strategies Involving Options» (Break-even eines gekauften Calls = Strike plus Prämie, Modul 06.1), «The Greek Letters» (Theta eines Calls im Geld auf eine Währung mit hohem Zins kann positiv sein, Glossar «Theta»), «Exotic Options» (Cash-or-nothing-Digital zahlt einen festen Betrag, Modul 07.3). Kapitel «Determination of Forward and Futures Prices»: gedeckte Zinsparität bei Währungen, der Forward folgt aus Spot und den beiden Zinsen (Modul 02.3). Kapitel «The Greek Letters»: Delta eines Forward-Kontrakts e^(−r_f·T); Greeks für ein Asset mit Rendite q, bei Währungen q = r_f (Modul 05.2, 05.3); die Lage des Gamma- und des Vega-Maximums ist aus diesen Formeln hergeleitet. Kapitel «Exotic Options»: Barrier-Optionen und In-Out-Parität (Modul 07.4); Volatility und Variance Swaps (Modul 05.1, 05.3).
 
 ## bis-2016-cip
 
@@ -48,6 +48,112 @@ URL (no links to copies of books; statements are paraphrased, never copied).
 - Datum: 2015
 - ISBN: 978-1-118-96745-4
 - Belegt: Weiterführende Literatur zur Praxis am FX-Options-Desk (Konventionen, Strukturen wie TARFs); kein Beleg für eine einzelne Aussage im Tool.
+
+<!-- Version 7, Review 3 (24.10.2026): Quellen zu den geänderten Aussagen. URLs stammen aus dem Review; die Seiten waren aus der Sandbox nicht abrufbar (Proxy), Inhalte sinngemäss nach dem Review wiedergegeben. -->
+
+## bis-xtd
+
+- Titel: Exchange-traded derivatives statistics
+- Herausgeber: Bank für Internationalen Zahlungsausgleich (BIZ) / Bank for International Settlements (BIS)
+- Datum: laufend (quartalsweise) / ongoing (quarterly)
+- URL: https://data.bis.org/topics/XTD_DER
+- Belegt: Es gibt börsengehandelte Futures und Optionen auf Devisen (und Zinsen); die BIZ erfasst sie in einer eigenen Statistik. Modul 01.2 sagt darum: Spot, Forwards und FX Swaps laufen überwiegend ausserbörslich, Währungsfutures und Optionen darauf werden an Börsen gehandelt. Das Tool nennt keine Grössenangabe zum Börsenanteil und keine Börse im Lerntext.
+
+## cme-rulebook-254a
+
+- Titel: CME Rulebook, Chapter 254A: Options on Swiss Franc/U.S. Dollar Futures (mit Chapter 254: Swiss Franc/U.S. Dollar Futures)
+- Herausgeber: CME Group (Regelwerk einer Terminbörse)
+- Datum: laufend / current rulebook
+- URL: https://www.cmegroup.com/rulebook/CME/III/250/254A/254A.pdf
+- Belegt: Primärbeleg, dass CHF/USD-Futures und Optionen darauf an einer Börse mit standardisierten Verträgen gehandelt werden (Modul 01.2). Nur als Quellenangabe (D-50); im Lerntext steht kein Börsenname.
+
+## oic-option-strategies
+
+- Titel: Option Strategies Quick Guide
+- Herausgeber: The Options Industry Council (OIC) / OCC
+- Datum: ohne Jahr (Stand Review 3, Oktober 2026)
+- URL: https://prd-web.theocc.com/getmedia/f34f8a0d-806f-4f1a-adf7-d49d8d94b16e/option-strategies-quick-guide.pdf
+- Belegt: Break-even eines gekauften Calls = Strike plus Prämie. Modul 06.1: Endet der Kurs nahe bei Forward und Strike, kostet eine Struktur mit Prämie mehr als «ohne Absicherung» und als der Forward.
+
+## seco-kmu-fx
+
+- Titel: Wechselkursrisiken: So können sich KMU absichern
+- Herausgeber: Staatssekretariat für Wirtschaft (SECO), KMU-Portal
+- Datum: laufend / ongoing
+- URL: https://www.kmu.admin.ch/de/wechselkursrisiken-so-koennen-sich-kmu-absichern
+- Belegt: Ein Forward fixiert den Kurs, eine Option kostet eine Prämie und lässt die Chance offen; welches Instrument passt, hängt vom tragbaren Worst Case ab. Modul 09.1: Der Call lohnt sich erst unter F − Prämie.
+
+## sec-cftc-2013-binary
+
+- Titel: Investor Alert: Binary Options and Fraud
+- Herausgeber: U.S. Securities and Exchange Commission (SEC) und Commodity Futures Trading Commission (CFTC)
+- Datum: 06.06.2013
+- URL: https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/investor-61
+- Belegt: Eine binäre (digitale) Option zahlt einen festen Betrag oder nichts. Modul 07.3: Für den Importeur höchstens ein Teilschutz, kein proportionaler Schutz wie beim USD Call.
+
+## hkma-2011-accumulator
+
+- Titel: Buy at a discount?
+- Herausgeber: Hong Kong Monetary Authority (HKMA), inSight
+- Datum: 28.09.2011
+- URL: https://www.hkma.gov.hk/eng/news-and-media/insight/2011/09/20110928/
+- Belegt: Ein Accumulator kauft unter dem Marktkurs, solange der Kurs in einer Spanne bleibt; steigt er stark, endet der Vertrag (Knock-out), fällt er stark, kauft man die doppelte Menge über dem Marktkurs. Modul 08.2, Merksatz.
+
+## ifec-2022-accumulators
+
+- Titel: Accumulators and decumulators
+- Herausgeber: Investor and Financial Education Council (IFEC), Hongkong
+- Datum: 29.12.2022
+- URL: https://www.ifec.org.hk/web/en/blog/2022/12/accumulators-and-decumulators-1.page
+- Belegt: Aufbau und Risiken von Accumulators und Decumulators (Rabatt, Knock-out, Hebel unter dem Strike). Modul 08.2, Merksatz.
+
+## bossens-2010
+
+- Titel: Vanna-Volga methods applied to FX derivatives: from theory to market practice
+- Herausgeber: Frédéric Bossens, Grégory Rayée, Nikos S. Skantzos, Griselda Deelstra; arXiv 0904.1074
+- Datum: 2010
+- URL: https://arxiv.org/abs/0904.1074
+- Belegt: Prämienadjustiertes Delta Δ_pa = Δ_Spot − V/S, wenn die Prämie in der Basiswährung bezahlt wird; welche Konvention gilt, hängt vom Währungspaar ab. Glossar «Prämienadjustiertes Delta».
+
+## wystup-2018-greeks
+
+- Titel: FX Greeks (FX Column)
+- Herausgeber: Uwe Wystup; MathFinance
+- Datum: 06.11.2018
+- URL: https://mathfinance.com/wp-content/uploads/2025/02/Wystup-FXcolumn-Greeks.pdf
+- Belegt: Spot-Delta, prämienadjustiertes Delta und Forward-Delta am FX-Markt; die Prämie in der Basiswährung ist selbst eine Position. Glossar «Prämienadjustiertes Delta».
+
+## kwok-mafs5030-hw4
+
+- Titel: MAFS5030 Quantitative Modeling of Derivative Securities, Homework 4
+- Herausgeber: Yue-Kuen Kwok; Hong Kong University of Science and Technology (HKUST)
+- Datum: ohne Jahr (Kursunterlage)
+- URL: https://www.math.hkust.edu.hk/~maykwok/courses/MAFS5030/HWs/MAFS5030_hw4.pdf
+- Belegt: Theta eines Calls kann tief im Geld positiv sein (Aufgabe 4). Glossar «Theta»: Für den Käufer meist negativ; bei FX-Optionen kann der Zins-Carry tief im Geld überwiegen.
+
+## bis-2008-fxswaps
+
+- Titel: The basic mechanics of FX swaps and cross-currency basis swaps
+- Herausgeber: Bank für Internationalen Zahlungsausgleich (BIZ) / Bank for International Settlements (BIS), BIS Quarterly Review
+- Datum: März 2008 / March 2008
+- URL: https://www.bis.org/publ/qtrpdf/r_qt0803z.htm
+- Belegt: Mechanik eines FX Swaps (Near Leg per Spot, Far Leg auf Termin) und eines Cross-Currency Basis Swaps; die Swap Points sind die Forward Points, wenn der Swap per Spot beginnt. Modul 03.2 und die Figur «Swap Legs».
+
+## derman-2007
+
+- Titel: The Second-Most Important Equation (Gamma gegen Theta beim Delta-Hedge)
+- Herausgeber: Emanuel Derman (Blog)
+- Datum: 2007
+- URL: https://emanuelderman.com/the-second-most-important-equation/
+- Belegt: Der Gewinn eines delta-gehedgten Calls aus Gamma gegen den Zeitwertverlust gilt im Modell (konstante Vola, laufender Delta-Hedge ohne Kosten). Modul 05.4, Merksatz «Im Modell».
+
+## lyuu-barrier
+
+- Titel: Barrier options (Vorlesungsunterlage Finance 1, 25.03.2022)
+- Herausgeber: Yuh-Dauh Lyuu; National Taiwan University (NTU)
+- Datum: 25.03.2022
+- URL: https://www.csie.ntu.edu.tw/~lyuu/finance1/2022/20220325.pdf
+- Belegt: Ein Knock-in hat vor der Berührung der Barriere einen Wert (In-Out-Parität, Bewertung von Knock-in-Optionen). Modul 07.1: Vorher hast du nur die Anwartschaft darauf, der Vertrag hat aber schon einen Wert.
 
 <!-- Riskometer -->
 

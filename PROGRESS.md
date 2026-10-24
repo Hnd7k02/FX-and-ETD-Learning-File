@@ -1,6 +1,6 @@
 # Progress
 
-Working branch: `claude/forward-first-v5` (Version 6 since Review 2 of 23.10.2026; Version 5 from `claude/forward-first-v1` at 1f0f4ff). Mode: phases without stops (D-16), uncertain choices kept easy to change (D-22).
+Working branch: `claude/forward-first-v5` (Version 7 since Review 3 of 24.10.2026; Version 6 = commit 36ffffa; Version 5 from `claude/forward-first-v1` at 1f0f4ff). Mode: phases without stops (D-16), uncertain choices kept easy to change (D-22).
 
 | Phase | Content                                                                                          | Status                                                                |
 | ----- | ------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------- |
@@ -14,13 +14,14 @@ Working branch: `claude/forward-first-v5` (Version 6 since Review 2 of 23.10.202
 | 7     | English complete, glossary, about and methodology                                                | written alongside each module; English review open (after Dario's go) |
 | 7b    | Offline file `forward-first.html` (D-13, D-40)                                                   | done; Version 4 tested by Dario on work PC and iPad                   |
 | 7c    | Version 5 after review and device test of 23.10.2026, with the binding supplement (D-41 to D-50) | done                                                                  |
-| 7d    | Version 6: subject-matter corrections from Review 2 (D-51 to D-62)                               | done; waiting for Dario's test of Version 6                           |
+| 7d    | Version 6: subject-matter corrections from Review 2 (D-51 to D-62)                               | done                                                                  |
+| 7e    | Version 7: corrections from Review 3 (D-64 to D-67), Monte Carlo with 4 Mio. paths               | done; waiting for Dario's test of Version 7                           |
 | 8     | Polish: transitions, micro-interactions, 390 px and iPad, visual comparison                      | open                                                                  |
 | 9     | Verification and release: tests, E2E in Chromium and WebKit, fact check, README                  | open                                                                  |
 
 ## Stop point (Dario, 23.10.2026)
 
-The branch is in PR #1 against `main` and must not be merged: Dario tests `release/forward-first-v6.html` on the iPad and on the work PC (sent by mail) first. Phases 8 and 9 start only after his go.
+The branch is in PR #1 against `main` and must not be merged: Dario tests `release/forward-first-v7.html` on the iPad and on the work PC (sent by mail) first. Phases 8 and 9 start only after his go.
 
 ## Version 5 (review 23.10.2026)
 
@@ -56,18 +57,29 @@ Subject-matter corrections only; the mechanics stay. DE and EN together, every n
 - **Data:** not updated. `npm run data:fetch` could not reach the ECB from the sandbox (proxy 403); the data date stays 14.09.2026.
 - **Independent audit (D-63):** six auditors and a skeptic per finding; nine confirmed findings fixed (vega of exotics, model-free parities across jumps, barrier option price, cross-currency basis in 03.4, risk-neutral label in quiz 09, quiz 08 coupon, About methodology on Monte Carlo and closed forms), plus clear nits.
 
+## Version 7 (Review 3, 24.10.2026)
+
+Six over-absolute conclusions, one glossary precision, eight review hints and the Monte Carlo coupons. Mechanics, formulas, contract rules, barrier monitoring and figures unchanged. DE and EN together, numbers via `<Num>`, D-26 and D-46 hold.
+
+- **Reproducibility:** Version 6 = commit `36ffffa`, built with `SOURCE_DATE_EPOCH=1792792699` → `release/forward-first-v6.html`, 1’757’756 bytes, SHA-256 `cad08ded263918fd68282f927077ddccfa0fec472d0dd6496a97c685596f61a6` (rebuilt and verified before Version 7). Version 7 build: `SOURCE_DATE_EPOCH=1792839824` → `release/forward-first-v7.html`, 1’768’306 bytes, SHA-256 `5d925b5366de9d5f96cfdb6039aea98bfec8e44707af8d00a24e202b65a498ac`.
+- **A · Six corrections (D-64):** 06.1 yardsticks not limits (example at 0.7950), 09.1 call beats the forward only below F − premium (0.7804), glossary theta with the interest carry, 01.2 mostly OTC with futures on exchanges, 07.3 digital as partial hedge (net CHF 50’759), 08.2 accumulator between 2K − F and the barrier. Guard `RETIRED_V7`, tests `tests/unit/v7-a.test.ts`.
+- **B · Glossary and hints (D-65):** premium-adjusted delta with its unit (Δ_pa = Δ_Spot − V/S); B2–B6 sharpened (same-tenor rates, spot-start swap, «im Modell», «im Beispiel short Vola», knock-in before the barrier), B1, B7, B8 deliberately unchanged. Tests `tests/unit/v7-b.test.ts`.
+- **C · Monte Carlo (D-66):** 4 Mio. paths, seed unchanged; every product within 3 SE of an independent reference; TPF 773.7 pips (CHF 7’737, max CHF 46’422), RTPF 808.2 pips (CHF 8’082, max CHF 48’492); grid scripts `docs/reference/xcheck/tpf_grid_check.py` and `dnt_grid_check.py`; DNT tests compare against the exact daily value.
+- **D · Sources, tests (D-67):** 13 new literature references (incl. `bis-xtd`), `hull-2012` chapters; quiz parity test (72 questions, same numbers in DE and EN); `OFFLINE_VERSION` 7, copy `release/forward-first-v7.html`.
+- **Data:** ECB data not updated (sandbox cannot reach the ECB; data date 14.09.2026).
+
 ## Current state
 
-- **Output:** one offline file `release/forward-first.html` (byte-identical copy `forward-first-v6.html`), 1.66 MB (CSS 475 KB, JS 757 KB, packed pages 467 KB), plain ASCII. 99 pages, 19 route aliases, 38 islands, both languages. CSP `default-src 'none'`, no network request (tested).
-- **Tests:** `npm run check` green (Vitest about 2’600 tests, coverage ≥ 90 % in `src/lib`). Offline file: 96 tests in Chromium 1440 (2 touch tests run only in the WebKit iPad projects); WebKit iPad runs in CI. Web build component tests: 460 green.
+- **Output:** one offline file `release/forward-first.html` (byte-identical copy `forward-first-v7.html`), 1’768’306 bytes (CSS 475 KB, JS 759 KB, packed pages 478 KB), plain ASCII. 99 pages, 19 route aliases, 38 islands, both languages. CSP `default-src 'none'`, no network request (tested).
+- **Tests:** `npm run check` green (Vitest 3’093 tests, coverage ≥ 90 % in `src/lib`). Offline file: 97 tests in Chromium 1440 (2 touch tests run only in the WebKit iPad projects); WebKit iPad runs in CI. Web build component tests: 460 green.
 - **Calculation core:** forward, swap, roll, arbitrage, Garman-Kohlhagen, Black-76, implied vol, delta strikes, six Greeks, smile, digitals, 8 barriers, touch, double no-touch; all §6 reference values within tolerance; cross-checked against independent formulas (max diff 1.8e-13).
-- **Monte Carlo:** 8 products, fair strikes/coupons with standard errors in `src/data/fx/mc-products.json`, independently re-implemented and reproduced; interactive pricing in chunks on the main thread.
+- **Monte Carlo:** 8 products, fair strikes/coupons with standard errors in `src/data/fx/mc-products.json` (4 Mio. paths, seed 20261022), independently re-implemented and reproduced, every value within 3 SE of an exact or 16-Mio.-path reference (D-66); interactive pricing in chunks on the main thread.
 - **Riskometer data:** ECB until 14.09.2026; EUR/CHF 3.9 % (Normal, percentile 45). Manual update via Actions → Release.
 - **Content:** nine modules with four sections, check questions and quiz each, DE and EN; glossary; about and methodology; every module reviewed by a fresh agent (D-39); sources merged into `src/content/sources.md` with a verification log.
 
 ## Next steps
 
-1. Dario: test Version 6 on the iPad and the work PC (by mail), incl. module 04.1 (Option oder Forward?) and 07.2 (barrier lab) while dragging. If the file does not start, the yellow diagnostics box shows why; if only the loading text stays, the view runs no JavaScript.
+1. Dario: test Version 7 on the iPad and the work PC (by mail), incl. module 04.1 (Option oder Forward?) and 07.2 (barrier lab) while dragging. If the file does not start, the yellow diagnostics box shows why; if only the loading text stays, the view runs no JavaScript.
 2. Dario: run Actions → Release with «Fetch new ECB reference rates first» (the sandbox could not reach the ECB).
 3. After his go: merge the PR, then phase 7 English review, phase 8 polish, phase 9 verification and release.
 
