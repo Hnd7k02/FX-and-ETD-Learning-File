@@ -1,0 +1,64 @@
+import SessionClockFigure from '@/components/figures/SessionClockFigure.astro';
+
+{/* 01 Spot · Section 2 · OTC market, sessions, participants. Facts via <Fact />, sources in src/content/sources/01-spot.md. */}
+
+You trade shares on an exchange with fixed opening hours. Spot, forwards and FX swaps, by contrast, mostly trade off-exchange: the FX market is above all an **OTC market** (over the counter). Two parties deal directly with each other, by phone, in a chat or on electronic trading platforms. There is no central place and no single closing price. Reference rates such as the ECB's, which the Riskometer uses, are snapshots taken at a fixed time of day, not tradable rates. Currency futures and options on them are traded on exchanges, though, with standardised contracts. This tool covers the OTC market.
+
+Small it is not. In <Fact id="m01-bis-month" /> an average of about <Fact id="m01-bis-turnover" /> changed hands every day, across all instruments: spot, forwards, swaps and options. That is the result of the survey the central banks carry out every three years together with the BIS, the bank of central banks.
+
+Trading follows the daylight. The week starts on Monday morning in **Wellington**, while it is still Sunday evening in Zurich. Then trading moves with the sun: via Sydney and Tokyo to London and on to New York. On Friday evening New York closes, and the market rests until Sunday evening.
+
+<SessionClockFigure caption="Tap “Play the day” or drag the time. The dashed blue line marks the current time in Zurich. Choose “Sun” to see where the week begins." />
+
+### When the market is deepest
+
+The market is busiest when London and New York are open at the same time. In Zurich that is the afternoon. Many dealers make prices then, and even large amounts can be traded without moving the rate much. This is called **liquidity**: how easily can you buy or sell without shifting the price?
+
+For the importer this has a price. If he buys his USD 1m in the afternoon, we assume a spread of <Num of="m01.spreadBase" /> pips. Against the mid he then pays <Num of="m01.halfCostBase" /> more. Late in the evening, when New York winds down and Asia is not fully awake yet, it is <Num of="m01.spreadEvening" /> pips and <Num of="m01.halfCostEvening" />. These are schematic values, not market data. Not a fortune, but it is paid on every single deal. Section 3 shows exactly what the spread is.
+
+### Who trades?
+
+- **Sovereigns:** central banks and sovereign wealth funds. Central banks manage FX reserves and sometimes intervene in the market to slow down or support their currency. Sovereign wealth funds invest a state's surpluses around the world.
+- **Real money:** pension funds, insurers and asset managers. They invest for the long term, mostly without leverage. They need currencies for investments abroad and to hedge them.
+- **Fast money:** hedge funds and other short-term traders. They often use leverage and turn their positions over quickly.
+- **Corporates:** importers, exporters and multinational groups. They need currencies for their business and usually want to hedge. Our importer belongs here.
+- **Banks as market makers:** they continuously quote buying and selling prices, take on their clients' orders and offset their risk among themselves, in the interbank market.
+- **Private and wealth clients:** individuals and wealthy clients. They exchange money for travel, payments or investments in foreign currencies.
+
+### The journey of an order
+
+The importer calls his bank and buys USD 1m for <Num of="m01.costToday" /> plus the spread. The bank sells him the dollars and is now short USD 1m itself. It does not want to hold this position for long. It buys the dollars back from another bank or on a trading platform, often within seconds. In this way the risk travels through the market until it lands with someone who wants to carry it.
+
+<Derivation title="Derivation: time zones and the schematic liquidity curve">
+
+**Time zones.** The clock works entirely in Zurich time. In winter Zurich is at UTC+1 (CET), in summer at UTC+2 (CEST). Schematically a session lasts about nine hours, roughly from 08:00 to 17:00 local time. Three examples for winter:
+
+<Formula>
+  <span>London 08:00 (UTC+0) = 08:00 UTC = 09:00 Zurich</span>
+  <span>Tokyo 09:00 (UTC+9) = 00:00 UTC = 01:00 Zurich</span>
+  <span>Wellington Mon 08:00 (UTC+13) = Sun 19:00 UTC = Sun 20:00 Zurich</span>
+</Formula>
+
+In summer Zurich, London and New York put their clocks forward, almost at the same time. Relative to Zurich these sessions therefore stay put. Japan has no daylight saving time, so Tokyo moves one hour later in Zurich time. Wellington and Sydney are then in winter and move two hours later. The clock stores every time in UTC, so this can be changed in one place.
+
+**Liquidity.** The curve is a model, not a measurement. Each session <i>i</i> gets a weight <i>w</i><sub>i</sub>, London the largest. Its activity <i>a</i><sub>i</sub>(<i>h</i>) ramps up softly at the open, fades towards the close and drops off softly when the session shuts. The sum is scaled so that the highest value of a normal weekday is 1:
+
+<Formula variant="accent"><i>L</i>(<i>h</i>) = Σ<sub>i</sub> <i>w</i><sub>i</sub> · <i>a</i><sub>i</sub>(<i>h</i>) / max</Formula>
+
+Where two large sessions overlap, their activities add up. That is why the maximum lies in the London/New York overlap.
+
+</Derivation>
+
+<Desk title="The trading day on the desk">
+
+On the desk the trading day ends at 17:00 New York time. After that, spot deals get the next value date: the new trading day has begun, and it is already morning in Wellington.
+
+Monday morning in Wellington and Sydney is special: whatever happened at the weekend, such as elections or government decisions, is priced in during the first, still thin trading. The rate can then jump instead of moving. Section 3 shows why that is dangerous for stop-loss orders.
+
+</Desk>
+
+<Takeaway>
+
+FX trading runs mostly OTC and only rests at the weekend. It is deepest when London and New York trade at the same time: that is when spreads are tightest.
+
+</Takeaway>

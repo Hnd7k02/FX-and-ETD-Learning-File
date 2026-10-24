@@ -1,0 +1,91 @@
+import ParityPathsFigure from '@/components/figures/ParityPathsFigure.astro';
+
+{/* 02 Forward · Abschnitt 2 · Zinsparität. Zahlen nur über <Num />, Register src/lib/nums/ex.ts und m02.ts. */}
+
+Woher kommt der Forward von <Num of="m02.fwd" />? Die Bank rät ihn nicht. Sie fragt sich: Wie komme ich selbst ohne Kursrisiko zu USD 1 Mio. in 3 Monaten? Es gibt zwei Wege.
+
+- **Weg A, der Forward.** Kaufe die Dollars heute auf Termin. In 3 Monaten zahlst du den vereinbarten Kurs.
+- **Weg B, der Geldmarkt.** Leihe heute Franken, kaufe damit sofort Dollars und lege sie bis zum Zahltag an.
+
+Beide Wege sind gleich sicher. Auf keinem spielt der Kurs in 3 Monaten noch eine Rolle. Und beide enden gleich: mit USD 1 Mio. am Zahltag und einem festen Betrag in Franken, den du dafür zahlst. Dann müssen sie auch gleich viel kosten. Sonst würde jeder den billigeren Weg nehmen und den teureren verkaufen (Abschnitt 4). Diese Idee heisst **gedeckte Zinsparität** (Covered Interest Parity). «Gedeckt» heisst: Der Kurs ist auf beiden Wegen schon heute fixiert.
+
+<ParityPathsFigure caption="Links Weg A, rechts Weg B, die Zeit läuft nach unten. Spiel die Schritte ab oder geh sie einzeln durch. Ändere danach die Zinsen und die Laufzeit: Beide Wege kosten immer gleich viel." />
+
+### Weg B Schritt für Schritt
+
+Im Geldmarkt rechnet man mit einfachen Zinsen. Für CHF und USD gilt die Konvention Act/360: Für 90 Tage zählt der Anteil 90/360 = <Num of="m02.t" /> eines Jahres.
+
+1. **Wie viele Dollars brauchst du heute?** Eine USD-Anlage zu <Num of="ex.rf" /> wächst in 90 Tagen um den Faktor <Num of="m02.growthUsd" />. Für USD 1 Mio. am Zahltag reichen heute <Num of="m02.usdToday" />.
+2. **Was kosten sie?** Zum Spot von <Num of="ex.spot" /> sind das <Num of="m02.chfLoan" />. Diesen Betrag leihst du dir in Franken.
+3. **Die Zeit läuft.** Die Anlage bringt <Num of="m02.usdInterest" /> Zins und wird zu USD 1 Mio. Der Franken-Kredit kostet bei <Num of="ex.rd" /> Zins genau <Num of="m02.chfInterest" />.
+4. **Am Zahltag** hast du USD 1 Mio. und zahlst den Kredit zurück: <Num of="m02.chfRepay" />.
+
+Weg B liefert also USD 1 Mio. für <Num of="m02.chfRepay" />. Weg A muss gleich viel kosten. Daraus folgt der Forward:
+
+<Formula variant="accent"><i>F</i> = <Num of="m02.chfRepay" /> ÷ USD 1 Mio. = <Num of="m02.fwd" /></Formula>
+
+### Die Formel
+
+Allgemein wächst der Franken-Betrag mit dem Zins der Quote-Währung (CHF), der Dollar-Betrag mit dem Zins der Base-Währung (USD). Der Forward ist der Spot mal das Verhältnis der beiden Zinsfaktoren:
+
+<Formula variant="accent"><i>F</i> = <i>S</i> · (1 + <i>r</i><sub>CHF</sub> · <i>t</i>) / (1 + <i>r</i><sub>USD</sub> · <i>t</i>)</Formula>
+
+Mit Zahlen: <Num of="ex.spot" /> · <Num of="m02.growthChf" /> / <Num of="m02.growthUsd" /> = <Num of="m02.fwd" />. Ist der USD-Zins höher, liegt der Forward unter dem Spot. Ist der CHF-Zins höher, darüber. Probier es mit den Schiebern aus.
+
+### Geldmarkt oder stetig?
+
+Die Optionsmodelle ab Modul 04 rechnen mit stetigen Zinsen und <i>T</i> = Tage/365. Dort heisst die Formel:
+
+<Formula><i>F</i> = <i>S</i> · e<sup>(<i>r</i><sub>d</sub> − <i>r</i><sub>f</sub>) · <i>T</i></sup></Formula>
+
+Dabei ist <i>r</i><sub>d</sub> der Zins der Quote-Währung (CHF) und <i>r</i><sub>f</sub> der Zins der Base-Währung (USD).
+
+Für «3 Monate» nimmt das Tool in beiden Welten <i>T</i> = <Num of="ex.T" />. Das ist eine stilisierte Konvention. Im Geldmarkt sind es <Num of="ex.mmDays" />/360. Im Optionsmodell sind es <Num of="ex.T" /> Jahre, also <Num of="m02.daysT" /> Tage. Mit diesem <i>T</i> ergibt die stetige Formel <Num of="ex.forward" />, also <Num of="ex.fwdDiffPips" /> Pips weniger als im Geldmarkt. Auf USD 1 Mio. sind das <Num of="m02.fwdDiffChf" />.
+
+Bei gleichem <i>T</i> ist der Unterschied kein Fehler. Derselbe Zinssatz bedeutet einmal einfache Verzinsung und einmal [stetige](/glossar/#term-continuous-compounding). Stetig verzinst wächst Geld etwas schneller, darum diskontiert die stetige Formel den Dollar etwas stärker.
+
+Bei exakt demselben Termin, <Num of="ex.mmDays" /> Tagen, ist <i>T</i> = <Num of="ex.mmDays" />/365. Dann ergibt die stetige Formel <Num of="m02.fwdCont90" digits={6} />, also <Num of="m02.fwdCont90DiffPips" /> Pips über dem Geldmarkt-Forward von <Num of="m02.fwd" digits={6} />. Auch diese <Num of="m02.fwdCont90DiffPips" /> Pips sind nur Konvention: Derselbe Zinssatz von <Num of="ex.rf" /> gilt einmal einfach über <Num of="ex.mmDays" />/360 und einmal stetig über <Num of="ex.mmDays" />/365. Der Geldmarkt zählt den grösseren Jahresanteil; das macht hier mehr aus als die stetige Verzinsung. Darum wächst der Dollar im Geldmarkt etwas stärker, er wird stärker diskontiert, und der Geldmarkt-Forward liegt tiefer.
+
+**Kein Arbitragegewinn.** Die <Num of="ex.fwdDiffPips" /> Pips bei gleichem <i>T</i> und die <Num of="m02.fwdCont90DiffPips" /> Pips bei gleichem Enddatum kannst du nicht verdienen. Am Markt gibt es für ein Enddatum nur einen Forward. Die zwei Formeln beschreiben ihn in zwei Konventionen, und jede braucht ihren eigenen Zins. Rechne den Geldmarktzins <i>r</i><sub>MM</sub> in den laufzeitgleichen stetigen Zins <i>r</i> um:
+
+<Formula><i>r</i> = ln(1 + <i>r</i><sub>MM</sub> · 90/360) / (90/365)</Formula>
+
+Für den USD sind das <Num of="m02.rfCont90" /> statt <Num of="ex.rf" />. Beim CHF-Zins von <Num of="ex.rd" /> ändert sich nichts. Mit diesen Zinsen liefert die stetige Formel genau <Num of="m02.fwdCont90Conv" digits={6} />, den Geldmarkt-Forward.
+
+**Merksatz:** Vergleiche Forwards nur mit gleichem Enddatum und gleicher Konvention.
+
+<Derivation title="Herleitung: zwei Wege, ein Preis">
+
+Sei <i>S</i> der Spot in CHF je USD, <i>N</i> der USD-Betrag bei Fälligkeit, <i>t</i><sub>CHF</sub> und <i>t</i><sub>USD</sub> die Laufzeiten in Jahren nach der Tageskonvention der Währung. CHF und USD zählen Act/360, also beide 90/360.
+
+**Weg B heute.** Du brauchst <i>B</i><sub>0</sub> = <i>N</i> / (1 + <i>r</i><sub>USD</sub> · <i>t</i><sub>USD</sub>) Dollars. Sie kosten <i>Q</i><sub>0</sub> = <i>S</i> · <i>B</i><sub>0</sub> Franken, die du leihst.
+
+**Weg B bei Fälligkeit.** Die Anlage zahlt genau <i>N</i>. Der Kredit kostet
+
+<Formula><i>Q</i><sub>0</sub> · (1 + <i>r</i><sub>CHF</sub> · <i>t</i><sub>CHF</sub>) = <i>N</i> · <i>S</i> · (1 + <i>r</i><sub>CHF</sub> · <i>t</i><sub>CHF</sub>) / (1 + <i>r</i><sub>USD</sub> · <i>t</i><sub>USD</sub>)</Formula>
+
+**Weg A bei Fälligkeit** kostet <i>N</i> · <i>F</i>. Gleichsetzen und durch <i>N</i> teilen:
+
+<Formula variant="accent"><i>F</i> = <i>S</i> · (1 + <i>r</i><sub>CHF</sub> · <i>t</i><sub>CHF</sub>) / (1 + <i>r</i><sub>USD</sub> · <i>t</i><sub>USD</sub>)</Formula>
+
+**Stetig.** Mit stetigen Zinsen wird aus dem Zinsfaktor 1 + <i>r</i> · <i>t</i> der Faktor e<sup><i>r</i> · <i>T</i></sup>, und der Quotient zweier Exponentialfunktionen ist e<sup>(<i>r</i><sub>d</sub> − <i>r</i><sub>f</sub>) · <i>T</i></sup>.
+
+**Woher die <Num of="ex.fwdDiffPips" /> Pips kommen.** Diese Rechnung gilt bei gleichem <i>T</i>: Im Beispiel ist <i>T</i> = <Num of="ex.T" /> in beiden Welten. Der Geldmarkt diskontiert den Dollar mit 1 / <Num of="m02.growthUsd" /> = <Num of="m02.dfMM" />, die stetige Formel mit e<sup>−<i>r</i><sub>f</sub> · <i>T</i></sup> = <Num of="m02.dfCont" />. Der einfache Zins von <Num of="ex.rf" /> über 90/360 entspricht bei gleichem <i>T</i> = <Num of="ex.T" /> stetig nur <Num of="m02.rfCont" />. Setzt du diesen Wert ein, liefern beide Formeln denselben Forward. Den CHF-Zins müsstest du genauso umrechnen; bei <Num of="ex.rd" /> ändert sich nichts.
+
+**Warum die Umrechnung genau passt.** Mit <i>r</i> = ln(1 + <i>r</i><sub>MM</sub> · <i>t</i>) / <i>T</i> ist e<sup><i>r</i> · <i>T</i></sup> = 1 + <i>r</i><sub>MM</sub> · <i>t</i>. Der stetige Zinsfaktor ist dann gleich dem einfachen, für jede Währung. Also ist auch ihr Quotient gleich und damit der Forward. Mit gleichem <i>T</i> ist <i>t</i> = <i>T</i> = <Num of="ex.T" />, dann ist der stetige USD-Zins <Num of="m02.rfCont" />. Mit gleichem Enddatum ist <i>t</i> = 90/360 und <i>T</i> = 90/365, dann ist er <Num of="m02.rfCont90" />.
+
+</Derivation>
+
+<Desk title="Woher die Zinsen kommen">
+
+Am Desk rechnet niemand den Forward aus Leitzinsen. Die Forward Points kommen direkt aus dem Markt für FX Swaps (Modul 03), in dem Banken Währungen auf Zeit tauschen. Die Zinsen darin sind die Sätze, zu denen man eine Währung tatsächlich leihen und anlegen kann.
+
+Darum weicht der Markt-Forward oft leicht von der Formel mit Referenzzinsen gleicher Laufzeit ab. Diese Abweichung heisst **Cross-Currency Basis**. Sie zeigt, ob es mehr oder weniger kostet, sich eine Währung über FX Swaps zu leihen statt direkt am Geldmarkt. Modul 03 kommt darauf zurück. Die Logik der zwei Wege bleibt dieselbe.
+
+</Desk>
+
+<Takeaway>
+
+Zwei gleich sichere Wege zum selben Ziel kosten gleich viel. Darum ist der Forward keine Schätzung, sondern Spot mal Zinsfaktor CHF durch Zinsfaktor USD: <Num of="m02.fwd" />. Die stetige Formel gibt mit umgerechneten Zinsen denselben Forward; ein Abstand ist eine Frage der Konvention, kein Arbitragegewinn.
+
+</Takeaway>

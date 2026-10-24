@@ -1,0 +1,64 @@
+import SessionClockFigure from '@/components/figures/SessionClockFigure.astro';
+
+{/* 01 Spot · Abschnitt 2 · OTC-Markt, Sessions, Teilnehmer. Fakten über <Fact />, Quellen in src/content/sources/01-spot.md. */}
+
+Aktien handelst du an einer Börse mit festen Öffnungszeiten. Spot, Forwards und FX Swaps laufen dagegen überwiegend ausserbörslich: Der Devisenmarkt ist vor allem ein **OTC-Markt** (over the counter). Zwei Parteien handeln direkt miteinander, am Telefon, im Chat oder über elektronische Handelsplattformen. Es gibt keinen zentralen Ort und keinen einheitlichen Schlusskurs. Referenzkurse wie die der EZB, die das Riskometer nutzt, sind Momentaufnahmen zu einer festen Uhrzeit, keine handelbaren Kurse. Währungsfutures und Optionen darauf werden aber an Börsen gehandelt, mit standardisierten Verträgen. Dieses Tool behandelt den OTC-Markt.
+
+Klein ist dieser Markt nicht. Im <Fact id="m01-bis-month" /> wurden im Schnitt rund <Fact id="m01-bis-turnover" /> pro Tag gehandelt, über alle Instrumente: Spot, Forwards, Swaps und Optionen. Das zeigt die Umfrage, die die Zentralbanken alle drei Jahre gemeinsam mit der BIZ durchführen, der Bank der Zentralbanken.
+
+Gehandelt wird dort, wo gerade Tag ist. Die Woche beginnt am Montagmorgen in **Wellington**, in Zürich ist dann noch Sonntagabend. Danach wandert der Handel mit der Sonne: über Sydney und Tokio nach London und weiter nach New York. Am Freitagabend schliesst New York, und der Markt ruht bis Sonntagabend.
+
+<SessionClockFigure caption="Tippe auf «Tag abspielen» oder zieh an der Uhrzeit. Die gestrichelte blaue Linie markiert die aktuelle Zeit in Zürich. Wähle «So», um zu sehen, wo die Woche beginnt." />
+
+### Wann der Markt am tiefsten ist
+
+Am meisten los ist, wenn London und New York gleichzeitig offen sind. In Zürich ist das am Nachmittag. Dann stellen sehr viele Händler Kurse, und auch grosse Beträge lassen sich handeln, ohne den Kurs stark zu bewegen. Das nennt man **Liquidität**: Wie leicht kannst du kaufen oder verkaufen, ohne den Preis zu verschieben?
+
+Für den Importeur hat das einen Preis. Kauft er seine USD 1 Mio. am Nachmittag, rechnen wir mit einem Spread von <Num of="m01.spreadBase" /> Pips. Gegenüber dem Mittelkurs zahlt er dann <Num of="m01.halfCostBase" /> mehr. Spät am Abend, wenn New York ausläuft und Asien noch nicht richtig wach ist, sind es <Num of="m01.spreadEvening" /> Pips und <Num of="m01.halfCostEvening" />. Das sind schematische Werte, keine Marktdaten. Kein Vermögen, aber es fällt bei jedem Geschäft an. Was der Spread genau ist, zeigt Abschnitt 3.
+
+### Wer handelt?
+
+- **Sovereigns:** Zentralbanken und Staatsfonds. Zentralbanken verwalten Devisenreserven und greifen manchmal in den Markt ein, um ihre Währung zu bremsen oder zu stützen. Staatsfonds legen die Überschüsse eines Staates weltweit an.
+- **Real Money:** Pensionskassen, Versicherungen und Asset Manager. Sie investieren langfristig, meist ohne Hebel. Devisen brauchen sie für Anlagen im Ausland und um diese abzusichern.
+- **Fast Money:** Hedge Funds und andere kurzfristig orientierte Händler. Sie arbeiten oft mit Hebel und drehen ihre Positionen schnell.
+- **Firmen (Corporates):** Importeure, Exporteure und internationale Konzerne. Sie brauchen Devisen für ihr Geschäft und wollen sich meist absichern. Hierher gehört unser Importeur.
+- **Banken als Market Maker:** Sie stellen laufend Kauf- und Verkaufskurse, nehmen die Aufträge der Kunden an und gleichen ihr Risiko untereinander aus, im Interbankenmarkt.
+- **Privat- und Wealth-Kunden:** Privatpersonen und vermögende Kunden. Sie tauschen für Reisen, Zahlungen oder Anlagen in Fremdwährung.
+
+### Der Weg einer Order
+
+Der Importeur ruft seine Bank an und kauft USD 1 Mio. für <Num of="m01.costToday" /> plus Spread. Die Bank verkauft ihm die Dollars und ist danach selbst short USD 1 Mio. Diese Position will sie nicht lange halten. Sie kauft die Dollars bei einer anderen Bank oder auf einer Handelsplattform zurück, oft innert Sekunden. So wandert das Risiko durch den Markt, bis es bei jemandem landet, der es tragen will.
+
+<Derivation title="Herleitung: Zeitzonen und die schematische Liquiditätskurve">
+
+**Zeitzonen.** Die Uhr rechnet alles in Zürcher Zeit. Zürich liegt im Winter bei UTC+1 (MEZ), im Sommer bei UTC+2 (MESZ). Eine Session dauert schematisch etwa neun Stunden, rund von 08:00 bis 17:00 Ortszeit. Drei Beispiele für den Winter:
+
+<Formula>
+  <span>London 08:00 (UTC+0) = 08:00 UTC = 09:00 Zürich</span>
+  <span>Tokio 09:00 (UTC+9) = 00:00 UTC = 01:00 Zürich</span>
+  <span>Wellington Mo 08:00 (UTC+13) = So 19:00 UTC = So 20:00 Zürich</span>
+</Formula>
+
+Im Sommer stellen Zürich, London und New York die Uhr vor, fast gleichzeitig. Gegenüber Zürich bleiben diese Sessions darum gleich. Japan kennt keine Sommerzeit, Tokio rückt in Zürcher Zeit eine Stunde später. Wellington und Sydney haben dann Winter und rücken zwei Stunden später. Die Uhr speichert alle Zeiten in UTC, darum lässt sich das an einer Stelle ändern.
+
+**Liquidität.** Die Kurve ist ein Modell, keine Messung. Jede Session <i>i</i> bekommt ein Gewicht <i>w</i><sub>i</sub>, London das grösste. Ihre Aktivität <i>a</i><sub>i</sub>(<i>h</i>) steigt beim Öffnen weich an, lässt gegen den Schluss nach und fällt beim Schliessen weich ab. Die Summe wird so skaliert, dass der höchste Wert eines normalen Werktags 1 ist:
+
+<Formula variant="accent"><i>L</i>(<i>h</i>) = Σ<sub>i</sub> <i>w</i><sub>i</sub> · <i>a</i><sub>i</sub>(<i>h</i>) / max</Formula>
+
+Wo sich zwei grosse Sessions überlappen, addieren sich ihre Aktivitäten. Deshalb liegt das Maximum in der Überlappung von London und New York.
+
+</Derivation>
+
+<Desk title="Der Handelstag am Desk">
+
+Am Desk endet der Handelstag um 17:00 Uhr New Yorker Zeit. Danach gilt für Spot-Geschäfte das nächste Valutadatum: Der neue Handelstag hat begonnen, in Wellington ist es schon Morgen.
+
+Der Montagmorgen in Wellington und Sydney ist besonders: Was am Wochenende passiert ist, etwa Wahlen oder Entscheide einer Regierung, wird im ersten, noch dünnen Handel eingepreist. Der Kurs kann dann springen, statt sich zu bewegen. Warum das für Stop-Loss Orders gefährlich ist, siehst du in Abschnitt 3.
+
+</Desk>
+
+<Takeaway>
+
+Der Devisenhandel läuft überwiegend OTC und ruht nur am Wochenende. Am tiefsten ist er, wenn London und New York gleichzeitig handeln: Dann sind die Spreads am engsten.
+
+</Takeaway>

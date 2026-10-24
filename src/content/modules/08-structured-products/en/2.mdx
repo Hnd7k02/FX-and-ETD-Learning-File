@@ -1,0 +1,77 @@
+import PathSimulatorFigure from '@/components/figures/PathSimulatorFigure.astro';
+
+{/* 08 Structured products · Section 2 · Accumulator and decumulator. Numbers only via <Num />, registry src/lib/nums/m08.ts. */}
+
+The accumulator from section 1 runs over <Num of="m08.accFixings" /> weekly fixings. On every fixing the product looks at the rate <i>S</i><sub><i>i</i></sub> and decides:
+
+| Fixing <i>S</i><sub><i>i</i></sub> | What happens |
+| --- | --- |
+| at or above the barrier <Num of="m08.accBarrier" /> | Knock-out: the product ends and nothing more is bought. |
+| between strike and barrier | You buy <Num of="m08.accNotional" /> at the strike <Num of="m08.accStrike" />. Gain: <i>S</i><sub><i>i</i></sub> − <i>K</i> per dollar. |
+| below the strike | You buy **twice the amount** at the strike. Loss: twice <i>K</i> − <i>S</i><sub><i>i</i></sub> per dollar. |
+
+In building blocks: per fixing, one bought USD call on <Num of="m08.accNotional" /> and two sold USD puts, all at the strike <Num of="m08.accStrike" />, all with a knock-out at <Num of="m08.accBarrier" />. The fair strike lies <Num of="m08.accBetter" /> pips below the forward of <Num of="m08.accFwd" />, with a standard error of <Num of="m08.accSe" /> pips.
+
+<PathSimulatorFigure
+  products={['accumulator', 'decumulator']}
+  scenario="trendUp"
+  caption="The accumulator in time-lapse. Every dot is a fixing: blue with a gain, orange with a loss. Switch to sideways or trend down, drag the end of the path or move the strike: the present value is recalculated live."
+/>
+
+### Worked example: three markets, three results
+
+The simulator compares the product with a forward hedge. The hedge buys <Num of="m08.accNotional" /> on every scheduled fixing at that day's forward. Both are measured against the market rate. The difference shows how much cheaper (+) or dearer (−) the accumulator made the dollars than the forward did.
+
+- **Trend up.** The dollar rises and reaches the barrier at fixing <Num of="m08.accUpKo" />: knock-out. The importer has bought only <Num of="m08.accUpUsd" />. He has to buy the rest in the market, at higher rates. Accumulator <Num of="m08.accUpPnl" />, forward <Num of="m08.accUpFwd" />, difference <Num of="m08.accUpDiff" />.
+- **Sideways.** No knock-out, no fixing below the strike. Every fixing buys the normal amount at the better rate. Accumulator <Num of="m08.accSidePnl" />, forward <Num of="m08.accSideFwd" />: <Num of="m08.accSideDiff" /> for the accumulator.
+- **Trend down.** See the box below.
+
+<Callout variant="bad" title="When it goes wrong: the dollar falls sharply">
+
+Switch to ‘trend down’ and drag the end of the path to <Num of="m08.accDownMove" />. From fixing <Num of="m08.accDownFirstLev" /> the rate is below the strike. <Num of="m08.accDownLev" /> fixings buy twice the amount, <Num of="m08.accDownUsd" /> in total. That is far more than the importer needs, bought above the market rate. Accumulator <Num of="m08.accDownPnl" />, forward <Num of="m08.accDownFwd" />: <Num of="m08.accDownDiff" />. Once a fixing is below <Num of="m08.accBreakLev" />, every double fixing loses more than the forward.
+
+</Callout>
+
+So the accumulator is not simply a better forward. It beats the forward when the market stays calm. In large moves it loses in **both** directions: upwards through the knock-out, downwards through the double amount.
+
+### The decumulator: the mirror image
+
+An exporter who has to sell dollars gets the mirror image. He sells at the strike <Num of="m08.decStrike" />, <Num of="m08.decBetter" /> pips above the forward (standard error <Num of="m08.decSe" /> pips). If the fixing is above the strike, he sells twice the amount. If the rate falls to the barrier <Num of="m08.decBarrier" />, everything ends. Building blocks: one bought USD put and two sold USD calls, with a knock-out.
+
+Why more pips than the accumulator? The forward again. Both barriers sit <Num of="m08.barrierDist" /> away from spot, but the forward lies below spot. Seen from the forward, the decumulator's barrier is only <Num of="m08.decFwdToBarrier" /> pips away, the accumulator's <Num of="m08.accFwdToBarrier" /> pips. So the knock-out comes more often: in <Num of="m08.decPKo" /> of the paths instead of <Num of="m08.accPKo" /> ([risk-neutral](/en/glossary/#term-risk-neutral), not a forecast). Every knock-out takes good scenarios away from the exporter, and he is paid for that with a better strike. The decumulator goes wrong when the dollar rises sharply: then he sells twice the amount at the strike, below the market rate.
+
+<Callout variant="warn" title="Risk box: accumulator and decumulator">
+
+- **Maximum loss:** for the accumulator very high, but finite. The product has no built-in stop on losses, but USD/CHF cannot fall below zero. In the extreme case all <Num of="m08.accFixings" /> fixings are at zero: you buy double, <Num of="m08.accTotalMax" /> at the strike, and the dollars are worth nothing. That is <Num of="m08.accMaxLoss" /> in theory. Monte Carlo: one path in 20 ends at <Num of="m08.accQ05" /> or worse, the worst of <Num of="m08.paths" /> paths at <Num of="m08.accWorst" />. The decumulator sells twice the amount above the strike. The rate has no upper limit, so its loss is theoretically unlimited.
+- **Leverage:** 2. Below the strike (decumulator: above the strike) you trade twice the amount.
+- **Path dependence:** the knock-out ends the hedge exactly when the dollar rises, which is the scenario the importer fears. That happens in <Num of="m08.accPKo" /> of the paths (risk-neutral, not a forecast), on average after only <Num of="m08.accKoFix" /> of <Num of="m08.accFixings" /> fixings.
+
+</Callout>
+
+<Derivation title="Derivation: product against forward, fixing by fixing">
+
+**1.** On fixing <i>i</i> the accumulator buys the amount <i>q</i><sub><i>i</i></sub> (normally <i>N</i>, below the strike 2<i>N</i>, after the knock-out 0) at the strike <i>K</i>. Against the market rate this is worth (<i>S</i><sub><i>i</i></sub> − <i>K</i>) · <i>q</i><sub><i>i</i></sub>.
+
+**2.** The forward hedge buys <i>N</i> on every scheduled fixing at that day's forward, <i>F</i><sub><i>i</i></sub> = <i>S</i> · <i>e</i><sup>(<i>r</i><sub>d</sub> − <i>r</i><sub>f</sub>) · day<sub><i>i</i></sub>/365</sup>. Against the market: (<i>S</i><sub><i>i</i></sub> − <i>F</i><sub><i>i</i></sub>) · <i>N</i>.
+
+**3.** Both buy what is missing in the market and sell what is too much. The difference is therefore exactly the product's cost advantage:
+
+<Formula variant="accent">Δ<sub><i>i</i></sub> = (<i>S</i><sub><i>i</i></sub> − <i>K</i>) · <i>q</i><sub><i>i</i></sub> − (<i>S</i><sub><i>i</i></sub> − <i>F</i><sub><i>i</i></sub>) · <i>N</i></Formula>
+
+**4.** A double fixing gives Δ = [2 · (<i>S</i> − <i>K</i>) − (<i>S</i> − <i>F</i>)] · <i>N</i> = (<i>S</i> − 2<i>K</i> + <i>F</i>) · <i>N</i>. This turns negative as soon as <i>S</i> falls below 2<i>K</i> − <i>F</i>. With the forward at the average fixing date that is <Num of="m08.accBreakLev" />.
+
+**5.** After the knock-out <i>q</i><sub><i>i</i></sub> = 0. What remains is Δ = −(<i>S</i><sub><i>i</i></sub> − <i>F</i><sub><i>i</i></sub>) · <i>N</i>: when the dollar rises, you miss exactly the gain the forward would have made.
+
+</Derivation>
+
+<Desk title="Three questions before signing">
+
+How much do I buy at most, and do I need that amount at all? What happens to my hedge after a knock-out? Below which rate is a double fixing worse than the forward? Whoever can answer these three questions understands the accumulator. Whoever knows only the better strike does not.
+
+</Desk>
+
+<Takeaway>
+
+An accumulator beats the forward as long as the fixings stay between <Num of="m08.accBreakLev" /> and the barrier <Num of="m08.accBarrier" />: in calm markets and in moderate moves. If the dollar rises sharply, it ends too early. If it falls sharply, you buy twice as much as planned, above the market rate.
+
+</Takeaway>

@@ -1,0 +1,61 @@
+import FourPositionsFigure from '@/components/figures/FourPositionsFigure.astro';
+import PayoffBuilderFigure from '@/components/figures/PayoffBuilderFigure.astro';
+
+Every option has two sides. The buyer is **long**: he pays the premium and receives a right. The seller is **short**: he receives the premium and takes on an obligation. The seller is also called the writer: he has to wait and see what the buyer decides.
+
+Then there are two types. A **call** is the right to buy the base currency at the strike, in USD/CHF that is USD. A **put** is the right to sell it at the strike. Two sides times two types give four basic positions.
+
+<FourPositionsFigure caption="The four basic positions: profit or loss at expiry after the premium, all with the strike at the forward. Blue are the options bought, orange the options sold. The dot marks the break-even." />
+
+Our importer is **long a call**: he fears a rising dollar. An exporter who will receive USD in 3 months fears the opposite and buys a **put**. On the other side are sellers who collect the premium for taking the risk.
+
+<PayoffBuilderFigure templates={['long-call', 'short-call', 'long-put', 'short-put']} initial="long-call" caption="Switch the template, or flip the leg between long and short, call and put. Drag the strike K1 right on the axis. With 'P&L after premium' you see the break-even." />
+
+### Payoff and profit
+
+The payoff builder shows two lines. Grey and dashed is the **payoff at expiry**: what the option is worth then. Blue is the **value today**, three months before expiry. The blue dot at the spot is exactly the premium. Why does the blue curve not sit on the grey one? The rate can still wander before expiry; that is time value. And for the expiry date the forward counts, not spot. Section 3 shows both. Switch to "P&L after premium" and the premium is deducted. Now you see whether the trade paid off.
+
+A worked example with the long call, strike <Num of="ex.strike" />, premium <Num of="ex.callPips" /> pips:
+
+- If USD/CHF ends at <Num of="m04.stPnl" />, the call pays <Num of="m04.payoffPnlPips" /> pips. After the premium, a profit of <Num of="m04.pnlPips" /> pips remains, or <Num of="m04.pnlChf" /> on USD 1m.
+- The **break-even** is strike plus premium: <Num of="m04.beCall" />. Only above it does the buyer make money.
+- Below the strike the call expires worthless. The loss is the premium, <Num of="ex.callChf" />, and no more.
+
+Now the other side, a **short put** with the same strike. The seller receives <Num of="ex.putPips" /> pips, or <Num of="ex.putChf" />. As long as USD/CHF stays above the strike, he keeps the whole premium. Below <Num of="m04.bePut" /> he makes a loss. If the rate fell to zero, it would be <Num of="m04.shortPutMaxLossChf" />: limited, but large.
+
+Long and short are mirror images on the zero line. What the buyer gains, the seller loses, before costs. That is why the buyer can lose at most the premium, and the seller can earn at most the premium.
+
+<Derivation title="Derivation: payoff, P&L and break-even">
+
+At expiry only the position of the rate <i>S</i><sub>T</sub> against the strike <i>K</i> matters. Per USD of notional:
+
+<Formula>
+  <span>Long call: max(<i>S</i><sub>T</sub> − <i>K</i>, 0)</span>
+  <span>Short call: −max(<i>S</i><sub>T</sub> − <i>K</i>, 0)</span>
+  <span>Long put: max(<i>K</i> − <i>S</i><sub>T</sub>, 0)</span>
+  <span>Short put: −max(<i>K</i> − <i>S</i><sub>T</sub>, 0)</span>
+</Formula>
+
+For the P&L you deduct the premium (buyer) or add it (seller), carried forward with e<sup><i>r</i><sub>d</sub><i>T</i></sup>. For a long call with carried-forward premium <i>c</i> the P&L at expiry is zero when
+
+<Formula variant="accent">
+  <i>S</i><sub>T</sub> − <i>K</i> − <i>c</i> = 0 ⇒ <i>S</i><sub>T</sub> = <i>K</i> + <i>c</i>
+</Formula>
+
+For a put with carried-forward premium <i>p</i> the break-even is <i>K</i> − <i>p</i>. The largest loss of the short put arises when the rate goes towards zero: −(<i>K</i> − <i>p</i>) per USD. A short call has no upper limit; its loss is unlimited.
+
+</Derivation>
+
+<Desk title="Who sells options?">
+
+Banks act as market makers and quote prices to buyers and sellers. They do not simply leave a sold option open; they hedge its risk continuously with spot and forwards. Module 05 shows how, using delta.
+
+A company rarely sells options on their own. Usually the sale is part of a structure that pays for a purchase, for example a zero-cost collar (module 06). Whoever is short may owe a lot of money at expiry, so the counterparty asks for a credit line or collateral.
+
+</Desk>
+
+<Takeaway>
+
+Long means: right bought, premium paid, loss at most the premium. Short means: obligation taken on, premium received, gain at most the premium.
+
+</Takeaway>

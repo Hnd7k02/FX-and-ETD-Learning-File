@@ -1,0 +1,114 @@
+import MoneynessExplorerFigure from '@/components/figures/MoneynessExplorerFigure.astro';
+
+Der Importeur kann den Strike frei wählen. Ein höherer Strike schützt erst ab einem höheren Kurs, ist dafür billiger. Ein tieferer Strike schützt schon früher und kostet mehr. Wie weit ein Strike «im Geld» liegt, nennt man **Moneyness**.
+
+Dafür gibt es zwei Konventionen. Die **Spot-Moneyness** misst den Strike gegen den Spot. Die **Forward-Moneyness** misst ihn gegen den Forward. Beide sind am Markt üblich, auch für europäische Optionen. Dieses Tool hat die Forward-Moneyness als Konvention gewählt. Das ist eine Entscheidung des Tools, keine Eigenschaft europäischer Optionen. Sie passt aber gut zu ihnen: Eine europäische Option wird erst bei Verfall ausgeübt, und der faire Kurs für diesen Tag ist der Forward.
+
+Ein Beispiel: Ein USD Call mit Strike <Num of="m04.kMid" /> liegt <Num of="m04.kMidSpotPips" /> Pips unter dem Spot. In Spot-Moneyness ist er im Geld (ITM). Gegen den Forward von <Num of="ex.forward" /> liegt er aber <Num of="m04.kMidOtmPips" /> Pips darüber. In Forward-Moneyness ist er aus dem Geld (OTM). Gleicher Strike, zwei Antworten. Sag darum immer dazu, gegen welchen Kurs du misst.
+
+In Forward-Moneyness, wie in diesem Tool, gilt:
+
+- **ATMF** (at the money forward): Strike gleich Forward.
+- **ITM** (in the money): Beim Call liegt der Strike unter dem Forward, beim Put darüber.
+- **OTM** (out of the money): Beim Call liegt der Strike über dem Forward, beim Put darunter.
+
+<MoneynessExplorerFigure caption="Zieh den Strike oder wähle einen Desk-Strike. Grau ist der innere Wert gegen den Forward, die blaue Fläche der Zeitwert. Schalte zwischen USD Call und USD Put. Delta und die risikoneutrale Chance im Geld stehen als zwei getrennte Werte nebeneinander." />
+
+### Prämie = innerer Wert + Zeitwert
+
+Der **innere Wert gegen den Forward** ist, was du dir heute schon sichern kannst: Du verkaufst die Dollars per Forward und übst den Call bei Verfall aus. So sind dir mindestens F − K pro USD sicher. Beim Call ist der innere Wert darum DF · max(F − K, 0). DF ist der Diskontfaktor, der auf heute abzinst. Die klassische Definition max(S − K, 0) misst den Wert bei sofortiger Ausübung, doch eine europäische Option kannst du nicht sofort ausüben. Der **Zeitwert** ist der Rest. Er bezahlt die Chance, dass sich der Kurs bis zum Verfall noch zu deinen Gunsten bewegt.
+
+Drei USD Calls mit 3 Monaten Laufzeit:
+
+- **ATMF**, Strike genau am Forward (<Num of="ex.forward" />): <Num of="m04.atmfPips" /> Pips. Das ist reiner Zeitwert.
+- **ITM**, Strike <Num of="m04.kItm" />: <Num of="m04.itmPips" /> Pips. Davon sind <Num of="m04.itmIntrinsicPips" /> Pips innerer Wert gegen den Forward und <Num of="m04.itmTimePips" /> Pips Zeitwert.
+- **OTM**, Strike <Num of="m04.kOtm" />: <Num of="m04.otmPips" /> Pips, also <Num of="m04.otmChf" />. Auch das ist reiner Zeitwert.
+
+Gegen den Spot wären es beim ITM Call <Num of="m04.itmSpotIntrinsicPips" /> Pips innerer Wert und ein negativer Zeitwert von <Num of="m04.itmSpotTimePips" /> Pips. Das ist keine negative Prämie: Der Call kostet weiterhin <Num of="m04.itmPips" /> Pips. Es ist auch keine Arbitrage. Die <Num of="m04.itmSpotIntrinsicPips" /> Pips bekämst du nur bei sofortiger Ausübung, und die gibt es bei einer europäischen Option nicht. Sichern kannst du dir heute nur den Wert gegen den Forward: Du verkaufst die Dollars per Forward und hast <Num of="m04.itmIntrinsicPips" /> Pips sicher.
+
+Das Minus entsteht allein in der Zerlegung. Der USD-Zins liegt über dem CHF-Zins, darum liegt der Forward unter dem Spot. Der innere Wert gegen den Spot ist deshalb um <Num of="m04.itmSpotIntrinsicPips" /> − <Num of="m04.itmIntrinsicPips" /> = <Num of="m04.itmSpotGapPips" /> Pips höher, und um genau so viel schrumpft der Rest: <Num of="m04.itmTimePips" /> − <Num of="m04.itmSpotGapPips" /> = <Num of="m04.itmSpotTimePips" /> Pips. Gegen den Forward gemessen ist der Zeitwert nie negativ. Auch darum hat das Tool diese Konvention gewählt.
+
+Unser Call aus Abschnitt 1 hat den gerundeten Strike <Num of="ex.strike" />. Der liegt <Num of="m04.fwdVsStrikePips" /> Pips unter dem Forward, darum kostet er eine Spur mehr: <Num of="ex.callPips" /> Pips.
+
+Der Zeitwert ist am Forward am grössten und wird gegen beide Flügel kleiner. Tief im Geld verhält sich die Option fast wie ein Forward, weit aus dem Geld ist sie fast wertlos.
+
+### Delta statt Kurs: 25Δ und 10Δ
+
+Am Desk nennt man Strikes oft nicht als Kurs, sondern über das **Delta**. Delta ist eine Preissensitivität: Es sagt, wie stark der Optionswert auf den Spot reagiert. Der 25Δ Call ist der Call mit dem Delta <Num of="m04.call25Delta" />, der 25Δ Put der Put mit dem Delta <Num of="m04.put25Delta" />.
+
+Im Beispiel liegt der 25Δ Call bei <Num of="m04.call25" />, der 25Δ Put bei <Num of="m04.put25" />. Weiter draussen liegen die 10Δ-Strikes, <Num of="m04.call10" /> und <Num of="m04.put10" />. Der Vorteil: «25Δ» bedeutet in jedem Paar, bei jeder Laufzeit und jeder Vola eine vergleichbare Moneyness.
+
+Auch «ATM» hat am Desk eine eigene Bedeutung. Gemeint ist meist der **delta-neutrale Straddle** (ATM DNS): der Strike, bei dem sich Call-Delta und Put-Delta genau aufheben. Er liegt bei <Num of="m04.dns" />, also <Num of="m04.dnsGapPips" /> Pips über dem Forward. Das Call-Delta ist dort <Num of="m04.dnsDelta" />, das Put-Delta gleich gross mit negativem Vorzeichen.
+
+### Delta ist keine Wahrscheinlichkeit
+
+Als Faustregel hörst du oft: Delta ≈ Chance, dass die Option im Geld verfällt. Das ist nur eine Näherung. Die [risikoneutrale](/glossar/#term-risk-neutral) [Chance, im Geld zu verfallen](/glossar/#term-prob-itm), ist im Modell dieses Tools ([Garman-Kohlhagen](/glossar/#term-garman-kohlhagen), flache Vola) beim Call N(<i>d</i><sub>2</sub>) und beim Put N(−<i>d</i><sub>2</sub>). Sie gehört zum Preis und ist keine Prognose. Mit einem Vola-Smile (Modul 06) weicht die Chance, die der Markt einpreist, davon ab. An den Delta-Strikes des Beispiels liegen die beiden Werte so:
+
+| Strike | Delta | Chance im Geld (risikoneutral, keine Prognose) |
+| --- | --- | --- |
+| 25Δ Call <Num of="m04.call25" /> | <Num of="m04.call25Delta" /> | <Num of="m04.call25Prob" /> |
+| 25Δ Put <Num of="m04.put25" /> | <Num of="m04.put25Delta" /> | <Num of="m04.put25Prob" /> |
+| 10Δ Call <Num of="m04.call10" /> | <Num of="m04.call10Delta" /> | <Num of="m04.call10Prob" /> |
+| 10Δ Put <Num of="m04.put10" /> | <Num of="m04.put10Delta" /> | <Num of="m04.put10Prob" /> |
+
+Die Faustregel liegt nahe, trifft aber nicht genau. Hier ist beim Call die Chance etwas kleiner als das Delta, beim Put etwas grösser als der Betrag des Deltas. Delta brauchst du zum Absichern: Pro Dollar Nominal verkaufst du so viele Dollars gegen den gekauften Call. N(<i>d</i><sub>2</sub>) beantwortet eine andere Frage: Wie oft endet die Option im Modell im Geld? In [Modul 07](/module/07-barrier-binary/3/) kommt N(<i>d</i><sub>2</sub>) wieder: abgezinst ist es der Preis eines Digital Calls, der 1 Franken zahlt.
+
+### Pips oder Prozent
+
+Die Prämie unseres Calls lässt sich zweimal schreiben. In CHF-Pips: <Num of="ex.callPips" /> Pips, das sind <Num of="ex.callChf" /> auf USD 1 Mio. Oder in Prozent vom Nominal: Die Prämie in USD umgerechnet ergibt <Num of="m04.callUsd" />, also <Num of="m04.callPctUsd" /> des USD-Nominals. Gleicher Preis, andere Einheit. Frag deshalb immer, wie quotiert wird.
+
+### Europäisch oder amerikanisch
+
+Eine **europäische** Option kannst du nur am Verfallstag ausüben, eine **amerikanische** jederzeit bis dahin. Im OTC-Devisenmarkt ist die europäische Form der Standard. Eine amerikanische Option ist mindestens so viel wert wie die europäische, denn sie gibt dir ein zusätzliches Recht. In diesem Tool sind alle Optionen europäisch.
+
+<Derivation title="Herleitung: innerer Wert, Faustregel, Strike aus Delta und N(d2)">
+
+**Innerer Wert gegen den Forward.** Übst du den Call bei Verfall aus und verkaufst die Dollars heute schon per Forward, erhältst du bei Verfall sicher mindestens F − K pro USD. Liegt der Kurs dann unter dem Strike, kaufst du die Dollars für den Forward sogar günstiger am Markt. Der sichere Teil ist heute abgezinst wert:
+
+<Formula>
+  innerer Wert = e<sup>−<i>r</i><sub>d</sub><i>T</i></sup> · max(<i>F</i> − <i>K</i>, 0)
+</Formula>
+
+**Faustregel für ATMF.** Mit <i>K</i> = <i>F</i> wird aus Garman-Kohlhagen näherungsweise
+
+<Formula variant="accent">
+  <span><i>C</i><sub>ATMF</sub> ≈ e<sup>−<i>r</i><sub>d</sub><i>T</i></sup> · <i>F</i> · σ√<i>T</i> / √(2π) ≈ 0.4 · <i>F</i> · σ√<i>T</i></span>
+</Formula>
+
+Mit σ√<i>T</i> = <Num of="m04.sigmaSqrtT" /> ergibt das <Num of="m04.atmfApproxPips" /> Pips. Die Prämie wächst also mit der Vola und mit der Wurzel der Laufzeit.
+
+**Strike aus Delta.** Das Spot-Delta des Calls ist e<sup>−<i>r</i><sub>f</sub><i>T</i></sup> · N(<i>d</i><sub>1</sub>). Für ein Ziel-Delta löst du nach <i>d</i><sub>1</sub> auf und setzt ein:
+
+<Formula>
+  <span><i>d</i><sub>1</sub> = N<sup>−1</sup>(Δ · e<sup><i>r</i><sub>f</sub><i>T</i></sup>)</span>
+  <span><i>K</i> = <i>F</i> · e<sup>−<i>d</i><sub>1</sub>σ√<i>T</i> + ½σ²<i>T</i></sup></span>
+</Formula>
+
+**ATM DNS.** Call- und Put-Delta heben sich auf, wenn N(<i>d</i><sub>1</sub>) = ½, also <i>d</i><sub>1</sub> = 0. Daraus folgt <i>K</i> = <i>F</i> · e<sup>½σ²<i>T</i></sup>, leicht über dem Forward.
+
+**Delta oder Chance?** Beim Call stehen die beiden Werte so nebeneinander:
+
+<Formula>
+  <span>Δ<sub>Call</sub> = e<sup>−<i>r</i><sub>f</sub><i>T</i></sup> · N(<i>d</i><sub>1</sub>)</span>
+  <span>Chance<sub>Call</sub> = N(<i>d</i><sub>2</sub>) = N(<i>d</i><sub>1</sub> − σ√<i>T</i>)</span>
+</Formula>
+
+Zwei Dinge trennen sie. Der Faktor e<sup>−<i>r</i><sub>f</sub><i>T</i></sup> macht das Delta etwas kleiner als N(<i>d</i><sub>1</sub>): Am 25Δ-Strike ist N(<i>d</i><sub>1</sub>) = <Num of="m04.nd1At25" />. Und <i>d</i><sub>2</sub> liegt σ√<i>T</i> = <Num of="m04.sigmaSqrtT" /> unter <i>d</i><sub>1</sub>. Das drückt die Chance des Calls auf <Num of="m04.call25Prob" />. Beim Put ist alles gespiegelt: N(−<i>d</i><sub>1</sub>) ist ebenfalls <Num of="m04.nd1At25" />, und N(−<i>d</i><sub>2</sub>) = N(−<i>d</i><sub>1</sub> + σ√<i>T</i>) liegt darüber, bei <Num of="m04.put25Prob" /> ([risikoneutral](/glossar/#term-risk-neutral), keine Prognose).
+
+**Ein schöner Zusammenhang.** Der Zeitwert des ITM Calls oben, <Num of="m04.itmTimePips" /> Pips, ist genau der Preis des OTM Puts mit gleichem Strike. Das folgt aus der Put-Call-Parität in Abschnitt 4.
+
+</Derivation>
+
+<Desk title="Welches ATM ist gemeint?">
+
+ATM kann den Spot, den Forward oder den delta-neutralen Straddle meinen. Im Interbankmarkt ist für Vola-Quotes meist ATM DNS gemeint. Zusammen mit dem 25Δ Risk Reversal und dem 25Δ Butterfly beschreibt es die Form des Vola-Smiles (Modul 06).
+
+Wird die Prämie in USD bezahlt, wie in USD/CHF üblich, rechnet der Desk mit einem prämienadjustierten Delta. Die Strikes verschieben sich dann leicht. ATM DNS liegt so sogar knapp unter dem Forward, bei <Num of="m04.dnsPa" />. Frag bei jedem Delta-Strike, welche Konvention gilt.
+
+</Desk>
+
+<Takeaway>
+
+Moneyness gibt es gegen den Spot und gegen den Forward. Dieses Tool hat die Forward-Moneyness gewählt; sie passt zur Ausübung bei Verfall, ist aber eine Konvention. Die Prämie besteht aus innerem Wert gegen den Forward und Zeitwert; mit Strike am Forward ist sie reiner Zeitwert. Delta ist eine Preissensitivität, keine Wahrscheinlichkeit: Die risikoneutrale Chance, im Geld zu verfallen, ist im Modell N(d2) beim Call und N(−d2) beim Put.
+
+</Takeaway>

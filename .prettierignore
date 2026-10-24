@@ -1,0 +1,11 @@
+dist/
+.astro/
+node_modules/
+coverage/
+playwright-report/
+test-results/
+package-lock.json
+docs/
+data/raw/
+src/data/fx/
+*.mdx

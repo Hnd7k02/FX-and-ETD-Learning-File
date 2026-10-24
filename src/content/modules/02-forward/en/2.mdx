@@ -1,0 +1,91 @@
+import ParityPathsFigure from '@/components/figures/ParityPathsFigure.astro';
+
+{/* 02 Forward · Section 2 · Interest rate parity. Numbers only via <Num />, registries src/lib/nums/ex.ts and m02.ts. */}
+
+Where does the forward of <Num of="m02.fwd" /> come from? The bank does not guess it. It asks itself: how can I get USD 1m in 3 months myself, without any exchange-rate risk? There are two routes.
+
+- **Route A, the forward.** Buy the dollars today for future delivery. In 3 months you pay the agreed rate.
+- **Route B, the money market.** Borrow francs today, use them to buy dollars straight away, and deposit the dollars until payment day.
+
+Both routes are equally safe. On neither does the rate in 3 months matter any more. And both end the same way: with USD 1m on payment day and a fixed amount of francs paid for it. So they must also cost the same. Otherwise everybody would take the cheaper route and sell the dearer one (section 4). This idea is called **covered interest parity**. "Covered" means that on both routes the exchange rate is already fixed today.
+
+<ParityPathsFigure caption="Route A on the left, route B on the right, time runs downwards. Play the steps or go through them one by one. Then change the rates and the term: both routes always cost the same." />
+
+### Route B step by step
+
+The money market uses simple interest. For CHF and USD the convention is Act/360: 90 days count as 90/360 = <Num of="m02.t" /> of a year.
+
+1. **How many dollars do you need today?** A USD deposit at <Num of="ex.rf" /> grows by a factor of <Num of="m02.growthUsd" /> in 90 days. For USD 1m on payment day, <Num of="m02.usdToday" /> today is enough.
+2. **What do they cost?** At the spot rate of <Num of="ex.spot" /> that is <Num of="m02.chfLoan" />. You borrow this amount in francs.
+3. **Time passes.** The deposit earns <Num of="m02.usdInterest" /> in interest and grows to USD 1m. At <Num of="ex.rd" />, the franc loan costs exactly <Num of="m02.chfInterest" /> in interest.
+4. **On payment day** you have USD 1m and repay the loan: <Num of="m02.chfRepay" />.
+
+So route B delivers USD 1m for <Num of="m02.chfRepay" />. Route A must cost the same. That gives the forward:
+
+<Formula variant="accent"><i>F</i> = <Num of="m02.chfRepay" /> ÷ USD 1m = <Num of="m02.fwd" /></Formula>
+
+### The formula
+
+In general the franc amount grows at the rate of the quote currency (CHF), the dollar amount at the rate of the base currency (USD). The forward is spot times the ratio of the two interest factors:
+
+<Formula variant="accent"><i>F</i> = <i>S</i> · (1 + <i>r</i><sub>CHF</sub> · <i>t</i>) / (1 + <i>r</i><sub>USD</sub> · <i>t</i>)</Formula>
+
+In numbers: <Num of="ex.spot" /> · <Num of="m02.growthChf" /> / <Num of="m02.growthUsd" /> = <Num of="m02.fwd" />. If the USD rate is higher, the forward sits below spot. If the CHF rate is higher, above. Try it with the sliders.
+
+### Money market or continuous?
+
+The option models from module 04 onwards use continuous rates and <i>T</i> = days/365. There the formula reads:
+
+<Formula><i>F</i> = <i>S</i> · e<sup>(<i>r</i><sub>d</sub> − <i>r</i><sub>f</sub>) · <i>T</i></sup></Formula>
+
+Here <i>r</i><sub>d</sub> is the rate of the quote currency (CHF) and <i>r</i><sub>f</sub> the rate of the base currency (USD).
+
+For "3 months" the tool uses <i>T</i> = <Num of="ex.T" /> in both worlds. That is a stylised convention. In the money market it is <Num of="ex.mmDays" />/360. In the option model it is <Num of="ex.T" /> years, which is <Num of="m02.daysT" /> days. With this <i>T</i> the continuous formula gives <Num of="ex.forward" />, which is <Num of="ex.fwdDiffPips" /> pips below the money-market forward. On USD 1m that is <Num of="m02.fwdDiffChf" />.
+
+At the same <i>T</i> the difference is not an error. The same rate means simple interest in one case and [continuous compounding](/en/glossary/#term-continuous-compounding) in the other. Compounded continuously, money grows slightly faster, so the continuous formula discounts the dollar slightly more.
+
+At exactly the same end date, <Num of="ex.mmDays" /> days, <i>T</i> = <Num of="ex.mmDays" />/365. Then the continuous formula gives <Num of="m02.fwdCont90" digits={6} />, which is <Num of="m02.fwdCont90DiffPips" /> pips above the money-market forward of <Num of="m02.fwd" digits={6} />. These <Num of="m02.fwdCont90DiffPips" /> pips, too, are only convention: the same rate of <Num of="ex.rf" /> applies once simply over <Num of="ex.mmDays" />/360 and once continuously over <Num of="ex.mmDays" />/365. The money market counts the larger year fraction; here that matters more than continuous compounding. So the dollar grows slightly more in the money market, is discounted more, and the money-market forward is lower.
+
+**No arbitrage gain.** You cannot earn the <Num of="ex.fwdDiffPips" /> pips at the same <i>T</i> or the <Num of="m02.fwdCont90DiffPips" /> pips at the same end date. In the market there is only one forward for an end date. The two formulas describe it in two conventions, and each needs its own rate. Convert the money-market rate <i>r</i><sub>MM</sub> into the continuous rate <i>r</i> for the same term:
+
+<Formula><i>r</i> = ln(1 + <i>r</i><sub>MM</sub> · 90/360) / (90/365)</Formula>
+
+For the USD that is <Num of="m02.rfCont90" /> instead of <Num of="ex.rf" />. At a CHF rate of <Num of="ex.rd" /> nothing changes. With these rates the continuous formula gives exactly <Num of="m02.fwdCont90Conv" digits={6} />, the money-market forward.
+
+**Remember:** only compare forwards with the same end date and the same convention.
+
+<Derivation title="Derivation: two routes, one price">
+
+Let <i>S</i> be spot in CHF per USD, <i>N</i> the USD amount at maturity, and <i>t</i><sub>CHF</sub> and <i>t</i><sub>USD</sub> the terms in years under each currency's day count. CHF and USD both count Act/360, so both are 90/360.
+
+**Route B today.** You need <i>B</i><sub>0</sub> = <i>N</i> / (1 + <i>r</i><sub>USD</sub> · <i>t</i><sub>USD</sub>) dollars. They cost <i>Q</i><sub>0</sub> = <i>S</i> · <i>B</i><sub>0</sub> francs, which you borrow.
+
+**Route B at maturity.** The deposit pays exactly <i>N</i>. The loan costs
+
+<Formula><i>Q</i><sub>0</sub> · (1 + <i>r</i><sub>CHF</sub> · <i>t</i><sub>CHF</sub>) = <i>N</i> · <i>S</i> · (1 + <i>r</i><sub>CHF</sub> · <i>t</i><sub>CHF</sub>) / (1 + <i>r</i><sub>USD</sub> · <i>t</i><sub>USD</sub>)</Formula>
+
+**Route A at maturity** costs <i>N</i> · <i>F</i>. Set the two equal and divide by <i>N</i>:
+
+<Formula variant="accent"><i>F</i> = <i>S</i> · (1 + <i>r</i><sub>CHF</sub> · <i>t</i><sub>CHF</sub>) / (1 + <i>r</i><sub>USD</sub> · <i>t</i><sub>USD</sub>)</Formula>
+
+**Continuous.** With continuous rates the interest factor 1 + <i>r</i> · <i>t</i> becomes e<sup><i>r</i> · <i>T</i></sup>, and the ratio of two exponentials is e<sup>(<i>r</i><sub>d</sub> − <i>r</i><sub>f</sub>) · <i>T</i></sup>.
+
+**Where the <Num of="ex.fwdDiffPips" /> pips come from.** This calculation holds at the same <i>T</i>: in the example <i>T</i> = <Num of="ex.T" /> in both worlds. The money market discounts the dollar by 1 / <Num of="m02.growthUsd" /> = <Num of="m02.dfMM" />, the continuous formula by e<sup>−<i>r</i><sub>f</sub> · <i>T</i></sup> = <Num of="m02.dfCont" />. A simple rate of <Num of="ex.rf" /> over 90/360 corresponds, at the same <i>T</i> = <Num of="ex.T" />, to only <Num of="m02.rfCont" /> continuously. Plug in that value and both formulas give the same forward. The CHF rate would need the same conversion; at <Num of="ex.rd" /> nothing changes.
+
+**Why the conversion fits exactly.** With <i>r</i> = ln(1 + <i>r</i><sub>MM</sub> · <i>t</i>) / <i>T</i>, e<sup><i>r</i> · <i>T</i></sup> = 1 + <i>r</i><sub>MM</sub> · <i>t</i>. The continuous interest factor then equals the simple one, for each currency. So their ratio is equal too, and with it the forward. At the same <i>T</i>, <i>t</i> = <i>T</i> = <Num of="ex.T" /> and the continuous USD rate is <Num of="m02.rfCont" />. At the same end date, <i>t</i> = 90/360 and <i>T</i> = 90/365, and it is <Num of="m02.rfCont90" />.
+
+</Derivation>
+
+<Desk title="Where the rates come from">
+
+On the desk nobody works out the forward from policy rates. Forward points come straight from the FX swap market (module 03), where banks exchange currencies for a period. The rates in it are the rates at which a currency can actually be borrowed and deposited.
+
+That is why the market forward often differs slightly from the formula with reference rates of the same tenor. The difference is called the **cross-currency basis**. It shows whether borrowing a currency through FX swaps costs more or less than borrowing it directly in the money market. Module 03 comes back to it. The logic of the two routes stays the same.
+
+</Desk>
+
+<Takeaway>
+
+Two equally safe routes to the same destination cost the same. That is why the forward is not an estimate but spot times the CHF interest factor divided by the USD interest factor: <Num of="m02.fwd" />. With converted rates the continuous formula gives the same forward; a gap is a matter of convention, not an arbitrage gain.
+
+</Takeaway>

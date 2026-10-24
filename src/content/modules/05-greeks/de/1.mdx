@@ -1,0 +1,69 @@
+import GreeksLeversFigure from '@/components/figures/GreeksLeversFigure.astro';
+
+{/* 05 Greeks · Abschnitt 1 · Intuition. Zahlen nur über <Num />, Registry src/lib/nums/ex.ts und m05.ts. */}
+
+Der Importeur hat seinen USD Call gekauft: Strike <Num of="ex.strike" />, Betrag <Num of="ex.notional" />, Prämie <Num of="ex.callChf" />. Am nächsten Morgen zeigt der Bildschirm einen anderen Wert. Er hat nichts getan. Was ist passiert?
+
+Strike und Betrag stehen im Vertrag. Alles andere bewegt der Markt: der Spot USD/CHF, die Restlaufzeit, die implizite Vola, der CHF-Zins und der USD-Zins. Das sind die fünf Hebel einer Option. In Modul 04 hast du gesehen, in welche Richtung jeder Hebel wirkt. Hier geht es um die nächste Frage: **wie stark?**
+
+Genau das messen die Greeks. Jeder Greek beantwortet eine einzige Frage: Um wie viel ändert sich die Prämie, wenn sich ein Hebel ein kleines Stück bewegt und alle anderen stillstehen? Mathematisch ist das eine Ableitung. Anschaulich ist es die Steigung einer Kurve.
+
+<GreeksLeversFigure caption="Wähl bei jedem Hebel eine Richtung. Der Balken zeigt die exakte Änderung der Prämie, darunter steht die Schätzung des passenden Greeks." />
+
+### Die sechs Greeks im Beispiel
+
+Fünf Hebel, aber sechs Greeks: Der Spot bekommt zwei. Delta misst die Steigung, Gamma die Krümmung, also wie schnell sich Delta selbst verändert.
+
+| Hebel | Greek | Ableitung | Im Beispiel, auf USD 1 Mio. |
+| --- | --- | --- | --- |
+| Spot | Delta Δ | ∂<i>V</i>/∂<i>S</i> | <Num of="m05.delta" />: reagiert wie <Num of="m05.deltaUsd" /> in Spot |
+| Spot | Gamma Γ | ∂²<i>V</i>/∂<i>S</i>² | <Num of="m05.gamma" />: Delta steigt um <Num of="m05.deltaChangeApprox" /> je Big Figure |
+| Zeit | Theta Θ | ∂<i>V</i>/∂<i>t</i> | <Num of="ex.thetaDayChf" digits={0} /> pro Tag |
+| Vola | Vega <span class="math">ν</span> | ∂<i>V</i>/∂σ | <Num of="ex.vegaChf" /> je Vola-Punkt |
+| CHF-Zins | Rho CHF ρ<sub>d</sub> | ∂<i>V</i>/∂<i>r</i><sub>d</sub> | <Num of="ex.rhoDChf" /> je +1 % |
+| USD-Zins | Rho USD ρ<sub>f</sub> | ∂<i>V</i>/∂<i>r</i><sub>f</sub> | <Num of="ex.rhoFChf" /> je +1 % |
+
+Lies jede Zeile zusammen mit ihrem Schritt. Eine Big Figure bewegt die Prämie um mehrere Tausend Franken, ein Vola-Punkt um rund eineinhalb Tausend, ein Prozent Zins um rund Tausend, ein Tag nur um ein paar Dutzend. Die Schritte sind aber nicht gleich häufig. Eine typische Tagesbewegung von USD/CHF ist bei dieser Vola nur rund <Num of="ex.breakEvenPips1" /> Pips (σ · <i>S</i> / √365), und ein ganzes Prozent Zins kommt selten über Nacht. Theta ist klein, aber es kommt sicher, jeden Tag.
+
+### Wie gut schätzen die Greeks?
+
+Steigt USD/CHF um eine Big Figure, schätzt Delta allein einen Gewinn von <Num of="m05.spotUpDeltaChf" />. Gamma ergänzt die Krümmung: Delta plus Gamma ergeben <Num of="m05.spotUpDeltaGammaChf" />. Die exakte Neubewertung liefert <Num of="m05.spotUpChf" />. Für kleine Bewegungen sind die Greeks sehr genau.
+
+Für grosse Schritte stimmen sie weniger. Über einen ganzen Monat ändert sich die Prämie um <Num of="m05.monthChf" />. Rund 30-mal das heutige Theta sagt nur <Num of="m05.monthThetaChf" /> voraus. Der Grund: Ein Greek ist eine Momentaufnahme. Der Zeitverfall wird gegen Verfall hin schneller, und das sieht das heutige Theta noch nicht.
+
+<Derivation title="Herleitung: Greeks als Taylor-Entwicklung">
+
+Der Preis eines Calls im Garman-Kohlhagen-Modell:
+
+<Formula>
+  <span><i>V</i> = <i>e</i><sup>−<i>r</i><sub>d</sub><i>T</i></sup> · [<i>F</i> · <i>N</i>(<i>d</i><sub>1</sub>) − <i>K</i> · <i>N</i>(<i>d</i><sub>2</sub>)]</span>
+  <span><i>F</i> = <i>S</i> · <i>e</i><sup>(<i>r</i><sub>d</sub> − <i>r</i><sub>f</sub>)<i>T</i></sup>, <i>d</i><sub>1,2</sub> = [ln(<i>F</i>/<i>K</i>) ± ½σ²<i>T</i>] / (σ√<i>T</i>)</span>
+</Formula>
+
+Spot und beide Zinsen wirken über den Forward <i>F</i>. Die Vola wirkt nur über σ√<i>T</i>. Die Zeit wirkt dreifach: über den Forward, über σ√<i>T</i> und über die Diskontierung.
+
+Bewegen sich alle Hebel ein kleines Stück, zerlegt die Taylor-Entwicklung die Preisänderung in Beiträge. Jeder Beitrag ist ein Greek mal die Bewegung seines Hebels:
+
+<Formula variant="accent">
+  d<i>V</i> ≈ Δ · d<i>S</i> + ½ · Γ · (d<i>S</i>)² + ν · dσ + Θ · d<i>t</i> + ρ<sub>d</sub> · d<i>r</i><sub>d</sub> + ρ<sub>f</sub> · d<i>r</i><sub>f</sub>
+</Formula>
+
+Nur beim Spot nimmt man den Term zweiter Ordnung dazu. Dort ist die Preiskurve am stärksten gekrümmt, und Kursbewegungen sind gross genug, dass (d<i>S</i>)² zählt. In Vola und Zinsen ist die Kurve nahe ATMF fast eine Gerade. Gemischte Terme wie Spot mal Vola (Vanna) kommen in Abschnitt 4 als Ausblick.
+
+Zu den Einheiten: Theta zählt die Zeit, die vergeht. Es ist also −∂<i>V</i>/∂<i>T</i> mit der Restlaufzeit <i>T</i>, im Tool pro Kalendertag. Vega gilt je Vola-Punkt, Rho je Prozentpunkt Zins. Alle Werte beziehen sich auf USD 1 Mio. und sind in CHF.
+
+</Derivation>
+
+<Desk title="Greeks als Risikosprache">
+
+Ein Options-Desk hat Tausende von Positionen. Niemand schaut jede einzeln an. Man addiert die Greeks: Delta in USD, Vega in CHF je Vola-Punkt, Theta pro Tag. So lässt sich ein ganzes Buch in wenigen Zahlen lesen.
+
+Jeder Greek hat sein eigenes Werkzeug. Delta sicherst du mit Spot oder Forwards ab: Gegen kleine Kursbewegungen wirkt der Call des Importeurs wie eine Spot-Position über <Num of="m05.deltaUsd" />. Mit Spot und Forwards lässt sich Vega nicht absichern, sie haben kein Vega. Am FX-Desk nimmt man dafür andere Optionen, seltener Volatilitäts- oder Varianz-Swaps. Theta lässt sich nicht separat absichern: Wer weniger Theta will, verkauft Optionen und gibt damit auch Gamma ab. Der grösste Teil von Theta ist der Preis, den der Käufer für Gamma bezahlt (Abschnitt 4).
+
+</Desk>
+
+<Takeaway>
+
+Fünf Hebel bewegen eine Option: Spot, Zeit, Vola und zwei Zinsen. Jeder Greek misst, wie stark die Prämie auf genau einen Hebel reagiert, während die anderen stillstehen.
+
+</Takeaway>

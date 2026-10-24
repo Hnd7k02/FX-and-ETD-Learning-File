@@ -1,0 +1,78 @@
+import SpotExposureFigure from '@/components/figures/SpotExposureFigure.astro';
+
+{/* 01 Spot · Section 1 · Intuition. Numbers only via <Num />, registries src/lib/nums/ex.ts and m01.ts. */}
+
+An exchange rate is a price. It tells you what one currency costs in another. USD/CHF <Num of="ex.spot" /> means: one US dollar costs <Num of="ex.spot" /> francs. The dollar is the goods, the franc is the money you pay with.
+
+Our importer buys machines in the United States. In 3 months he has to transfer USD 1m. If he paid today, it would cost him <Num of="m01.costToday" />. But he pays in 3 months, at whatever rate applies then. Nobody knows that rate today.
+
+So he has a problem, even though he has not bought a single dollar yet. If the dollar rises, his bill in francs gets more expensive. If it falls, the bill gets cheaper. His result depends on a rate he cannot influence. This is called **currency risk** or **exposure**.
+
+<SpotExposureFigure caption="Drag the rate. Each block is one big figure more or less. The grey band shows where the rate typically ends up in 3 months." />
+
+### Pips and big figures
+
+Rates such as USD/CHF have four decimal places. The last digit is called a **pip**, so 0.0001. One hundred pips make a **big figure**, so 0.0100. On USD 1m one pip is worth <Num of="m01.pipChf" />, one big figure <Num of="m01.bigFigChf" />.
+
+Three scenarios for payment day:
+
+- **One big figure higher, <Num of="m01.sBf" />.** The dollars cost <Num of="m01.costBf" />, that is <Num of="m01.bigFigChf" /> more than today.
+- **The dollar rises to <Num of="m01.stUp" />.** That is <Num of="m01.bfUp" /> big figures or <Num of="m01.pctUp" sign={false} />. The importer pays <Num of="m01.costUp" />, <Num of="m01.diffUp" sign={false} /> more.
+- **The dollar falls to <Num of="m01.stDown" />.** He pays <Num of="m01.costDown" />, <Num of="m01.saveDown" /> less.
+
+### How far can the rate move?
+
+How much a rate swings is measured by its **volatility** (vol for short), stated per year. With a volatility of <Num of="ex.vol" />, the model puts the rate in 3 months between <Num of="m01.rangeLo" /> and <Num of="m01.rangeHi" /> in roughly two cases out of three ([risk-neutral](/en/glossary/#term-risk-neutral), not a forecast). That is the grey band in the chart. For the importer it means: his bill can come out <Num of="m01.rangeLoSave" /> lower or <Num of="m01.rangeHiChf" sign={false} /> higher than today. And that is in a perfectly ordinary quarter.
+
+And a rise to <Num of="m01.stUp" /> or higher? The model gives it a probability of about <Num of="m01.probUp" /> (risk-neutral, not a forecast). Unlikely, but no freak event. These are exactly the cases the importer wants protection against. Module 02 shows how, with the forward.
+
+### The same rate, the other way round
+
+You can write any rate the other way round. Instead of francs per dollar you state dollars per franc: CHF/USD = 1 ÷ <Num of="ex.spot" /> = <Num of="m01.inverse" />. The market trades and shows USD/CHF. The first currency is called the **base**, the second the **quote**. More on this in section 3.
+
+Percentages are not symmetric here. If USD/CHF rises from <Num of="ex.spot" /> to <Num of="m01.stUp" />, the dollar gains <Num of="m01.pctUp" sign={false} />. But the franc loses only <Num of="m01.inverseLossUp" />: CHF/USD falls from <Num of="m01.inverse" /> to <Num of="m01.inverseUp" />.
+
+<Derivation title="Derivation: cost, inverse, range and probability">
+
+**Cost.** With the notional <i>N</i> = USD 1m and the rate <i>S</i> in CHF per USD, the dollars cost <i>C</i> = <i>N</i> · <i>S</i>. The cost is linear in the rate:
+
+<Formula>Δ<i>C</i> = <i>N</i> · Δ<i>S</i></Formula>
+
+So one pip (Δ<i>S</i> = 0.0001) costs <Num of="m01.pipChf" />, one big figure (Δ<i>S</i> = 0.01) <Num of="m01.bigFigChf" />. The slope of the orange line in the chart is exactly the notional.
+
+**Inverse.** If <i>S</i> rises by the fraction <i>x</i>, then 1/<i>S</i> changes by
+
+<Formula variant="accent">1 / (1 + <i>x</i>) − 1 = −<i>x</i> / (1 + <i>x</i>)</Formula>
+
+With <i>x</i> = <Num of="m01.pctUp" /> this gives <Num of="m01.inversePctUp" />. The larger the move, the larger the gap between the two percentages.
+
+**Range.** In the option model (module 04) the log return of the rate over the term <i>T</i> is normally distributed with standard deviation σ√<i>T</i> = <Num of="ex.vol" /> · √<Num of="ex.T" /> = <Num of="m01.sigmaSqrtT" />. For the band we work without drift, so the centre is today's spot. Under the risk-neutral measure, by contrast, the expected rate is the forward, <Num of="m01.fwdBelowPips" /> pips below the spot (module 02). Without drift the rate would lie in the band below with a probability of about <Num of="m01.bandProbNoDrift" />:
+
+<Formula><i>S</i> · e<sup>−σ√<i>T</i></sup> ≤ <i>S</i><sub>T</sub> ≤ <i>S</i> · e<sup>+σ√<i>T</i></sup></Formula>
+
+That gives <Num of="m01.rangeLo" /> to <Num of="m01.rangeHi" />. The band is symmetric on the log scale, so it reaches a little further above the spot than below. With the risk-neutral drift the rate ends in the same band in <Num of="m01.bandProb" /> of cases (risk-neutral, not a forecast). So for the band the drift changes little.
+
+**Probability.** This tool computes probabilities [risk-neutrally](/en/glossary/#term-risk-neutral), like the option models. That only means: the rate drifts at <i>r</i><sub>d</sub> − <i>r</i><sub>f</sub>, and its expected value at <i>T</i> is the forward <i>F</i>. A formula needs further assumptions of the model: constant vol, a lognormally distributed rate and no jumps. With both together, the chance that the rate ends at or above <i>K</i> at <i>T</i> is
+
+<Formula>
+  <span>P(<i>S</i><sub>T</sub> ≥ <i>K</i>) = N(<i>d</i><sub>2</sub>)</span>
+  <span><i>d</i><sub>2</sub> = [ln(<i>F</i>/<i>K</i>) − ½σ²<i>T</i>] / (σ√<i>T</i>)</span>
+</Formula>
+
+N is the cumulative distribution function of the standard normal distribution. For <i>K</i> = <Num of="m01.stUp" /> this gives <Num of="m01.probUp" />; for a fall to <Num of="m01.stDown" /> or lower, N(−<i>d</i><sub>2</sub>) = <Num of="m01.probDown" /> (risk-neutral, not a forecast). Here the drift matters: the forward lies below spot, so the fall to <Num of="m01.stDown" /> is more likely than the equally large rise to <Num of="m01.stUp" />.
+
+</Derivation>
+
+<Desk title="Long and short">
+
+On the desk you would say: the importer is **short USD**. He owes dollars he does not have yet, and he loses if the dollar rises. Whoever owns dollars is **long USD** and gains in that case.
+
+In the charts of this tool, long is blue and short is orange. That is why the importer's cost line is orange.
+
+</Desk>
+
+<Takeaway>
+
+An exchange rate is the price of one currency in another. Whoever has to pay USD 1m in 3 months is short USD: every big figure the dollar rises costs him <Num of="m01.bigFigChf" />.
+
+</Takeaway>

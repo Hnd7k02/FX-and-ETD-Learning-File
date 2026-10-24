@@ -1,0 +1,224 @@
+---
+/**
+ * Dual currency calculator as an MDX figure (modules 08 and 09).
+ *
+ * Props (all optional)
+ * - capital?: number   CHF invested (default 100’000, MC_CONFIG.products.dualCurrency).
+ * - months?: number    Tenor 1, 2 or 3 months (default 1).
+ * - distance?: number  Strike distance below spot as a fraction (default 0.01 = 1 %).
+ * - fixing?: number    USD/CHF at maturity shown first in the outcome card.
+ * - caption?: string   Figure caption.
+ *
+ * Example (module 09): <DciCalculatorFigure months={3} distance={0.02} caption="…" />
+ */
+import Figure from '@/components/content/Figure.astro';
+import DciCalculator from '@/components/islands/DciCalculator';
+import { pageLang } from '@/components/content/lang';
+
+interface Props {
+  capital?: number;
+  months?: number;
+  distance?: number;
+  fixing?: number;
+  caption?: string;
+}
+const { caption, ...rest } = Astro.props;
+const lang = pageLang(Astro.currentLocale);
+---
+
+<Figure caption={caption}>
+  <DciCalculator client:visible lang={lang} {...rest} />
+</Figure>
+
+<style is:global>
+  .dci {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+    color: var(--ff-ink);
+  }
+  .dci p {
+    margin: 0;
+  }
+  .dci .ff-lab-head {
+    margin-bottom: 0;
+  }
+  .dci-head-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+  .dci-generic {
+    background: var(--ff-exotics-soft);
+    color: var(--ff-exotics-text);
+    font-weight: 700;
+    max-width: 100%;
+  }
+  .dci .ff-legend {
+    flex-direction: row;
+    padding: 0;
+    gap: 6px 18px;
+  }
+  .dci .ff-legend li {
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--ff-ink-2);
+  }
+  .dci .ff-stat-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .dci .ff-stat-value,
+  .dci .ff-stat-hero-main {
+    font-variant-numeric: tabular-nums;
+  }
+  .dci .segmented > button {
+    min-height: 44px;
+    padding: 0 16px;
+  }
+  .dci-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .dci-chart {
+    width: 100%;
+  }
+  .dci-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    font-family: var(--ff-font-ui);
+    touch-action: pan-y;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .dci-svg text,
+  .dci-line,
+  .dci-guide,
+  .dci-strike,
+  .dci-deposit,
+  .dci-be,
+  .dci-zone {
+    pointer-events: none;
+  }
+  .dci-zone {
+    fill: rgba(234, 88, 12, 0.07);
+  }
+  .dci-zone-label {
+    font-weight: 700;
+    fill: var(--ff-exotics-text);
+  }
+  .dci-axis-title {
+    font-weight: 600;
+    fill: var(--ff-muted);
+  }
+  .dci-guide {
+    fill: none;
+    stroke: var(--ff-axis);
+    stroke-width: 1;
+    stroke-dasharray: 2 4;
+  }
+  .dci-ref-label {
+    font-weight: 600;
+    fill: var(--ff-muted);
+  }
+  .dci-strike {
+    fill: none;
+    stroke: var(--ff-ref);
+    stroke-width: 1;
+    stroke-dasharray: 4 5;
+  }
+  .dci-k-label {
+    font-family: var(--ff-font-mono);
+    font-weight: 600;
+    fill: var(--ff-ink-2);
+  }
+  .dci-deposit {
+    fill: none;
+    stroke: var(--ff-forward);
+    stroke-width: 1.75;
+    stroke-dasharray: 6 6;
+  }
+  .dci-line {
+    fill: none;
+    stroke: var(--ff-long);
+    stroke-width: 3;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+  }
+  .dci-be {
+    fill: #fff;
+    stroke: var(--ff-forward);
+    stroke-width: 2;
+  }
+  .dci-be-label {
+    font-weight: 700;
+    fill: var(--ff-ink);
+  }
+  .dci-handle {
+    cursor: ew-resize;
+    touch-action: pan-y;
+  }
+  .dci-fix-line {
+    fill: none;
+    stroke: var(--ff-ink);
+    stroke-width: 1;
+    stroke-opacity: 0.45;
+  }
+  .dci-fix-dot {
+    stroke: #fff;
+    stroke-width: 2.5;
+    transition: fill 200ms ease;
+  }
+  .dci-fix-dot--good {
+    fill: var(--ff-good);
+  }
+  .dci-fix-dot--warn {
+    fill: var(--ff-warn);
+  }
+  .dci-fix-dot--bad {
+    fill: var(--ff-bad);
+  }
+  .dci-fix-pill {
+    fill: var(--ff-ink);
+  }
+  .dci-fix-text {
+    font-family: var(--ff-font-mono);
+    font-weight: 600;
+    fill: #fff;
+  }
+  .dci .dci-hint {
+    font-size: 12px;
+    color: var(--ff-muted);
+  }
+  .dci-out {
+    padding: 12px 14px;
+    border-radius: var(--ff-r-box);
+    font-size: 14px;
+    line-height: 1.5;
+    font-weight: 600;
+    transition:
+      background-color 200ms ease,
+      color 200ms ease;
+  }
+  .dci-out--good {
+    background: var(--ff-good-soft);
+    color: var(--ff-good-text-strong);
+  }
+  .dci-out--warn {
+    background: var(--ff-warn-soft);
+    color: var(--ff-warn-text);
+  }
+  .dci-out--bad {
+    background: var(--ff-bad-soft);
+    color: var(--ff-bad-text-strong);
+  }
+  .dci .dci-blocks {
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--ff-ink-2);
+  }
+</style>

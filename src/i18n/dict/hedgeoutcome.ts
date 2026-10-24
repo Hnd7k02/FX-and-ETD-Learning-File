@@ -1,0 +1,120 @@
+/** UI strings of the HedgeOutcome island (module 02, section 1). */
+import { defineDict } from '../types';
+
+export const hedgeoutcome = defineDict({
+  de: {
+    'ho.title': 'Mit oder ohne Forward?',
+    'ho.sub':
+      'USD {notional} in {months} Monaten · Forward heute fixiert: {fwd} · Spot heute: {spot}',
+    'ho.legend.unhedged': 'Ohne Absicherung',
+    'ho.legend.forward': 'Mit Forward',
+    'ho.legend.scenarios': 'Szenarien (Modell)',
+    'ho.y': 'Kosten in CHF 1’000',
+    'ho.x': 'USD/CHF bei Fälligkeit',
+    'ho.region.savesA': 'Dollar stärker:',
+    'ho.region.savesB': 'Forward spart',
+    'ho.region.costsA': 'Dollar schwächer:',
+    'ho.region.costsB': 'Chance abgegeben',
+    'ho.fLabel': 'F {fwd}',
+    'ho.strip.unhedged': 'ohne',
+    'ho.strip.hedged': 'mit F',
+    'ho.chip.saves': 'Forward spart {chf}',
+    'ho.chip.costs': 'Ohne Absicherung {chf} günstiger',
+    'ho.chip.equal': 'Gleich teuer',
+    'ho.slider': 'USD/CHF bei Fälligkeit',
+    'ho.play': 'Szenarien abspielen',
+    'ho.pause': 'Pause',
+    'ho.replay': 'Nochmals abspielen',
+    'ho.reseed': 'Neue Szenarien',
+    'ho.row.unhedged': 'Ohne Absicherung',
+    'ho.row.unhedgedSub': 'USD {notional} × {st}',
+    'ho.row.forward': 'Mit Forward',
+    'ho.row.forwardSub': 'fix, egal wo der Kurs steht',
+    'ho.row.diff.saves': 'Forward spart',
+    'ho.row.diff.costs': 'Abgegebene Chance',
+    'ho.row.diff.equal': 'Differenz',
+    'ho.row.diffSub': 'ohne minus mit Forward',
+    'ho.scn.title': '{shown} von {n} Szenarien',
+    'ho.scn.sub':
+      'Risikoneutral um den Forward zentriert; Modell: lognormal, Vola {vol}. Keine Prognose.',
+    'ho.scn.rangeUnhedged': 'Spannweite ohne Absicherung',
+    'ho.scn.rangeHedged': 'Spannweite mit Forward',
+    'ho.scn.cheaper': 'Forward günstiger',
+    'ho.scn.cheaperVal': '{k} von {n}',
+    'ho.scn.none': 'noch keine',
+    'ho.aha.title': 'Der Forward nimmt die Unsicherheit weg',
+    'ho.insight.idle':
+      'Spiel die Szenarien ab: Jeder Punkt ist ein möglicher Kurs in {months} Monaten. Schau, wie weit die Kosten ohne Absicherung streuen.',
+    'ho.insight.running':
+      'Szenario {i}: USD/CHF {st}, ohne Absicherung {unhedged}, mit Forward {hedged}.',
+    'ho.aha.text': 'Ohne Absicherung: {min} bis {max}. Mit Forward: immer {fwd}.',
+    'ho.note.saves':
+      'Der Dollar steht bei {st}, über dem Forward. Ohne Absicherung zahlt der Importeur {unhedged}. Mit dem Forward bleibt es bei {hedged}: Er spart {diff}.',
+    'ho.note.costs':
+      'Der Dollar steht bei {st}, unter dem Forward. Ohne Absicherung hätte der Importeur nur {unhedged} gezahlt. Mit dem Forward zahlt er trotzdem {hedged}, also {diff} mehr. Das ist kein Verlust in der Kasse, sondern die Chance, die er abgegeben hat.',
+    'ho.note.equal':
+      'Der Dollar steht genau beim Forward. Mit und ohne Absicherung kosten die USD gleich viel: {hedged}.',
+    'ho.aria':
+      'Kosten von USD {notional} in CHF gegen den Kurs bei Fälligkeit. Bei {st}: ohne Absicherung {unhedged}, mit Forward {hedged}.',
+    'ho.aria.scn':
+      '{n} Modellszenarien: ohne Absicherung zwischen {min} und {max}, mit Forward immer {hedged}.',
+    'ho.hint': 'Zieh den schwarzen Kurs-Anfasser unter dem Chart oder nutze den Schieber.',
+  },
+  en: {
+    'ho.title': 'With or without a forward?',
+    'ho.sub': 'USD {notional} in {months} months · forward fixed today: {fwd} · spot today: {spot}',
+    'ho.legend.unhedged': 'Unhedged',
+    'ho.legend.forward': 'With forward',
+    'ho.legend.scenarios': 'Scenarios (model)',
+    'ho.y': 'Cost in CHF thousands',
+    'ho.x': 'USD/CHF at maturity',
+    'ho.region.savesA': 'Stronger dollar:',
+    'ho.region.savesB': 'forward saves',
+    'ho.region.costsA': 'Weaker dollar:',
+    'ho.region.costsB': 'chance given up',
+    'ho.fLabel': 'F {fwd}',
+    'ho.strip.unhedged': 'no F',
+    'ho.strip.hedged': 'with F',
+    'ho.chip.saves': 'Forward saves {chf}',
+    'ho.chip.costs': 'Unhedged {chf} cheaper',
+    'ho.chip.equal': 'Same cost',
+    'ho.slider': 'USD/CHF at maturity',
+    'ho.play': 'Play scenarios',
+    'ho.pause': 'Pause',
+    'ho.replay': 'Play again',
+    'ho.reseed': 'New scenarios',
+    'ho.row.unhedged': 'Unhedged',
+    'ho.row.unhedgedSub': 'USD {notional} × {st}',
+    'ho.row.forward': 'With forward',
+    'ho.row.forwardSub': 'fixed, wherever the rate ends up',
+    'ho.row.diff.saves': 'Forward saves',
+    'ho.row.diff.costs': 'Chance given up',
+    'ho.row.diff.equal': 'Difference',
+    'ho.row.diffSub': 'unhedged minus forward',
+    'ho.scn.title': '{shown} of {n} scenarios',
+    'ho.scn.sub':
+      'Risk-neutral, centred on the forward; model: lognormal, vol {vol}. Not a forecast.',
+    'ho.scn.rangeUnhedged': 'Range unhedged',
+    'ho.scn.rangeHedged': 'Range with forward',
+    'ho.scn.cheaper': 'Forward cheaper',
+    'ho.scn.cheaperVal': '{k} of {n}',
+    'ho.scn.none': 'none yet',
+    'ho.aha.title': 'The forward removes the uncertainty',
+    'ho.insight.idle':
+      'Play the scenarios: each dot is a possible rate in {months} months. Watch how far the unhedged cost spreads.',
+    'ho.insight.running':
+      'Scenario {i}: USD/CHF {st}, unhedged {unhedged}, with the forward {hedged}.',
+    'ho.aha.text': 'Unhedged: {min} to {max}. With the forward: always {fwd}.',
+    'ho.note.saves':
+      'The dollar is at {st}, above the forward. Unhedged, the importer pays {unhedged}. With the forward it stays at {hedged}: he saves {diff}.',
+    'ho.note.costs':
+      'The dollar is at {st}, below the forward. Unhedged, the importer would have paid only {unhedged}. With the forward he still pays {hedged}, which is {diff} more. That is not a cash loss but the chance he gave up.',
+    'ho.note.equal':
+      'The dollar ends exactly at the forward. Hedged or not, the dollars cost the same: {hedged}.',
+    'ho.aria':
+      'Cost of USD {notional} in CHF against the rate at maturity. At {st}: unhedged {unhedged}, with the forward {hedged}.',
+    'ho.aria.scn':
+      '{n} model scenarios: unhedged between {min} and {max}, with the forward always {hedged}.',
+    'ho.hint': 'Drag the black rate handle below the chart or use the slider.',
+  },
+});

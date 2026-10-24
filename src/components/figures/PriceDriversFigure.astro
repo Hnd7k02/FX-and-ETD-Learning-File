@@ -1,0 +1,173 @@
+---
+/** Price drivers (module 04, section 4) for MDX. Props: caption. */
+import PriceDrivers from '@/components/islands/PriceDrivers';
+import Figure from '@/components/content/Figure.astro';
+import { pageLang } from '@/components/content/lang';
+
+interface Props {
+  caption?: string;
+}
+const { caption } = Astro.props;
+const lang = pageLang(Astro.currentLocale);
+---
+
+<Figure caption={caption}>
+  <PriceDrivers client:visible lang={lang} />
+</Figure>
+
+<style is:global>
+  .pd {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+  }
+  .pd .ff-lab-head {
+    margin-bottom: 0;
+  }
+  .pd-head-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+  .pd p {
+    margin: 0;
+  }
+  /* the Legend is a <ul>; keep the .prose list styles away from it */
+  .pd .ff-legend {
+    flex-direction: row;
+    padding-left: 0;
+    gap: 8px 20px;
+  }
+  .pd .ff-legend li {
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--ff-ink-2);
+  }
+  .pd-reset {
+    min-height: 44px;
+  }
+  .pd-prices {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .pd-price {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 12px 16px;
+    border-radius: var(--ff-r-box);
+    background: var(--ff-ink);
+    color: #fff;
+    border-left: 4px solid var(--ff-long);
+  }
+  .pd-price--put {
+    border-left-color: var(--ff-options);
+  }
+  .pd-price-label {
+    font-size: 12px;
+    color: var(--ff-on-dark-muted);
+  }
+  .pd-price-main {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    font-variant-numeric: tabular-nums;
+  }
+  .pd-price-sub {
+    font-size: 12px;
+    color: var(--ff-on-dark-muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .pd-parity {
+    align-self: flex-start;
+    padding: 8px 14px;
+    border-radius: var(--ff-r-formula);
+    background: var(--ff-options-soft);
+    font-size: 18px;
+  }
+  .pd-chart-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 16px;
+  }
+  .pd-slope {
+    animation: pd-fade 300ms ease-out both;
+  }
+  @keyframes pd-fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  .pd-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    font-family: var(--ff-font-ui);
+  }
+  .pd .pd-bump {
+    font-size: 13px;
+    color: var(--ff-ink-2);
+    font-variant-numeric: tabular-nums;
+  }
+  .pd-drivers {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .pd-driver {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 10px 12px;
+    border-radius: var(--ff-r-box);
+    background: var(--ff-surface-2);
+    border: 1px solid transparent;
+    transition:
+      border-color 200ms ease,
+      background-color 200ms ease;
+  }
+  .pd-driver.is-active {
+    background: var(--ff-surface);
+    border-color: var(--ff-line-strong);
+  }
+  .pd-effects {
+    display: flex;
+    gap: 6px;
+  }
+  .pd-eff {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 9px 2px 7px;
+    border-radius: var(--ff-r-pill);
+    font-size: 12px;
+    font-weight: 700;
+    background: var(--ff-chip);
+    color: var(--ff-ink-2);
+    transition:
+      background-color 200ms ease,
+      color 200ms ease;
+  }
+  .pd-eff--call.is-up,
+  .pd-eff--call.is-down {
+    background: var(--ff-linear-soft);
+    color: var(--ff-linear-text);
+  }
+  .pd-eff--put.is-up,
+  .pd-eff--put.is-down {
+    background: var(--ff-options-soft);
+    color: var(--ff-options-text);
+  }
+  .pd-eff svg {
+    transition: transform 250ms ease;
+  }
+</style>

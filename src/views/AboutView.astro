@@ -1,0 +1,1912 @@
+---
+/**
+ * About & Methodology page (DE /ueber/, EN /en/about/).
+ * Every number comes from the calculation core (src/lib/fx), the Riskometer data
+ * (src/data/fx/riskometer.json, if built), the data validation (src/lib/data/validate.ts) or the
+ * source files (src/content/sources*.md).
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import ArrowIcon from '@/components/layout/ArrowIcon.astro';
+import ResetProgress from '@/components/islands/ResetProgress';
+import { FAMILIES, MODULES, getModule, type Family } from '@/data/modules';
+import { about as dict } from '@/i18n/dict/about';
+import { common } from '@/i18n/dict/common';
+import { reset } from '@/i18n/dict/reset';
+import { levels, LEVEL_COLORS, LEVEL_KEYS, type LevelIndex } from '@/i18n/dict/levels';
+import { aboutPath, homePath, modulePath, riskometerPath, type SectionKey } from '@/i18n/routes';
+import { translator, type Lang } from '@/i18n/types';
+import { EXAMPLE as E, EXAMPLE_FORWARD, EXAMPLE_LABEL, EXAMPLE_STRIKE } from '@/lib/fx/example';
+import { DAY_COUNT } from '@/lib/fx/daycount';
+import { forwardMoneyMarket, forwardPoints } from '@/lib/fx/forward';
+import { gkPrice } from '@/lib/fx/vanilla';
+import {
+  fmtDate,
+  fmtMillions,
+  fmtMoney,
+  fmtNumber,
+  fmtPct,
+  fmtPctValue,
+  fmtPips,
+  fmtRate,
+  pipSize,
+} from '@/lib/format';
+import { collectSources, inlineSegments, splitBilingual, urlHost } from '@/lib/sources';
+import { MAX_ABS_LOG_RETURN, MAX_AGE_BANK_DAYS } from '@/lib/data/validate';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const other: Lang = lang === 'de' ? 'en' : 'de';
+const t = translator(dict, lang);
+const tc = translator(common, lang);
+const tr = translator(reset, lang);
+const tl = translator(levels, lang);
+/** Escapes dictionary text and typesets r_d / r_f as r with subscript. */
+const esc = (x: string) =>
+  x.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const rich = (x: string) => esc(x).replace(/\br_([df])\b/g, '<i>r</i><sub>$1</sub>');
+
+/* ---------- Running example (calculation core) ---------- */
+const fwdMm = forwardMoneyMarket(E.spot, E.rd, E.rf, E.mmDays);
+const points = forwardPoints(EXAMPLE_FORWARD, E.spot, E.pair);
+const mmDiffPips = Math.abs(fwdMm - EXAMPLE_FORWARD) / pipSize(E.pair);
+const call = gkPrice(E.spot, EXAMPLE_STRIKE, E.T, E.vol, E.rd, E.rf, 'call');
+const callPips = call / pipSize(E.pair);
+const callMoney = call * E.notional;
+const notional = fmtMillions(E.notional, E.base, lang);
+
+const tiles = [
+  { label: t('about.example.spot'), value: fmtRate(E.spot, E.pair) },
+  {
+    label: t('about.example.forward', { months: E.months }),
+    value: fmtRate(EXAMPLE_FORWARD, E.pair, 5),
+  },
+  { label: t('about.example.strike'), value: fmtRate(EXAMPLE_STRIKE, E.pair) },
+  { label: t('about.example.premium'), value: fmtMoney(callMoney, E.quote, lang) },
+];
+
+const exampleRows: Array<{ qty: string; sym?: string; value: string; note: string }> = [
+  { qty: t('about.example.pair'), value: E.pair, note: t('about.example.pairNote') },
+  {
+    qty: t('about.example.spot'),
+    sym: '<i>S</i>',
+    value: fmtRate(E.spot, E.pair),
+    note: t('about.example.input'),
+  },
+  {
+    qty: t('about.example.rd'),
+    sym: '<i>r</i><sub>d</sub>',
+    value: fmtPct(E.rd, lang, 1),
+    note: t('about.example.input'),
+  },
+  {
+    qty: t('about.example.rf'),
+    sym: '<i>r</i><sub>f</sub>',
+    value: fmtPct(E.rf, lang, 1),
+    note: t('about.example.input'),
+  },
+  {
+    qty: t('about.example.term'),
+    sym: '<i>T</i>',
+    value: t('about.example.termValue', { months: E.months }),
+    note: t('about.example.termNote', { T: fmtNumber(E.T, lang, { digits: 2 }), days: E.mmDays }),
+  },
+  {
+    qty: t('about.example.vol'),
+    sym: '<i>σ</i>',
+    value: fmtPct(E.vol, lang, 0),
+    note: t('about.example.input'),
+  },
+  {
+    qty: t('about.example.fwdCont'),
+    sym: '<i>F</i>',
+    value: fmtRate(EXAMPLE_FORWARD, E.pair, 5),
+    note: '<i>S</i> · e<sup>(<i>r</i><sub>d</sub> − <i>r</i><sub>f</sub>)<i>T</i></sup>',
+  },
+  {
+    qty: t('about.example.fwdMm'),
+    value: fmtRate(fwdMm, E.pair, 5),
+    note: '<i>S</i> · (1 + <i>r</i><sub>d</sub><i>t</i>) / (1 + <i>r</i><sub>f</sub><i>t</i>)',
+  },
+  {
+    qty: t('about.example.points'),
+    value: t('about.example.pointsValue', { pips: fmtPips(points, lang, 1) }),
+    note: '(<i>F</i> − <i>S</i>) / pip',
+  },
+  {
+    qty: t('about.example.strike'),
+    sym: '<i>K</i>',
+    value: fmtRate(EXAMPLE_STRIKE, E.pair),
+    note: t('about.example.calcStrike'),
+  },
+  {
+    qty: t('about.example.notional'),
+    value: notional,
+    note: t('about.example.input'),
+  },
+  { qty: t('about.example.position'), value: t('about.example.positionValue'), note: '' },
+  {
+    qty: t('about.example.premium'),
+    sym: '<i>C</i>',
+    value: t('about.example.premiumValue', {
+      pips: fmtPips(callPips, lang, 1),
+      money: fmtMoney(callMoney, E.quote, lang),
+    }),
+    note: t('about.example.calcPremium'),
+  },
+];
+
+/* ---------- Riskometer method (generated JSON if present, else documented constants) ---------- */
+interface RmThresholds {
+  p20: number;
+  p60: number;
+  p85: number;
+  p97: number;
+  max: number;
+  maxDate: string;
+}
+interface RmJson {
+  asOf?: string;
+  method?: {
+    window?: number;
+    annualisation?: number;
+    since?: string;
+    percentiles?: number[];
+    peakRange?: { before?: number; after?: number };
+  };
+  pairs?: Record<string, { thresholds?: RmThresholds }>;
+}
+const rmFiles = import.meta.glob<{ default: RmJson }>('../data/fx/riskometer.json', {
+  eager: true,
+});
+const rm: RmJson | null = Object.values(rmFiles)[0]?.default ?? null;
+const num = (x: unknown, d: number) => (typeof x === 'number' && Number.isFinite(x) ? x : d);
+const pctl =
+  Array.isArray(rm?.method?.percentiles) && rm!.method!.percentiles!.length === 4
+    ? rm!.method!.percentiles!
+    : [20, 60, 85, 97];
+const method = {
+  window: num(rm?.method?.window, 21),
+  ann: num(rm?.method?.annualisation, 252),
+  since: typeof rm?.method?.since === 'string' ? rm.method.since : '2006-01-01',
+  p: pctl as [number, number, number, number],
+  before: num(rm?.method?.peakRange?.before, 10),
+  after: num(rm?.method?.peakRange?.after, 60),
+};
+const sinceLabel = fmtDate(method.since, lang);
+const sinceYear = method.since.slice(0, 4);
+const bounds = [0, ...method.p, 100];
+const levelBands = ([1, 2, 3, 4, 5] as LevelIndex[]).map((lv, i) => {
+  const from = bounds[i]!;
+  const to = bounds[i + 1]!;
+  const range =
+    i === 0
+      ? t('about.risk.range.first', { to })
+      : i === 4
+        ? t('about.risk.range.last', { from })
+        : t('about.risk.range.mid', { from, to });
+  return {
+    label: tl(LEVEL_KEYS[i]!),
+    color: LEVEL_COLORS[lv],
+    range,
+    share: t('about.risk.share', { pct: fmtPctValue(to - from, lang, 0) }),
+  };
+});
+const PAIR_ORDER = ['EUR/CHF', 'USD/CHF', 'EUR/USD', 'USD/JPY'];
+const thresholdRows = rm?.pairs
+  ? PAIR_ORDER.filter((p) => rm.pairs![p]?.thresholds).map((p) => ({
+      pair: p,
+      th: rm.pairs![p]!.thresholds!,
+    }))
+  : [];
+
+const pipeline: Array<{ h: string; p: string; math: string; kind: 'math' | 'mono' }> = [
+  {
+    h: t('about.risk.step1.h'),
+    p: t('about.risk.step1.p'),
+    kind: 'mono',
+    math: ['EUR/CHF', 'EUR/USD', 'EUR/JPY'].map((x) => `<span>${x}</span>`).join(''),
+  },
+  {
+    h: t('about.risk.step2.h'),
+    p: t('about.risk.step2.p'),
+    kind: 'mono',
+    math: '<span>USD/CHF = EUR/CHF ÷ EUR/USD</span><span>USD/JPY = EUR/JPY ÷ EUR/USD</span>',
+  },
+  {
+    h: t('about.risk.step3.h'),
+    p: t('about.risk.step3.p'),
+    kind: 'math',
+    math: '<span><i>r</i><sub><i>t</i></sub> = ln(<i>S</i><sub><i>t</i></sub> / <i>S</i><sub><i>t</i>−1</sub>)</span>',
+  },
+  {
+    h: t('about.risk.step4.h'),
+    p: t('about.risk.step4.p', {
+      window: method.window,
+      fixings: method.window + 1,
+      ann: method.ann,
+    }),
+    kind: 'math',
+    math: `<span><i>σ</i><sub><i>t</i></sub> = √(${method.ann}/${method.window} · Σ<sub><i>i</i>=0</sub><sup>${method.window - 1}</sup> <i>r</i><sub><i>t</i>−<i>i</i></sub><sup>2</sup>)</span>`,
+  },
+  {
+    h: t('about.risk.step5.h'),
+    p: t('about.risk.step5.p', { since: sinceLabel }),
+    kind: 'mono',
+    math: method.p.map((x) => `<span>P${x}</span>`).join(''),
+  },
+];
+
+/* ---------- Conventions ---------- */
+const act360 = Object.entries(DAY_COUNT)
+  .filter(([, dc]) => dc === 'ACT/360')
+  .map(([c]) => c)
+  .join(', ');
+const act365 = Object.entries(DAY_COUNT)
+  .filter(([, dc]) => dc === 'ACT/365')
+  .map(([c]) => c)
+  .join(', ');
+const conventions = [
+  {
+    topic: t('about.conv.numbers'),
+    rule: t('about.conv.numbersRule'),
+    sample: fmtNumber(1234567.5, lang, { digits: 2 }),
+  },
+  {
+    topic: t('about.conv.percent'),
+    rule: t('about.conv.percentRule'),
+    sample: fmtPct(0.125, lang, 1),
+  },
+  {
+    topic: t('about.conv.minus'),
+    rule: t('about.conv.minusRule'),
+    sample: fmtNumber(-0.42, lang, { digits: 2 }),
+  },
+  {
+    topic: t('about.conv.rates'),
+    rule: t('about.conv.ratesRule'),
+    sample: `${fmtRate(1.23456, 'EUR/USD')} · ${fmtRate(123.456, 'USD/JPY')}`,
+  },
+  {
+    topic: t('about.conv.pip'),
+    rule: t('about.conv.pipRule'),
+    sample: `${pipSize('EUR/USD')} · ${pipSize('USD/JPY')}`,
+  },
+  { topic: t('about.conv.quote'), rule: t('about.conv.quoteRule'), sample: 'Base/Quote' },
+  {
+    topic: t('about.conv.mm'),
+    rule: t('about.conv.mmRule', { act360, act365 }),
+    sample: `${E.mmDays} / 360 = ${fmtNumber(E.mmDays / 360, lang, { digits: 4 })}`,
+  },
+  {
+    topic: t('about.conv.model'),
+    rule: t('about.conv.modelRule'),
+    sample: `${fmtNumber(E.T * 365, lang, { digits: 2 })} / 365 = ${fmtNumber(E.T, lang, { digits: 2 })}`,
+  },
+  { topic: t('about.conv.value'), rule: t('about.conv.valueRule'), sample: 'T+2' },
+  { topic: t('about.conv.greeks'), rule: t('about.conv.greeksRule'), sample: 'Δ Γ ν Θ ρ' },
+];
+
+/* ---------- Sources ---------- */
+const mainSrc = import.meta.glob<string>('../content/sources.md', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+});
+const fragSrc = import.meta.glob<string>('../content/sources/*.md', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+});
+const sources = collectSources(
+  [
+    ...Object.entries(mainSrc),
+    ...Object.entries(fragSrc).sort(([a], [b]) => a.localeCompare(b)),
+  ].map(([file, markdown]) => ({ file, markdown })),
+);
+
+/* ---------- Models (formulas are language-neutral HTML) ---------- */
+const r = (x: 'd' | 'f') => `<i>r</i><sub>${x}</sub>`;
+const sub12 = '<i>d</i><sub>1,2</sub>';
+const modelOf = (slug: string, section: SectionKey) => {
+  const m = getModule(slug);
+  return { family: m.family, n: m.n, module: m.title[lang], href: modulePath(lang, slug, section) };
+};
+const models: Array<
+  ReturnType<typeof modelOf> & {
+    title: string;
+    text: string;
+    formulas: string[];
+    wide?: boolean;
+    bullets?: Array<{ text: string; formula?: string }>;
+  }
+> = [
+  {
+    ...modelOf('02-forward', '2'),
+    title: t('about.models.fwd.h'),
+    text: t('about.models.fwd.p', { diff: fmtPips(mmDiffPips, lang, 1) }),
+    formulas: [
+      `<span><i>F</i> = <i>S</i> · (1 + ${r('d')} <i>t</i><sub>d</sub>) / (1 + ${r('f')} <i>t</i><sub>f</sub>)</span>`,
+      `<span><i>F</i> = <i>S</i> · e<sup>(${r('d')} − ${r('f')}) <i>T</i></sup></span>`,
+    ],
+  },
+  {
+    ...modelOf('04-vanilla-options', '4'),
+    title: t('about.models.gk.h'),
+    text: t('about.models.gk.p'),
+    formulas: [
+      `<span><i>C</i> = <i>S</i> e<sup>−${r('f')}<i>T</i></sup> <i>N</i>(<i>d</i><sub>1</sub>) − <i>K</i> e<sup>−${r('d')}<i>T</i></sup> <i>N</i>(<i>d</i><sub>2</sub>)</span><span class="formula-sub">${sub12} = [ln(<i>S</i>/<i>K</i>) + (${r('d')} − ${r('f')} ± ½<i>σ</i><sup>2</sup>) <i>T</i>] / (<i>σ</i>√<i>T</i>)</span>`,
+    ],
+  },
+  {
+    ...modelOf('04-vanilla-options', '4'),
+    title: t('about.models.b76.h'),
+    text: t('about.models.b76.p'),
+    formulas: [
+      `<span><i>C</i> = DF<sub>d</sub> · [<i>F</i> <i>N</i>(<i>d</i><sub>1</sub>) − <i>K</i> <i>N</i>(<i>d</i><sub>2</sub>)]</span><span class="formula-sub">${sub12} = [ln(<i>F</i>/<i>K</i>) ± ½<i>σ</i><sup>2</sup><i>T</i>] / (<i>σ</i>√<i>T</i>), DF<sub>d</sub> = e<sup>−${r('d')}<i>T</i></sup></span>`,
+    ],
+  },
+  {
+    ...modelOf('05-greeks', '2'),
+    title: t('about.models.greeks.h'),
+    text: t('about.models.greeks.p'),
+    formulas: [
+      `<span>Δ = e<sup>−${r('f')}<i>T</i></sup> <i>N</i>(<i>d</i><sub>1</sub>)</span><span>Γ = e<sup>−${r('f')}<i>T</i></sup> <i>φ</i>(<i>d</i><sub>1</sub>) / (<i>S σ</i>√<i>T</i>)</span>`,
+      `<span><i>C</i> − <i>P</i> = DF<sub>d</sub> · (<i>F</i> − <i>K</i>)</span>`,
+    ],
+  },
+  {
+    ...modelOf('06-combos-smile', '4'),
+    title: t('about.models.smile.h'),
+    text: t('about.models.smile.p'),
+    formulas: [
+      `<span><i>σ</i>(Δ) = ATM − 2 · RR · (Δ − 0.5) + 16 · BF · (Δ − 0.5)<sup>2</sup></span>`,
+    ],
+  },
+  {
+    ...modelOf('07-barrier-binary', '2'),
+    title: t('about.models.exotics.h'),
+    text: t('about.models.exotics.p'),
+    formulas: [
+      `<span>Digital<sub>call</sub> = e<sup>−${r('d')}<i>T</i></sup> <i>N</i>(<i>d</i><sub>2</sub>)</span>`,
+      `<span>Knock-in + Knock-out = Vanilla</span>`,
+    ],
+  },
+  {
+    ...modelOf('08-structured-products', '2'),
+    title: t('about.models.mc.h'),
+    text: t('about.models.mc.p'),
+    wide: true,
+    formulas: [
+      `<span><i>S</i><sub><i>t</i>+Δ<i>t</i></sub> = <i>S</i><sub><i>t</i></sub> · exp[(${r('d')} − ${r('f')} − ½<i>σ</i><sup>2</sup>) Δ<i>t</i> + <i>σ</i>√Δ<i>t</i> · <i>Z</i>], Δ<i>t</i> = 1/365</span>`,
+    ],
+    bullets: [
+      { text: t('about.models.mc.seed') },
+      { text: t('about.models.mc.anti') },
+      {
+        text: t('about.models.mc.bgk'),
+        formula: `<span><i>B</i> → <i>B</i> · e<sup>±0.5826 · <i>σ</i> · √Δ<i>t</i></sup></span>`,
+      },
+      { text: t('about.models.mc.out') },
+    ],
+  },
+];
+
+/* ---------- Families and TOC ---------- */
+const families = (Object.keys(FAMILIES) as Family[]).map((f) => ({
+  key: f,
+  label: FAMILIES[f].label[lang],
+  modules: MODULES.filter((m) => m.family === f),
+}));
+
+const toc = [
+  { id: 'was', en: 'what', label: t('about.what.h') },
+  { id: 'beispiel', en: 'example', label: t('about.example.h') },
+  { id: 'modelle', en: 'models', label: t('about.models.h') },
+  { id: 'riskometer', en: 'riskometer', label: t('about.risk.h') },
+  { id: 'konventionen', en: 'conventions', label: t('about.conv.h') },
+  { id: 'quellen', en: 'sources', label: t('about.sources.h') },
+  { id: 'credits', en: 'credits', label: t('about.credits.h') },
+].map((s) => ({ id: lang === 'de' ? s.id : s.en, label: s.label }));
+const sid = (i: number) => toc[i]!.id;
+---
+
+<BaseLayout
+  lang={lang}
+  title={t('about.title')}
+  description={t('about.description')}
+  nav="about"
+  altPath={aboutPath(other)}
+>
+  <div class="ab-page">
+    <header class="ab-head">
+      <div class="container-module ab-head-inner">
+        <nav aria-label={tc('a11y.breadcrumb')} class="ab-crumbs">
+          <a href={homePath(lang)}>{tc('module.home')}</a>
+          <span aria-hidden="true">/</span>
+          <span aria-current="page" class="ab-crumb-current">
+            {t('about.crumb')}
+          </span>
+        </nav>
+        <div class="ab-chips">
+          <span class="chip chip-neutral">{t('about.chip')}</span>
+        </div>
+        <h1 class="h1-module">{t('about.h1')}</h1>
+        <p class="lead ab-lead">{t('about.lead')}</p>
+        <p class="ab-version" data-ff-version data-template={t('about.version')} hidden></p>
+        <aside class="ab-disclaimer" aria-labelledby="ab-disclaimer-title">
+          <span class="ab-disclaimer-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 22 22">
+              <circle
+                cx="11"
+                cy="11"
+                r="9.25"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+              ></circle>
+              <path
+                d="M11 10v6"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              ></path>
+              <circle cx="11" cy="6.6" r="1.2" fill="currentColor"></circle>
+            </svg>
+          </span>
+          <div>
+            <p class="ab-disclaimer-title" id="ab-disclaimer-title">
+              {t('about.disclaimer')}
+            </p>
+            <p class="ab-disclaimer-text">{t('about.disclaimerText')}</p>
+          </div>
+        </aside>
+      </div>
+    </header>
+
+    <div class="container-module ab-layout">
+      <nav class="ab-toc" aria-label={t('about.toc')}>
+        <p class="ab-toc-title">{t('about.toc')}</p>
+        <ol>
+          {toc.map((s, i) => (
+            <li>
+              <a href={`#${s.id}`} data-toc={s.id}>
+                <span class="ab-toc-n mono">{String(i + 1).padStart(2, '0')}</span>
+                <span>{s.label}</span>
+              </a>
+            </li>
+          ))}
+        </ol>
+      </nav>
+
+      <main class="ab-main">
+        {/* 01 What */}
+        <section class="ab-section" id={sid(0)} aria-labelledby={`${sid(0)}-h`}>
+          <p class="ab-num mono" aria-hidden="true">
+            01
+          </p>
+          <h2 class="h2" id={`${sid(0)}-h`}>
+            {t('about.what.h')}
+          </h2>
+          <div class="ab-prose">
+            <p>{t('about.what.p1')}</p>
+            <p>{t('about.what.p2')}</p>
+            <p>{t('about.what.p3')}</p>
+          </div>
+          <div class="ab-not">
+            <p class="ab-not-title">{t('about.what.notH')}</p>
+            <ul>
+              <li>{t('about.what.not1')}</li>
+              <li>{t('about.what.not2')}</li>
+              <li>{t('about.what.not3')}</li>
+              <li>{t('about.what.not4')}</li>
+            </ul>
+          </div>
+          <h3 class="ab-h3">{t('about.what.familiesH')}</h3>
+          <ul class="ab-families">
+            {families.map((f) => (
+              <li class="ab-family card" data-family={f.key}>
+                <span class="chip chip-family">{f.label}</span>
+                <ul>
+                  {f.modules.map((m) => (
+                    <li>
+                      <a href={modulePath(lang, m.slug, '1')}>
+                        <span class="mono ab-family-n">{m.n}</span>
+                        <span>{m.title[lang]}</span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        {/* 02 Example */}
+        <section class="ab-section" id={sid(1)} aria-labelledby={`${sid(1)}-h`}>
+          <p class="ab-num mono" aria-hidden="true">
+            02
+          </p>
+          <h2 class="h2" id={`${sid(1)}-h`}>
+            {t('about.example.h')}
+          </h2>
+          <p class="ab-lead2">{t('about.example.lead', { months: E.months, notional })}</p>
+          <div class="ab-case card-hero">
+            <div class="ab-tiles">
+              {tiles.map((tile, i) => (
+                <div class:list={['ab-tile', i === 3 && 'ab-tile--dark']}>
+                  <span class="ab-tile-label">{tile.label}</span>
+                  <span class="ab-tile-value mono">{tile.value}</span>
+                </div>
+              ))}
+            </div>
+            <div
+              class="ab-table-wrap"
+              role="region"
+              tabindex="0"
+              aria-label={t('about.example.tableCaption')}
+            >
+              <table class="ab-table ab-table--example">
+                <caption class="sr-only">{t('about.example.tableCaption')}</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">{t('about.example.colQty')}</th>
+                    <th scope="col">{t('about.example.colSym')}</th>
+                    <th scope="col">{t('about.example.colValue')}</th>
+                    <th scope="col">{t('about.example.colNote')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {exampleRows.map((r) => (
+                    <tr>
+                      <th scope="row">{r.qty}</th>
+                      <td class="ab-sym math" set:html={r.sym ?? ''} />
+                      <td class="mono ab-val">{r.value}</td>
+                      <td class="ab-note math-mixed" set:html={r.note} />
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p class="ab-example-label">
+              <span class="dot" aria-hidden="true"></span>
+              {EXAMPLE_LABEL[lang]}
+            </p>
+          </div>
+        </section>
+
+        {/* 03 Models */}
+        <section class="ab-section" id={sid(2)} aria-labelledby={`${sid(2)}-h`}>
+          <p class="ab-num mono" aria-hidden="true">
+            03
+          </p>
+          <h2 class="h2" id={`${sid(2)}-h`}>
+            {t('about.models.h')}
+          </h2>
+          <p class="ab-lead2" set:html={rich(t('about.models.lead'))} />
+
+          <div class="ab-models">
+            {models.map((m) => (
+              <article
+                class:list={['ab-model card', m.wide && 'ab-model--wide']}
+                data-family={m.family}
+              >
+                <a class="chip chip-family ab-model-chip" href={m.href}>
+                  <span class="mono">{m.n}</span>
+                  {m.module}
+                </a>
+                <h3 class="ab-h3">{m.title}</h3>
+                <p set:html={rich(m.text)} />
+                {m.formulas.map((f, i) => (
+                  <div
+                    class:list={['formula', i === m.formulas.length - 1 && 'formula--accent']}
+                    set:html={f}
+                  />
+                ))}
+                {m.bullets && (
+                  <ul class="ab-mc-list">
+                    {m.bullets.map((b) => (
+                      <li>
+                        {b.text}
+                        {b.formula && (
+                          <span class="formula ab-inline-formula" set:html={b.formula} />
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </article>
+            ))}
+          </div>
+          <p class="ab-small">{t('about.models.normal')}</p>
+        </section>
+
+        {/* 04 Riskometer */}
+        <section class="ab-section" id={sid(3)} aria-labelledby={`${sid(3)}-h`}>
+          <p class="ab-num mono" aria-hidden="true">
+            04
+          </p>
+          <h2 class="h2" id={`${sid(3)}-h`}>
+            {t('about.risk.h')}
+          </h2>
+          <p class="ab-lead2">{t('about.risk.lead', { since: sinceYear })}</p>
+
+          <ol class="ab-pipeline">
+            {pipeline.map((st, i) => (
+              <li class="ab-step">
+                <span class="ab-step-n mono" aria-hidden="true">
+                  {i + 1}
+                </span>
+                <div class="ab-step-body">
+                  <h3>{st.h}</h3>
+                  <p>{st.p}</p>
+                </div>
+                <div class:list={['ab-step-math', st.kind]} set:html={st.math} />
+              </li>
+            ))}
+          </ol>
+
+          <h3 class="ab-h3">{t('about.risk.levelsH')}</h3>
+          <ol class="ab-levels">
+            {levelBands.map((b) => (
+              <li style={`--lv:${b.color}`}>
+                <span class="ab-level-bar" aria-hidden="true" />
+                <span class="ab-level-label">{b.label}</span>
+                <span class="ab-level-range mono">{b.range}</span>
+                <span class="ab-level-share">{b.share}</span>
+              </li>
+            ))}
+          </ol>
+          <p class="ab-small">
+            {t('about.risk.levelsCaption', {
+              p1: method.p[0],
+              p4: method.p[3],
+              since: sinceYear,
+            })}
+          </p>
+
+          {thresholdRows.length > 0 && (
+            <div class="ab-thresholds card">
+              <div class="ab-thresholds-head">
+                <p class="ab-thresholds-title">{t('about.risk.thresholdsH')}</p>
+                <p class="ab-small">
+                  {t('about.risk.thresholdsCaption', {
+                    since: sinceYear,
+                    asOf: rm?.asOf ? fmtDate(rm.asOf, lang) : '–',
+                  })}
+                </p>
+              </div>
+              <div
+                class="ab-table-wrap"
+                role="region"
+                tabindex="0"
+                aria-label={t('about.risk.thresholdsH')}
+              >
+                <table class="ab-table ab-table--thresholds">
+                  <caption class="sr-only">{t('about.risk.thresholdsH')}</caption>
+                  <thead>
+                    <tr>
+                      <th scope="col">{t('about.risk.colPair')}</th>
+                      {method.p.map((p) => (
+                        <th scope="col" class="num">
+                          P{p}
+                        </th>
+                      ))}
+                      <th scope="col" class="num">
+                        {t('about.risk.colMax')}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {thresholdRows.map((r) => (
+                      <tr>
+                        <th scope="row" class="mono">
+                          {r.pair}
+                        </th>
+                        <td class="num mono">{fmtPctValue(r.th.p20, lang, 1)}</td>
+                        <td class="num mono">{fmtPctValue(r.th.p60, lang, 1)}</td>
+                        <td class="num mono">{fmtPctValue(r.th.p85, lang, 1)}</td>
+                        <td class="num mono">{fmtPctValue(r.th.p97, lang, 1)}</td>
+                        <td class="num mono">
+                          {fmtPctValue(r.th.max, lang, 1)}
+                          <span class="ab-max-date">{fmtDate(r.th.maxDate, lang)}</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          <div class="ab-details">
+            <h3 class="ab-h3">{t('about.risk.detailsH')}</h3>
+            <ul>
+              <li>{t('about.risk.chart', { since: sinceYear })}</li>
+              <li>{t('about.risk.gauge')}</li>
+              <li>{t('about.risk.events', { before: method.before, after: method.after })}</li>
+              <li>{t('about.risk.snapshot')}</li>
+              <li>
+                {t('about.risk.update', {
+                  maxAge: MAX_AGE_BANK_DAYS,
+                  maxJump: fmtPct(MAX_ABS_LOG_RETURN, lang, 0),
+                })}
+              </li>
+            </ul>
+            <p class="ab-small">{t('about.risk.caveat')}</p>
+          </div>
+          <div class="ab-risk-cta">
+            <a class="btn btn-dark" href={riskometerPath(lang)}>
+              {t('about.risk.open')}
+              <ArrowIcon />
+            </a>
+            {rm?.asOf && (
+              <span class="ab-small">{t('about.risk.asOf', { date: fmtDate(rm.asOf, lang) })}</span>
+            )}
+          </div>
+        </section>
+
+        {/* 05 Conventions */}
+        <section class="ab-section" id={sid(4)} aria-labelledby={`${sid(4)}-h`}>
+          <p class="ab-num mono" aria-hidden="true">
+            05
+          </p>
+          <h2 class="h2" id={`${sid(4)}-h`}>
+            {t('about.conv.h')}
+          </h2>
+          <p class="ab-lead2">{t('about.conv.lead')}</p>
+          <div class="ab-table-wrap card" role="region" tabindex="0" aria-label={t('about.conv.h')}>
+            <table class="ab-table ab-table--conv">
+              <caption class="sr-only">{t('about.conv.h')}</caption>
+              <thead>
+                <tr>
+                  <th scope="col">{t('about.conv.colTopic')}</th>
+                  <th scope="col">{t('about.conv.colRule')}</th>
+                  <th scope="col">{t('about.conv.colSample')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {conventions.map((c) => (
+                  <tr>
+                    <th scope="row">{c.topic}</th>
+                    <td set:html={rich(c.rule)} />
+                    <td class="mono ab-sample">{c.sample}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* 06 Sources */}
+        <section class="ab-section" id={sid(5)} aria-labelledby={`${sid(5)}-h`}>
+          <p class="ab-num mono" aria-hidden="true">
+            06
+          </p>
+          <h2 class="h2" id={`${sid(5)}-h`}>
+            {t('about.sources.h')}
+          </h2>
+          <p class="ab-lead2">{t('about.sources.lead', { n: sources.length })}</p>
+          <ol class="ab-sources">
+            {sources.map((s) => {
+              const publisher = splitBilingual(s.publisher)[lang];
+              const date = splitBilingual(s.date)[lang];
+              const host = urlHost(s.url);
+              return (
+                <li class="ab-source card" id={`src-${s.id}`}>
+                  <div class="ab-source-head">
+                    {s.url ? (
+                      <a
+                        class="ab-source-title"
+                        href={s.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {s.title}
+                        <span class="sr-only"> {t('about.sources.newTab')}</span>
+                        <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
+                          <path
+                            d="M4.5 2H10v5.5M10 2L3 9"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.6"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                        </svg>
+                      </a>
+                    ) : (
+                      <span class="ab-source-title">{s.title}</span>
+                    )}
+                    {host && <span class="ab-source-host mono">{host}</span>}
+                  </div>
+                  <dl class="ab-source-meta">
+                    {publisher && (
+                      <div>
+                        <dt>{t('about.sources.publisher')}</dt>
+                        <dd>{publisher}</dd>
+                      </div>
+                    )}
+                    {date && (
+                      <div>
+                        <dt>{t('about.sources.date')}</dt>
+                        <dd>{date}</dd>
+                      </div>
+                    )}
+                    {s.extra['ISBN'] && (
+                      <div>
+                        <dt>{t('about.sources.isbn')}</dt>
+                        <dd class="mono">{s.extra['ISBN']}</dd>
+                      </div>
+                    )}
+                    {s.supports && (
+                      <div class="ab-source-supports">
+                        <dt>{t('about.sources.supports')}</dt>
+                        <dd>
+                          {inlineSegments(s.supports).map((seg) =>
+                            seg.code ? <code>{seg.text}</code> : seg.text,
+                          )}
+                        </dd>
+                      </div>
+                    )}
+                  </dl>
+                </li>
+              );
+            })}
+          </ol>
+        </section>
+
+        {/* 07 Credits & reset */}
+        <section class="ab-section" id={sid(6)} aria-labelledby={`${sid(6)}-h`}>
+          <p class="ab-num mono" aria-hidden="true">
+            07
+          </p>
+          <h2 class="h2" id={`${sid(6)}-h`}>
+            {t('about.credits.h')}
+          </h2>
+          <div class="ab-credits">
+            <div class="ab-credit-card card-hero">
+              <span class="ab-credit-mark" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 20 20">
+                  <path
+                    d="M3 14.5H9.5L17 5"
+                    style="fill:none;stroke:#fff;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round"
+                  ></path>
+                </svg>
+              </span>
+              <p class="ab-credit-line">
+                {tc('footer.credits')
+                  .split(' · ')
+                  .map((part) => (
+                    <span>{part}</span>
+                  ))}
+              </p>
+              <p class="ab-small">{t('about.credits.stack')}</p>
+              <p class="ab-small">{tc('footer.data')}</p>
+            </div>
+            <div class="ab-reset card">
+              <h3 class="ab-h3">{tr('reset.h')}</h3>
+              <p class="ab-small">{t('about.credits.privacy')}</p>
+              <ResetProgress client:load lang={lang} />
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  import '@/client/about-toc';
+</script>
+
+<style>
+  /* ---------- Header ---------- */
+  .ab-head {
+    background: var(--ff-surface);
+    border-bottom: 1px solid var(--ff-line);
+  }
+  .ab-head-inner {
+    padding-top: 36px;
+    padding-bottom: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .ab-crumbs {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--ff-muted);
+  }
+  .ab-crumbs a {
+    color: var(--ff-muted);
+  }
+  .ab-crumbs a:hover {
+    color: var(--ff-ink);
+  }
+  .ab-crumb-current {
+    font-weight: 700;
+    color: var(--ff-ink);
+  }
+  .ab-chips {
+    display: flex;
+    gap: 8px;
+  }
+  .ab-lead {
+    max-width: var(--ff-measure);
+    margin-top: -4px;
+  }
+  .ab-version {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ff-ink-2);
+  }
+  .ab-disclaimer {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    max-width: 820px;
+    margin-top: 6px;
+    padding: 20px 24px;
+    border-radius: var(--ff-r-card);
+    background: var(--ff-ink);
+    color: #fff;
+  }
+  .ab-disclaimer-icon {
+    flex: 0 0 auto;
+    display: inline-flex;
+    width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--ff-r-pill);
+    background: #3a2214;
+    color: #fdba8c;
+  }
+  .ab-disclaimer-title {
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    line-height: 1.35;
+  }
+  .ab-disclaimer-text {
+    margin-top: 4px;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ff-on-dark-body);
+  }
+
+  /* ---------- Layout ---------- */
+  .ab-layout {
+    display: grid;
+    grid-template-columns: 200px minmax(0, 1fr);
+    gap: 48px;
+    padding-top: 48px;
+    align-items: start;
+  }
+  .ab-toc {
+    position: sticky;
+    top: 24px;
+  }
+  .ab-toc-title {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ff-muted);
+    margin-bottom: 10px;
+  }
+  .ab-toc ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    border-left: 1px solid var(--ff-line);
+  }
+  .ab-toc a {
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+    padding: 8px 12px;
+    margin-left: -1px;
+    border-left: 2px solid transparent;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.35;
+    color: var(--ff-ink-2);
+  }
+  .ab-toc a:hover {
+    color: var(--ff-ink);
+  }
+  .ab-toc a[aria-current] {
+    border-left-color: var(--ff-ink);
+    color: var(--ff-ink);
+    font-weight: 800;
+  }
+  .ab-toc-n {
+    font-size: 11px;
+    color: var(--ff-muted);
+  }
+
+  .ab-main {
+    display: flex;
+    flex-direction: column;
+    gap: 72px;
+    min-width: 0;
+  }
+  .ab-section {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    scroll-margin-top: 24px;
+  }
+  .ab-num {
+    font-size: 12px;
+    color: var(--ff-muted);
+    margin-bottom: -10px;
+  }
+  .ab-h3 {
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: -0.015em;
+    line-height: 1.25;
+  }
+  .ab-prose {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    max-width: var(--ff-measure);
+  }
+  .ab-prose p,
+  .ab-lead2 {
+    font-size: var(--ff-article);
+    line-height: 1.7;
+    color: var(--ff-body);
+    max-width: var(--ff-measure);
+  }
+  .ab-small {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--ff-muted);
+    max-width: var(--ff-measure);
+  }
+
+  /* What it is not */
+  .ab-not {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 14px;
+    padding: 14px 18px;
+    border-radius: var(--ff-r-box);
+    background: var(--ff-surface);
+    border: 1px solid var(--ff-line);
+  }
+  .ab-not-title {
+    font-size: 13px;
+    font-weight: 800;
+  }
+  .ab-not ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .ab-not li {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: var(--ff-r-pill);
+    background: var(--ff-bad-soft);
+    color: var(--ff-bad-text-strong);
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .ab-not li::before {
+    content: '×';
+    font-weight: 800;
+  }
+
+  /* Families */
+  .ab-families {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .ab-family {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    border-top: 3px solid var(--fam);
+  }
+  .ab-family .chip {
+    align-self: flex-start;
+  }
+  .ab-family ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .ab-family a {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+    padding: 6px 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ff-ink);
+  }
+  .ab-family a:hover {
+    color: var(--fam-text);
+  }
+  .ab-family-n {
+    font-size: 12px;
+    color: var(--fam-text);
+  }
+
+  /* Example case */
+  .ab-case {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .ab-tiles {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .ab-tile {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px 16px;
+    border-radius: var(--ff-r-box);
+    background: var(--ff-surface-2);
+  }
+  .ab-tile--dark {
+    background: var(--ff-ink);
+    color: #fff;
+  }
+  .ab-tile-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ff-muted);
+  }
+  .ab-tile--dark .ab-tile-label {
+    color: var(--ff-on-dark-muted);
+  }
+  .ab-tile-value {
+    font-size: 22px;
+    letter-spacing: -0.01em;
+  }
+  .ab-example-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ff-warn-text);
+  }
+  .ab-example-label .dot {
+    background: var(--ff-warn);
+  }
+
+  /* Tables */
+  .ab-table-wrap {
+    overflow-x: auto;
+    max-width: 100%;
+    border-radius: var(--ff-r-card);
+  }
+  .ab-table-wrap:focus-visible {
+    outline: 2px solid var(--ff-long);
+    outline-offset: 2px;
+  }
+  .ab-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  .ab-table caption {
+    text-align: left;
+  }
+  .ab-table th,
+  .ab-table td {
+    padding: 10px 14px;
+    text-align: left;
+    vertical-align: baseline;
+    border-top: 1px solid var(--ff-row);
+  }
+  .ab-table thead th {
+    border-top: 0;
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--ff-muted);
+    background: var(--ff-surface-2);
+  }
+  .ab-table tbody th {
+    font-weight: 700;
+    color: var(--ff-ink);
+  }
+  .ab-case .ab-table thead th {
+    background: transparent;
+  }
+  .ab-case .ab-table th:first-child,
+  .ab-case .ab-table td:first-child {
+    padding-left: 4px;
+  }
+  .ab-sym {
+    font-size: 17px;
+    color: var(--ff-ink-2);
+    white-space: nowrap;
+  }
+  .ab-val {
+    white-space: nowrap;
+    color: var(--ff-ink);
+  }
+  .ab-note {
+    color: var(--ff-ink-2);
+  }
+  .ab-note :global(i),
+  .ab-note :global(sub),
+  .ab-note :global(sup) {
+    font-family: var(--ff-font-math);
+  }
+  .ab-note :global(i) {
+    font-size: 1.12em;
+  }
+  .ab-table .num {
+    text-align: right;
+    white-space: nowrap;
+  }
+  .ab-thresholds-head {
+    padding: 18px 16px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .ab-thresholds-title {
+    font-size: 16px;
+    font-weight: 800;
+  }
+  .ab-max-date {
+    display: block;
+    font-family: var(--ff-font-ui);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ff-muted);
+  }
+  .ab-table--conv td:nth-child(2) {
+    color: var(--ff-ink-2);
+    line-height: 1.55;
+  }
+  .ab-sample {
+    white-space: nowrap;
+    color: var(--ff-ink);
+  }
+
+  /* Models */
+  .ab-models {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+  .ab-model {
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 0;
+  }
+  .ab-model--wide {
+    grid-column: 1 / -1;
+  }
+  .ab-model .chip {
+    align-self: flex-start;
+  }
+  .ab-model p {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ff-body);
+  }
+  .ab-model .formula {
+    font-size: 17px;
+    padding: 10px 16px;
+  }
+  .ab-model .formula :global(.formula-sub) {
+    font-size: 15px;
+    color: var(--ff-ink-2);
+  }
+  .ab-mc-list {
+    margin: 0;
+    padding-left: 1.2em;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ff-body);
+  }
+  .ab-mc-list li::marker {
+    color: var(--fam);
+  }
+  .ab-inline-formula {
+    display: inline-flex;
+    margin: 6px 0 0;
+    font-size: 17px !important;
+  }
+
+  /* Pipeline (vertical stepper) */
+  .ab-pipeline {
+    list-style: none;
+    margin: 0;
+    padding: 6px 0;
+    background: var(--ff-surface);
+    border: 1px solid var(--ff-line);
+    border-radius: var(--ff-r-card);
+  }
+  .ab-step {
+    position: relative;
+    display: grid;
+    grid-template-columns: 28px minmax(0, 1fr) minmax(0, 300px);
+    gap: 4px 18px;
+    align-items: center;
+    padding: 16px 22px;
+  }
+  .ab-step + .ab-step {
+    border-top: 1px solid var(--ff-row);
+  }
+  .ab-step::before {
+    content: '';
+    position: absolute;
+    left: 35px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--ff-line);
+  }
+  .ab-step:first-child::before {
+    top: 50%;
+  }
+  .ab-step:last-child::before {
+    bottom: 50%;
+  }
+  .ab-step-n {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: var(--ff-r-pill);
+    background: var(--ff-ink);
+    color: #fff;
+    font-size: 12px;
+    box-shadow: 0 0 0 4px var(--ff-surface);
+  }
+  .ab-step-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .ab-step h3 {
+    font-size: 15px;
+    font-weight: 800;
+    line-height: 1.35;
+  }
+  .ab-step p {
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--ff-ink-2);
+  }
+  .ab-step-math {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: flex-end;
+  }
+  .ab-step-math.mono :global(span) {
+    display: inline-flex;
+    padding: 4px 10px;
+    border-radius: var(--ff-r-pill);
+    background: var(--ff-chip);
+    font-family: var(--ff-font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .ab-step-math.math :global(span) {
+    font-family: var(--ff-font-math);
+    font-size: 18px;
+    white-space: nowrap;
+    padding: 6px 14px;
+    border-radius: var(--ff-r-formula);
+    background: var(--ff-linear-soft);
+  }
+  .ab-step-math :global(i) {
+    font-style: italic;
+  }
+
+  /* Levels */
+  .ab-levels {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 6px;
+  }
+  .ab-levels li {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 0 0 12px;
+    border-radius: var(--ff-r-control);
+    background: var(--ff-surface);
+    border: 1px solid var(--ff-line);
+    overflow: hidden;
+  }
+  .ab-level-bar {
+    display: block;
+    height: 8px;
+    background: var(--lv);
+    margin-bottom: 6px;
+  }
+  .ab-level-label {
+    padding: 0 12px;
+    font-size: 14px;
+    font-weight: 800;
+  }
+  .ab-level-range {
+    padding: 0 12px;
+    font-size: 12px;
+    color: var(--ff-ink-2);
+  }
+  .ab-level-share {
+    padding: 0 12px;
+    font-size: 12px;
+    color: var(--ff-muted);
+  }
+  .ab-details {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .ab-details ul {
+    margin: 0;
+    padding-left: 1.2em;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-width: var(--ff-measure);
+  }
+  .ab-details li {
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--ff-body);
+  }
+  .ab-risk-cta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 18px;
+  }
+
+  /* Sources */
+  .ab-sources {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .ab-source {
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .ab-source-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 4px 16px;
+  }
+  .ab-source-title {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 1.4;
+    color: var(--ff-ink);
+  }
+  a.ab-source-title {
+    color: var(--ff-linear-text);
+  }
+  .ab-source-title svg {
+    flex: 0 0 auto;
+  }
+  a.ab-source-title:hover {
+    text-decoration: underline;
+  }
+  .ab-source-host {
+    font-size: 12px;
+    color: var(--ff-muted);
+  }
+  .ab-source-meta {
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 24px;
+    font-size: 13px;
+  }
+  .ab-source-meta div {
+    display: flex;
+    gap: 6px;
+  }
+  .ab-source-meta dt {
+    color: var(--ff-muted);
+    font-weight: 600;
+  }
+  .ab-source-meta dd {
+    margin: 0;
+    color: var(--ff-ink-2);
+  }
+  .ab-source-supports {
+    flex-basis: 100%;
+    min-width: 0;
+  }
+  .ab-source-supports dd {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .ab-source-meta code {
+    font-family: var(--ff-font-mono);
+    font-size: 0.92em;
+    padding: 1px 6px;
+    border-radius: 6px;
+    background: var(--ff-chip);
+    color: var(--ff-ink);
+  }
+
+  /* Credits */
+  .ab-credits {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 14px;
+    align-items: start;
+  }
+  .ab-credit-card {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .ab-credit-mark {
+    display: inline-flex;
+    width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: var(--ff-ink);
+    margin-bottom: 4px;
+  }
+  .ab-credit-line {
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    line-height: 1.4;
+  }
+  .ab-credit-line span {
+    display: block;
+  }
+  .ab-credit-line span + span {
+    font-weight: 600;
+    color: var(--ff-ink-2);
+  }
+  .ab-reset {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  @media (max-width: 960px) {
+    .ab-layout {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 32px;
+      padding-top: 32px;
+    }
+    .ab-toc {
+      position: static;
+    }
+    .ab-toc ol {
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 6px;
+      border-left: 0;
+    }
+    .ab-toc a {
+      border: 1px solid var(--ff-line);
+      border-radius: var(--ff-r-pill);
+      background: var(--ff-surface);
+      padding: 8px 14px;
+      margin: 0;
+      min-height: 44px;
+      align-items: center;
+      font-size: 13px;
+    }
+    .ab-toc a[aria-current] {
+      border-color: var(--ff-ink);
+    }
+    .ab-families {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 640px) {
+    .ab-main {
+      gap: 56px;
+    }
+    .ab-tiles {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .ab-tile-value {
+      font-size: 18px;
+    }
+    .ab-table--example thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+    }
+    .ab-table--example tr {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-areas: 'qty val' 'note note';
+      gap: 2px 12px;
+      padding: 10px 0;
+      border-top: 1px solid var(--ff-row);
+    }
+    .ab-table--example th,
+    .ab-table--example td {
+      display: block;
+      border: 0;
+      padding: 0 !important;
+    }
+    .ab-table--example tbody th {
+      grid-area: qty;
+    }
+    .ab-table--example .ab-sym {
+      display: none;
+    }
+    .ab-table--example .ab-val {
+      grid-area: val;
+      text-align: right;
+    }
+    .ab-table--example .ab-note {
+      grid-area: note;
+      font-size: 13px;
+      color: var(--ff-muted);
+    }
+    .ab-table--example .ab-note:empty {
+      display: none;
+    }
+    .ab-table--conv thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+    }
+    .ab-table--conv tr {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-areas: 'topic sample' 'rule rule';
+      gap: 4px 12px;
+      padding: 12px 16px;
+      border-top: 1px solid var(--ff-row);
+    }
+    .ab-table--conv tbody tr:first-child {
+      border-top: 0;
+    }
+    .ab-table--conv th,
+    .ab-table--conv td {
+      display: block;
+      padding: 0;
+      border: 0;
+    }
+    .ab-table--conv tbody th {
+      grid-area: topic;
+    }
+    .ab-table--conv td:nth-child(2) {
+      grid-area: rule;
+      font-size: 13px;
+    }
+    .ab-table--conv .ab-sample {
+      grid-area: sample;
+      text-align: right;
+      white-space: normal;
+    }
+    .ab-table--thresholds th,
+    .ab-table--thresholds td {
+      padding: 8px 6px;
+      font-size: 12px;
+    }
+    .ab-table--thresholds th:first-child {
+      padding-left: 12px;
+    }
+    .ab-table--thresholds td:last-child,
+    .ab-table--thresholds th:last-child {
+      padding-right: 12px;
+    }
+    .ab-case {
+      padding: 16px;
+      border-radius: var(--ff-r-card);
+    }
+    .ab-models,
+    .ab-credits {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .ab-model {
+      padding: 18px;
+    }
+    .ab-model .formula {
+      font-size: 16px;
+    }
+    .ab-step {
+      grid-template-columns: 28px minmax(0, 1fr);
+      padding: 14px 16px;
+      align-items: start;
+    }
+    .ab-step::before {
+      left: 29px;
+    }
+    .ab-step-math {
+      grid-column: 2;
+      justify-content: flex-start;
+      margin-top: 6px;
+    }
+    .ab-step-math.math :global(span) {
+      font-size: 16px;
+      white-space: normal;
+    }
+    .ab-levels {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .ab-levels li {
+      display: grid;
+      grid-template-columns: 8px minmax(0, 1fr) auto;
+      grid-template-rows: auto auto;
+      column-gap: 12px;
+      padding: 10px 12px 10px 0;
+    }
+    .ab-level-bar {
+      grid-row: 1 / span 2;
+      height: auto;
+      margin: -10px 0;
+    }
+    .ab-level-label,
+    .ab-level-range,
+    .ab-level-share {
+      padding: 0;
+    }
+    .ab-level-share {
+      grid-column: 3;
+      grid-row: 1;
+      text-align: right;
+    }
+    .ab-level-range {
+      grid-column: 2;
+    }
+    .ab-families {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .ab-disclaimer {
+      padding: 18px;
+      gap: 12px;
+    }
+    .ab-disclaimer-icon {
+      width: 34px;
+      height: 34px;
+    }
+  }
+</style>
+
+<style is:global>
+  /* Sub- and superscripts must not stretch the line height of prose and tables. */
+  .ab-page sub,
+  .ab-page sup {
+    line-height: 0;
+  }
+  /* Reset island (markup rendered by ResetProgress.tsx). */
+  .ab-page .rp {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    margin-top: 4px;
+  }
+  .ab-page .rp-state {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ff-ink);
+  }
+  .ab-page .rp-bar {
+    width: 100%;
+    height: 6px;
+    border-radius: var(--ff-r-pill);
+    background: var(--ff-chip);
+    overflow: hidden;
+  }
+  .ab-page .rp-bar > span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--ff-ink);
+  }
+  .ab-page .rp-confirm {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px;
+    border-radius: var(--ff-r-box);
+    background: var(--ff-bad-soft);
+    color: var(--ff-bad-text-strong);
+  }
+  .ab-page .rp-confirm-title {
+    font-weight: 800;
+    font-size: 15px;
+  }
+  .ab-page .rp-confirm-text {
+    font-size: 14px;
+    line-height: 1.55;
+  }
+  .ab-page .rp-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 6px;
+  }
+  .ab-page .rp-yes {
+    background: var(--ff-bad-text);
+  }
+  .ab-page .rp-yes:hover {
+    background: var(--ff-bad-text-strong);
+  }
+  .ab-page .rp-status {
+    min-height: 1.5em;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .ab-page .rp-status[data-status='done'] {
+    color: var(--ff-good-text);
+  }
+  .ab-page .rp-status[data-status='cancelled'] {
+    color: var(--ff-muted);
+  }
+</style>

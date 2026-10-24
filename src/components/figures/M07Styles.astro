@@ -1,0 +1,842 @@
+---
+/**
+ * Shared styles of the module 07 figures (BarrierPaths, BarrierLab, TouchLab, GapReplay).
+ * Every figure wrapper renders this component; Astro includes the styles once per page.
+ * Colour semantics: option alive / long blue (the knock-in leg of the parity bar a lighter blue),
+ * barrier and gap events exotics orange, forward, probability and tangents black, comparisons
+ * (vanilla, call spread, counterpart) grey dashed, payoff at expiry dark grey dashed, knocked
+ * paths grey. Orange is never used for a curve, so it cannot be read as "short".
+ */
+---
+
+<style is:global>
+  .m7 {
+    color: var(--ff-ink);
+  }
+  .m7 .ff-lab-head {
+    margin-bottom: 18px;
+  }
+  .m7-titles {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+  .m7 .ff-lab-main {
+    container-type: inline-size;
+  }
+  .m7-chart-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 12px;
+    min-height: 32px;
+  }
+  .m7-chart-head + .m7-chart-head {
+    margin-top: 10px;
+  }
+  .m7 .m7-legend {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 13px;
+    color: var(--ff-ink-2);
+  }
+  .m7 .m7-legend li {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13px;
+    line-height: 1.4;
+    color: var(--ff-ink-2);
+  }
+  .m7-sw {
+    display: inline-block;
+    width: 20px;
+    height: 0;
+    border-top: 3px solid var(--ff-long);
+  }
+  .m7-sw-alive {
+    border-top-color: var(--ff-long);
+  }
+  .m7-sw-dead {
+    border-top: 2px solid var(--ff-ref);
+    opacity: 0.6;
+  }
+  .m7-sw-wait {
+    border-top: 2px dashed var(--ff-ref);
+  }
+  .m7-sw-dash {
+    border-top: 2px dashed var(--ff-forward);
+  }
+  .m7-sw-dot {
+    border-top: 2px dotted var(--ff-ink-2);
+  }
+  .m7-sw-vanilla {
+    border-top: 1.75px dashed var(--ff-ref);
+  }
+  .m7-sw-payoff {
+    border-top: 1.5px dashed var(--ff-payoff);
+  }
+  /* Knock-in leg of the parity bar: a lighter blue, because it is a long option as well. */
+  .m7-sw-ki {
+    border-top-color: #9bb8f6;
+  }
+  .m7-sw-delta {
+    border-top-color: var(--ff-delta-curve);
+  }
+  .m7-sw-ring {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    border: 2px solid var(--ff-exotics);
+    background: #fff;
+  }
+  .m7-sw-area {
+    display: inline-block;
+    width: 16px;
+    height: 10px;
+    border-radius: 3px;
+    background: rgba(37, 99, 235, 0.16);
+  }
+  .m7-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: var(--ff-r-pill);
+    background: var(--ff-chip);
+    font-size: 13px;
+    color: var(--ff-ink);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .m7-pill.is-soft {
+    background: var(--ff-exotics-soft);
+    color: var(--ff-exotics-text);
+  }
+  .m7-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: var(--ff-r-pill);
+    background: var(--ff-chip);
+    color: var(--ff-ink);
+    font-size: 13px;
+    font-weight: 600;
+    transition:
+      background-color 300ms ease,
+      color 300ms ease;
+  }
+  .m7-chip b {
+    font-weight: 800;
+  }
+  .m7-chip.is-warn {
+    background: var(--ff-warn-soft);
+    color: var(--ff-warn-text);
+  }
+  .m7-chip.is-bad {
+    background: var(--ff-bad-soft);
+    color: var(--ff-bad-text-strong);
+  }
+  .m7-chip.is-good {
+    background: var(--ff-good-soft);
+    color: var(--ff-good-text-strong);
+  }
+  .m7-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    font-family: var(--ff-font-ui);
+    touch-action: pan-y;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .m7-svg.is-dragging {
+    cursor: grabbing;
+  }
+  .m7-svg.is-grab {
+    cursor: grab;
+  }
+  .m7-grid {
+    fill: none;
+    stroke: var(--ff-grid);
+    stroke-width: 1;
+  }
+  .m7-axis {
+    fill: none;
+    stroke: var(--ff-axis);
+    stroke-width: 1;
+  }
+  .m7-tick {
+    font-size: 12px;
+    fill: var(--ff-muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .m7-axis-title {
+    font-size: 12px;
+    font-weight: 600;
+    fill: var(--ff-muted);
+    paint-order: stroke;
+    stroke: #fff;
+    stroke-width: 4px;
+    stroke-linejoin: round;
+  }
+  .m7-ref {
+    fill: none;
+    stroke: var(--ff-ref);
+    stroke-width: 1;
+    stroke-dasharray: 4 5;
+  }
+  .m7-ref-label,
+  .m7-label {
+    font-size: 12px;
+    font-weight: 600;
+    fill: var(--ff-ink-2);
+    paint-order: stroke;
+    stroke: #fff;
+    stroke-width: 4px;
+    stroke-linejoin: round;
+  }
+  .m7-zone {
+    fill: var(--ff-exotics);
+    fill-opacity: 0.06;
+    transition: fill-opacity 300ms ease;
+  }
+  .m7-zone-label {
+    font-size: 12px;
+    font-weight: 700;
+    fill: var(--ff-exotics-text);
+    paint-order: stroke;
+    stroke: #fff;
+    stroke-width: 4px;
+    stroke-linejoin: round;
+  }
+  .m7-barrier {
+    fill: none;
+    stroke: var(--ff-exotics);
+    stroke-width: 2;
+  }
+  .m7-barrier.is-dashed {
+    stroke-dasharray: 6 4;
+  }
+  .m7-barrier-label {
+    font-size: 12px;
+    font-weight: 700;
+    fill: var(--ff-exotics-text);
+    paint-order: stroke;
+    stroke: #fff;
+    stroke-width: 4px;
+    stroke-linejoin: round;
+  }
+  .m7-handle {
+    cursor: grab;
+    touch-action: none;
+  }
+  /* Invisible touch targets: 44 px around each handle, a 24 px band along horizontal barriers.
+     touch-action: none lets a finger drag them vertically instead of scrolling the page. */
+  .m7-handle-hit,
+  .m7-hitband {
+    fill: transparent;
+    touch-action: none;
+  }
+  .m7-hitband {
+    cursor: ns-resize;
+  }
+  .m7-handle-dot {
+    fill: var(--ff-exotics);
+    stroke: #fff;
+    stroke-width: 2.5;
+    transition: r 150ms ease;
+  }
+  .m7-handle-grip {
+    fill: none;
+    stroke: #fff;
+    stroke-width: 1.4;
+    stroke-linecap: round;
+  }
+  .m7-handle.is-v .m7-handle-grip {
+    transform: rotate(90deg);
+  }
+  .m7-path-alive {
+    fill: none;
+    stroke: var(--ff-long);
+    stroke-width: 1.75;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    opacity: 0.9;
+  }
+  .m7-path-dead {
+    fill: none;
+    stroke: var(--ff-ref);
+    stroke-width: 1.25;
+    stroke-linejoin: round;
+    opacity: 0.45;
+  }
+  .m7-path-wait {
+    fill: none;
+    stroke: var(--ff-ref);
+    stroke-width: 1.25;
+    stroke-dasharray: 3 3;
+    stroke-linejoin: round;
+    opacity: 0.75;
+  }
+  .m7-path-faint {
+    fill: none;
+    stroke: var(--ff-ref);
+    stroke-width: 1;
+    opacity: 0.35;
+  }
+  .m7-path-pay {
+    fill: none;
+    stroke: var(--ff-long);
+    stroke-width: 1.25;
+    opacity: 0.55;
+  }
+  .m7-path-head {
+    fill: var(--ff-long);
+  }
+  .m7-hit {
+    fill: #fff;
+    stroke: var(--ff-exotics);
+    stroke-width: 2.25;
+  }
+  .m7-pop {
+    animation: m7-pop 420ms cubic-bezier(0.2, 0.9, 0.3, 1.3) both;
+  }
+  @keyframes m7-pop {
+    0% {
+      transform: scale(0);
+    }
+    70% {
+      transform: scale(1.35);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  .m7-spot {
+    fill: var(--ff-forward);
+    stroke: #fff;
+    stroke-width: 2;
+  }
+  .m7-dot {
+    fill: var(--ff-forward);
+    stroke: #fff;
+    stroke-width: 2.5;
+    transition: r 150ms ease;
+  }
+  .m7-halo {
+    fill: var(--ff-forward);
+    fill-opacity: 0.1;
+  }
+  .m7-curve {
+    fill: none;
+    stroke: var(--ff-long);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .m7-curve-delta {
+    fill: none;
+    stroke: var(--ff-delta-curve);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .m7-compare {
+    fill: none;
+    stroke: var(--ff-ref);
+    stroke-width: 1.75;
+    stroke-dasharray: 6 6;
+  }
+  .m7-payoff {
+    fill: none;
+    stroke: var(--ff-payoff);
+    stroke-width: 1.5;
+    stroke-dasharray: 6 6;
+  }
+  .m7-prob {
+    fill: none;
+    stroke: var(--ff-forward);
+    stroke-width: 1.5;
+    stroke-dasharray: 3 4;
+  }
+  .m7-tangent {
+    fill: none;
+    stroke: var(--ff-forward);
+    stroke-width: 2.25;
+    stroke-linecap: round;
+  }
+  .m7-area {
+    fill: var(--ff-timevalue);
+  }
+  .m7-area-strong {
+    fill: rgba(37, 99, 235, 0.22);
+  }
+  .m7-aha {
+    pointer-events: none;
+    animation: m7-fade 300ms ease both;
+  }
+  @keyframes m7-fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  .m7-aha-box {
+    fill: var(--ff-exotics-soft);
+    stroke: #fed7aa;
+    stroke-width: 1;
+  }
+  .m7-aha-title {
+    font-size: 12px;
+    font-weight: 800;
+    fill: var(--ff-exotics-text);
+  }
+  .m7-aha-text {
+    font-size: 12px;
+    font-weight: 500;
+    fill: var(--ff-ink-2);
+  }
+  .m7 p.m7-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 4px 0 0;
+    font-size: 12px;
+    color: var(--ff-muted);
+  }
+  .m7 p.m7-note {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--ff-muted);
+  }
+  .m7-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .m7-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 0 16px;
+    border: 1px solid var(--ff-line-strong);
+    border-radius: var(--ff-r-pill);
+    background: var(--ff-surface);
+    color: var(--ff-ink);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .m7-btn:hover:not(:disabled) {
+    background: var(--ff-chip);
+  }
+  .m7-btn:disabled {
+    cursor: default;
+    color: var(--ff-muted);
+    border-color: var(--ff-line);
+  }
+  .m7-btn-dark {
+    border-color: var(--ff-ink);
+    background: var(--ff-ink);
+    color: #fff;
+  }
+  .m7-btn-dark:hover:not(:disabled) {
+    background: #262b33;
+  }
+  .m7-icon-stroke {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .m7-icon-fill {
+    fill: currentColor;
+  }
+  .m7 .segmented > button {
+    min-height: 44px;
+  }
+  .m7-seg-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .m7-seg-label {
+    font-size: 13px;
+    color: var(--ff-ink-2);
+  }
+  .m7-counter {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+    border-radius: var(--ff-r-box);
+    background: var(--ff-exotics-soft);
+    color: var(--ff-exotics-text);
+  }
+  .m7-counter.is-in {
+    background: var(--ff-linear-soft);
+    color: var(--ff-linear-text);
+  }
+  .m7-counter-n {
+    font-size: 34px;
+    font-weight: 600;
+    line-height: 1;
+    min-width: 1.4ch;
+    text-align: right;
+  }
+  .m7-counter-t {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 13px;
+    color: var(--ff-ink-2);
+  }
+  .m7-counter-t b {
+    font-size: 15px;
+    color: inherit;
+  }
+  .m7-counter.is-out .m7-counter-t b {
+    color: var(--ff-exotics-text);
+  }
+  .m7-counter.is-in .m7-counter-t b {
+    color: var(--ff-linear-text);
+  }
+  .m7 .ff-stat-value {
+    font-variant-numeric: tabular-nums;
+  }
+  /* Rows without a symbol: label column shrinks, the value keeps its width. */
+  .m7 .ff-stat-row:not(:has(.ff-stat-symbol)) {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .m7-check-body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+  .m7-check-title {
+    font-weight: 800;
+  }
+  .m7-check-f {
+    font-family: var(--ff-font-math);
+    font-size: 17px;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+  .m7-check-f sub {
+    font-size: 11px;
+  }
+  .m7-parity {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 10px;
+    padding: 14px 16px;
+    border-radius: var(--ff-r-box);
+    background: var(--ff-surface-2);
+  }
+  .m7-parity-head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 4px 12px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .m7-parity-row {
+    display: grid;
+    grid-template-columns: 76px minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    color: var(--ff-ink-2);
+  }
+  .m7-bar {
+    position: relative;
+    display: flex;
+    height: 22px;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: inset 0 0 0 1px var(--ff-line);
+  }
+  /* The width follows the sliders frame by frame: no transition (a restarted transition lags and
+     runs in bursts, D-42); padding only with a label, so a zero share is really zero wide. */
+  .m7-bar > span {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    height: 100%;
+    padding: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    font-family: var(--ff-font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: #fff;
+  }
+  .m7-bar > span.has-label {
+    padding: 0 6px;
+  }
+  .m7-bar .is-ko {
+    background: var(--ff-long);
+  }
+  .m7-bar .is-ki {
+    background: #9bb8f6;
+    color: var(--ff-ink);
+  }
+  .m7-bar .is-van {
+    background: var(--ff-ink);
+  }
+  .m7-bar .is-selected {
+    box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.9);
+  }
+  .m7 table.m7-table {
+    display: table;
+    width: 100%;
+    border: 0;
+    border-radius: 0;
+    border-collapse: collapse;
+    font-size: 13px;
+    background: transparent;
+  }
+  .m7 .m7-table th,
+  .m7 .m7-table td {
+    padding: 8px 10px;
+    border-top: 1px solid var(--ff-row);
+    text-align: left;
+    vertical-align: top;
+    font-size: 13px;
+  }
+  .m7 .m7-table thead th {
+    border-top: 0;
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--ff-muted);
+    background: var(--ff-surface-2);
+  }
+  .m7 .m7-table td.num,
+  .m7 .m7-table th.num {
+    text-align: right;
+    font-family: var(--ff-font-mono);
+    font-weight: 600;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  .m7-table tr {
+    transition: background-color 300ms ease;
+  }
+  .m7-table tr.is-hit {
+    background: var(--ff-bad-soft);
+  }
+  .m7 .m7-table tr.is-hit td {
+    color: var(--ff-bad-text-strong);
+  }
+  .m7-table-wrap {
+    border: 1px solid var(--ff-line);
+    border-radius: var(--ff-r-box);
+    overflow: hidden;
+    background: var(--ff-surface);
+  }
+  .m7-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ff-linear-text);
+  }
+  .m7-link:hover {
+    color: #1e40af;
+  }
+  .m7-muted {
+    font-weight: 500;
+    color: var(--ff-muted);
+  }
+  .bl-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    margin-bottom: 18px;
+  }
+  .bl-guide {
+    fill: none;
+    stroke: var(--ff-axis);
+    stroke-width: 1;
+    stroke-dasharray: 2 4;
+  }
+  .m7-check-icon {
+    flex: 0 0 20px;
+    margin-top: 2px;
+  }
+  .m7-check-icon circle {
+    fill: var(--ff-good-text);
+  }
+  .m7-check-icon path {
+    fill: none;
+    stroke: #fff;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .tl-cone2 {
+    fill: var(--ff-long);
+    fill-opacity: 0.05;
+  }
+  .tl-cone1 {
+    fill: var(--ff-long);
+    fill-opacity: 0.08;
+  }
+  .tl-forward {
+    fill: none;
+    stroke: var(--ff-forward);
+    stroke-width: 1.5;
+  }
+  .m7 .tl-sw-fwd {
+    border-top: 1.5px solid var(--ff-forward);
+  }
+  .m7 .tl-sw-pay {
+    border-top: 2px solid var(--ff-long);
+    opacity: 0.7;
+  }
+  .m7 p.tl-rule {
+    margin: -6px 0 16px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ff-ink-2);
+  }
+  .tl-subhead {
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .gr-line {
+    fill: none;
+    stroke: var(--ff-forward);
+    stroke-width: 2.25;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+  }
+  .gr-gap {
+    fill: none;
+    stroke: var(--ff-bad);
+    stroke-width: 2;
+    stroke-dasharray: 2 5;
+    stroke-linecap: round;
+  }
+  .gr-floor {
+    fill: none;
+    stroke: var(--ff-forward);
+    stroke-width: 1.5;
+    stroke-dasharray: 6 4;
+  }
+  .gr-floor.is-gone {
+    opacity: 0.25;
+  }
+  .gr-gone-label {
+    fill: var(--ff-bad-text);
+  }
+  .gr-order-line {
+    fill: none;
+    stroke: var(--ff-exotics);
+    stroke-width: 1;
+    stroke-dasharray: 3 3;
+    transition: stroke 300ms ease;
+  }
+  .gr-order-label {
+    font-size: 11px;
+    font-weight: 600;
+    fill: var(--ff-exotics-text);
+    font-variant-numeric: tabular-nums;
+    transition: fill 300ms ease;
+  }
+  .gr-order.is-hit .gr-order-line {
+    stroke: var(--ff-bad);
+    stroke-width: 1.5;
+    stroke-dasharray: none;
+  }
+  .gr-order.is-hit .gr-order-label {
+    fill: var(--ff-bad-text);
+    font-weight: 800;
+  }
+  .gr-order.is-hit .m7-hit {
+    stroke: var(--ff-bad);
+  }
+  .m7 .gr-sw-fix {
+    border-top: 2.25px solid var(--ff-forward);
+  }
+  .m7 .gr-sw-order {
+    border-top: 1.5px dashed var(--ff-exotics);
+  }
+  .m7 p.gr-aha {
+    margin: 8px 0 0;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: var(--ff-exotics-soft);
+    border: 1px solid #fed7aa;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--ff-ink-2);
+  }
+  .m7 p.gr-aha b {
+    color: var(--ff-exotics-text);
+  }
+  .gr-controls {
+    align-items: flex-end;
+    margin-top: 8px;
+  }
+  .gr-scrub {
+    flex: 1 1 220px;
+    min-width: 0;
+  }
+  .gr-caption {
+    caption-side: top;
+    padding: 10px 12px 8px;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: left;
+    color: var(--ff-ink);
+  }
+  .gr-caption span {
+    display: block;
+    margin-top: 2px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ff-muted);
+  }
+  .gr .m7-table-wrap {
+    margin-top: 14px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .m7-pop,
+    .m7-aha {
+      animation: none;
+    }
+    .m7-chip,
+    .m7-table tr,
+    .m7-handle-dot,
+    .m7-dot,
+    .m7-zone {
+      transition: none;
+    }
+  }
+</style>

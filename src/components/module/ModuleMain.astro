@@ -1,0 +1,331 @@
+---
+/**
+ * Main column of a module page (B-Modul): 1080 px container, article as a 32 px flex column.
+ * Also carries the global styles of the Quiz island (.qz-*), because Preact islands have no
+ * scoped <style> block of their own; the prefix keeps them from leaking.
+ */
+interface Props {
+  slug: string;
+  kind: 'section' | 'quiz';
+  section?: string;
+}
+const { slug, kind, section } = Astro.props;
+---
+
+<main
+  class="container-module mod-main"
+  data-module-page={kind}
+  data-slug={slug}
+  data-section={section}
+>
+  <article class="mod-article">
+    <slot />
+  </article>
+</main>
+
+<style>
+  .mod-main {
+    padding-top: 48px;
+    padding-bottom: 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+  .mod-article {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+  /* MDX output: the intro block above already provides the 16 px gap to the first paragraph. */
+  .mod-article > :global(.prose) {
+    margin-top: -16px;
+  }
+  @media (max-width: 640px) {
+    .mod-main {
+      padding-top: 32px;
+      padding-bottom: 48px;
+    }
+    .mod-article {
+      gap: 24px;
+    }
+  }
+</style>
+
+<style is:global>
+  /* ---------- Quiz island (check and quiz mode) ---------- */
+  .qz {
+    max-width: var(--ff-measure);
+    padding: 28px;
+    border-radius: var(--ff-r-card);
+    background: var(--ff-surface);
+    border: 1px solid var(--ff-line);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .qz-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 12px;
+  }
+  .qz-title {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--fam-text, var(--ff-ink));
+    outline-offset: 4px;
+  }
+  .qz-hint {
+    font-size: 13px;
+    color: var(--ff-muted);
+  }
+  .qz-dots {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    gap: 6px;
+  }
+  .qz-dots li {
+    width: 28px;
+    height: 4px;
+    border-radius: var(--ff-r-pill);
+    background: var(--ff-line-input);
+    transition: background-color 300ms ease;
+  }
+  .qz-dots li[data-state='current'] {
+    background: var(--fam, var(--ff-ink));
+  }
+  .qz-dots li[data-state='correct'] {
+    background: var(--ff-good);
+  }
+  .qz-dots li[data-state='wrong'] {
+    background: var(--ff-bad);
+  }
+  .qz-prompt {
+    font-size: 19px;
+    line-height: 1.5;
+    font-weight: 700;
+    color: var(--ff-ink);
+  }
+  .qz-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .qz-opt {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-height: 56px;
+    padding: 10px 18px;
+    border-radius: 16px;
+    border: 2px solid var(--ff-line-input);
+    background: var(--ff-surface);
+    text-align: left;
+    cursor: pointer;
+    color: var(--ff-ink);
+    transition:
+      border-color 150ms ease,
+      background-color 150ms ease;
+  }
+  .qz-opt:hover {
+    border-color: var(--ff-ref);
+  }
+  .qz-opt[aria-disabled='true'] {
+    cursor: default;
+  }
+  .qz-opt[aria-disabled='true']:hover {
+    border-color: var(--ff-line-input);
+  }
+  .qz-opt[data-state='correct'],
+  .qz-opt[data-state='correct']:hover {
+    border-color: var(--ff-good);
+    background: var(--ff-good-soft);
+  }
+  .qz-opt[data-state='wrong'],
+  .qz-opt[data-state='wrong']:hover {
+    border-color: var(--ff-bad);
+    background: var(--ff-bad-soft);
+  }
+  .qz-key {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    flex: 0 0 28px;
+    border-radius: var(--ff-r-pill);
+    background: var(--ff-chip);
+    color: var(--ff-ink);
+    font-size: 13px;
+    font-weight: 800;
+  }
+  .qz-opt[data-state='correct'] .qz-key {
+    background: var(--ff-good-text);
+    color: #fff;
+  }
+  .qz-opt[data-state='wrong'] .qz-key {
+    background: var(--ff-bad-text);
+    color: #fff;
+  }
+  .qz-label {
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+  .qz-label.mono {
+    font-family: var(--ff-font-mono);
+    font-weight: 600;
+  }
+  .qz-status:empty {
+    display: none;
+  }
+  .qz-feedback {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px 16px;
+    border-radius: var(--ff-r-formula);
+    background: var(--ff-good-soft);
+    color: var(--ff-good-text-strong);
+    font-size: 15px;
+    line-height: 1.55;
+    animation: qz-in 260ms ease-out both;
+  }
+  .qz-feedback[data-ok='false'] {
+    background: var(--ff-bad-soft);
+    color: var(--ff-bad-text-strong);
+  }
+  .qz-feedback strong {
+    font-weight: 800;
+  }
+  .qz-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+  }
+  .qz-link {
+    min-height: var(--ff-touch);
+    padding: 0 4px;
+    border: 0;
+    background: none;
+    color: var(--ff-ink-2);
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+  .qz-link:hover {
+    color: var(--ff-ink);
+  }
+  .qz-result {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    animation: qz-in 360ms ease-out both;
+  }
+  .qz-score {
+    font-size: 40px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    color: var(--ff-ink);
+  }
+  .qz-verdict {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    align-self: flex-start;
+    padding: 8px 14px 8px 10px;
+    border-radius: var(--ff-r-pill);
+    background: var(--ff-good-soft);
+    color: var(--ff-good-text-strong);
+    font-size: 15px;
+    font-weight: 700;
+  }
+  .qz-result[data-ok='false'] .qz-verdict {
+    background: var(--ff-warn-soft);
+    color: var(--ff-warn-text);
+  }
+  .qz-verdict svg {
+    flex: 0 0 auto;
+  }
+  .qz-review {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid var(--ff-row);
+  }
+  .qz-review li {
+    display: grid;
+    grid-template-columns: 22px minmax(0, 1fr);
+    gap: 12px;
+    align-items: start;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--ff-row);
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--ff-ink-2);
+  }
+  .qz-review-dot {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: var(--ff-r-pill);
+    background: var(--ff-bad-text);
+    color: #fff;
+  }
+  .qz-review li[data-ok='true'] .qz-review-dot {
+    background: var(--ff-good-text);
+  }
+  .qz-review-dot svg path {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .qz-best {
+    font-size: 13px;
+    color: var(--ff-muted);
+  }
+  /* transform only: an opacity fade would make the text fail contrast checks mid-animation */
+  @keyframes qz-in {
+    from {
+      transform: translateY(6px);
+    }
+    to {
+      transform: none;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .qz-feedback,
+    .qz-result {
+      animation: none;
+    }
+  }
+  @media (max-width: 640px) {
+    .qz {
+      padding: 22px 18px;
+      border-radius: 20px;
+    }
+    .qz-prompt {
+      font-size: 17px;
+    }
+    .qz-opt {
+      padding: 10px 14px;
+      gap: 12px;
+    }
+    .qz-score {
+      font-size: 34px;
+    }
+  }
+</style>

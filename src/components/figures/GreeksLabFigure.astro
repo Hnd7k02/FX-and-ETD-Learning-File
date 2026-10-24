@@ -1,0 +1,23 @@
+---
+/**
+ * Greeks lab as an MDX figure: <GreeksLabFigure mode="vega" caption="…" />.
+ * Reads the page language itself and hydrates the island when it scrolls into view.
+ */
+import Figure from '@/components/content/Figure.astro';
+import GreeksLabStyles from './GreeksLabStyles.astro';
+import GreeksLab from '@/components/islands/GreeksLab';
+import { pageLang } from '@/components/content/lang';
+import type { LabMode } from '@/lib/greekslab';
+
+interface Props {
+  mode?: LabMode;
+  caption?: string;
+}
+const { mode = 'delta-gamma', caption } = Astro.props;
+const lang = pageLang(Astro.currentLocale);
+---
+
+<GreeksLabStyles />
+<Figure caption={caption}>
+  <GreeksLab client:visible lang={lang} mode={mode} />
+</Figure>

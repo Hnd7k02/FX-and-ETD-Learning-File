@@ -1,0 +1,76 @@
+import ForwardCurveFigure from '@/components/figures/ForwardCurveFigure.astro';
+
+{/* 02 Forward · Abschnitt 3 · Forward Points und Carry. Zahlen nur über <Num />, Register src/lib/nums/ex.ts und m02.ts. */}
+
+Unter Händlern nennt niemand den Forward als ganzen Kurs. Man quotiert die **Forward Points**: den Abstand zum Spot in Pips. Für 3 Monate sind das im Beispiel <Num of="ex.fwdPointsMM" /> Pips. Den Forward rechnest du selbst: Spot plus Points, <Num of="ex.spot" /> + (<Num of="m02.pointsRate" />) = <Num of="m02.fwd" />. Der Grund ist praktisch: Der Spot bewegt sich ständig, die Points ändern sich viel langsamer. So bleibt eine Quote länger gültig. Der Importeur bekommt von seiner Bank am Ende den ganzen Kurs, den Outright.
+
+### Aufschlag und Abschlag
+
+Liegt der Forward unter dem Spot, notiert die Base-Währung mit **Abschlag** (Discount). Liegt er darüber, mit **Aufschlag** (Premium). Bei USD/CHF ist der Dollar die Base. Weil sein Zins höher ist, notiert er auf Termin mit Abschlag. Der Franken notiert spiegelbildlich mit Aufschlag.
+
+Für den Importeur ist der Abschlag angenehm: Er zahlt mit dem Forward <Num of="m02.belowSpotChf" /> weniger als zum Spot heute. Geschenkt ist das nicht. Hätte er die Dollars heute gekauft, hätte er bis zum Zahltag selbst den USD-Zins verdient.
+
+### Forward = Spot + Cost − Benefit
+
+Eine einfache Regel fasst das zusammen. Stell dir vor, du kaufst die Dollars nicht auf Termin, sondern heute und hältst sie bis zum Zahltag:
+
+- **Cost:** Du musst den Kaufpreis heute finanzieren. Das kostet den Zins der Quote-Währung, hier CHF.
+- **Benefit:** Du hältst die Dollars und bekommst ihren Zins. Das ist der Zins der Base-Währung, hier USD.
+
+Der Forward verrechnet beides. Im Beispiel ist die Cost <Num of="m02.cost" /> (CHF-Zins <Num of="ex.rd" />) und der Benefit <Num of="m02.benefit" /> (USD-Zins <Num of="ex.rf" />). Also:
+
+<Formula variant="accent"><i>F</i> = <Num of="ex.spot" /> + <Num of="m02.cost" /> − <Num of="m02.benefit" /> = <Num of="m02.fwd" /></Formula>
+
+<ForwardCurveFigure caption="Für jede Laufzeit: Cost nach oben (orange), Benefit nach unten (blau), der schwarze Punkt ist der Rest, die Forward Points. Tausch die Zinsen und schau, was mit den Points passiert." />
+
+### Längere Laufzeit, mehr Points
+
+Der Abstand zum Spot wächst fast linear mit der Laufzeit: 1 Woche <Num of="m02.points1W" />, 1 Monat <Num of="m02.points1M" />, 3 Monate <Num of="ex.fwdPointsMM" />, 6 Monate <Num of="m02.points6M" />, 1 Jahr <Num of="m02.points1Y" /> Pips. Eine Faustregel genügt meist: Points ≈ Spot · Zinsdifferenz · Laufzeit. Für 3 Monate gibt das <Num of="m02.pointsApprox" /> Pips, nahe am exakten Wert.
+
+Aufs Jahr gerechnet beträgt der Abschlag <Num of="m02.discountPa" />. Das ist fast genau der Zinsvorsprung des Dollars von <Num of="m02.usdLead" />.
+
+Und wenn sich ein Zins ändert? Steigt der CHF-Zins auf <Num of="m02.whatIfRd" />, kommt eine Cost von <Num of="m02.whatIfCostPips" /> Pips dazu. Die 3-Monats-Points schrumpfen auf <Num of="m02.whatIfPoints" /> Pips, der Forward steigt auf <Num of="m02.whatIfFwd" />. Der Spot hat sich dabei nicht bewegt.
+
+### Ein Forward ist keine Prognose
+
+Der 1-Jahres-Forward steht bei <Num of="m02.fwd1Y" />, <Num of="m02.points1YAbs" /> Pips unter dem Spot. Heisst das, der Markt erwartet einen schwächeren Dollar? Nein. Der Forward folgt aus Spot und Zinsen, nicht aus einer Erwartung. Am Markt kommt die Cross-Currency Basis dazu ([Abschnitt 2](/module/02-forward/2/) und [Modul 03](/module/03-fx-swap/4/)). Auch sie ist keine Kursprognose. Tausch in der Grafik die beiden Zinsen: Die Points springen ins Plus, obwohl niemand seine Meinung über den Dollar geändert hat.
+
+Wer Dollars hält, verdient den höheren Zins. Diesen Zinsvorsprung nennt man **Carry**. Im Forward ist er schon eingepreist: In der Zinsparität gibt der Abschlag ihn genau wieder ab, am Markt bis auf die Basis. Wer Dollars nur wegen des Zinses hält, gewinnt darum nur, wenn der Dollar bei Fälligkeit über dem Forward steht. Ob er das tut, weiss niemand. Carry als Abwägung von Kosten und Nutzen ist Thema von Modul 09.
+
+<Callout variant="note" title="Contango ist kein FX-Begriff">
+
+Bei Rohstoffen heisst ein Terminpreis über dem Kassapreis Contango, einer darunter Backwardation. Dort spielen auch Lagerkosten mit. In FX sagt man Forward-Aufschlag und Forward-Abschlag (Premium und Discount). Die Ursache ist der Zinsunterschied; am Markt kommt die Cross-Currency Basis dazu.
+
+</Callout>
+
+<Derivation title="Herleitung: Cost und Benefit exakt">
+
+Aus <i>F</i> = <i>S</i> · (1 + <i>r</i><sub>CHF</sub> · <i>t</i>) / (1 + <i>r</i><sub>USD</sub> · <i>t</i>) folgt durch Umformen
+
+<Formula>
+  <span><i>F</i> − <i>S</i> = <i>S</i> · (<i>r</i><sub>CHF</sub> − <i>r</i><sub>USD</sub>) · <i>t</i> / (1 + <i>r</i><sub>USD</sub> · <i>t</i>)</span>
+  <span>Cost = <i>S</i> · <i>r</i><sub>CHF</sub> · <i>t</i> / (1 + <i>r</i><sub>USD</sub> · <i>t</i>)</span>
+  <span>Benefit = <i>S</i> · <i>r</i><sub>USD</sub> · <i>t</i> / (1 + <i>r</i><sub>USD</sub> · <i>t</i>)</span>
+</Formula>
+
+Beide Teile sind durch 1 + <i>r</i><sub>USD</sub> · <i>t</i> geteilt. Der Grund: Für USD 1 am Zahltag brauchst du heute nur 1 / (1 + <i>r</i><sub>USD</sub> · <i>t</i>) Dollar (Abschnitt 2). Mit <i>t</i> = <Num of="m02.t" /> ergibt das Cost <Num of="m02.cost" /> und Benefit <Num of="m02.benefit" />.
+
+**Faustregel.** Lässt du den Nenner weg, bleibt <i>F</i> − <i>S</i> ≈ <i>S</i> · (<i>r</i><sub>CHF</sub> − <i>r</i><sub>USD</sub>) · <i>t</i> = <Num of="m02.pointsApprox" /> Pips. Der Fehler wächst mit Zins und Laufzeit.
+
+**Aufs Jahr gerechnet.** (<i>F</i> / <i>S</i> − 1) · 360 / Tage = (<i>r</i><sub>CHF</sub> − <i>r</i><sub>USD</sub>) / (1 + <i>r</i><sub>USD</sub> · <i>t</i>) = <Num of="m02.premPa" />.
+
+</Derivation>
+
+<Desk title="Wie Points quotiert werden">
+
+Forward Points haben wie der Spot einen Bid und einen Offer. Die Händler nennen nur die Pips, ohne Vorzeichen. Ist die erste Zahl grösser als die zweite, ziehst du die Points vom Spot ab: Abschlag. Ist sie kleiner, zählst du sie dazu: Aufschlag.
+
+Standardlaufzeiten sind 1W, 1M, 2M, 3M, 6M, 9M und 1Y. Sie zählen ab dem Spot-Valutatag (T+2, Modul 01): Ein 3M-Forward ist drei Monate nach der Spot-Valuta fällig, nicht drei Monate nach dem Abschluss. Für Daten dazwischen (Broken Dates) interpoliert man zwischen den Nachbarn.
+
+</Desk>
+
+<Takeaway>
+
+Forward = Spot + Cost − Benefit: Cost ist der Zins der Quote-Währung (CHF), Benefit der Zins der Base-Währung (USD). Die Forward Points spiegeln den Zinsunterschied, am Markt dazu die Cross-Currency Basis. Ein Forward ist keine Prognose.
+
+</Takeaway>

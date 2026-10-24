@@ -1,0 +1,98 @@
+---
+/**
+ * Module header band (B-Modul): breadcrumb, family chip and level chip, H1 and the section
+ * stepper, on white with a bottom border, inside the 1080 px module container.
+ * The H1 and the family chip carry the view-transition names of the learning-path station
+ * (ff-title-{slug}, ff-node-{slug}) so that the station grows into this header (MASTER_PROMPT §4).
+ */
+import SectionStepper from './SectionStepper.astro';
+import { FAMILIES, LEVELS, type ModuleDef } from '@/data/modules';
+import { common } from '@/i18n/dict/common';
+import { homePath, type SectionKey } from '@/i18n/routes';
+import { translator, type Lang } from '@/i18n/types';
+
+interface Props {
+  lang: Lang;
+  module: ModuleDef;
+  current: SectionKey;
+}
+const { lang, module: m, current } = Astro.props;
+const t = translator(common, lang);
+---
+
+<header class="mh" data-family={m.family}>
+  <div class="container-module mh-inner">
+    <nav aria-label={t('a11y.breadcrumb')} class="crumbs">
+      <a href={`${homePath(lang)}#lernpfad`}>{t('module.home')}</a>
+      <span aria-hidden="true">/</span>
+      <span class="crumb-current" aria-current="location">
+        {m.n}
+        {m.title[lang]}
+      </span>
+    </nav>
+    <div class="chips">
+      <span class="chip chip-family" style={`view-transition-name: ff-node-${m.slug}`}>
+        {m.n} · {FAMILIES[m.family].label[lang]}
+      </span>
+      <span class="chip chip-outline">
+        {t('module.minutes', { level: LEVELS[m.level][lang], min: m.minutes })}
+      </span>
+    </div>
+    <h1 class="h1-module mh-title" style={`view-transition-name: ff-title-${m.slug}`}>
+      {m.headline[lang]}
+    </h1>
+    <SectionStepper lang={lang} module={m} current={current} />
+  </div>
+</header>
+
+<style>
+  .mh {
+    background: var(--ff-surface);
+    border-bottom: 1px solid var(--ff-line);
+  }
+  .mh-inner {
+    padding-top: 36px;
+    padding-bottom: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .crumbs {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--ff-muted);
+  }
+  .crumbs a {
+    color: var(--ff-muted);
+    display: inline-flex;
+    align-items: center;
+    min-height: 32px;
+  }
+  .crumbs a:hover {
+    color: var(--ff-ink);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .crumb-current {
+    font-weight: 700;
+    color: var(--ff-ink);
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .mh-title {
+    max-width: 900px;
+  }
+  @media (max-width: 640px) {
+    .mh-inner {
+      padding-top: 24px;
+      padding-bottom: 20px;
+      gap: 14px;
+    }
+  }
+</style>

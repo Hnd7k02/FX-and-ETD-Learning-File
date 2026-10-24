@@ -1,0 +1,22 @@
+---
+/**
+ * SwapLegs as an MDX figure (module 03, section 2): <SwapLegsFigure caption="…" />.
+ * Reads the page language and hydrates the island when it scrolls into view.
+ */
+import Figure from '@/components/content/Figure.astro';
+import SwapLegs, { type SwapLegsProps } from '@/components/islands/SwapLegs';
+import { pageLang } from '@/components/content/lang';
+import M03Styles from './M03Styles.astro';
+
+interface Props {
+  caption?: string;
+  initial?: SwapLegsProps['initial'];
+}
+const { caption, initial } = Astro.props;
+const lang = pageLang(Astro.currentLocale);
+---
+
+<M03Styles />
+<Figure caption={caption}>
+  <SwapLegs client:visible lang={lang} initial={initial} />
+</Figure>

@@ -1,0 +1,75 @@
+---
+/**
+ * Mini gauge (240 × 140) of the home page: five level segments and a needle that swings in from
+ * the left over 1.4 s (easeOutCubic, CSS only; none under prefers-reduced-motion via --ff-needle).
+ * Decorative: the surrounding card carries the accessible description.
+ */
+import { LEVEL_COLORS, type LevelIndex } from '@/i18n/dict/levels';
+import { MINI_GAUGE, gaugeSegments, needleAngle, needleBasePath } from '@/lib/gauge';
+
+interface Props {
+  /** Needle position 0..5, null when no data has been built yet (segments dimmed, no needle). */
+  needle: number | null;
+  class?: string;
+}
+const { needle, class: cls } = Astro.props;
+const g = MINI_GAUGE;
+const segments = gaugeSegments(g);
+const angle = needle === null ? null : needleAngle(needle);
+---
+
+<svg
+  class:list={['gauge', cls]}
+  width={g.width}
+  height={g.height}
+  viewBox={`0 0 ${g.width} ${g.height}`}
+  aria-hidden="true"
+  data-empty={needle === null ? 'true' : undefined}
+>
+  {segments.map((d, i) => (
+    <path class="seg" d={d} style={`stroke:${LEVEL_COLORS[(i + 1) as LevelIndex]}`} />
+  ))}
+  {angle !== null && (
+    <g class="needle" style={`--needle:${angle.toFixed(2)}deg`}>
+      <path d={needleBasePath(g)} />
+    </g>
+  )}
+  <circle class="hub" cx={g.cx} cy={g.cy} r={g.hub}></circle>
+</svg>
+
+<style define:vars={{ cx: `${g.cx}px`, cy: `${g.cy}px`, sw: g.stroke, nw: g.needleStroke }}>
+  .gauge {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+  .seg {
+    fill: none;
+    stroke-width: var(--sw);
+  }
+  .gauge[data-empty] .seg {
+    opacity: 0.35;
+  }
+  .needle {
+    transform-box: view-box;
+    transform-origin: var(--cx) var(--cy);
+    transform: rotate(var(--needle));
+    animation: ff-needle-in var(--ff-needle) cubic-bezier(0.33, 1, 0.68, 1) both;
+  }
+  .needle path {
+    fill: none;
+    stroke: var(--ff-ink);
+    stroke-width: var(--nw);
+    stroke-linecap: round;
+  }
+  .hub {
+    fill: var(--ff-ink);
+    stroke: #fff;
+    stroke-width: 3;
+  }
+  @keyframes ff-needle-in {
+    from {
+      transform: rotate(-180deg);
+    }
+  }
+</style>

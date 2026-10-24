@@ -1,0 +1,68 @@
+import HedgeOutcomeFigure from '@/components/figures/HedgeOutcomeFigure.astro';
+
+{/* 02 Forward · Abschnitt 1 · Intuition. Zahlen nur über <Num />, Register src/lib/nums/ex.ts und m02.ts; Fakten über <Fact />, Register src/content/facts/m02.ts. */}
+
+Unser Importeur muss in 3 Monaten USD 1 Mio. bezahlen. Heute steht USD/CHF bei <Num of="ex.spot" />. Was ihn die Dollars kosten, weiss er erst am Zahltag. Steigt der Dollar, wird seine Rechnung in Franken teurer. Das ist sein Währungsrisiko aus Modul 01.
+
+Ein **Forward** löst das Problem. Er ist ein Vertrag, den der Importeur heute mit seiner Bank abschliesst: In 3 Monaten kauft er USD 1 Mio. zu einem Kurs, der schon heute feststeht. Heute fliesst kein Geld. Am Fälligkeitstag liefert die Bank die Dollars, und der Importeur zahlt die vereinbarten Franken. Kurs heute fixieren, Lieferung später.
+
+Forwards sind kein Spezialprodukt. Im <Fact id="m02-bis-month" /> machten Outright Forwards <Fact id="m02-bis-fwd-share" /> des weltweiten Devisenhandels aus. Ihr Umsatz lag <Fact id="m02-bis-fwd-growth" /> über dem von drei Jahren zuvor (vorläufige Zahlen der BIZ).
+
+### Was der Forward kostet
+
+Der Forward für 3 Monate steht bei <Num of="m02.fwd" />. Damit kosten den Importeur seine Dollars <Num of="m02.fwdChf" />, egal wo der Kurs am Zahltag steht. Das ist sogar weniger als zum Spot heute (<Num of="m02.spotChf" />): Der Forward liegt <Num of="m02.discountPips" /> Pips unter dem Spot.
+
+Das ist kein Rabatt und keine Meinung über den Dollar. Es ist der Zinsunterschied zwischen Dollar und Franken. Warum genau, zeigt Abschnitt 2.
+
+<HedgeOutcomeFigure caption="Zieh den Kurs bei Fälligkeit. Orange: was der Importeur ohne Absicherung zahlt. Schwarz: der Forward, flach. Spiel die Szenarien ab und schau, wie weit die Kosten ohne Forward streuen." />
+
+### Zwei Szenarien
+
+- **Der Dollar steigt auf <Num of="m02.stUp" />.** Ohne Absicherung zahlt der Importeur <Num of="m02.upChf" />. Mit dem Forward bleibt es bei <Num of="m02.fwdChf" />. Er spart <Num of="m02.saveUpChf" />.
+- **Der Dollar fällt auf <Num of="m02.stDown" />.** Ohne Absicherung hätte er nur <Num of="m02.downChf" /> gezahlt. Mit dem Forward zahlt er trotzdem <Num of="m02.fwdChf" />, also <Num of="m02.missDownChf" /> mehr.
+
+Das zweite Szenario fühlt sich wie ein Verlust an. In der Kasse ist es keiner: Der Importeur zahlt genau den Betrag, mit dem er kalkuliert hat. Er hat auf eine Chance verzichtet. Das ist der Preis der Sicherheit. Mit dem Forward gibt er die guten Szenarien genauso ab wie die schlechten.
+
+### Unsicherheit weg, nicht Kosten weg
+
+Spiel die Szenarien in der Grafik ab. Im Modell mit einer Vola von <Num of="ex.vol" /> kosten die Dollars ohne Absicherung zwischen <Num of="m02.scnMin" /> und <Num of="m02.scnMax" />. Mit dem Forward sind es in jedem Szenario <Num of="m02.fwdChf" />. In <Num of="m02.scnCheaper" /> von <Num of="m02.scnCount" /> Szenarien war der Forward günstiger, in den übrigen teurer.
+
+Die Szenarien sind [risikoneutral](/glossar/#term-risk-neutral) um den Forward zentriert. Im Mittel kosten die Dollars ohne Absicherung darum etwa gleich viel wie mit: <Num of="m02.scnMean" />. Der Forward macht die Dollars also nicht billiger und nicht teurer. Er nimmt die Streuung weg. Der Importeur kann seine Preise heute rechnen, statt auf den Kurs zu hoffen.
+
+### Was der Importeur gewinnt und was er abgibt
+
+- **Er gewinnt Planbarkeit.** Kosten, Verkaufspreise und Marge stehen heute fest. Ein starker Dollar kann ihm nichts mehr anhaben.
+- **Er gibt die Chance ab.** Fällt der Dollar, profitiert er nicht davon.
+- **Er geht eine Pflicht ein.** Der Forward muss erfüllt werden, auch wenn das Geschäft mit dem Lieferanten platzt. Er kann ihn dann nur zum aktuellen Marktwert auflösen, und der kann gegen ihn sein. Ein Recht ohne Pflicht ist eine Option, das Thema von Modul 04.
+
+<Derivation title="Herleitung: warum der Forward die Kosten fixiert">
+
+Der Forward ist ein eigener Vertrag. Bei Fälligkeit ist er für den Käufer der Dollars so viel wert, wie der Kurs <i>S</i><sub>T</sub> über dem vereinbarten Kurs <i>F</i> liegt:
+
+<Formula>Wert bei Fälligkeit = <i>N</i> · (<i>S</i><sub>T</sub> − <i>F</i>)</Formula>
+
+Mit <i>N</i> = USD 1 Mio. ist er bei <i>S</i><sub>T</sub> = <Num of="m02.stUp" /> genau <Num of="m02.fwdValueUp" /> wert, bei <i>S</i><sub>T</sub> = <Num of="m02.stDown" /> <Num of="m02.fwdValueDown" />. Pro Dollar ist die Auszahlung eine Gerade mit Steigung 1: Der Forward ist das lineare Grundinstrument, auf das Modul 04 die Optionen zurückführt.
+
+Ohne Absicherung zahlt der Importeur <i>N</i> · <i>S</i><sub>T</sub>. Rechnest du den Wert des Forwards dazu, bleibt in jedem Szenario derselbe Betrag:
+
+<Formula variant="accent"><i>N</i> · <i>S</i><sub>T</sub> − <i>N</i> · (<i>S</i><sub>T</sub> − <i>F</i>) = <i>N</i> · <i>F</i> = <Num of="m02.fwdChf" /></Formula>
+
+Der Kurs bei Fälligkeit kürzt sich weg. Darum ist die schwarze Linie im Chart flach.
+
+**Die Szenarien.** Die Grafik zieht Kurse aus derselben Verteilung wie die Optionsmodelle. Dass sie im Mittel beim Forward liegen, verlangt das [risikoneutrale](/glossar/#term-risk-neutral) Bewertungsmass. Lognormal mit Vola <Num of="ex.vol" /> über die Laufzeit <i>T</i> = <Num of="ex.T" /> ist eine zusätzliche Annahme des Modells. Zusammen ist das ein Modell, keine Prognose. Es zeigt, wie stark ein gewöhnliches Quartal streuen kann.
+
+</Derivation>
+
+<Desk title="Ein Forward kostet keine Prämie">
+
+Beim Abschluss ist ein fairer Forward für beide Seiten null wert. Darum zahlt heute niemand etwas. Die Bank verdient an der Marge im Kurs.
+
+Weil der Forward später viel wert werden kann, für die eine oder die andere Seite, prüft die Bank vorher die Bonität des Kunden. Sie gibt ihm eine Kreditlinie, bis zu der sie Forwards mit ihm abschliesst. Am Desk heisst ein einfacher Forward **Outright Forward** oder kurz Outright.
+
+</Desk>
+
+<Takeaway>
+
+Ein Forward fixiert heute den Kurs für eine Lieferung später. Er nimmt die Unsicherheit weg, nicht die Kosten: Der Importeur zahlt sicher <Num of="m02.fwdChf" />, egal wo der Dollar landet.
+
+</Takeaway>

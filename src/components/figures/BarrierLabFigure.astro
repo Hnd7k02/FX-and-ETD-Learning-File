@@ -1,0 +1,23 @@
+---
+/**
+ * BarrierLab as an MDX figure (module 07, section 2): <BarrierLabFigure caption="…" />.
+ * Reads the page language and hydrates the island when it scrolls into view.
+ */
+import Figure from '@/components/content/Figure.astro';
+import BarrierLab from '@/components/islands/BarrierLab';
+import { pageLang } from '@/components/content/lang';
+import type { LabState } from '@/lib/m07/barrierlab';
+import M07Styles from './M07Styles.astro';
+
+interface Props {
+  caption?: string;
+  initial?: Partial<LabState>;
+}
+const { caption, initial } = Astro.props;
+const lang = pageLang(Astro.currentLocale);
+---
+
+<M07Styles />
+<Figure caption={caption}>
+  <BarrierLab client:visible lang={lang} initial={initial} />
+</Figure>

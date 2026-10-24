@@ -1,0 +1,78 @@
+import BarrierLabFigure from '@/components/figures/BarrierLabFigure.astro';
+
+{/* 07 Barrier & Binary · Abschnitt 2 · Knock-out und Knock-in. Zahlen nur über <Num />, Registry src/lib/nums/m07.ts. */}
+
+Drei Fragen bestimmen jede einfache Barrier-Option. Call oder Put? Liegt die Barriere über dem Spot (Up) oder darunter (Down)? Verschwindet die Option beim Berühren (Out) oder entsteht sie (In)? Zwei mal zwei mal zwei: Es gibt acht Grundtypen.
+
+| | Barriere oben (Up) | Barriere unten (Down) |
+| --- | --- | --- |
+| **Call** | Up-and-out, Up-and-in. Barriere im Geld: **reverse** | Down-and-out, Down-and-in. Barriere aus dem Geld: **regulär** |
+| **Put** | Up-and-out, Up-and-in. Barriere aus dem Geld: **regulär** | Down-and-out, Down-and-in. Barriere im Geld: **reverse** |
+
+Die Tabelle gilt für einen Strike nahe am Spot, wie beim Importeur. Die Regel dahinter: Liegt die Barriere dort, wo die Option im Geld ist, heisst sie reverse. Sonst ist sie regulär.
+
+### Die In-Out-Parität
+
+Kauf einen Knock-out und einen Knock-in mit gleichem Strike, gleicher Barriere und gleicher Laufzeit. Auf jedem Pfad lebt dann genau eine der beiden Optionen. Berührt der Kurs die Barriere, stirbt der Knock-out und der Knock-in erwacht. Berührt er sie nie, lebt der Knock-out weiter und der Knock-in entsteht nie. Zusammen hast du also immer den Vanilla.
+
+<Formula variant="accent">Knock-out + Knock-in = Vanilla (ohne Rebate)</Formula>
+
+Im Beispiel mit Barriere <Num of="m07.barrierUp" />: Up-and-out Call <Num of="m07.uocPips" /> Pips plus Up-and-in Call <Num of="m07.uicPips" /> Pips ergibt <Num of="m07.paritySumPips" /> Pips, genau den Preis des Vanilla Calls. Kennst du zwei der drei Preise, kennst du den dritten.
+
+<BarrierLabFigure caption="Wähl Typ, Richtung und Art. Zieh den Spot (schwarzer Punkt) an die Barriere und verkürze die Laufzeit: Beim Reverse Knock-out wird Delta stark negativ. Unten siehst du die In-Out-Parität als zwei gleich lange Balken." />
+
+### Reverse Knock-out: billig, aber nervös
+
+Beim regulären Down-and-out Call mit Barriere <Num of="m07.barrierDown" /> liegt die Barriere unter dem Strike. Wird sie berührt, ist der Call ohnehin aus dem Geld. Der Knock-out nimmt dir wenig weg, darum kostet er fast so viel wie der Vanilla.
+
+Beim Up-and-out Call mit Barriere <Num of="m07.barrierUp" /> liegt die Barriere über dem Strike, also im Geld. Kurz vor der Barriere hat der Call viel inneren Wert, an der Barriere null. Diese Klippe prägt die Greeks:
+
+- Bei Spot <Num of="ex.spot" /> ist Delta <Num of="m07.uocDelta" />, der Vanilla hat <Num of="ex.delta" />. Die Option reagiert kaum auf den Kurs.
+- Bei Spot <Num of="m07.nearSpot" />, kurz vor der Barriere, ist Delta <Num of="m07.uocDeltaNear" />. Der Vanilla hat dort <Num of="m07.vanillaDeltaNear" />. Steigt der Dollar, verliert die Option.
+- Mit nur <Num of="m07.shortWeeks" /> Wochen Restlaufzeit ist der Call bei <Num of="m07.nearSpot" /> mehr wert: <Num of="m07.uocNearShortPips" /> statt <Num of="m07.uocNearPips" /> Pips, denn bis Verfall bleibt wenig Zeit für eine Berührung. Dafür ist Delta <Num of="m07.uocDeltaNearShort" /> und Gamma <Num of="m07.uocGammaNearShort" />, beim Vanilla nur <Num of="m07.vanillaGammaNearShort" />. Auf <Num of="ex.notional" /> verhält sich der Call damit wie eine Short-Position von <Num of="m07.uocDeltaNearShortUsd" />. Der Importeur wollte long Dollar sein.
+
+Für den Absicherer heisst das: Nahe der Barriere schwankt das Delta heftig, und an der Barriere springt es auf null. Ein Reverse Knock-out lässt sich dort kaum sauber hedgen.
+
+### Rebate: ein Trostpreis
+
+Manche Knock-outs zahlen bei der Berührung eine feste Entschädigung, das Rebate. Ein Rebate von <Num of="m07.rebatePips" /> Pips hebt den Preis des Up-and-out Calls von <Num of="m07.uocPips2" /> auf <Num of="m07.uocRebatePips" /> Pips. Das Rebate ist nur <Num of="m07.rebateValuePips" /> Pips wert, weil es nur fällig wird, wenn die Barriere tatsächlich berührt wird. Das geschieht mit <Num of="m07.touchUp" /> Wahrscheinlichkeit (Abschnitt 1; [risikoneutral](/glossar/#term-risk-neutral), keine Prognose). Bei Knock-ins zahlt das Rebate bei Verfall, falls die Option nie entstanden ist.
+
+<Derivation title="Herleitung: die Spiegel-Methode">
+
+**1.** Nimm den regulären Down-and-out Call mit Barriere <i>H</i> unter dem Strike <i>K</i>. Gesucht ist ein Preis mit zwei Eigenschaften: Bei Verfall zahlt er oberhalb der Barriere dasselbe wie der Vanilla. An der Barriere ist er null.
+
+**2.** Die Idee aus der Physik: Stell neben den Vanilla einen gespiegelten Vanilla, dessen Spot an der Barriere reflektiert ist: <i>H</i>²/<i>S</i>. Mit dem passenden Gewicht ziehst du ihn ab:
+
+<Formula variant="accent">
+  <span><i>C</i><sub>DO</sub>(<i>S</i>) = <i>C</i>(<i>S</i>) − (<i>H</i>/<i>S</i>)<sup>2μ</sup> · <i>C</i>(<i>H</i>²/<i>S</i>)</span>
+  <span>μ = (<i>r</i><sub>d</sub> − <i>r</i><sub>f</sub> − ½σ²) / σ²</span>
+</Formula>
+
+**3.** Beide Eigenschaften stimmen. An der Barriere ist <i>S</i> = <i>H</i>, also <i>H</i>²/<i>S</i> = <i>H</i> und das Gewicht 1: Beide Terme sind gleich, die Differenz ist null. Bei Verfall liegt der gespiegelte Spot <i>H</i>²/<i>S</i> unter <i>H</i> und damit unter dem Strike: Der Spiegel-Call zahlt nichts, es bleibt der Vanilla. Das Gewicht sorgt dafür, dass auch der Spiegel-Term ein fairer Preis ist; er erfüllt dieselbe Bewertungsgleichung wie der Vanilla.
+
+**4.** Im Beispiel mit <i>H</i> = <Num of="m07.barrierDown" />: μ = <Num of="m07.mirrorMu" />, Spiegel-Spot <Num of="m07.mirrorSpot" />, Gewicht <Num of="m07.mirrorWeight" />, gespiegelter Call <Num of="m07.mirrorCallPips" /> Pips. Der Spiegel-Term ist <Num of="m07.mirrorPips" /> Pips, und <Num of="m07.vanillaPips" /> − <Num of="m07.mirrorPips" /> = <Num of="m07.docPips" /> Pips ist der Down-and-out Call.
+
+**5.** Der Spiegel-Term ist genau der Down-and-in Call. Das ist die In-Out-Parität von oben, diesmal aus der Formel gelesen. Reiner und Rubinstein haben so alle acht Typen hergeleitet. Das Labor rechnet mit diesen Formeln; reverse Typen brauchen mehrere Spiegel-Terme.
+
+</Derivation>
+
+<Desk title="Stetig oder täglich beobachtet">
+
+Die Formeln gehen von stetiger Beobachtung aus: Jede Sekunde zählt. Manche Verträge, vor allem in strukturierten Produkten, prüfen die Barriere aber nur einmal pro Tag gegen ein Fixing. Dann wird sie seltener berührt, und ein Knock-out ist mehr wert.
+
+Broadie, Glasserman und Kou haben gezeigt: Eine täglich beobachtete Barriere wirkt fast wie eine stetige, die ein Stück weiter vom Spot weg liegt.
+
+<Formula variant="dark">
+  <span><i>H</i><sub>stetig</sub> ≈ <i>H</i> · <i>e</i><sup>±β · σ · √Δ<i>t</i></sup></span>
+  <span>β = <Num of="m07.bgkBeta" />, Δ<i>t</i> = 1/365</span>
+</Formula>
+
+Mit σ = <Num of="ex.vol" /> ist der Faktor <Num of="m07.bgkFactor" />. Die Barriere <Num of="m07.barrierUp" /> wirkt wie <Num of="m07.bgkBarrier" />, rund <Num of="m07.bgkShiftPips" /> Pips weiter weg. Der Up-and-out Call kostet dann <Num of="m07.uocDailyPips" /> statt <Num of="m07.uocPips" /> Pips. Im Labor schaltest du das mit «Täglich (BGK)» um.
+
+</Desk>
+
+<Takeaway>
+
+Knock-out plus Knock-in ergibt den Vanilla. Liegt die Barriere im Geld, ist der Knock-out billig, aber Delta und Gamma spielen an der Barriere verrückt.
+
+</Takeaway>

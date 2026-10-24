@@ -1,0 +1,90 @@
+import ProductMatrixFigure from '@/components/figures/ProductMatrixFigure.astro';
+import PathSimulatorFigure from '@/components/figures/PathSimulatorFigure.astro';
+
+{/* 09 Hedge, alpha, yield · Section 3 · Alpha. Numbers only via <Num />, registry src/lib/nums/m09.ts. Alpha as risk-adjusted excess return: source jensen-1968 in src/content/sources.md. */}
+
+The investor has a view: the dollar will not fall much over the next few months. She has no risk that needs hedging. She wants to use her view to earn more than a benchmark.
+
+In finance theory, **alpha** is the excess return over a benchmark, adjusted for risk. Only what goes beyond the reward for the risk taken counts. Here the benchmark is the forward or the money market: anyone with a view wants more than this reference. Only the comparison shows whether that becomes alpha. A gain from a rising dollar is at first just the result of the dollar position.
+
+Before choosing a product, she answers two questions.
+
+- **How do I want to be paid?** As a **coupon**, that is cash per fixing without exchanging any currency. Or as a **strike**, that is a better rate for dollars she buys.
+- **What is my view?** A direction (**direct**: ‘the dollar will not fall below X’) or a band (**range**: ‘the dollar stays between X and Y’).
+
+Two questions with two answers each give four boxes and four product families:
+
+| | Direct | Range |
+| --- | --- | --- |
+| **Coupon** | TPF | RTPF |
+| **Strike** | TARF and accumulator | Pivot TARF |
+
+<ProductMatrixFigure need="alpha" view="coupon-direct" caption="The alpha matrix: choose a box. Each curve shows a single fixing. Above, a capped gain; below, a leveraged loss that runs off the chart. The ‘Worst case’ chip shows how far it can go." />
+
+### Worked example: four boxes, one pattern
+
+All products come from [module 08](/en/module/08-structured-products/1/), with the strike or coupon solved so that they are worth zero at inception (Monte Carlo with <Num of="m09.paths" /> paths). As there, the contract rounds the coupons to <Num of="m09.couponQuote" /> pips. The products run over <Num of="m09.fixings" /> monthly fixings of <Num of="m09.structNotional" /> each, the accumulator over <Num of="m09.accFixings" /> weeks of <Num of="m09.accNotional" /> each.
+
+- **Coupon direct, TPF:** <Num of="m09.tpfCoupon" /> pips per fixing, so <Num of="m09.tpfCouponChf" />, as long as the fixing is at or above <Num of="m09.tpfStrike" />. After <Num of="m09.tpfTargetCoupons" /> coupons it ends.
+- **Coupon range, RTPF:** <Num of="m09.rtpfCoupon" /> pips per fixing, so <Num of="m09.rtpfCouponChf" />, as long as the fixing is between <Num of="m09.rtpfLower" /> and <Num of="m09.rtpfUpper" />.
+- **Strike direct, TARF:** buys at <Num of="m09.tarfStrike" />, <Num of="m09.tarfBetter" /> pips below the forward at the average fixing date. It ends at a gain of <Num of="m09.tarfTarget" /> pips.
+- **Strike direct, accumulator:** buys at <Num of="m09.accStrike" />, <Num of="m09.accBetter" /> pips below the forward at the average fixing date, with a knock-out at <Num of="m09.accBarrier" />.
+- **Strike range, pivot TARF:** if the fixing is below the pivot <Num of="m09.pivPivot" />, she buys at <Num of="m09.pivLower" />. If it is above, she sells at <Num of="m09.pivUpper" />. Target <Num of="m09.pivTarget" /> pips.
+
+The pattern is the same everywhere. The gain is capped: by a target, a knock-out or the size of the coupon. The loss is leveraged: on the wrong side every pip counts twice.
+
+<PathSimulatorFigure
+  products={['tpf', 'rtpf', 'tarf', 'pivotTarf', 'accumulator']}
+  scenario="sideways"
+  adjustable={false}
+  caption="Test your view on a path. Sideways, the products collect their gains and end early. Switch to ‘trend down’: then the double amount shows."
+/>
+
+<Callout variant="bad" title="When it goes wrong: the view is wrong">
+
+If the dollar falls sharply, every fixing lands on the wrong side. The products then run to maturity, with double the amount. In the worst of the <Num of="m09.paths" /> simulated paths the TPF ends at <Num of="m09.tpfWorst" />, the RTPF at <Num of="m09.rtpfWorst" />, the TARF at <Num of="m09.tarfWorst" />, the pivot TARF at <Num of="m09.pivWorst" /> and the accumulator at <Num of="m09.accWorst" />. The TPF, by contrast, can gain at most <Num of="m09.tpfMaxChf" />: <Num of="m09.tpfTargetCoupons" /> coupons of <Num of="m09.tpfCouponChf" />. For the RTPF it is at most <Num of="m09.rtpfMaxChf" />. And the worst simulated path is not a limit. An even worse one is possible.
+
+</Callout>
+
+<Callout variant="warn" title="Risk box: products for a view">
+
+- **Maximum loss:** no built-in stop on losses. The gain is capped, by a target, a knock-out or the coupon. Downwards the loss is very high, but finite, because USD/CHF cannot fall below zero: in theory at most <Num of="m09.tpfMaxLoss" /> for the TPF, <Num of="m09.tarfMaxLoss" /> for the TARF and <Num of="m09.accMaxLoss" /> for the accumulator. The RTPF and the pivot TARF also lose with leverage above their upper edge. Upwards their loss is theoretically unlimited.
+- **Leverage:** 2 on the wrong side of the strike or the range.
+- **Path dependence:** target and knock-out end the good scenarios early. The bad ones run to the end.
+- **Generic:** simplified examples, market variants differ. Offers also include a margin.
+
+</Callout>
+
+<Derivation title="Derivation: where does the premium of the sold puts go?">
+
+All four boxes sell options and put the premium into something else. It is clearest with a single fixing in 3 months, without a target.
+
+**1. Strike direct.** The premium of the two sold puts pays for a bought call at the same strike. Because two puts pay for it, that strike can sit below the forward:
+
+<Formula><i>C</i>(<i>K</i>) = 2 · <i>P</i>(<i>K</i>) ⇒ <i>K</i> = <Num of="m09.levStrike" /></Formula>
+
+This is exactly the structured hedge from [section 2](/en/module/09-hedge-alpha-yield/2/).
+
+**2. Coupon direct.** The premium pays for a digital instead ([module 07](/en/module/07-barrier-binary/3/)). <i>D</i>(<i>K</i>) is the price of a digital that pays CHF 1 if the fixing is above <i>K</i>. That is the discounted probability that it pays ([risk-neutral](/en/glossary/#term-risk-neutral), not a forecast). With <i>K</i> = <Num of="m09.kCoupon" />:
+
+<Formula><i>c</i> · <i>D</i>(<i>K</i>) = 2 · <i>P</i>(<i>K</i>) ⇒ <i>c</i> = <Num of="m09.coupon1" /> pips</Formula>
+
+**3. Coupon range.** Two puts are sold at the lower and two calls at the upper boundary. They pay for a range digital between <Num of="m09.lowR" /> and <Num of="m09.upR" />:
+
+<Formula><i>c</i> · [<i>D</i>(<i>L</i>) − <i>D</i>(<i>U</i>)] = 2 · [<i>P</i>(<i>L</i>) + <i>C</i>(<i>U</i>)] ⇒ <i>c</i> = <Num of="m09.couponRange1" /> pips</Formula>
+
+**4.** The real products have <Num of="m09.fixings" /> fixings over a year and a target. The late fixings carry more time value, and for the TPF the forward even falls below the strike with the interest differential. That is why their coupons are much larger than here. The calculation is in [module 08](/en/module/08-structured-products/4/).
+
+</Derivation>
+
+<Desk title="Strike or coupon: who needs the currency?">
+
+A strike product delivers currency. It suits someone who buys the dollars anyway, such as an importer with a clear view. Anyone who does not need the dollars has to sell them again at the market rate: the better rate turns into a position. A coupon product pays out only francs. It is a pure bet on the view. For both: first work out the loss on a fixing far on the wrong side, then talk about the coupon or the strike.
+
+</Desk>
+
+<Takeaway>
+
+Products for a view turn it into a coupon or a better strike. They are paid for with sold options. The gain is capped; there is no built-in stop for the loss. Alpha is only what remains after the comparison with the forward or the money market, adjusted for risk.
+
+</Takeaway>

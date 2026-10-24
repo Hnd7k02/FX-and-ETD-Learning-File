@@ -1,0 +1,15 @@
+---
+/** Merksatz: one sentence to remember at the end of a section. */
+import { common } from '@/i18n/dict/common';
+import { translator } from '@/i18n/types';
+import { pageLang } from './lang';
+
+const t = translator(common, pageLang(Astro.currentLocale));
+---
+
+<div class="takeaway">
+  <span class="takeaway-label">{t('module.takeaway')}</span>
+  <div>
+    <slot />
+  </div>
+</div>
