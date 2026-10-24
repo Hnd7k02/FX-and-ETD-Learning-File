@@ -28,6 +28,7 @@ import {
   shaperPosition,
   shaperStrikes,
   effectiveRate,
+  type ShaperFacts,
   type ShaperId,
 } from '@/lib/hedge-shaper';
 import {
@@ -57,6 +58,11 @@ export const M06_SCENARIOS = {
   stUp: 0.84,
   /** Weak dollar at expiry. */
   stDown: 0.76,
+  /**
+   * Rate at expiry close to forward and strike (06.1): there a structure with a premium costs
+   * more than both yardsticks, staying unhedged and the forward.
+   */
+  stMid: 0.795,
   /** Parallel shift of the implied vol in section 3 (decimal, +2 vol points). */
   volShock: 0.02,
 } as const;
@@ -92,8 +98,15 @@ const shCall = sh('call');
 const shSpread = sh('call-spread');
 const shCollar = sh('collar');
 const shSeagull = sh('seagull');
-const payAt = (id: ShaperId, st: number) =>
+/** CHF paid for the USD notional at S_T with a structure of the hedge shaper, premium included. */
+export const payAt = (id: ShaperId, st: number) =>
   effectiveRate(shaperPosition(id, MARKET).legs, MARKET, st) * N;
+/**
+ * Lower end of the band where a structure with a premium costs more than both yardsticks: the
+ * forward minus the premium carried to expiry. The upper end is its cap, strike plus premium
+ * (shaperFacts.capRate), as long as the cap holds there.
+ */
+const bandLow = (f: ShaperFacts) => F - f.premiumPips * PIP * growth;
 
 /* ---------- sections 2 and 3: payoff builder templates ---------- */
 const tpl = (id: TemplateId, m: PayoffMarket = MARKET) => {
@@ -169,6 +182,9 @@ export const M06 = {
   forward: F,
   stUp: SC.stUp,
   stDown: SC.stDown,
+  stMid: SC.stMid,
+  callBandLo: bandLow(shCall.f),
+  spreadBandLo: bandLow(shSpread.f),
   volShock: SC.volShock,
   dns: ks.dns,
   straddlePips: straddle.prem.pips,
@@ -231,6 +247,20 @@ export const nums: NumTable = {
     value: payAt('collar', SC.stDown) - SC.stDown * N,
     kind: 'money',
     note: 'What the collar costs against unhedged in the weak-dollar scenario',
+  },
+  'm06.stMid': { value: SC.stMid, kind: 'rate', note: 'Scenario: close to forward and strike' },
+  'm06.midUnhedgedChf': { value: SC.stMid * N, kind: 'money' },
+  'm06.midCallChf': { value: payAt('call', SC.stMid), kind: 'money' },
+  'm06.midSpreadChf': { value: payAt('call-spread', SC.stMid), kind: 'money' },
+  'm06.callBandLo': {
+    value: bandLow(shCall.f),
+    kind: 'rate',
+    note: 'F − premium: from here up to the cap the call costs more than unhedged and forward',
+  },
+  'm06.spreadBandLo': {
+    value: bandLow(shSpread.f),
+    kind: 'rate',
+    note: 'F − net premium: from here up to the cap the call spread costs more than both',
   },
 
   // Section 2: spreads and risk reversal (payoff builder templates, flat vol)

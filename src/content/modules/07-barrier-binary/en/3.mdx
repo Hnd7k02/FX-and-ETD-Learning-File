@@ -2,7 +2,7 @@ import TouchLabFigure from '@/components/figures/TouchLabFigure.astro';
 
 {/* 07 Barrier & Binary · section 3 · Digital and touch. Numbers only via <Num />, registry src/lib/nums/m07.ts. */}
 
-A digital pays all or nothing: a fixed amount if a condition is met. For the importer that is no hedge. The amount does not depend on how far the dollar rises. It is still worth a look: digitals are building blocks of many structures (module 08), and their price reveals which probability the market is pricing in.
+A digital pays all or nothing: a fixed amount if a condition is met. For the importer that is at best a partial hedge: if the dollar is above the strike at expiry, he receives a fixed amount, whether his extra cost is small or large. It is not a proportional hedge like the USD call, and the premium comes on top. With the digital call from the table below, <Num of="m07.digitalNetChf" /> is left after the premium. If the dollar rises to <Num of="m07.digitalMild" />, his extra cost against the strike is <Num of="m07.digitalMildExtraChf" />, at <Num of="m07.digitalStrong" /> already <Num of="m07.digitalStrongExtraChf" />; the fixed amount stays the same. It is still worth a look: digitals are building blocks of many structures (module 08), and their price reveals which probability the market is pricing in.
 
 All examples pay <Num of="m07.payout" /> and run for three months. The bet is always the same question about USD/CHF, just asked differently:
 

@@ -29,7 +29,7 @@ Der Importeur vergleicht zwei Hedges für die Sicht «USD stärker». Das Ergebn
 - **Dollar <Num of="m09.s1Move" /> stärker, USD/CHF <Num of="m09.s1Up" />:** Der Forward bringt <Num of="m09.s1FwdUp" /> Pips, auf USD 1 Mio. also <Num of="m09.s1FwdUpChf" />. Der Call bringt nur <Num of="m09.s1CallUp" /> Pips, weil die Prämie von <Num of="m09.callPremiumPips" /> Pips abgeht.
 - **Dollar <Num of="m09.s1Move" /> schwächer, USD/CHF <Num of="m09.s1Down" />:** Jetzt dreht es. Der Forward bringt <Num of="m09.s1FwdDown" /> Pips, denn der Importeur hätte günstiger kaufen können. Beim Call verfällt nur die Prämie, <Num of="m09.s1CallDown" /> Pips.
 
-Keines der beiden ist «besser». Der Forward ist ideal, wenn die Sicht stimmt. Der Call ist ideal, wenn sie falsch ist. Die Frage lautet also: Welchen Worst Case kannst du tragen? Genau das zeigen die Chips der Matrix.
+Keines der beiden ist «besser». Steigt der Dollar, ist der Forward besser. Fällt er deutlich, ist der Call besser. Fällt er nur leicht, ist die Sicht zwar falsch, der Forward aber trotzdem besser: Bei <Num of="m09.s1Mild" /> bringt der Forward <Num of="m09.s1FwdMild" /> Pips, der Call <Num of="m09.s1CallMild" /> Pips. Erst unter rund <Num of="m09.callBeatsFwd" /> (<Num of="m09.callBeatsFwdPct" /> gegenüber dem Spot) liegt der Kurs weiter als die Prämie unter dem Forward: Dann lohnt sich der Call. Die Frage lautet also: Welchen Worst Case kannst du tragen? Genau das zeigen die Chips der Matrix.
 
 <Derivation title="Herleitung: Warum kein Produkt den Forward gratis schlägt">
 

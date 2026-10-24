@@ -114,6 +114,12 @@ export const M09_CONFIG = {
     fixingStep: 0.0005,
     /** S_T shown first: the importer's fear, a dollar 3 % stronger. Choice. */
     initialMove: 0.03,
+    /**
+     * A dollar only slightly weaker (09.1 text): the view is wrong, yet the forward still beats
+     * the call, because the rate is less than the premium below the forward. Choice: 100 pips
+     * below spot.
+     */
+    mildDownPips: 100,
   },
 } as const;
 

@@ -78,6 +78,10 @@ const P = C.touch.payout;
 const m0 = touchMarket(defaultTouchState());
 const dfd = Math.exp(-rd * T);
 const digital = digitalCash(S, K, T, vol, rd, rf, 'call');
+/** Payout minus premium of the digital call: what is left for the importer when it pays. */
+const digitalNet = P - digital * P;
+const digMild = S * (1 + C.touch.digitalScenarios.mild);
+const digStrong = S * (1 + C.touch.digitalScenarios.strong);
 const spread = callSpreadDigital(m0, K, C.touch.spreadExamplePips * PIP);
 const ot = oneTouch({ S, H: Hu, T, vol, rd, rf });
 const nt = noTouch({ S, H: Hu, T, vol, rd, rf });
@@ -119,6 +123,9 @@ export const M07 = {
   uocDaily,
   mirror,
   digital,
+  digitalNet,
+  digitalMild: digMild,
+  digitalStrong: digStrong,
   spread,
   ot,
   nt,
@@ -228,6 +235,19 @@ export const nums: NumTable = {
   'm07.payout': { value: P, kind: 'money' },
   'm07.digitalChf': { value: digital * P, kind: 'money' },
   'm07.digitalProb': { value: digital / dfd, kind: 'pct', digits: 1, note: 'N(d2) at K' },
+  'm07.digitalNetChf': { value: digitalNet, kind: 'money', note: 'Payout − premium' },
+  'm07.digitalMild': { value: digMild, kind: 'rate', note: 'Scenario: spot + 2.5 %' },
+  'm07.digitalStrong': { value: digStrong, kind: 'rate', note: 'Scenario: spot + 12.5 %' },
+  'm07.digitalMildExtraChf': {
+    value: (digMild - K) * N,
+    kind: 'money',
+    note: 'Extra cost vs the strike on USD 1 Mio. in the mild scenario',
+  },
+  'm07.digitalStrongExtraChf': {
+    value: (digStrong - K) * N,
+    kind: 'money',
+    note: 'Extra cost vs the strike on USD 1 Mio. in the strong scenario',
+  },
   'm07.spreadPips': { value: C.touch.spreadExamplePips, kind: 'pips', digits: 0 },
   'm07.spreadChf': { value: spread * P, kind: 'money' },
   'm07.spreadDiffChf': { value: (spread - digital) * P, kind: 'money', digits: 2 },

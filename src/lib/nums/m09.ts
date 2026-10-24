@@ -37,6 +37,7 @@ const mp = matrixParams();
 const s1Move = M09_CONFIG.matrix.initialMove;
 const s1Up = S * (1 + s1Move);
 const s1Down = S * (1 - s1Move);
+const s1Mild = S - M09_CONFIG.matrix.mildDownPips * PIP;
 const res = (id: Parameters<typeof productResult>[0], x: number) => productResult(id, x, mp) ?? 0;
 
 /* ---------- section 2: the importer's toolbox ---------- */
@@ -88,6 +89,11 @@ export const M09 = {
   s1CallUpPips: pips(res('call', s1Up)),
   s1FwdDownPips: pips(res('forward', s1Down)),
   s1CallDownPips: pips(res('call', s1Down)),
+  s1Mild,
+  s1FwdMildPips: pips(res('forward', s1Mild)),
+  s1CallMildPips: pips(res('call', s1Mild)),
+  /** F − call premium carried to expiry: below it the call beats the forward, above it not. */
+  callBeatsFwd: hs.forward - hs.call.premiumAtExpiry,
   stop: mp.stop,
   limit: mp.limit,
   // section 2
@@ -227,6 +233,21 @@ export const nums: NumTable = {
   'm09.s1CallUp': { value: M.s1CallUpPips, kind: 'pips', digits: 0, sign: true },
   'm09.s1FwdDown': { value: M.s1FwdDownPips, kind: 'pips', digits: 0, sign: true },
   'm09.s1CallDown': { value: M.s1CallDownPips, kind: 'pips', digits: 0, sign: true },
+  'm09.s1Mild': { value: M.s1Mild, kind: 'rate', note: 'Dollar slightly weaker: spot − 100 pips' },
+  'm09.s1FwdMild': { value: M.s1FwdMildPips, kind: 'pips', digits: 0, sign: true },
+  'm09.s1CallMild': { value: M.s1CallMildPips, kind: 'pips', digits: 0, sign: true },
+  'm09.callBeatsFwd': {
+    value: M.callBeatsFwd,
+    kind: 'rate',
+    note: 'F − call premium carried to expiry: below it the call beats the forward',
+  },
+  'm09.callBeatsFwdPct': {
+    value: M.callBeatsFwd / S - 1,
+    kind: 'pct',
+    digits: 2,
+    sign: true,
+    note: 'The same level relative to spot',
+  },
   'm09.stop': { value: M.stop, kind: 'rate', note: 'Stop-loss level, spot + 1 %' },
   'm09.limit': { value: M.limit, kind: 'rate', note: 'Limit level, spot − 1 %' },
   'm09.orderDist': {

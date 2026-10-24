@@ -4,7 +4,8 @@
  * - every <Fact id> exists and its source is listed in sources.md,
  * - no forbidden terms (bank names, "garantiert", "risikolos" outside arbitrage/rates),
  * - no typed-in example or reference values outside <Num>,
- * - no wording retired in Version 6 (RETIRED_V6, Review 2).
+ * - no wording retired in Version 6 (RETIRED_V6, Review 2),
+ * - no wording retired in Version 7 (RETIRED_V7, Review 3, Block A).
  */
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
@@ -243,6 +244,27 @@ const RETIRED_V6_FILES = [
   join(ROOT, 'README.md'),
 ];
 
+/**
+ * Wordings retired in Version 7 (Review 3, Block A: six conclusions that were too absolute),
+ * DE and EN, by point. Checked on the same files as RETIRED_V6.
+ */
+const RETIRED_V7: [point: string, phrase: string][] = [
+  ['A1 yardsticks', 'Jede Optionsstruktur liegt dazwischen'],
+  ['A1 yardsticks', 'Every option structure sits in between'],
+  ['A2 forward or call', 'Der Call ist ideal, wenn sie falsch ist'],
+  ['A2 forward or call', 'The call is ideal if it is wrong'],
+  ['A3 theta', 'Wie viel Wert die Option verliert'],
+  ['A3 theta', 'How much value the option loses'],
+  ['A4 OTC', 'Für Devisen gibt es so etwas nicht'],
+  ['A4 OTC', 'hat keine Börse'],
+  ['A4 OTC', 'Currencies have nothing of the kind'],
+  ['A4 OTC', 'has no exchange'],
+  ['A5 digital', 'Für den Importeur ist das kein Schutz'],
+  ['A5 digital', 'For the importer that is no hedge'],
+  ['A6 accumulator', 'schlägt den Forward nur in ruhigen Märkten'],
+  ['A6 accumulator', 'beats the forward only in calm markets'],
+];
+
 /** Values from the running example and the reference table that must come from <Num>. */
 const REFERENCE_LITERALS = [
   '0.8000',
@@ -452,6 +474,19 @@ describe('content lint', () => {
   });
 
   it.each(RETIRED_V6)('retired in Version 6 (point %s): «%s»', (_point, phrase) => {
+    const hits = RETIRED_V6_FILES.filter((f) => readFileSync(f, 'utf8').includes(phrase)).map((f) =>
+      relative(ROOT, f),
+    );
+    expect(hits).toEqual([]);
+  });
+
+  it('guards the Version 7 wordings: six points, seven phrases per language', () => {
+    expect(RETIRED_V7.length).toBe(14);
+    const points = new Set(RETIRED_V7.map(([p]) => p.split(' ')[0]));
+    expect([...points].sort()).toEqual(['A1', 'A2', 'A3', 'A4', 'A5', 'A6']);
+  });
+
+  it.each(RETIRED_V7)('retired in Version 7 (point %s): «%s»', (_point, phrase) => {
     const hits = RETIRED_V6_FILES.filter((f) => readFileSync(f, 'utf8').includes(phrase)).map((f) =>
       relative(ROOT, f),
     );

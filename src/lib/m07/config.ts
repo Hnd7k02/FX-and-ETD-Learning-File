@@ -139,6 +139,11 @@ export const M07_CONFIG = {
     },
     /** Minimum distance of a barrier from the spot (pips) so a touch is not certain. */
     minGapPips: 10,
+    /**
+     * Two "dollar stronger" scenarios of the 07.3 text, relative to spot (choice: +2.5 % and
+     * +12.5 %): the digital pays the same fixed amount while the importer's extra cost grows.
+     */
+    digitalScenarios: { mild: 0.025, strong: 0.125 },
     /** x-axis of the "price vs level" chart (USD/CHF) and the vol axis of the DNT chart (%). */
     levelDomain: [0.75, 0.85] as [number, number],
     volDomain: [2, 16] as [number, number],

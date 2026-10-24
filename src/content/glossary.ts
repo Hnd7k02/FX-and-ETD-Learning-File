@@ -994,12 +994,12 @@ export const GLOSSARY: GlossaryEntry[] = [
     term: { de: 'Theta', en: 'Theta' },
     aliases: ['Θ', 'Zeitwertverlust', 'time decay'],
     def: {
-      de: 'Wie viel Wert die Option verliert, wenn ein Tag vergeht und sonst nichts passiert. Für den Käufer ist Theta meist negativ: Es ist der Preis für Gamma.',
-      en: 'How much value the option loses when one day passes and nothing else happens. For the buyer theta is usually negative: it is the price of gamma.',
+      de: 'Wie sich der Optionswert ändert, wenn ein Tag vergeht und sonst nichts passiert: Für den Käufer meist negativ, weil Zeitwert verloren geht; dieser Zeitwertverlust (der Gamma-Anteil) ist der Preis für Gamma. Bei FX-Optionen kommt der Zins-Carry dazu: Tief im Geld kann er überwiegen, dann ist Theta positiv.',
+      en: 'How the option value changes when one day passes and nothing else happens: for the buyer usually negative, because time value is lost; that loss of time value (the gamma share) is the price of gamma. In FX options the interest carry comes on top: deep in the money it can dominate, and then theta is positive.',
     },
     module: '05-greeks',
     section: '4',
-    see: ['gamma', 'time-value'],
+    see: ['gamma', 'time-value', 'carry'],
   },
   {
     id: 'rho',

@@ -29,7 +29,7 @@ The importer compares two hedges for the view ‘USD stronger’. He measures th
 - **Dollar <Num of="m09.s1Move" /> stronger, USD/CHF <Num of="m09.s1Up" />:** the forward earns <Num of="m09.s1FwdUp" /> pips, so <Num of="m09.s1FwdUpChf" /> on USD 1m. The call earns only <Num of="m09.s1CallUp" /> pips, because the premium of <Num of="m09.callPremiumPips" /> pips is deducted.
 - **Dollar <Num of="m09.s1Move" /> weaker, USD/CHF <Num of="m09.s1Down" />:** now it turns round. The forward returns <Num of="m09.s1FwdDown" /> pips, because the importer could have bought more cheaply. With the call only the premium is lost, <Num of="m09.s1CallDown" /> pips.
 
-Neither is ‘better’. The forward is ideal if the view is right. The call is ideal if it is wrong. So the question is: which worst case can you bear? That is exactly what the chips in the matrix show.
+Neither is ‘better’. If the dollar rises, the forward is better. If it falls clearly, the call is better. If it falls only a little, the view is wrong, yet the forward is still better: at <Num of="m09.s1Mild" /> the forward returns <Num of="m09.s1FwdMild" /> pips, the call <Num of="m09.s1CallMild" /> pips. Only below roughly <Num of="m09.callBeatsFwd" /> (<Num of="m09.callBeatsFwdPct" /> against spot) does the rate sit further below the forward than the premium: then the call pays off. So the question is: which worst case can you bear? That is exactly what the chips in the matrix show.
 
 <Derivation title="Derivation: why no product beats the forward for free">
 
