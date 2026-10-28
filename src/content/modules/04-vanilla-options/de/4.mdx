@@ -1,0 +1,90 @@
+import PriceDriversFigure from '@/components/figures/PriceDriversFigure.astro';
+import PayoffBuilderFigure from '@/components/figures/PayoffBuilderFigure.astro';
+import WowFigure from '@/components/figures/WowFigure.astro';
+
+Was kostet das Recht des Importeurs? Die Antwort liefert das **Garman-Kohlhagen-Modell**, publiziert <Fact id="gk-1983" />. Es ist Black-Scholes für Devisen: mit zwei Zinsen statt einem, dem der Quote-Währung (CHF, <i>r</i><sub>d</sub>) und dem der Base-Währung (USD, <i>r</i><sub>f</sub>).
+
+Sechs Grössen bestimmen den Preis: Spot, Strike, Laufzeit, Vola und die zwei Zinsen. Fünf davon kennst du: Strike und Laufzeit stehen im Vertrag, Spot und Zinsen zeigt der Markt. Offen ist nur die Vola, und genau darüber handelt der Optionsmarkt.
+
+<PriceDriversFigure caption="Beweg einen Regler. Der Chart zeigt Call (blau) und Put (violett) entlang dieses Treibers, die Pfeile zeigen die Richtung. Die Steigung der Kurve ist der Greek aus Modul 05." />
+
+### Die Formel, alles über den Forward
+
+<Formula variant="accent">
+  <span><i>C</i> = e<sup>−<i>r</i><sub>d</sub><i>T</i></sup> · [<i>F</i> · N(<i>d</i><sub>1</sub>) − <i>K</i> · N(<i>d</i><sub>2</sub>)]</span>
+  <span><i>P</i> = e<sup>−<i>r</i><sub>d</sub><i>T</i></sup> · [<i>K</i> · N(−<i>d</i><sub>2</sub>) − <i>F</i> · N(−<i>d</i><sub>1</sub>)]</span>
+  <span><i>d</i><sub>1,2</sub> = [ln(<i>F</i>/<i>K</i>) ± ½σ²<i>T</i>] / (σ√<i>T</i>)</span>
+</Formula>
+
+Der Spot taucht nur über den Forward <i>F</i> = <i>S</i> · e<sup>(<i>r</i><sub>d</sub> − <i>r</i><sub>f</sub>)<i>T</i></sup> auf. Darum heisst dieses Tool «Forward First».
+
+Im Beispiel: <i>F</i> = <Num of="ex.forward" />, <i>K</i> = <Num of="ex.strike" />, σ√<i>T</i> = <Num of="m04.sigmaSqrtT" />. Daraus folgen <i>d</i><sub>1</sub> = <Num of="ex.d1" /> und <i>d</i><sub>2</sub> = <Num of="ex.d2" />, N(<i>d</i><sub>1</sub>) = <Num of="m04.nd1" /> und N(<i>d</i><sub>2</sub>) = <Num of="m04.nd2" />. Der Abzinsungsfaktor ist <Num of="m04.dfd" />, weil der CHF-Zins <Num of="ex.rd" /> beträgt. Ergebnis: Der Call kostet <Num of="ex.callPips" /> Pips.
+
+| Wenn … steigt | Call | Put | Warum |
+| --- | --- | --- | --- |
+| Spot <i>S</i> | ↑ | ↓ | Der Forward steigt. |
+| Strike <i>K</i> | ↓ | ↑ | Beim Call kaufst du teurer, beim Put verkaufst du teurer. |
+| Laufzeit <i>T</i> | meist ↑ | meist ↑ | Mehr Zeit, mehr mögliche Bewegung. Tief im Geld kann der Zins-Carry überwiegen. |
+| Vola σ | ↑ | ↑ | Grosse Bewegungen werden wahrscheinlicher, der Verlust bleibt begrenzt. |
+| CHF-Zins <i>r</i><sub>d</sub> | ↑ | ↓ | Der Forward steigt. |
+| USD-Zins <i>r</i><sub>f</sub> | ↓ | ↑ | Der Forward sinkt. |
+
+### Put-Call-Parität
+
+Kauf einen Call und verkauf einen Put mit demselben Strike. Bei Verfall bekommst du immer <i>S</i><sub>T</sub> − <i>K</i>: Über dem Strike zahlt der Call, darunter kostet dich der Put. Genau das zahlt auch ein Forward mit Kurs <i>K</i>. Gleiche Auszahlung heisst gleicher Preis heute:
+
+<Formula variant="accent">
+  <i>C</i> − <i>P</i> = e<sup>−<i>r</i><sub>d</sub><i>T</i></sup> · (<i>F</i> − <i>K</i>)
+</Formula>
+
+Im Beispiel liegt der Strike <Num of="m04.parityGapPips" /> Pips unter dem Forward. Also ist der Call um <Num of="m04.parityPips" /> Pips teurer als der Put: <Num of="ex.callPips" /> gegen <Num of="ex.putPips" /> Pips. Liegt der Strike genau beim Forward, kosten Call und Put gleich viel.
+
+Long Call plus Short Put ist darum ein **synthetischer Forward**. Sein Spot-Delta ist <Num of="m04.synthDelta" />, also e<sup>−<i>r</i><sub>f</sub><i>T</i></sup>, und sein Forward-Delta genau 1: Er bewegt sich eins zu eins mit dem Forward.
+
+<PayoffBuilderFigure templates={['synthetic-forward', 'long-forward', 'long-call', 'short-put']} initial="synthetic-forward" caption="Zieh den gemeinsamen Strike K1·2. Die Nettoprämie ist immer DF · (F − K). Zero Cost entsteht genau beim Forward. Vergleiche mit der Vorlage «Forward»." />
+
+### Arbitrage, wenn die Parität nicht gilt
+
+Angenommen, der Call notiert <Num of="m04.arbPips" /> Pips zu teuer. Dann baust du drei Geschäfte:
+
+- Du **verkaufst den teuren Call** und **kaufst den Put**. Das ist ein synthetischer Short Forward: Bei Verfall verkaufst du USD zum Strike, egal wo der Kurs steht.
+- Du **kaufst einen echten Forward** zum fairen Kurs. Damit beschaffst du genau die USD, die du liefern musst.
+- Alle Zahlungen bei Verfall stehen heute fest und sind durch die heutigen Einnahmen gedeckt. Übrig bleibt der Preisfehler: <Num of="m04.arbChf" /> auf USD 1 Mio., heute vereinnahmt, ohne Kursrisiko.
+
+Solche Lücken schliessen Market Maker sofort. Darum gilt die Parität in liquiden Märkten bis auf Kosten und Spreads.
+
+<WowFigure initialPhase={3} autoplay={false} caption="Zusammenfassung in vier Schritten: vom Forward über den Call und den Zeitwert zur Parität. Klick auf 1 bis 4 oder starte die Animation." />
+
+<Derivation title="Herleitung: Parität durch Nachbilden, Garman-Kohlhagen über Black-76">
+
+**Parität.** Portfolio A: Long Call und Short Put mit Strike <i>K</i>. Portfolio B: Long Forward zum Kurs <i>K</i>. Bei Verfall gilt für jedes <i>S</i><sub>T</sub>:
+
+<Formula>
+  <span>max(<i>S</i><sub>T</sub> − <i>K</i>, 0) − max(<i>K</i> − <i>S</i><sub>T</sub>, 0) = <i>S</i><sub>T</sub> − <i>K</i></span>
+</Formula>
+
+Gleiche Zahlungen bei Verfall heissen gleicher Wert heute, sonst gäbe es Arbitrage. Ein Forward zum Kurs <i>K</i> ist heute e<sup>−<i>r</i><sub>d</sub><i>T</i></sup> · (<i>F</i> − <i>K</i>) wert. Daraus folgt <i>C</i> − <i>P</i> = e<sup>−<i>r</i><sub>d</sub><i>T</i></sup> · (<i>F</i> − <i>K</i>). Die Parität braucht kein Modell und keine Vola.
+
+**Garman-Kohlhagen.** Unter dem [risikoneutralen Mass](/glossar/#term-risk-neutral) ist der Erwartungswert des Kurses bei Verfall der Forward <i>F</i>. Das Modell nimmt zusätzlich konstante Vola und keine Sprünge an; dann ist der Kurs bei Verfall lognormal verteilt. Der Erwartungswert der Auszahlung ist der Black-76-Preis auf den Forward. Abgezinst mit dem CHF-Zins ergibt sich
+
+<Formula>
+  <span><i>C</i> = e<sup>−<i>r</i><sub>d</sub><i>T</i></sup> · E[max(<i>S</i><sub>T</sub> − <i>K</i>, 0)] = e<sup>−<i>r</i><sub>d</sub><i>T</i></sup> · [<i>F</i> N(<i>d</i><sub>1</sub>) − <i>K</i> N(<i>d</i><sub>2</sub>)]</span>
+</Formula>
+
+Setzt du <i>F</i> = <i>S</i> · e<sup>(<i>r</i><sub>d</sub> − <i>r</i><sub>f</sub>)<i>T</i></sup> ein, steht da die Spot-Form <i>S</i> e<sup>−<i>r</i><sub>f</sub><i>T</i></sup> N(<i>d</i><sub>1</sub>) − <i>K</i> e<sup>−<i>r</i><sub>d</sub><i>T</i></sup> N(<i>d</i><sub>2</sub>). Der CHF-Zins wirkt zweimal: Er hebt den Forward und er zinst ab. Beim Call überwiegt der erste Effekt.
+
+</Derivation>
+
+<Desk title="Der Markt quotiert Vola, nicht Prämie">
+
+Weil Spot, Zinsen, Strike und Laufzeit beobachtbar sind, bleibt nur die Vola als Verhandlungsgrösse. Market Maker quotieren Optionen deshalb in **impliziter Vola**: Die Prämie folgt dann aus der Formel.
+
+Im Interbankmarkt wird eine Option oft zusammen mit ihrem Delta-Hedge gehandelt. So tauschen die Parteien nur das Vola-Risiko, nicht das Kursrisiko. Wie sich der Preis bei kleinen Änderungen bewegt, messen die Greeks in Modul 05.
+
+</Desk>
+
+<Takeaway>
+
+Spot und Zinsen wirken über den Forward, offen ist allein die Vola. Long Call plus Short Put mit gleichem Strike ist ein Forward: C − P = DF · (F − K).
+
+</Takeaway>

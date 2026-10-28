@@ -1,0 +1,73 @@
+---
+/** Hero of the home page (B-Home): chip, H1, lead and the two calls to action. */
+import ArrowIcon from '@/components/layout/ArrowIcon.astro';
+import { common } from '@/i18n/dict/common';
+import { modulePath, riskometerPath } from '@/i18n/routes';
+import { translator, type Lang } from '@/i18n/types';
+import { MODULES } from '@/data/modules';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = translator(common, lang);
+const first = MODULES[0]!;
+---
+
+<div class="hero-copy">
+  <span class="chip chip-outline hero-chip">
+    <span class="dot" style="background: var(--ff-linear)" aria-hidden="true"></span>
+    {t('site.tagline')}
+  </span>
+  <h1 id="hero-h" class="h1-hero">
+    {t('home.h1')}
+  </h1>
+  <p class="lead hero-lead">{t('home.lead')}</p>
+  <div class="hero-actions">
+    <a
+      class="btn btn-dark btn-lg"
+      href={modulePath(lang, first.slug, '1')}
+      data-cta
+      data-tpl-continue={common[lang]['home.ctaContinue']}
+      data-tpl-start={common[lang]['home.ctaStart']}
+    >
+      <span data-cta-label>{t('home.ctaStart')}</span>
+      <ArrowIcon />
+    </a>
+    <a class="btn btn-light btn-lg" href={riskometerPath(lang)}>
+      {t('home.ctaRiskometer')}
+    </a>
+  </div>
+</div>
+
+<style>
+  .hero-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    max-width: 860px;
+  }
+  .hero-chip {
+    align-self: flex-start;
+    padding: 6px 14px;
+    font-size: 13px;
+    background: var(--ff-surface);
+  }
+  .hero-lead {
+    max-width: 720px;
+  }
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding-top: 4px;
+  }
+  @media (max-width: 640px) {
+    .hero-copy {
+      gap: 14px;
+    }
+    .hero-lead {
+      font-size: 17px;
+    }
+  }
+</style>

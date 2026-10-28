@@ -1,0 +1,51 @@
+---
+/** 404 page (served by the static host for unknown routes). German first, with an English line. */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import ArrowIcon from '@/components/layout/ArrowIcon.astro';
+import { common } from '@/i18n/dict/common';
+import { home } from '@/i18n/dict/home';
+import { homePath } from '@/i18n/routes';
+import { translator } from '@/i18n/types';
+
+const t = translator(common, 'de');
+const th = translator(home, 'de');
+---
+
+<BaseLayout lang="de" title={`${t('notFound.title')} · ${t('site.name')}`} altPath={homePath('en')}>
+  <main class="container not-found">
+    <p class="chip chip-neutral chip-mono" aria-hidden="true">
+      404
+    </p>
+    <h1 class="h1-hero">{t('notFound.title')}</h1>
+    <p class="lead">{t('notFound.text')}</p>
+    <div class="actions">
+      <a class="btn btn-dark btn-lg" href={`${homePath('de')}#lernpfad`}>
+        {th('notFound.cta')}
+        <ArrowIcon />
+      </a>
+      <a class="btn btn-light btn-lg" href={`${homePath('en')}#lernpfad`} hreflang="en" lang="en">
+        {th('notFound.alt')}
+      </a>
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  .not-found {
+    padding-top: 72px;
+    padding-bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 18px;
+  }
+  .not-found .lead {
+    max-width: 720px;
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding-top: 6px;
+  }
+</style>

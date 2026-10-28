@@ -1,0 +1,630 @@
+# Decisions
+
+Format: `D-xx · date · origin`, then question, decision, reasoning. Origin is `Dario`, `Claude, von Dario bestätigt` or `Claude`.
+
+## D-01 · 2026-10 · Dario
+
+**Question:** What kind of tool is this?
+**Decision:** A pure education tool without any reference to a bank.
+**Reasoning:** No names of banks, firms, people or clients; no internal terms or processes. Keeps the tool neutral and shareable as a portfolio piece.
+
+## D-02 · 2026-10 · Dario
+
+**Question:** Language?
+**Decision:** German with English technical terms, fully switchable to English.
+**Reasoning:** The target audience works in Switzerland; the desk speaks English terms.
+
+## D-03 · 2026-10 · Dario
+
+**Question:** How deep?
+**Decision:** Intuition and worked examples first, formulas collapsible; focus on moneyness, forward, arbitrage and the six Greeks with derivations.
+**Reasoning:** Beginners stay with the story, the curious can open every derivation.
+
+## D-04 · 2026-10 · Claude, von Dario bestätigt
+
+**Question:** Structure?
+**Decision:** Nine modules that build on each other (01 Spot … 09 Hedge, Alpha, Yield).
+**Reasoning:** Linear → options → exotics → application mirrors how the instruments are built from each other.
+
+## D-05 · 2026-10 · Dario
+
+**Question:** Design direction?
+**Decision:** Direction B "Lernpfad" instead of A "Dashboard".
+**Reasoning:** A path invites learning in order; a dashboard invites browsing.
+
+## D-06 · 2026-10 · Dario
+
+**Question:** How to show the Riskometer?
+**Decision:** As a gauge (Tacho), not a bar.
+**Reasoning:** Immediately readable, memorable.
+
+## D-07 · 2026-10 · Claude, von Dario bestätigt
+
+**Question:** Name?
+**Decision:** "Forward First".
+**Reasoning:** The red thread: everything is reduced to the forward.
+
+## D-08 · 2026-10 · Claude, von Dario bestätigt
+
+**Question:** Navigation between modules?
+**Decision:** No module wheel; the transition station → module header stays.
+**Reasoning:** Less gimmick, the learning path stays the home base.
+
+## D-09 · 2026-10 · Dario
+
+**Question:** Extras?
+**Decision:** Running example, G10 profiles, franc-shock case, quiz per module, Riskometer with real data.
+**Reasoning:** Each extra connects the theory to something concrete.
+
+## D-10 · 2026-10 · Claude
+
+**Question:** Stack and output?
+**Decision:** Astro, TypeScript, Preact. Updated 2026-10-23: no hosting; the output is one offline HTML file `forward-first.html` built from the Astro output (D-13, D-40). The original choice was hosting on Cloudflare.
+**Reasoning:** Static output, islands only where interaction is needed. Static pre-rendering is exactly what the single file needs: every page is rendered once at build time and packed into the file, so calculation core, components and content stay unchanged.
+
+## D-11 · 2026-10 · Claude
+
+**Question:** Data source for the Riskometer?
+**Decision:** ECB euro foreign exchange reference rates.
+**Reasoning:** Official, free, daily, long history since 1999, stable API.
+
+## D-12 · 2026-10 · Claude, von Dario bestätigt
+
+**Question:** Riskometer method?
+**Decision:** 21 log returns, zero mean, annualised with √252; percentiles of all daily values since 2006 per pair; five levels at P20/P60/P85/P97.
+**Reasoning:** A one-month window reacts quickly but not nervously; percentiles make the pairs comparable.
+
+## D-13 · 2026-10-23 · Dario
+
+**Eine Offline-HTML-Datei für Arbeits-PC und iPad, kein Hosting, kein Login**
+
+**Question:** How does Dario use Forward First: hosted site or file?
+**Decision:** Forward First is one HTML file, `forward-first.html`, that runs offline on the work PC (Chrome and Edge, double click) and in the iPad Files app (WebKit). No hosting, no PWA, no Cloudflare, no login. Everything is inside the one file: CSS, JavaScript, fonts (subset), Riskometer data, both languages. No external files and no network requests, enforced by a Content-Security-Policy meta tag. Target under 3 MB, at most 5 MB. Navigation by hash routing inside the file (e.g. `#/module/05-greeks/2/`). Optional features are feature-detected with a fallback: View Transitions for station → module, Monte Carlo without a Web Worker in small chunks on the main thread, progress in `localStorage` (if blocked, the tool runs without saved progress). The data update is manual: fetch ECB data, validate, test, build the file, publish it as a GitHub Release; no daily cron; the tool shows the data date. Tests open the built file over `file://` in Chromium (1440 × 900) and WebKit (iPad 820 × 1180 and 1180 × 820) with the network blocked; any request fails the test. Lighthouse and the 120 KB JS budget are dropped.
+**Evidence:** Device test by Dario on 2026-10-23: a local test HTML file with inline JavaScript runs in the iPad Files app and on the work PC by double click; the iPad does not load side files there, so everything has to be in one file.
+**Reasoning:** The tool is used where hosting is not an option; one file is the only format that works on both devices. Replaces the earlier D-13 (Cloudflare Workers Static Assets, 2026-10-22), which is void; `wrangler.jsonc` and the daily data cron are removed.
+
+## D-14 · 2026-10-22 · Claude
+
+**Question:** Exact versions?
+**Decision:** Node 24 LTS, Astro 7.4, TypeScript 6.0, Preact 10.29, Vitest 5, Playwright 1.56, ESLint 10.
+**Reasoning:** Astro 7 requires Node ≥ 22.23; Node 24 is the active LTS. TypeScript 7 (native port) is not yet supported by `astro check` and typescript-eslint, so 6.0. Preact 10 is the long-proven line; the islands use only hooks, an upgrade to 11 is a one-line change. Playwright 1.56 matches the Chromium build preinstalled in the build sandbox; CI installs its own browser.
+
+## D-15 · 2026-10-22 · Claude
+
+**Question:** The build sandbox cannot reach the ECB API. Where does the first data snapshot come from?
+**Decision:** The initial `data/raw/ecb-eur-reference.csv` was converted from the ECB's official `eurofxref-hist.zip` (as bundled unchanged in the PyPI package CurrencyConverter 0.18.22, data until 14.09.2026). From then on the daily GitHub Action fetches directly from the ECB Data Portal API and overwrites the file.
+**Reasoning:** Same ECB reference rates, same values; only the delivery route differs. Documented so nobody wonders why the first commit predates the API fetch.
+
+## D-16 · 2026-10-22 · Dario
+
+**Question:** Stop after every phase?
+**Decision:** No. In this session Claude works through as many phases as possible without waiting for "weiter", records open questions in `PROGRESS.md` and decides small things itself.
+**Reasoning:** Dario's instruction at the start of the session ("so weit du kannst", focus on learning value and wow effect).
+
+## D-17 · 2026-10-22 · Claude
+
+**Question:** How is content organised so that numbers stay honest?
+**Decision:** One MDX file per section and language. Numbers via `<Num of="ns.key" />` from per-namespace registries in `src/lib/nums/` (merged automatically), facts via `<Fact id="…" />` from `src/content/facts/`, sources in `src/content/sources.md`. A content lint fails on unknown keys, missing sources, forbidden words and typed-in reference values.
+**Reasoning:** Per-namespace files let modules be written in parallel without merge conflicts; the lint makes the integrity rule enforceable instead of a promise.
+
+## D-18 · 2026-10-22 · Claude
+
+**Question:** The B-Modul prototype shows a quiz card inside a section, the brief has a separate quiz page. Which one?
+**Decision:** Both. Every section ends with one ungraded "Kurz geprüft" question (retrieval practice); the quiz page per module has the four graded questions (pass from 3 of 4).
+**Reasoning:** Matches the prototype and the brief; a question right after reading is one of the most effective learning techniques.
+
+## D-19 · 2026-10-22 · Claude
+
+**Question:** Language switch: buttons (prototype) or links?
+**Decision:** Links styled as the prototype's segmented control, with `hreflang` and `aria-current`. The choice is stored (`ff-lang`); the German home page sends a visitor who chose English to `/en/` once per browser session.
+**Reasoning:** The switch navigates to another page, so a link is the correct element.
+
+## D-20 · 2026-10-22 · Claude
+
+**Question:** Normal distribution accuracy?
+**Decision:** Hart/West double-precision algorithm for N(x) (error < 1e-14) and Acklam + Halley step for N⁻¹, instead of the Abramowitz-Stegun 7.1.26 approximation in the prototypes (error ≈ 1e-7).
+**Reasoning:** The tests compare against the Python reference down to 1e-10 (parity); the prototype formula is good enough for the eye but not for the tests.
+
+## D-21 · 2026-10-22 · Claude
+
+**Question:** Minus sign and English percent?
+**Decision:** Typographic minus (U+2212) in both languages; English percent without a space ("8%").
+**Reasoning:** Matches the prototypes; en-GB convention has no space before the percent sign.
+
+## D-22 · 2026-10-22 · Dario
+
+**Question:** How to handle choices Claude is unsure about while Dario is away?
+
+**Decision:** Decide, and make the choice easy to change later: every uncertain parameter lives in one clearly named, documented config object (e.g. the running example in `src/lib/fx/example.ts`, module structure in `src/data/modules.ts`, product parameters in `PRODUCT_DEFAULTS` in `src/lib/fx/mc/products.ts`, Riskometer method constants in `src/lib/data`), never as scattered literals. Each such choice gets an entry here or an open question in `PROGRESS.md`.
+
+**Reasoning:** Dario's instruction during the session ("if you're not sure … code it so we can change it easily later").
+
+## D-23 · 2026-10-22 · Claude
+
+**Question:** Where do glossary chips link to?
+
+**Decision:** To the exact section where the term is taught (optional `section` per glossary entry), not always to section 1.
+
+**Reasoning:** One click to the explanation instead of searching through the module. Change per term in `src/content/glossary.ts`.
+
+## D-24 · 2026-10-22 · Claude
+
+**Question:** Conventions of the closed-form exotics?
+
+**Decision:** Knock-out rebates are paid at the hit, knock-in rebates at expiry (Haug). `oneTouch` pays at expiry by default (`payAt: 'hit'` optional), the usual interbank FX convention; with the CHF rate at 0 % both are equal in the example. European digitals pay ½ exactly at the strike. Pay-at-hit values with negative rates use a quadrature in u = √t (the uniform-in-t version was off by up to 6e-6 per unit near the barrier; found and fixed by the verification agent). Very low vols are computed in log space; vol ≤ 0 follows the forward path instead of throwing. The Double No-Touch uses Hui's series with an automatic number of terms, or 1 − two single touch probabilities when the chance of touching both barriers is provably below 1e-16.
+
+**Reasoning:** Matches the literature, never breaks a slider at an edge, verified against independent formulations (method of images, first-passage quadrature, image-sum DNT, PDE) to 1e-12, see `docs/reference/xcheck/`.
+
+## D-25 · 2026-10-22 · Claude
+
+**Question:** How exact is the hedge roll in module 03?
+
+**Decision:** Near leg at current spot; the all-in rate is old forward + swap points; interest on the cash settlement between roll date and new maturity is ignored and said so in the text.
+
+**Reasoning:** Keeps the teaching example readable; the historical-rate rollover and the settlement interest are desk details mentioned in prose.
+
+## D-26 · 2026-10-22 · Claude
+
+**Question:** How to split theta in the texts?
+
+**Decision:** `ex.thetaGammaChf` = −½σ²S²Γ/365 · N (CHF −69.33), `ex.thetaDayChf` = one-day difference (CHF −30.82, shown in the lab), and the carry part `ex.thetaCarryChf` is the residual of the two (CHF +38.50), so the parts add up to the number on screen. The analytic carry term (CHF +38.66) differs by the second-order effect of the one-day step; the derivation says so.
+
+**Reasoning:** Learners check sums; numbers that do not add up undermine trust.
+
+## D-27 · 2026-10-22 · Claude
+
+**Question:** Smile example values for module 06?
+
+**Decision:** `EXAMPLE_SMILE = { atm: 8 %, rr25: −1.0 %, bf25: 0.25 % }` in `src/lib/fx/example.ts`, labelled as example values.
+
+**Reasoning:** A negative risk reversal illustrates the typical demand for CHF calls as protection; the size is a round, plausible teaching value, not market data. One place to change.
+
+## D-28 · 2026-10-22 · Claude
+
+**Question:** Monte Carlo engine and product conventions (§7, §8.7)?
+
+**Decision:** xoshiro128\*\* (SplitMix32 seeding), Marsaglia polar normals, exact log-Euler GBM with drift rd − rf, daily steps, antithetic pairs, 1’000’000 paths for the precomputed fair values (seed 20261022), 20’000 paths for interactive runs in a Web Worker. Conventions, all in `MC_CONFIG` (`src/lib/fx/mc/products.ts`): no trade on the knock-out fixing of accumulator/decumulator; the last TARF gain is capped to the target; weekly fixings every 7 calendar days, monthly on day round(i·365/12), no business-day adjustment, settlement on the fixing day; Pivot TARF, TPF and RTPF use USD 100’000 per fixing and 12 monthly fixings (not specified in §8.7, copied from the TARF); dual currency interest Act/360, only the capital is converted. Fair values carry a standard error from the delta method; an independent re-implementation reproduced every value within 1.5 standard errors.
+
+**Reasoning:** Reproducible, fast enough (precompute 25 s), every convention changeable in one place; `npm run data:mc` regenerates `src/data/fx/mc-products.json` and a test fails if the JSON no longer matches the config.
+
+## D-29 · 2026-10-22 · Claude
+
+**Question:** The §8.7 parameters give a TARF that reaches its 500-pip target after about 2.4 fixings in 94 % of paths, and TPF/RTPF coupons of about 775–810 pips per fixing. Change the parameters?
+
+**Decision:** Keep Dario's parameters for now and teach the consequence: a target caps the good scenarios (the product ends early) while the bad scenarios run to maturity with double amounts — the asymmetry is the central TARF lesson. The large TPF/RTPF coupons are explained by the strike being set relative to the spot while the forward falls by the interest differential (strike above the 1-year forward). The "better than forward" comparison uses the forward at the average scheduled fixing day. Alternatives measured by the MC agent (TARF target 1’500 pips: K = 0.7540, about 6 fixings; Pivot TARF target 1’000 pips: about 5 fixings) are listed as an open question for Dario.
+
+**Reasoning:** The spec names the parameters as examples; changing them silently would contradict D-16/D-22, and the current values produce a valuable teaching point. Changing them is one edit in `MC_CONFIG` plus `npm run data:mc`.
+
+## D-30 · 2026-10-22 · Claude
+
+**Question:** The approved prototype text for 2008 names the failed investment bank; D-01 forbids bank names.
+
+**Decision:** Neutral wording ("eine grosse US-Investmentbank" / "a major US investment bank") for now; listed as an open question for Dario.
+
+**Reasoning:** When two of Dario's rules collide, the stricter one wins until he decides. One-line change in `src/data/events.json`.
+
+## D-31 · 2026-10-22 · Claude
+
+**Question:** How do the Riskometer event texts stay true to the data?
+
+**Decision:** Every computed number in `src/data/events.json` is a placeholder filled at build time (`{from}`, `{to}`, `{movePct}`, `{peak}`, `{peakDate}`, plus `{dayDate}`, `{dayMovePct}`, `{dayMoveAbsPct}`, `{volBefore}`, `{peakLevel}`); pair-specific sentences go into `pairNote[pair]`. Tests check each qualitative statement against the data. Corrections made because the ECB fixings say otherwise: EUR/CHF did not close below parity in March 2022 (ECB low 1.0056; the text now says "lowest since January 2015"); the 2015 move window runs to 23.01.2015 (ECB low); the fiscal-2025 peak window is anchor to +20 trading days (otherwise the April 2025 tariff turmoil would count). Claims without an official source were dropped ("within minutes", "largest Bund yield jump since 1990").
+
+**Reasoning:** The prototype used Fed noon rates; the build uses ECB fixings (D-11), so a few statements had to follow the data, not the other way round.
+
+## D-32 · 2026-10-22 · Claude
+
+**Question:** Deviations of the home page from the B-Home prototype?
+
+**Decision:** The Wow chart's SVG renders 1:1 in CSS pixels (viewBox = container width) so labels stay 13 px at every width, compact layout under 640 px; the phase-3 clock ends at 91.25 days (T = 0.25, "3 Monate"); the Riskometer card uses its visible text as accessible name (an aria-label failed axe "label-content-name-mismatch"); the learning path becomes a vertical list under 640 px; level chip icon up for levels ≥ 3, dash for 2, down for 1.
+
+**Reasoning:** Readability on phones, accessibility, and the spec's T = 0.25.
+
+## D-33 · 2026-10-22 · Claude
+
+**Question:** Deviations of the module template from B-Modul?
+
+**Decision:** Stepper items are links (44 px; numbers only under 640 px with full labels for screen readers); the per-section question is titled "Kurz geprüft" with the hint "ohne Wertung", the quiz page uses "Frage n von 4"; derivations are collapsed (§10) with the worked example visible above; appear animations are transform-only (opacity fades failed contrast checks mid-animation); `/module/{slug}/` uses Astro's static redirect page.
+
+**Reasoning:** Brief §10 and accessibility take precedence over the static prototype.
+
+## D-34 · 2026-10-22 · Claude
+
+**Question:** Rendering details found during integration.
+
+**Decision:** `<Num>`/`<Fact>` render with `set:text` (formatting could otherwise add spaces around values); `.formula` is a block with `width: fit-content` where plain child `<span>`s are lines and inline elements stay inline; Vitest's persistent module cache is off because the registries use `import.meta.glob` and new files would stay invisible.
+
+**Reasoning:** Bugs reported by the template agent; fixed centrally so no module has to work around them.
+
+## D-35 · 2026-10-23 · Claude
+
+**Question:** Deviations of the Riskometer page from the prototype?
+
+**Decision:** All four pairs active; H1 follows the pair (Franken / Euro / Yen). Event markers sit on the highest weekly value between the anchor week and the daily-peak week (otherwise the 2015 dot would sit at the foot of the cliff, because the 15.01. return leaves the 21-day window the day after the daily peak). Under 640 px the event buttons become a chip row below the chart (44 px hit areas would overlap on the chart). Year tags lift a row when they collide. The chart fills the card height with 12 px labels. Deep links `?pair=EURUSD&event=gfc-2008` are read on load and written after an interaction. Default events and all timings in `RISKOMETER_UI` (`src/lib/riskometer-ui.ts`).
+
+**Reasoning:** Fidelity where the prototype works, deviations where real data or touch targets require it.
+
+## D-36 · 2026-10-23 · Claude
+
+**Question:** `@axe-core/playwright` pulled a second, newer `playwright-core`, which broke `astro check` on the e2e specs.
+
+**Decision:** `overrides: { "playwright-core": "1.56.1" }` in `package.json`, matching `@playwright/test` (D-14).
+
+**Reasoning:** One Playwright version in the tree, types agree, no casts in the specs.
+
+## D-37 · 2026-10-23 · Claude
+
+**Question:** Plus Jakarta Sans has no Greek glyphs; system fallbacks drew ν like a "v".
+
+**Decision:** STIX Two Text is the second family in `--ff-font-ui`, so Greek letters in UI text fall back per glyph to the formula font (its Greek subset is self-hosted and loaded only when needed via `unicode-range`).
+
+**Reasoning:** Δ, Γ, ν, Θ, ρ, σ look the same in labels and formulas; no extra request for pages without Greek letters.
+
+## D-38 · 2026-10-23 · Claude
+
+**Question:** Choices made while building modules 04, 05, 07 and 08 that Dario may want to change?
+
+**Decision:** Kept as built, each in one config object:
+
+- 04: strikes named by spot delta (USD/CHF practice is premium-adjusted; the desk box says so) — `strikeMarkers` in `src/lib/moneyness.ts`; the moneyness explorer starts at the exact forward (pure time value 126.5 pips), the builder at the rounded strike 0.7930 (126.69 pips), explained in the text; short-put maximum loss shown as K − premium ("if USD/CHF fell to zero").
+- 05: the carry part of theta is shown as the rounded residual so −69 + 38 = −31 on screen (extends D-26); rho mode has sliders for both interest rates; lab limits in `LAB_CONFIG`, `LEVER_CONFIG`, `GT_CONFIG`.
+- 07: barriers at spot × 1.03 / × 0.97 (same as the MC window barrier), hypothetical orders in the franc-shock replay (stop at 1.1950, knock-outs at 1.18/1.15/1.10/1.05), fill at the first fixing beyond the level — `M07_CONFIG`.
+- 08: products compared with a forward hedge of the planned amount (accumulator, decumulator, TARF); pivot TARF, TPF, RTPF show gains/coupons received; start scenarios, speeds and DCI defaults in `PATHSIM_CONFIG` and `DCI_CONFIG`.
+
+**Reasoning:** D-22; the module texts explain each choice where it matters.
+
+## D-39 · 2026-10-23 · Claude
+
+**Question:** How is content quality checked beyond the authors' own tests?
+
+**Decision:** Every module gets a second, fresh review agent that did not write it (finance correctness, numbers, didactics, DE/EN language, figures at 1440/390 px, accessibility) and fixes findings directly. First round (modules 04, 05, 07, 08) corrected, among others: "spot has no vol" → "no vega"; reversed cause and effect for vanna/volga; gamma/vega peaks described "at the strike" although on the spot axis they sit near ATMF; sign wording ("kostet CHF −45"); unequal bar tracks in the levers figure; module-specific findings are in the review reports. Shared follow-ups done centrally: the quiz card strips a leading verdict word from explanations, Markdown tables render in a focusable scroll region, nice ticks tolerate float noise, stat rows without a symbol use two columns, italic variables get a hair space, glossary corrections (intrinsic value, gamma near ATMF, accumulator knock-out at the barrier, target = profit goal) and new terms vanna, volga, premium-adjusted delta.
+
+**Reasoning:** Authors miss their own mistakes; an adversarial second reader is cheap compared to a wrong explanation in a learning tool.
+
+## D-40 · 2026-10-23 · Claude
+
+**Question:** How is the single file built with the smallest change to the existing code?
+**Decision:**
+
+- `npm run build` runs the Astro build as before and then `scripts/build-offline.ts`. The script reads every pre-rendered page from `dist/`, keeps the content of `#main`, the top navigation and the footer per language, and packs all pages as JSON, gzip and Base64 into one `<script type="application/octet-stream">` block (about 0.45 MB instead of 2.2 MB). Redirect pages become route aliases.
+- Islands: Astro's server markup is dropped, `component-url` becomes `data-ff-island="Name"`, and one esbuild bundle (IIFE, Preact, all 38 islands, the page scripts from `src/client/`, `fflate` for gunzip) renders them with the same props. The page scripts listen to `astro:page-load` as on the web, so they run unchanged after each route change.
+- Router (`src/offline/main.tsx`): `#/path/?query#anchor`, aliases, 404 per language, scroll memory for back/forward, focus to `#main` plus an announcement on every route change, internal links rewritten from `/…` to `#/…`. Clicks change the route with `history.pushState` (no navigation at all, so embedded web views such as the iPad Files preview cannot block it), with a plain hash change as fallback; back/forward via `popstate` and `hashchange`. Islands read and write their query through `src/lib/url.ts`, which works for both hash routes and normal URLs.
+- Fonts: the Fontsource woff2 subsets that the pages need (Plus Jakarta Sans latin 400–800, JetBrains Mono latin 500/600, STIX Two Text latin and greek 400/500 regular/italic) as data URIs; other subsets are dropped.
+- CSP: `default-src 'none'`; the one inline script is allowed by its SHA-256 hash; styles inline; images and fonts only from `data:`; `connect-src 'none'`. The build fails if anything still points outside the file or the file exceeds 5 MB.
+- Monte Carlo: `createInlineMcClient` runs `priceChunked` in chunks of 1’000 paths and yields to the browser between chunks; same random sequence and result as the worker version (unit test), so D-28 stays valid except for "in a Web Worker".
+- The Astro web build (`dist/`) stays as a build stage and as the test harness for the detailed component tests (`npm run e2e:web`, incl. axe); it is not deployed.
+- CI runs on `ubuntu-24.04` because Playwright 1.56 has no browser builds for Ubuntu 26.04 (the `ubuntu-latest` image since October 2026). WebKit cannot be installed in the Claude sandbox, so the WebKit runs happen in CI.
+- Releases are tagged `vYYYY.MM.DD-<run>` and titled with the ECB data date.
+- Device hardening after a review round (three reviewers for iPad WebKit, PC `file://` browsers and router state; every finding checked by a skeptic): touches that start on an SVG chart handle with `touch-action: none` cancel page panning in JS, and handles that drag only sideways (`touch-action: pan-y`) do so once the first move is clearly sideways (`src/client/svg-touch.ts`), because iPadOS before WebKit bug 309293 (fixed March 2026) ignores touch-action on SVG child elements; animation loops clamp the frame step (`src/lib/anim.ts`; a negative first step crashed the franc-shock replay); ResizeObserver updates are applied in the next frame; unknown English routes fall back to the 404 page; the data block stays in the document so a copy saved with Ctrl+S still starts (an incomplete copy shows a message instead of hanging); in-page anchors mark the target (`data-target`, stands in for `:target`) and move focus there; a link to the open page adds no history entry and keeps the island's state (a remount for another query replaces the entry); "Weiterlernen" follows progress changes on the page; the learning path card is the containing block of its hidden labels (they widened the page to 998 px between 640 and 1000 px).
+
+**Reasoning:** Reuses the whole Astro pipeline (MDX, `<Num>`, i18n, components) instead of rebuilding the site as a client-only app; the only new runtime code is the router and the island mount. All settings are in the build script (D-22).
+
+## D-41 · 2026-10-23 · Review 23.10.2026
+
+**Transport-Regel: die Datei übersteht den Mailversand**
+
+**Question:** The file reaches the work PC by e-mail. On the way, backslash + n turned into a real line break; in Version 1 one such escape (the word-split regex `/[ \t\r\n]+/`) was a SyntaxError and the page stayed at "loading". How do we make sure that cannot happen again?
+**Decision:** The rule is built into `scripts/build-offline.ts` (helpers in `scripts/lib/transport.ts`, `semantics.ts`, `filecheck.ts`, `version.ts`). Revised by the binding supplement of 23.10.2026:
+
+- The rule holds for every byte of the file (HTML, CSS, JS): only 0x0A and 0x20–0x7E, and only the escapes that arrived intact in the mail test: `\uXXXX` (exactly 4 hex digits), `\\`, `\/`, `\.`, `\{`, `\}`, `\d`, `\s`, `\w`, `\B`.
+- esbuild with `charset: 'ascii'` and `supported: { 'unicode-escapes': false }`, so characters above U+FFFF come as surrogate pairs, never as `\u{…}`. esbuild leaves non-ASCII raw in regex literals, so the source writes them as `\uXXXX` (Quiz.tsx, en and em dash).
+- The scanner reads backslash pairs from left to right and rewrites only three things, each with the same meaning in strings, templates, regular expressions with and without `u`/`v` and character classes: `\n \r \t \v \f` → `\u000a \u000d \u0009 \u000b \u000c`; `\xHH` → `\u00hh`; an escaped backslash directly before n, r or t → `\u005c`. Every other escape stays; if it is not on the list, the build stops with script index, position and context. Back-references, `\b`, `\0`, `\u{`, `\p{`, `String.raw` and a trailing backslash are never reinterpreted.
+- Proof of meaning: esbuild output and written script are parsed with acorn (`ecmaVersion: 'latest'`) and compared without start, end and raw; strings by value (a directive by its raw text), templates by their cooked value (tagged templates also raw), regular expressions by flags and the pattern tree of `@eslint-community/regexpp` (code points). Any difference stops the build. devDependencies `acorn` 8.19.0 and `@eslint-community/regexpp` 4.12.2 (exact versions).
+- Every check runs on the bytes of the written file read back from disk (a temporary file, renamed only when everything passes): bytes, escapes, mail simulation (also the worst case `\r` → CR, `\t` → TAB), no ES module, data block plain base64 and never compiled, `vm.Script` only for the two classic scripts (main script, diagnostics), the CSS has only escapes that start with a tested pair and end unambiguously (a space follows when a hex digit or whitespace comes next) and decodes to its source, the lengths the diagnostics expects are the characters as written.
+- HTML text as `&#N;`. CSS escapes only `\d…` and `\B…`: today `\d7` (×) and `\B7` (· in the glossary). Any other special character in CSS goes into the markup as an HTML entity and is shown with `content: attr(data-…)`; the build stops otherwise.
+- CSP `script-src 'unsafe-inline'` instead of a sha256 hash: a character changed in transport must not block the script silently. `default-src 'none'`, `connect-src 'none'` and all other locks stay.
+- Start diagnostics (`src/offline/diagnose.ts`, before the data block): `window.__FF_OFFLINE__` is the first statement of the main script, `window.__FF_READY__` is set once the first page is on screen. If it is not ready after 4 s, a yellow box shows version, both flags, the lengths of data block and main script against the build, «lokal» or «Netzlaufwerk» (no path, no server name), browser, CSP violations and JS errors (text only).
+- The version number lives only in `OFFLINE_VERSION` (`scripts/lib/version.ts`); date = build date in Europe/Zurich, from `SOURCE_DATE_EPOCH` when set. `release/forward-first.html` and `release/forward-first-v5.html` are byte-identical (SHA-256 checked by the build and the offline tests).
+- Browser test (Playwright over `file://`): umlauts, «», ’, Δ and σ in DE and EN and × and · from the CSS arrive on screen.
+
+**Reasoning:** The mail test showed exactly which escapes arrive intact; everything else is rewritten into those forms or fails the build, so a broken file can no longer be produced. The diagnostics box makes a future transport problem visible on the device instead of a silent "loading".
+
+## D-42 · 2026-10-23 · Review 23.10.2026
+
+**Tween-Regel: Werte, die einem Regler folgen, laufen nicht hinterher**
+
+**Question:** Two device reports: in "Option oder Forward?" (04.1) the dots jumped off their lines while the slider moved, and in the barrier lab (07.2) the parity bar ran in bursts. Measured cause: animations on values that follow a slider (a 300 ms ease-in-out restarted on every input starts at speed zero; a CSS width transition restarted on every change).
+**Decision:**
+
+- `useTween`: a target that arrives while an animation runs or within its duration after the last change jumps; only a single, isolated change (toggle, preset, reset) animates (`tweenShouldJump`, `src/lib/anim.ts`). Covers mouse, touch and keyboard, also where no drag flag is set.
+- Dots that sit on a line are never tweened: OptionVsForward uses the costs directly; HedgeShaper and HedgeCompare take the dot height from the same samples as the drawn curve (`polylineAt`), so the dot stays on the line also while a block toggle morphs the curve.
+- No CSS transition on a property that follows a slider: the barrier lab's parity bars and the CarryCushion meter lost theirs. Audited and kept (discrete changes only): button and hover effects, toggle switches, the PriceDrivers arrows, the HedgeCompare row reordering, the path simulator's ensemble bars, the derivation icon.
+- Parity bar: padding only when a label is shown, so a zero KO share is zero pixels wide (was a 12 px stripe).
+- Barrier lab time to expiry in days 1–365 (T = days/365, shown in days, weeks or months): one week step moved the bar by up to 95 px at short maturities. The start value is 91.25 days, i.e. exactly the example's T = 0.25, so every number of the running example is unchanged; the "2 weeks" example of 07.2 is now 14 days (T = 14/365 instead of 2/52; the values move by 0.1 pip and 0.2 gamma and come via `<Num>`).
+- Supplement of 23.10.2026 (points 9 to 11): at the latest two frames after the last input nothing moves.
+  - The tween rule also jumps within `duration` of an input on any range slider or a pointer drag of more than 4 px inside a figure (one tracker in `src/components/ui/hooks.ts`), so values that follow a slider only now and then (an axis range, a label position) no longer glide after it. `useTween` decides in a layout effect, so a jump is drawn in the same frame as the slider, also through a chain of tweens.
+  - While a slider or a chart handle moves, and for a quick series of clicks in the same figure (again within 300 ms), finite CSS animations and transitions of that figure end at once (Web Animations `finish()`): pops, rings, fade-ins, the radius transition of the path simulator. A single click keeps its animation; endless decorative pulses (off under reduced motion) are not touched.
+  - HedgeCompare: the ranking rows jump while the rate is dragged or a slider moves (glide only after a single change). Cash-and-carry: crossing the fair forward while dragging shows the new steps at once (the step-by-step replay only after a single change). The panel-level drag flag counts only a pointer down on a range slider, so the reset button and toggles in the same panel animate again.
+  - Barrier lab parity as shown (D-26): KO and vanilla rounded, KI the rest (`parityShown`), so the shown KO + KI equals the shown vanilla; the bars use the unrounded values.
+- Tests over `file://` on the rendered geometry (`getBoundingClientRect`, `getScreenCTM`), frame by frame (`tests/offline/frames.ts`):
+  - `sliders.spec.ts`: every slider on every German page with an interactive figure (37 pages), mouse drag in 2 px steps and a held arrow key (repeated keydown); from the second frame after the last input nothing moves, dots within 1 px of their lines, parity bars within 1 px of their width. A running playback is paused first (a deliberate animation of its own); a Monte Carlo value that arrives later counts like an input.
+  - `smooth.spec.ts`: dots on their lines in three figures with the dots really measured; touch on a chart handle over the DevTools protocol in Chromium; a single toggle, preset and reset still animate (at least 5 different frames); a quick series of toggles or presets is still from the second frame after the last click; barrier lab parity against `labNumbers` for six states.
+  - Not tested: native range sliders by touch (not automatable); touch frame by frame in WebKit (the WebKit projects test the handle behaviour in `offline.spec.ts`); the English pages separately (same islands).
+
+**Reasoning:** The maths was right; the animations were wrong. The rule lives in one hook and one pure function, so every island follows it.
+
+## D-43 · 2026-10-23 · Review 23.10.2026
+
+**Maximalverlust-Klassen statt «nicht begrenzt»**
+
+**Question:** The texts said the loss of the leveraged structures was "not limited". USD/CHF cannot fall below zero, so for a dollar buyer the loss is finite. How do we describe the worst case correctly?
+**Decision:** Three terms, computed in `src/lib/fx/mc/maxloss.ts` from the product parameters:
+
+- «kein eingebauter Verluststopp» / "no built-in stop on losses": every one of these structures.
+- «sehr hoch, aber endlich» / "very high, but finite": accumulator, TARF, TPF, structured hedge. Bound = fixings × leverage × N × strike (all fixings at S = 0). Check values: accumulator CHF 1’609’922, TARF 1’804’296, TPF 1’872’000; pivot TARF below 1’800’595, RTPF below 1’852’800.
+- «theoretisch unbegrenzt» / "theoretically unlimited": decumulator, and pivot TARF and RTPF upwards (they sell or pay with leverage above a level).
+- The payoff kernels on a path with every fixing at S = 0 give exactly −bound; for decumulator, pivot TARF and RTPF the loss grows linearly with S without limit (tests).
+- Matrix `LossKind` 'unlimited' → 'noStop' (structured, accumulator, tarf, tpf) and 'unbounded' (pivotTarf, rtpf), both severity 3; chips «hoch, ohne Stopp» / «theoretisch unbegrenzt»; `pm.clip` «läuft aus dem Bild» / «off the chart» (supplement point 16; was «Verlust geht weiter»: the curve only leaves the chart). Takeaways: «Der Gewinn ist gedeckelt, für den Verlust gibt es keinen eingebauten Stopp.» Quiz m09-q3 names the theoretical TARF maximum next to the worst simulated path.
+- The risk boxes explain the bound in words (e.g. "USD 2’080’000 bought at the strike, worth nothing") rather than as a product with the rounded strike, which would not add up on screen.
+- Content lint: in modules 08/09 (MDX, quiz) and the product matrix, structure blocks and path simulator texts no «nicht begrenzt» / «not limited», no «ohne Boden/Grenze» / «no floor», no "gain capped, loss not" formula; «unbegrenzt» / «unlimited» only together with «theoretisch» / «theoretically». The 09/4 carry sentence now says "no further cushion and no stop; in the extreme the whole amount is lost".
+
+- Supplement of 23.10.2026 (point 16): `MaxLoss` is typed per side, `down` and `up` each `{ kind: 'finite', chf }` or `{ kind: 'unbounded' }` (a side without loss is finite 0); no numeric `Infinity`, no `total`. `finiteChf()` throws on an unbounded side, so ∞ or NaN never reach a formatter (test). The tests run on the app's own products and kernels (`M08_PRODUCTS`, `M08_MAX_LOSS`, `simProduct`, `fairProduct`). `productMaxLoss`/`lossKindOf` tie the matrix chips to the typed bound. The text alternative of a clipped curve (`pm.clipAlt`) names the product and points to its «Worst Case» chip; the 09.3 caption says the same. Content lint bans «Verlust geht weiter», «loss continues» and «aus dem Chart» in the 08/09 texts and the matrix.
+
+**Reasoning:** "Not limited" was wrong for the buyer and blurred the real point: there is no stop, and the bound, while finite, is several times the notional at stake in any normal scenario.
+
+## D-44 · 2026-10-23 · Review 23.10.2026
+
+**Forward-Konvention: T = 0.25 gegen 90/360 offen trennen**
+
+**Question:** 02.2 said "T = days/365" but used T = 0.25 (91.25 days) against 90/360 in the money market. Which comparison is right?
+**Decision:** The tool keeps T = 0.25 as a stylised convention for "3 months" in both worlds and says so (money market 90/360, option model 0.25 years = 91.25 days). Then 02.2 shows the like-for-like case: for exactly 90 days (T = 90/365) the continuous formula gives 0.79313, 0.65 pips above the money market (0.7930607). Supplement of 23.10.2026 (point 14): the gap comes only from using the same 3.5 % once as simple interest over 90/360 and once as continuous interest over 90/365 (the larger money-market year fraction outweighs continuous compounding, which explains the plus sign). It is no arbitrage gain and the text says so: with the term-matched continuous rate r = ln(1 + r_MM · 90/360) / (90/365) = 3.533 % (core function `continuousFromSimple`, nums `m02.rfCont90`, `m02.fwdCont90Conv`) the continuous formula gives the same forward for the same end date (unit test, tolerance 1e-12). New glossary entry «Stetige Verzinsung»; the quiz distractor m02-q2 explains the unconverted rate; ParityPaths labels the gap «Konvention, kein Arbitragegewinn». Merksatz: compare forwards only with the same end date and the same convention. The derivation "Woher die 0.3 Pips kommen" says it holds at equal T; the cross references in 04/1 and 09/2 say «bei gleichem T = 0.25». Both 90-day forwards are shown with 6 decimals so the gap adds up on screen (D-26 rule). New nums `m02.fwdCont90`, `m02.fwdCont90DiffPips`, `m02.daysT`. Convention labels (90/360, 90/365) stay typed, as elsewhere.
+
+**Reasoning:** The 0.3-pip gap was correct but only under equal T; without saying so, a reader could think continuous compounding always gives a lower forward.
+
+## D-45 · 2026-10-23 · Review 23.10.2026
+
+**Risk Reversal und Zero-Cost-Collar trennen**
+
+**Question:** 06.2 treated the 25Δ risk reversal as zero cost. At a flat 8 % vol the 25Δ call 0.8150 costs 47.2659 pips and the 25Δ put 0.7730 brings 49.5022 pips: net call − put −2.2362 pips, the importer receives CHF 223.62.
+**Decision:** Two cases: the 25Δ risk reversal (strikes fixed by the delta convention, net premium rarely zero) and the zero-cost collar (one strike chosen, the other solved for zero net premium: put 0.7721506, shown 0.7722, 8.49 pips below the 25Δ put). The rest of 06.2 works with the zero-cost collar («Der Zero-Cost-Collar des Importeurs»); takeaway and derivation step 3 separate the two. Supplement of 23.10.2026 (point 15):
+
+- Strike convention: 06.2 (and 06.3) use spot-delta strikes without premium adjustment at the flat vol, rounded to the 5-pip grid of the payoff builder (0.8150 / 0.7730; `m06.strikeStepPips`). The grid is part of the definition: on the grid the spot delta is 0.2514 / −0.2525; without it the strikes are 0.8151 / 0.7728 as in 04.3. 06.4 places the smile pillars by forward delta. New glossary entry «Spot- und Forward-Delta»; aliases for premium adjustment.
+- Premiums and net unrounded: call 47.2659, put 49.5022, net −2.2362 pips (CHF −223.62); `m06.rr25NetPips` and `m06.rr25NetChf` are signed call − put. Shown per D-26 as 47.27 − 49.50 = −2.23 (`m06.rr25NetShownPips`, the difference of the shown legs); the next sentence gives the unrounded −2.2362 pips and CHF −223.62.
+- Zero-cost strike solved unrounded (0.7721506, residual below 1e-6 CHF, test) and rounded only for display: 6 decimals (0.772151) wherever an amount comes from it (06.2, quiz m06-q2: strike × notional and CHF 12’151 add up), otherwise 0.7722; the gap 0.7730 − 0.772151 = 8.49 pips. Registry entry `m06.rrCallPips` removed (it duplicated `m06.rr25CallPips` at 1 decimal). Payoff builder: «Zero-Cost-Collar» only while the net premium is zero, otherwise «Collar (Risk Reversal)» (template id unchanged); the seagull description no longer claims zero cost in every state. Product matrix, 09/2 point 5 and the glossary follow (alias «Collar» only on zero-cost-collar). New nums `m06.rr25PutK`, `m06.rr25NetPips`, `m06.rr25NetChf`, `m06.rrPutGapPips`.
+
+**Reasoning:** Market convention: a risk reversal is quoted by delta; zero cost is a separate choice of strikes.
+
+## D-46 · 2026-10-23 · Review 23.10.2026
+
+**Wahrscheinlichkeiten sind risikoneutral, keine Prognose**
+
+**Question:** The tool shows probabilities (knock-out, touch, target, conversion, "chance in the money") without saying in which model.
+**Decision:** Every model probability carries «risikoneutral, keine Prognose» / «risk-neutral, not a forecast» (MDX in brackets, calculators as part of the sub-label); the first note of a section links the new glossary entry «Risikoneutral». Supplement of 23.10.2026 (point 13), replacing the first definition: «risikoneutral» is the pricing measure (the rate drifts with rd − rf, the expected value at expiry is the forward, probabilities under this measure belong to the price and are no forecast); constant vol, a lognormal distribution and no jumps are additional assumptions of the Garman-Kohlhagen model, not part of the measure. Glossary and texts (01/1, 02/1, 04/4, 07/3, 07/4, 08/1, 09/1, 09/4, HedgeOutcome) keep the two apart («unter dem risikoneutralen Mass», never «risikoneutrales Modell»); 09/1 derives E[S_T] = F from interest-rate parity. A wording test guards it. A content-lint rule (`RISK_NEUTRAL_NUMS`) fails when a listed probability num appears without the note in its block. Module 01's rise/fall probabilities were driftless before; they now come from the risk-neutral model (N(d2) with drift), which moves them from 11 % to 7 % (rise to 0.84) and from 10 % to 15 % (fall to 0.76); otherwise the label would be false. The ±1σ band stays driftless around spot; 01/1 shows that with drift the same band holds 67 % (`m01.bandProb`) against 68 % without (`m01.bandProbNoDrift`).
+
+**Reasoning:** A learner must not read a pricing probability as a forecast; the same label everywhere makes the model visible.
+
+## D-47 · 2026-10-23 · Review 23.10.2026
+
+**Moneyness und innerer Wert: gegen Forward und gegen Spot**
+
+**Question:** 04.3 presented forward moneyness and the intrinsic value against the forward as the only definitions; the quiz called the spot answer a "typical mistake".
+**Decision:** 04.3 names both conventions: spot moneyness (strike vs spot) and forward moneyness (strike vs forward); the tool uses forward moneyness because a European option is only exercised at expiry. Example: call 0.7990 is 10 pips below spot (spot moneyness: ITM) and 59.7 pips above the forward (forward moneyness: OTM). DF · max(F − K, 0) is the «innerer Wert gegen den Forward»; one sentence names the classic max(S − K, 0), the value of immediate exercise that a European option does not have. ITM call K = 0.7730: premium 249.8 pips, intrinsic value against the forward 200.3, time value 49.5; against the spot it would be 270.0 and −20.2 pips — which is why the tool measures at the forward. Quiz m04-q3 asks «in Forward-Moneyness, wie in diesem Tool»; the spot answer "holds in spot moneyness; the question asked for forward moneyness". Check m04-c3 and the glossary (moneyness, itm, otm, atm, intrinsic-value, time-value) follow. New nums `m04.itmSpotIntrinsicPips`, `m04.itmSpotTimePips`. Supplement of 23.10.2026 (point 19): forward moneyness is this tool's chosen convention, not a property of European options; both conventions are common (04.3, takeaway, quiz m04-q3, glossary). The negative time value against the spot follows from the split, because the USD rate is above the CHF rate; it is neither a negative premium (the call costs 249.8 pips) nor an arbitrage (no early exercise; only the forward value can be locked in today). Shown so that it adds up: 270.0 − 200.3 = 69.7 and 49.5 − 69.7 = −20.2 (`m04.itmSpotGapPips`); 05/2 refers to it where the price curve runs below the expiry payoff.
+
+**Reasoning:** Both conventions are used in practice; teaching one as the only truth would mislead.
+
+## D-48 · 2026-10-23 · Review 23.10.2026
+
+**EZB-Fixings im Replay und Valuta beim Swap (C4, C5) – Umsetzungsentscheide**
+
+**Decision:**
+
+- 07.4: the franc-shock replay is «ein hypothetisches Szenario mit täglichen EZB-Referenzkursen» everywhere (caption, title, aha, status, note, quiz). ECB reference rates are published for information and are not tradable prices (source `ecb-reference-rates-method`, its "Belegt" line extended; no new fact because the statement carries no value). A stop-loss is filled at the next tradable price (where depended on minute and liquidity; the replay simplifies to the next fixing); a knock-out is not a trade, the option is extinguished under the assumed terms (wording of supplement point 17); with daily observation against a fixing all four barriers go with the same fixing, with continuous observation the first price beyond the barrier counts under the term sheet. The table columns read «Typ» and «Fixing» (a knock-out is not an order); the chart's aha title is shortened to «Hypothetisches Szenario» because annotation titles do not wrap.
+- 03.1: a spot deal settles T+2, so the firm pays the supplier on the spot value date, not "today"; a shorter near leg (value today or tomorrow) exists at a slightly different rate. 03.3: the roll swap is dealt two business days before the old maturity, so its near leg has the old forward's value date; «Spot beim Abschluss des Rolls» replaces «Spot am Roll-Datum» in text, caption, slider and quiz. T+2 and "two business days" are market conventions written as text.
+- Barrier lab maturity in days: see D-42.
+- Supplement of 23.10.2026 (point 17): the replay is nowhere an executable historical transaction, also not in tooltips, ARIA texts or the quiz (m07-c4): every fill is an assumption, stop, put and barriers are «angenommene Beispiele, keine historischen Geschäfte», a knock-out «erlischt nach den angenommenen Bedingungen» (daily observation against the ECB fixing). The replay has no rebates; texts say so, a rebate would be a separate row, and a unit test fails when a rebate appears in its config. The glossary knock-out entry follows: extinguished under the terms of the deal, a rebate paid separately, in-out parity only without a rebate.
+- Supplement of 23.10.2026 (point 18): 03.1 and 03.3 say «zwei Bankarbeitstage, nach den Feiertagskalendern beider Währungen»; the tool counts in days without a holiday calendar and says so. Test in the existing model (`src/lib/m03/roll.ts`): on the old maturity the USD of the forward and of the near leg cancel exactly.
+
+**Reasoning:** Precision on what a reference rate is and when money moves; both points are textbook market practice.
+
+## D-49 · 2026-10-23 · Supplement 23.10.2026
+
+**Delta ist keine Wahrscheinlichkeit**
+
+**Question:** 04.3 said the 25Δ call is «grob auch die Chance» to end in the money («in einem von vier Fällen»). Delta is a price sensitivity; how do we show the chance without mixing the two?
+**Decision:** (supplement point 12)
+
+- New core function `probItm` in `src/lib/fx/vanilla.ts`: N(d2) for a call, N(−d2) for a put, in the money test with ½ at the strike at T ≤ 0 or zero vol (same edge cases as `digitalCash`, so probItm = digital / DF).
+- 04.3 explains delta as a price sensitivity and gets the subsection «Delta ist keine Wahrscheinlichkeit» / "Delta is not a probability" with a table of delta and the risk-neutral chance at the exact delta strikes of module 04: 25Δ call 0.815145 → 23.96 %, 25Δ put 0.772752 → 26.51 %, 10Δ call → 9.40 %, 10Δ put → 10.81 %, each «risikoneutral, keine Prognose». «Delta ≈ Chance» stays only as a rule of thumb with these values beside it. N(d2) is the chance «im Modell (Garman-Kohlhagen, flache Vola)»; with a smile the market-implied chance differs (module 06).
+- Moneyness explorer: its own stat row «Chance im Geld» (bei Verfall · risikoneutral, keine Prognose) next to delta; the 25Δ/10Δ notes show both values. Glossary: new entry «Chance im Geld» (aliases N(d2), ITM-Wahrscheinlichkeit …), delta and delta-25 reworded.
+- Tests: delta and chance as two separate values at the four strikes (unrounded with tolerance and as shown in DE and EN); a wording guard keeps «Delta ist die Chance» and «einer von vier Fällen» out of every text, quiz, dictionary and the glossary.
+
+**Reasoning:** Delta and the chance coincide only roughly and for different reasons; a learner who prices with delta as a probability makes systematic mistakes, especially for puts.
+
+## D-50 · 2026-10-23 · Supplement 23.10.2026
+
+**Namen: was verboten bleibt, was erlaubt ist**
+
+**Question:** The rule "no names of banks, companies or people" was read strictly enough to put the sources (ECB, SNB, BIS) and the model names (Garman-Kohlhagen, Reiner-Rubinstein) in doubt.
+**Decision:** (supplement point 24)
+
+- Forbidden stay: commercial banks, companies, clients, real persons as examples, and product brands. The content lint (`FORBIDDEN_NAMES` in `tests/unit/content-lint.test.ts`) enforces it on every text, quiz, dictionary and the glossary.
+- Allowed: central banks and authorities as sources (EZB/ECB, SNB, BIZ/BIS) and model and author names (Garman-Kohlhagen, Reiner-Rubinstein, Black-76, Broadie-Glasserman-Kou). A lint test checks that these names are not on the forbidden list and that the sources keep their publishers.
+- No source is removed; `src/content/sources.md` keeps every entry.
+- Version 6 (Review 2, 23.10.2026): in source entries, publishers and authors are allowed (e.g. a textbook's author and publisher, the authors of a BIS article). A book is listed with its ISBN instead of a URL; no links to copies of books, statements are paraphrased, never copied.
+
+**Reasoning:** The rule protects against advertising and against any link to a real firm or person; a source has to name its publisher, and a model is known by its authors' names.
+
+## D-51 · 2026-10-23 · Review 2, 23.10.2026
+
+**Double Knock-in: ein engerer Korridor macht ihn teurer (Punkt 1)**
+
+**Question:** 07.4 said «Je enger der Korridor, desto billiger, und desto wahrscheinlicher das Aus». That holds for the double knock-out and the double no-touch, not for the double knock-in.
+**Decision:** 07.4 names both directions: the double knock-out gets cheaper, the double knock-in dearer (the same event brings it to life more often); without a rebate both add up to the vanilla with the same barriers, strike and expiry (in-out parity). The 07.1 caption says the same for one barrier. Glossary (double barrier, barrier option, knock-out, knock-in, in-out parity) says «ohne Rebate» / "without a rebate" wherever the parity is stated. Source: `hull-2012`, «Exotic Options». Tests: Monte Carlo on nested corridors (pathwise and in price), in-out parity on the core (17.2343 + 109.4569 = 126.6912 pips; a 20-pip rebate adds 7.6171 pips), wording guard `RETIRED_V6`.
+**Reasoning:** The parity forces the opposite direction for the knock-in; a learner who reads «narrower = cheaper» for every barrier misprices half of them.
+
+## D-52 · 2026-10-23 · Review 2, 23.10.2026
+
+**Gamma-Maximum bei d1 = −σ√T (Punkt 2)**
+
+**Question:** 05.2 said gamma peaks at the strike because φ(d1) peaks at d1 = 0. Across spot, gamma has S in the denominator.
+**Decision:** 05.2 gives the exact peak across spot, d1 = −σ√T (F = K · e^(−1.5σ²T)), with a fifth derivation step (∂Γ/∂S = −(Γ/S) · [d1/(σ√T) + 1] = 0), then the rule of thumb «am grössten, wenn der Forward nahe am Strike liegt». Across strikes the peak stays at d1 = 0. 05.3 adds the mirror case for vega (d1 = +σ√T, i.e. d2 = 0, spot 0.80061). The takeaway ties the theta statement to the gamma share of theta; 05.4 to the last weeks. New numbers `m05.gammaPeakSpot` (0.79805, Γ 12.3786), `m05.spotD1Zero` (0.79933, Γ 12.3687), `m05.gammaPeakFwdPips` (19); Γ at spot 0.8000 is 12.3556. Glossary gamma and the module 05.3 teaser («nahe ATMF») follow. Source: `hull-2012`, «The Greek Letters». Test: the numerical maximum on a fine spot grid equals the analytic spot (tolerance 1e-5).
+**Reasoning:** The rule of thumb stays useful (ATMF gamma is within e^(−9σ²T/8) of the peak), but the exact place must not be taught wrong.
+
+## D-53 · 2026-10-23 · Review 2, 23.10.2026
+
+**Alpha ist der risikobereinigte Mehrertrag (Punkt 3)**
+
+**Question:** 09.3 defined alpha as «einen Ertrag, der aus einer Marktsicht kommt»; the glossary had the textbook definition.
+**Decision:** 09.3 (text and takeaway), 09.1, the section check of 09 and the glossary say: alpha is the excess return over a benchmark, adjusted for risk; here the benchmark is the forward or the money market; whether a view earns alpha only shows in that comparison, and a gain from a rising dollar is first of all the result of the dollar position. The module name «Hedge, Alpha, Yield» stays. Source: `jensen-1968`.
+**Reasoning:** A view is not alpha; only a risk-adjusted outperformance of the benchmark is.
+
+## D-54 · 2026-10-23 · Review 2, 23.10.2026
+
+**Carry: CHF 6’939 bei Fälligkeit, CHF 7’000 heute (Punkt 4)**
+
+**Question:** Module 01 computes the carry on USD 1 Mio. bought today (CHF 7’000), module 09 on USD 1 Mio. at maturity (CHF 6’939); 09.4 did not say so.
+**Decision:** New core function `moneyMarketCarry` (`src/lib/fx/forward.ts`) for both notionals. 09.4 says: for USD 1 Mio. at maturity he buys USD 991’325.90 today; his head start is CHF 6’939.28, exactly the forward discount (69.39 pips on USD 1 Mio.); with USD 1 Mio. today, as in module 01, it is CHF 7’000.00 because he deposits more dollars; forward, break-even and pips are the same for both. The derivation shows N · (S − F) = S · N / (1 + r_USD τ) · (r_USD − r_CHF) τ. New numbers `m09.carryUsdToday`, `m09.carryChfStart`, `m09.carryPipsExact`. Tests: the identity (also for r_CHF ≠ 0), the ratio 1 + r_USD τ and D-26 (shown pips × USD 1 Mio. = shown CHF).
+**Reasoning:** Two correct numbers for two different notionals look like a mistake unless the text names the notional.
+
+## D-55 · 2026-10-23 · Review 2, 23.10.2026
+
+**TPF und RTPF zahlen überall den vertraglichen Coupon (Punkt 5)**
+
+**Question:** Module 08 paid the contractual coupon (775.4 pips, CHF 7’754, maximum CHF 46’524), module 09 the unrounded fair coupon (maximum CHF 46’522).
+**Decision:** Every paid coupon and every maximum gain comes from the contractual coupon (`simProduct`: the Monte Carlo fair coupon rounded to 0.1 pip): matrix profiles and key numbers (`matrixParams`, readout to 0.1 pip via `pipsDigits`), the building blocks (`fullStage`, `stageCoupon`), the path simulator (`paidCoupon`: contractual or chosen coupon) and the texts of 08.4 and 09.3. TPF: 6 × CHF 7’754 = CHF 46’524; RTPF: 6 × CHF 8’105 = CHF 48’630, in both modules. The unrounded coupon appears only as «fairer Coupon (Monte Carlo) ± Standardfehler»: 775.37 ± 0.97 and 810.54 ± 1.61 pips. The maximum loss does not depend on the coupon. Tests: `m09.tpfMaxChf = m08.tpfMaxChf = coupons × shown coupon in CHF`, the same for the RTPF, and the matrix, simulator and building blocks against the same coupon.
+**Reasoning:** One product, one coupon; the rounding is far inside the standard error, so the contractual coupon is still fair.
+
+## D-56 · 2026-10-23 · Review 2, 23.10.2026
+
+**Methodik: eingefrorener Datenstand, Update nur von Hand (Punkt 6)**
+
+**Question:** The About page still described a GitHub Action that fetched rates on weekdays at 15:30 UTC; since D-13 the release workflow is manual and the file holds a frozen snapshot.
+**Decision:** About (DE/EN) describes the real process: the workflow «Release» has no schedule and runs only when started; it fetches the ECB rates, validates them with the rules and constants of `src/lib/data/validate.ts` (filled in from there: last value at most 5 bank days old at the time of the fetch, absolute daily log return below 10 % with documented exception, dates valid, ascending, unique, not in the future, no stored date missing), runs the checks, builds and tests the file. A new bullet says the file is a frozen snapshot; its date is shown in the Riskometer and in every footer. Labels that read «heute» for a frozen value now say «Letzter Stand», «zuletzt», «Stufe zum Datenstand» (EN "latest reading", "level at the data date"). The ECB publishes «an Arbeitstagen um ca. 16:00 MEZ» (on working days, without claiming every single one). Test: no text claims an automatic or daily update. Data were not updated: `npm run data:fetch` could not reach the ECB from the sandbox (proxy 403), so the data date stays 14.09.2026; Dario runs the Release workflow with the ECB fetch.
+**Reasoning:** The methodology must describe what the file really is.
+
+## D-57 · 2026-10-23 · Review 2, 23.10.2026
+
+**Forward Points: Zinsparität plus Cross-Currency Basis (Punkt 7)**
+
+**Question:** 02.3 and the quiz said the forward follows «allein aus Spot und Zinsen» and the only cause of the points is the interest differential.
+**Decision:** The core message stays «kein Forecast»: the forward follows from spot and interest rates, not from an expectation; in the market the cross-currency basis comes on top (links to 02.2 and 03.4, where the basis is discussed). Same in 02.3/02.4, 03.1/03.2, quiz 02 and 03, the forward-curve and cash-and-carry figures («nahe beim fairen Wert»), 09.1 (the risk-neutral mean follows from the absence of arbitrage between spot, money market and forward), 01.4 («mit diesem Forward») and the glossary (forward, forward points, interest rate parity, swap points, covered interest arbitrage, forward premium/discount, cross-currency basis). Formulas and examples keep the parity forward and say so. Sources: `hull-2012` («Determination of Forward and Futures Prices»), `bis-2016-cip`.
+**Reasoning:** Covered interest parity has not held exactly since 2008; the basis is small for USD/CHF but real, and it is still no forecast.
+
+## D-58 · 2026-10-23 · Review 2, 23.10.2026
+
+**Letztes TARF-Fixing: volles Nominal zum angepassten Kurs (Punkt 8)**
+
+**Question:** 08.3 said the last gain «wird so gekappt», but not how.
+**Decision:** The text states the rule of the core (`LastFixingRule` 'capped', `targetTrade` in `src/lib/fx/mc/payoffs.ts`): on the fixing that reaches the target you trade the full notional at an adjusted rate, the fixing minus what is left to the target (selling in the pivot TARF: plus); the counted total is exactly the target and the rate lies between strike and fixing. One sentence names the market variants («der volle Gewinn am letzten Fixing oder keine Zahlung; massgebend ist das Term Sheet»). Same in the pivot TARF paragraph, the glossary (tarf, pivot TARF, target), the building-block texts and the 08 quiz. Test: kernel test for the target fixing (total = target, notional = N, rate = fixing ∓ remaining).
+**Reasoning:** «Capped» without the mechanics hides that the full notional is still traded.
+
+## D-59 · 2026-10-23 · Review 2, 23.10.2026
+
+**Barriere und Sprung (Punkt 9)**
+
+**Question:** 07.4 said stops and barriers both assume a continuous rate. A barrier is triggered by a jump past it just as well.
+**Decision:** 07.4 (gap paragraph, example, risk box, takeaway), quiz 07 and the glossary (gap risk, knock-out, knock-in: «erreicht oder durchbricht») say: a stop needs a tradable price at its level; a barrier does not, a jump past it triggers it; only the pricing formulas (and hedging by them) assume a continuous rate, so they underestimate gap risk. The sentence on extinction without a trade stays. The replay counts the first fixing «auf oder jenseits» of a level, as the code does.
+**Reasoning:** The model assumption belongs to the formulas, not to the contract.
+
+## D-60 · 2026-10-23 · Review 2, 23.10.2026
+
+**Spot-Delta tief im Geld: e^(−r_f·T), nicht 1 (Punkt 10)**
+
+**Question:** The lab hint said «Delta läuft gegen eins»; the spot delta e^(−r_f·T) · N(d1) tends to e^(−r_f·T).
+**Decision:** 05.2 (text and lab tour), quiz 05, the lab annotation («Forward-Delta gegen 1») and the glossary (synthetic forward) say: the spot delta rises towards e^(−r_f·T) ≈ 0.991, which is the spot delta of a forward; the forward delta tends to 1. New number `m05.spotDeltaLimit` (0.991288). Test: deep in the money spot delta = e^(−r_f·T) and forward delta = 1 (tolerance 1e-6). Source: `hull-2012`, «The Greek Letters».
+**Reasoning:** With r_f = 3.5 % the difference is almost a percent of the hedge.
+
+## D-61 · 2026-10-23 · Review 2, 23.10.2026
+
+**Vega absichern (Punkt 11)**
+
+**Question:** 05.1 and 05.3 said vega can «nur mit anderen Optionen» be hedged.
+**Decision:** «Mit Spot und Forwards lässt sich Vega nicht absichern, sie haben kein Vega. Am FX-Desk nimmt man dafür andere Optionen, seltener Volatilitäts- oder Varianz-Swaps.» (EN analog). Source: `hull-2012`, «Exotic Options» (volatility and variance swaps).
+**Reasoning:** Options are the usual tool, not the only one.
+
+## D-62 · 2026-10-23 · Review 2, 23.10.2026
+
+**Ladetext ohne JavaScript (Punkt 12)**
+
+**Question:** Dario's iPad test: the preview of the iPad Files app runs no JavaScript, so only the loading text stays.
+**Decision:** The loading text (ASCII after `htmlAscii`) keeps its start and adds, DE then EN: if only this text stays (no yellow diagnostics box), the view runs no JavaScript, for example the preview of the iPad Files app; open the file in Chrome, Edge or Safari on a computer and allow JavaScript. README, the release notes of `release.yml` and the runtime header say the same. The iPad stays a target and its viewports stay tested in WebKit in CI; how the file is best opened on the iPad (D-13's device test ran inline JavaScript) is an open question in PROGRESS.
+**Reasoning:** A silent «wird geladen» gives no hint; the text now says what to do.
+
+Wordings retired by D-51 to D-62 are guarded in both languages by `RETIRED_V6` in `tests/unit/content-lint.test.ts`.
+
+## D-63 · 2026-10-23 · Review 2, 23.10.2026
+
+**Unabhängige Fachprüfung nach Version 6**
+
+**Question:** Review 2 asks for at least 95 % correct theory. Do the texts around the twelve points hold up as well?
+**Decision:** Six independent auditors read the final texts (DE and EN) by topic and recomputed the numbers; every finding went to a skeptic who tried to refute it. Nine findings were confirmed and fixed, none refuted:
+
+- Glossary vega: positive vega holds for bought vanilla options; a bought double no-touch is short vega (as 07.3 says).
+- 07.4: the pricing formulas and the simulation assume a continuous rate; parities such as knock-out + knock-in = vanilla hold on every path, also across a jump. The risk box says a gap skips the levels between the last and the next price.
+- Glossary barrier option: without a rebate never dearer than the vanilla and usually cheaper (a knock-in can cost the same).
+- 03.4: the cross-currency basis is the gap between swap funding and the money market; it sits in FX swaps and CCS alike, so these two stay about equally expensive. The basis is quoted as a spread «Auf- oder Abschlag».
+- Quiz 09: the zero expected excess return is «risikoneutral, keine Prognose» (D-46).
+- Quiz 08: 285 pips is the coupon without target and without the interest differential.
+- About: the fair values are computed in advance by a separate script started by hand, not during the build; the live Monte Carlo value of an adjusted parameter runs in the page in small chunks (no Web Worker in the file, `worker-src 'none'`); window barriers, accumulators and decumulators have closed forms only with continuous monitoring, the target products none; the event window is shorter when other market turmoil follows (D-31).
+- Clear nits fixed too: SNB rate «über dem Freibetrag» (source `snb-2015-01-15`) in 05.4 and 07.4, synthetic forward «zum selben Strike und Verfall», 09.3 risk box «Produkte für eine Sicht», 09.4 «der Abschlag pro Dollar bei Fälligkeit», ECB «an Arbeitstagen» in DE as in EN, home fallback «mit dem nächsten Release», «Jede Zahl kommt aus einem getesteten Rechenkern oder aus Daten mit Quelle», README (CSP and Monte Carlo), English PC line in the release notes.
+- A second check of these fixes by three independent reviewers (theory, code facts, language) added: the parity in 07.4 «ohne Rebate, gleiche Bedingungen», FX swap and CCS «bei gleicher Laufzeit», the SNB qualifier also in the Riskometer event text, and «Jede Zahl aus einem getesteten Rechenkern oder aus Daten mit Quelle» also in the site description and the README.
+- Old wordings join `RETIRED_V6`.
+
+Not changed: the Monte Carlo fair coupons. An auditor's high-precision recomputation gives about 772.7 pips (TPF) and 806–807 pips (RTPF), against 775.37 ± 0.97 and 810.54 ± 1.61 from the stored run (seed 20261022, 1 Mio. paths). No statement is wrong, but the interval of the stored run does not cover the recomputation; open question in PROGRESS.
+**Reasoning:** The texts around the corrected points must meet the same standard as the points themselves.
+
+## D-64 · 2026-10-24 · Review 3, 24.10.2026
+
+**Sechs zu absolute Schlussfolgerungen (Block A)**
+
+**Question:** A third review found six conclusions and takeaways that were true only in the example or under an unstated condition. Tables and calculations were right; only the sentences drawn from them were too absolute.
+**Decision:** Corrected in DE and EN, with the texts' numbers from the core (new keys in `m06`, `m07`, `m09`; teaching choices in one config object each, D-22):
+
+- A1 · 06.1: «ohne Absicherung» and the forward are yardsticks, not limits. In the two scenarios every structure lies between them; close to forward and strike a structure with a premium costs more than both. Example at 0.7950 (`M06_SCENARIOS.stMid`): unhedged CHF 795’000, forward CHF 793’031, call incl. premium CHF 804’528, call spread CHF 802’468; the call is dearer than both between F − premium (0.7835) and K + premium (0.8095), the call spread between 0.7856 and 0.8075. Collar and seagull are zero cost and stay between. Tests: in the band call and spread > max(unhedged, forward); collar and seagull between both on a rate grid.
+- A2 · 09.1: neither forward nor call is «better». A slightly weaker dollar still favours the forward; the call pays off only below F − premium (`m09.callBeatsFwd` 0.7804, −2.45 % vs spot; at 0.7900, `mildDownPips` 100: forward −30 pips, call −127 pips). The threshold is shown with «rund» because it comes from the unrounded forward 0.79303 (0.7930 − 127 pips would read 0.7803). Test: forward better above the threshold, call below.
+- A3 · glossary «Theta»: how the option value changes when a day passes; for the buyer usually negative (time value, the gamma share, the price of gamma); in FX the interest carry comes on top and can dominate deep in the money, then theta is positive (as 05.4 already said). Tests: `thetaSplit` × USD 1 Mio. per day, call 0.7930 −69.33 / +38.66 / −30.67, call 0.7730 −55.79 / +56.67 / +0.88, call 0.7500 −25.49 / +70.07 / +44.58, call 0.7000 −0.50 / +75.98 / +75.48; gamma share + carry = theta.
+- A4 · 01.2: spot, forwards and FX swaps trade mostly OTC; there is no central place and no single closing price; reference rates are snapshots, not tradable rates; currency futures and options on them trade on exchanges with standardised contracts; the tool covers the OTC market. Takeaway «läuft überwiegend OTC». No size of the exchange share, no exchange name in the learning text (tested); sources `bis-xtd` and, as a primary document, an exchange rulebook (`cme-rulebook-254a`, source entry only, D-50).
+- A5 · 07.3: a digital is at best a partial hedge: a fixed amount whether the extra cost is small or large, not a proportional hedge, and the premium comes on top. Shown: net after premium CHF 50’759; extra cost vs the strike CHF 27’000 at 0.8200 and CHF 107’000 at 0.9000 (`M07_CONFIG.touch.digitalScenarios` +2.5 % / +12.5 %). The break-even 0.843759 is a test value only; the text never says a rate is «genau gedeckt».
+- A6 · 08.2 takeaway: an accumulator beats the forward as long as the fixings lie between 2K − F (`m08.accBreakLev`) and the barrier (`m08.accBarrier`): calm markets and moderate moves; a sharp rise ends it early, a sharp fall buys twice the amount above the market. Convention as in the module: forward at the average fixing day. Test from the core (`productResult`): advantage per fixing (F − K)·N between K and B, (S − 2K + F)·N below K, sign change exactly at 2K − F; with the forward of a single fixing day the lower end lies between 0.7485 (first) and 0.7618 (last fixing). The quiz question («am ehesten … Der Markt bleibt ruhig») stays.
+- Guard `RETIRED_V7` in the content lint: the 14 old phrases (DE and EN) must not come back.
+
+**Reasoning:** A conclusion that holds only in the two scenarios of a table must say so; the learner otherwise generalises it.
+
+## D-65 · 2026-10-24 · Review 3, 24.10.2026
+
+**Glossar «Prämienadjustiertes Delta» und acht Prüfhinweise (Block B)**
+
+**Question:** The review called the premium-adjusted delta entry wrong and listed eight further places.
+**Decision:** The code and formula are right (Δ_pa = Δ_Spot − V/S = (K/S)·e^(−r_d·T)·N(d2) for the call, test to 1e-12 for call and put); only the unit was missing. The entry now says: spot delta minus the premium when the premium is paid in the base currency, both per unit of notional; the premium is then itself a position in that currency; the convention depends on the pair. The review's sentence «the premium amount itself is not simply subtracted from delta» is wrong and was not adopted (sources `bossens-2010`, `wystup-2018-greeks`). The eight hints, each checked in code and text:
+
+| Hint                    | Place                       | Classification                                                                                                                                                                         |
+| ----------------------- | --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| B1 Market order         | 01.3, glossary              | bewusst unverändert: the bullet mirrors the limit-order bullet, Hull and the SEC describe it the same way; the no-trading case is shown two paragraphs below (weekend gap)             |
+| B2 Cross-currency basis | 02.2                        | angepasst: «Formel mit Referenzzinsen gleicher Laufzeit» / «reference rates of the same tenor» (`bis-2016-cip`)                                                                        |
+| B3 Swap points          | 03.2, swap-legs figure      | angepasst: «Beginnt der Swap per Spot, sind die Swap Points genau die Forward Points» (the glossary stays general: far minus near); the figure text says the same (`bis-2008-fxswaps`) |
+| B4 Gamma against theta  | 05.4 takeaway               | angepasst: «Im Modell verdient der delta-gehedgte Call nur an Tagen …» (constant vol, daily delta hedge, no costs; `derman-2007`); formulas unchanged                                  |
+| B5 Butterfly            | 06.3 heading                | angepasst: «Butterfly und Seagull: im Beispiel short Vola» (holds with the spot near the body)                                                                                         |
+| B6 Knock-in             | 07.1                        | angepasst: «Vorher hast du nur die Anwartschaft darauf, der Vertrag hat aber schon einen Wert.» (`lyuu-barrier`); the glossary entry stays as Hull words it                            |
+| B7 Alpha                | 09.1, 09.3, glossary        | bewusst unverändert: defined risk-adjusted since Version 6 (D-53)                                                                                                                      |
+| B8 Riskometer vola      | `vol.ts`, Riskometer, About | bewusst unverändert: code and texts say «Mittelwert 0» and compute it that way                                                                                                         |
+
+None was «nicht verifizierbar». Tests in `tests/unit/v7-b.test.ts`.
+**Reasoning:** A definition without its unit reads as a different formula; the hints were sharpened where a qualifier makes the statement exact and left where the text was already right.
+
+## D-66 · 2026-10-24 · Review 3, 24.10.2026
+
+**Monte Carlo mit 4 Mio. Pfaden; Coupons von TPF und RTPF (Block C)**
+
+**Question:** The stored fair coupons (seed 20261022, 1 Mio. paths) sat 2.5 and 2.3 standard errors above an exact grid computation (TPF 775.37 ± 0.97 vs 772.91 pips, RTPF 810.54 ± 1.61 vs 806.86 pips). Engine bias or sampling noise?
+**Decision:** Sampling noise, one seed for all products (common random numbers): an engine control without target (targetCoupons = 12) lands within 3 standard errors of the closed form (1 Mio. paths +2.27 / +2.13 SE, 4 Mio. +1.71 / +1.53 SE), and 24 other seeds average 772.76 ± 0.21 and 806.63 ± 0.32 pips (review). Therefore:
+
+- `MC_CONFIG.engine.precomputePaths` 1’000’000 → 4’000’000, seed unchanged 20261022; `npm run data:mc` runs about 2 minutes and needs about 830 MB for the weekly set. The 1 Mio. run is reproduced byte-identically (except `generatedAt`) before the change.
+- Acceptance only with evidence: every product within 3 new standard errors of an independent reference (exact or 16 Mio. paths): accumulator 0.773980 ± 0.11 pips (ref 0.773992, −1.1 SE), decumulator 0.816949 ± 0.13 (0.816928, +1.7), TARF 0.751812 ± 0.25 (0.751839, −1.1), pivot TARF half-width 0.049679 ± 0.34 (0.049658, +0.6), TPF 773.72 ± 0.49 pips (772.91, +1.7), RTPF 808.15 ± 0.80 (806.86, +1.6), window barrier CHF 8’609 ± 6 (8’611, −0.3), double no-touch CHF 41’846 ± 30 (41’824, +0.7). Cross-check on fresh paths (seed 7031989, 2 Mio.): every zero-cost product with its contractual parameters prices to zero within 2 SE.
+- Contractual coupons: TPF 773.7 pips = CHF 7’737 per fixing, at most 6 × CHF 7’737 = CHF 46’422; RTPF 808.2 pips = CHF 8’082, at most CHF 48’492 (modules 08 and 09, matrix, building blocks, simulator, quiz; D-26). The rounding (0.02 / 0.05 pip) stays far inside the standard error. `quoteCoupon` rounds half up to 0.1 pip and cleans binary noise first: 0.080815 / 0.00001 = 8081.4999999999990905 in floating point, so plain `Math.round` gave 808.1 for the shown 808.15 (direct unit tests). TARF P(target) stays 94.4 %.
+- Independent grid computations in `docs/reference/xcheck/`: `tpf_grid_check.py` (probability mass of ln S, state = coupons paid, exact Gaussian transition per fixing; TPF 772.91, RTPF 806.86 pips; control without target equals the closed form to 0.01 pip) and `dnt_grid_check.py` (daily double no-touch, Richardson limit CHF 41’824.6).
+- The BGK-shifted closed form of the double no-touch is an approximation 0.3 % above the exact daily value; at 1 Mio. paths the gap hid inside the standard error, at 4 Mio. paths it is 3.5 SE. The unit tests now compare the Monte Carlo against the exact daily value (3 SE) and require the BGK form only within 0.5 % of it. Texts unchanged (07.2 says «fast wie eine stetige»).
+- PROGRESS: question 23 resolved, question 4 (D-29) updated to the new coupons. Max-loss check values follow the strikes (accumulator CHF 1’609’878, TARF 1’804’349, pivot TARF 1’800’770).
+
+**Reasoning:** More paths with the same seed remove the noise without choosing a seed to hit a number; the independent references make the acceptance a test, not a judgement.
+
+## D-67 · 2026-10-24 · Review 3, 24.10.2026
+
+**Version 7: Reproduzierbarkeit, Quiz-Parität, Quellen**
+
+**Decision:**
+
+- Version 6 stays reproducible: commit `36ffffa` with `SOURCE_DATE_EPOCH=1792792699` builds `release/forward-first-v6.html` byte-identically (1’757’756 bytes, SHA-256 `cad08ded…f61a6`, verified before Version 7 started). Version 7 records its own epoch in PROGRESS.
+- New test `tests/unit/quiz-parity.test.ts`: in all 72 quiz questions (9 modules × 4 graded + 4 checks) the German and English prompt, option labels and explanations carry the same numbers, as a multiset and in order, with a minimal, documented normaliser (Swiss and English thousands separators, «8 %» / «8%», «1 Mio.» / «1m», typographic signs, dates to ISO, identifiers such as d1 excluded); three fields whose translation moves a clause are listed explicitly and must really be reordered. The same `correct` index alone was not enough.
+- Sources of Version 7 are literature references: `bis-xtd` (mandatory for A4), `cme-rulebook-254a` (primary document, D-50), `oic-option-strategies`, `seco-kmu-fx`, `sec-cftc-2013-binary`, `hkma-2011-accumulator`, `ifec-2022-accumulators`, `bossens-2010`, `wystup-2018-greeks`, `kwok-mafs5030-hw4`, `bis-2008-fxswaps`, `derman-2007`, `lyuu-barrier`; `hull-2012` lists the chapters used. No link to a copy of a book; no TPF or RTPF number is attributed to Hull. The URLs come from the review; they could not be fetched from the sandbox.
+- `OFFLINE_VERSION` 7, copy `release/forward-first-v7.html`.
+
+**Reasoning:** A delivered file must be rebuildable from its commit; a quiz that shows different numbers in the two languages would pass every other test.

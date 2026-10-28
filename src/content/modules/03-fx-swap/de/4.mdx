@@ -1,0 +1,66 @@
+import SwapCompareFigure from '@/components/figures/SwapCompareFigure.astro';
+
+FX Swaps sind das meistgehandelte Instrument am Devisenmarkt. Das zeigt die Triennial Survey: Alle drei Jahre erheben die Zentralbanken den Devisenhandel, koordiniert von der BIZ (Bank für Internationalen Zahlungsausgleich). Im <Fact id="m03-bis-month" /> wurden pro Tag <Fact id="m03-bis-swaps" /> in FX Swaps umgesetzt, bei einem gesamten Devisenumsatz von <Fact id="m03-bis-total" />. Das ist <Fact id="m03-bis-share" /> des ganzen Marktes.
+
+Neben dem FX Swap gibt es einen Verwandten mit ähnlichem Namen: den **Cross-Currency Swap**, kurz CCS. Auch er tauscht zwei Währungen am Anfang und tauscht sie am Ende zurück. Aber er läuft meist viel länger, und während der Laufzeit fliessen Zinsen.
+
+<SwapCompareFigure caption="Oben der FX Swap, unten der Cross-Currency Swap, beide für eine Firma mit Franken, die USD 1 Mio. braucht. Wähle die Laufzeit und hebe Nominal, Zinsen oder den Kurs beim Rücktausch hervor. Die Tabelle markiert die passende Zeile." />
+
+### Gleiche Idee, andere Verpackung
+
+Beim **FX Swap** gibt es zwei Tausche und sonst nichts. Die Zinsdifferenz steckt im Far-Kurs: Die Firma bekommt am Ende weniger Franken zurück, als sie bezahlt hat.
+
+Beim **Cross-Currency Swap** wird am Ende zum selben Kurs zurückgetauscht wie am Anfang. Dafür zahlt die Firma während der Laufzeit Zinsen auf die Dollar und erhält Zinsen auf die Franken. Die Zinsdifferenz fliesst also offen, als Zins.
+
+Ein Rechenbeispiel über ein Jahr:
+
+- **FX Swap:** Tausch heute zu <Num of="ex.spot" />, Rücktausch zum Far-Kurs <Num of="m03.fwd1y" />. Die Firma erhält am Ende <Num of="m03.fxCost1y" /> weniger zurück.
+- **Cross-Currency Swap:** Tausch und Rücktausch zu <Num of="ex.spot" />. Dazu zahlt die Firma nach einem Jahr <Num of="m03.ccsCoupon" /> Zins und erhält <Num of="m03.ccsCouponChf" />, weil der CHF-Zins <Num of="ex.rd" /> beträgt.
+
+Rechne die <Num of="m03.ccsCoupon" /> zum Far-Kurs in Franken um: Es sind genau <Num of="m03.fxCost1y" />. Beide Instrumente kosten dasselbe. Über fünf Jahre gilt das auch, gemessen am Barwert: <Num of="m03.pv5y" /> in beiden Fällen. Der Far-Kurs eines Fünfjahres-FX-Swaps läge aber bei <Num of="m03.fwd5y" />. So lange FX Swaps sind selten. Für mehrjährige Laufzeiten nimmt man den CCS.
+
+### Wer braucht was?
+
+Der **FX Swap** ist das Werkzeug für kurze Fristen: Liquidität in einer Fremdwährung für ein paar Tage oder Monate, Zahlungen verschieben, Absicherungen rollen wie in Abschnitt 3.
+
+Der **Cross-Currency Swap** ist das Werkzeug für lange Finanzierungen. Ein Beispiel: Eine Schweizer Firma gibt eine Anleihe in USD heraus, braucht aber Franken. Mit einem CCS tauscht sie den Erlös in CHF. Während der Laufzeit erhält sie USD-Zinsen, mit denen sie die Coupons der Anleihe bezahlt, und zahlt dafür CHF-Zinsen. Am Ende tauscht sie zum Anfangskurs zurück und zahlt die Anleihe zurück. So hat sie eine Schuld in Franken, ohne Kursrisiko auf dem Nominal.
+
+Damit kennst du die linearen Bausteine: Spot, Forward und Swap. Jeder lässt sich auf den Forward zurückführen. In Modul 04 kommt die Option dazu, ein Recht statt einer Pflicht. Auch dort bleibt der Forward der Bezugspunkt.
+
+<Derivation title="Herleitung: Warum beide gleich viel kosten">
+
+Nimm Zinsperioden mit den Zinsfaktoren (1 + <i>r</i> · τ) und die Diskontfaktoren <i>D</i><sub>CHF</sub> und <i>D</i><sub>USD</sub> bis zum Ende. Der Far-Kurs des FX Swaps über alle Perioden ist
+
+<Formula>
+  <i>F</i> = <i>S</i> · <i>D</i><sub>USD</sub> / <i>D</i><sub>CHF</sub>
+</Formula>
+
+Die Firma bekommt am Ende <i>N</i> · (<i>S</i> − <i>F</i>) Franken weniger zurück. Heute ist das wert:
+
+<Formula>
+  <i>N</i> · (<i>S</i> − <i>F</i>) · <i>D</i><sub>CHF</sub> = <i>N</i> · <i>S</i> · (<i>D</i><sub>CHF</sub> − <i>D</i><sub>USD</sub>)
+</Formula>
+
+Beim CCS zahlt die Firma USD-Zinsen und erhält CHF-Zinsen. Zahlt eine Anleihe Zinsen zum Marktzins, ist der Barwert aller Zinsen gleich 1 − <i>D</i>, gemessen am Nominal. Also:
+
+<Formula variant="accent">
+  <i>S</i> · <i>N</i> · (1 − <i>D</i><sub>USD</sub>) − <i>N</i> · <i>S</i> · (1 − <i>D</i><sub>CHF</sub>) = <i>N</i> · <i>S</i> · (<i>D</i><sub>CHF</sub> − <i>D</i><sub>USD</sub>)
+</Formula>
+
+Derselbe Barwert. Das gilt in dieser vereinfachten Welt ohne Basis, mit fixen Zinsen zu den Geldmarktsätzen des Beispiels.
+
+</Derivation>
+
+<Desk title="Die Cross-Currency Basis">
+
+In der Praxis kostet der Weg über Swaps nicht immer gleich viel wie ein Kredit direkt am Geldmarkt. Wenn viele Marktteilnehmer gleichzeitig Dollar brauchen, zahlen Dollar-Leiher über FX Swaps und CCS mehr, als die reine Zinsdifferenz sagt. Diese Abweichung von der Zinsparität heisst **Cross-Currency Basis**. Sie steckt in beiden Instrumenten, darum bleiben FX Swap und CCS bei gleicher Laufzeit auch mit Basis etwa gleich teuer.
+
+Unter Banken laufen CCS meist mit variablen Geldmarktsätzen in beiden Währungen; im Beispiel sind die Zinsen fix, damit die Rechnung einfach bleibt. Die Basis wird als Auf- oder Abschlag in Basispunkten auf eines der beiden variablen Beine quotiert. Beim FX Swap steckt sie unsichtbar in den Swap Points. Wer die Swap Points mit der reinen Zinsdifferenz vergleicht, sieht die Basis.
+
+</Desk>
+
+<Takeaway>
+
+FX Swap und Cross-Currency Swap tauschen beide Kapital hin und zurück. Beim FX Swap steckt die Zinsdifferenz im Far-Kurs, beim CCS fliesst sie als Zins: der eine für kurze Liquidität, der andere für lange Finanzierung.
+
+</Takeaway>

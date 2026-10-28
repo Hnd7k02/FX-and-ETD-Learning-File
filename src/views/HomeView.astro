@@ -1,0 +1,71 @@
+---
+/**
+ * Home page (B-Home), shared by / (de) and /en/ (en). Everything is rendered statically for
+ * "no progress"; the script below updates the progress-dependent parts from localStorage on
+ * every astro:page-load (the site uses the ClientRouter).
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Hero from '@/components/home/Hero.astro';
+import WowCard from '@/components/home/WowCard.astro';
+import LearningPath from '@/components/home/LearningPath.astro';
+import ResumeCard from '@/components/home/ResumeCard.astro';
+import RiskCard from '@/components/home/RiskCard.astro';
+import { common } from '@/i18n/dict/common';
+import { home } from '@/i18n/dict/home';
+import { homePath } from '@/i18n/routes';
+import { translator, type Lang } from '@/i18n/types';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = translator(common, lang);
+const th = translator(home, lang);
+const other: Lang = lang === 'de' ? 'en' : 'de';
+---
+
+<BaseLayout lang={lang} title={t('home.title')} nav="modules" altPath={homePath(other)}>
+  <main data-home data-lang={lang}>
+    <section class="container hero" aria-labelledby="hero-h">
+      <Hero lang={lang} />
+      <WowCard lang={lang} />
+    </section>
+
+    <LearningPath lang={lang} />
+
+    <section class="container cards" aria-label={th('home.resumeSection')}>
+      <ResumeCard lang={lang} />
+      <RiskCard lang={lang} />
+    </section>
+  </main>
+</BaseLayout>
+
+<script>
+  import '@/client/home';
+</script>
+
+<style>
+  .hero {
+    padding-top: 56px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+  .cards {
+    padding-top: 32px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    align-items: stretch;
+  }
+  @media (max-width: 640px) {
+    .hero {
+      padding-top: 32px;
+      gap: 24px;
+    }
+    .cards {
+      padding-top: 24px;
+      gap: 16px;
+    }
+  }
+</style>

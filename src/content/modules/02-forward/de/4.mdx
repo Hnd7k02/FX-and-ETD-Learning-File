@@ -1,0 +1,72 @@
+import CashCarryCalculatorFigure from '@/components/figures/CashCarryCalculatorFigure.astro';
+
+{/* 02 Forward · Abschnitt 4 · Arbitrage (Cash and Carry). Zahlen nur über <Num />, Register src/lib/nums/ex.ts und m02.ts. */}
+
+Angenommen, ein Händler stellt den 3-Monats-Forward bei <Num of="m02.arbMarket" />. Fair wären <Num of="m02.fwd" />. Sein Forward ist also <Num of="m02.arbGapPips" /> Pips zu teuer. Was tust du?
+
+Du verkaufst ihm USD 1 Mio. auf Termin zum teuren Kurs. Die Dollars, die du liefern musst, besorgst du dir über Weg B aus Abschnitt 2, und der kostet nur den fairen Kurs. Der Unterschied bleibt dir. Du brauchst dafür kein eigenes Geld und trägst kein Kursrisiko. Das ist **Arbitrage**, genauer ein **Cash and Carry**: Ware heute kaufen (Cash), bis zur Lieferung halten (Carry), auf Termin verkaufen.
+
+### Schritt für Schritt
+
+**Heute:**
+
+1. Leih dir <Num of="m02.chfLoan" /> zu <Num of="ex.rd" />.
+2. Kauf damit zum Spot von <Num of="ex.spot" /> genau <Num of="m02.usdToday" />.
+3. Leg die Dollars für 90 Tage zu <Num of="ex.rf" /> an.
+4. Verkauf USD 1 Mio. auf Termin zu <Num of="m02.arbMarket" />. Das ist ein Vertrag, heute fliesst dafür kein Geld.
+
+Netto ist dein Kontostand heute in beiden Währungen null: Der Kredit hat den Kauf bezahlt, der Kauf die Anlage.
+
+**Bei Fälligkeit:**
+
+5. Die Anlage zahlt USD 1 Mio. aus.
+6. Du lieferst die USD 1 Mio. in den Forward und erhältst <Num of="m02.arbChfIn" />.
+7. Du zahlst den Kredit mit Zins zurück: <Num of="m02.chfRepay" />.
+
+Übrig bleiben <Num of="m02.arbProfit" />. Das ist genau USD 1 Mio. mal die Abweichung von <Num of="m02.arbGapPips" /> Pips. Der Gewinn steht schon heute fest. Die Arbitrage ist risikolos, solange alle Gegenparteien zahlen.
+
+<CashCarryCalculatorFigure caption="Tipp einen Markt-Forward ein oder zieh ihn auf dem Lineal. Rechts vom fairen Wert ist er zu teuer, links zu billig. Spiel die Schritte ab und drück dann auf «Markt reagiert»." />
+
+### Und wenn der Forward zu billig ist?
+
+Dann drehst du alles um. Steht der Forward bei <Num of="m02.arbMarketLow" />, kaufst du die Dollars billig auf Termin und verkaufst sie über den Geldmarkt zum fairen Kurs: <Num of="m02.usdToday" /> leihen, zum Spot in <Num of="m02.chfLoan" /> tauschen, die Franken anlegen. Bei Fälligkeit zahlst du <Num of="m02.arbChfPayLow" /> in den Forward, erhältst USD 1 Mio. und zahlst damit den Dollar-Kredit zurück. Aus der Franken-Anlage kommen <Num of="m02.chfRepay" />. Übrig bleiben wieder <Num of="m02.arbProfit" />.
+
+### Warum der Forward fair bleibt
+
+Eine solche Lücke sieht nicht nur einer. Viele machen denselben Trade, und jeder davon drückt die Preise zurück:
+
+- Sie **verkaufen** den teuren Forward. Er wird billiger.
+- Sie **kaufen** Dollars zum Spot. Der Spot steigt und mit ihm der faire Forward.
+- Sie **leihen** Franken und **legen** Dollars an. Der CHF-Zins steigt, der USD-Zins sinkt. Beides hebt den fairen Forward.
+
+Das geht, bis kein Gewinn mehr übrig bleibt. Darum steht der Forward im Markt nahe beim fairen Wert, und darum durfte Abschnitt 2 so selbstverständlich gleich teure Wege annehmen.
+
+In der Wirklichkeit kostet jeder Schritt etwas: Spreads auf Spot, Points und Zinsen, Kreditlinien und Eigenkapital. Kleine Abweichungen vom Lehrbuch-Forward können darum bestehen bleiben, solange sie kleiner als diese Kosten sind. Das ist ein Grund, warum die Cross-Currency Basis aus Abschnitt 2 nicht einfach verschwindet.
+
+<Derivation title="Herleitung: Gewinn = Nominal mal Abweichung">
+
+Mit <i>N</i> = USD 1 Mio. bewegst du heute <i>B</i><sub>0</sub> = <i>N</i> / (1 + <i>r</i><sub>USD</sub> · <i>t</i>) Dollars und <i>Q</i><sub>0</sub> = <i>S</i> · <i>B</i><sub>0</sub> Franken. Bei Fälligkeit ist die Anlage genau <i>N</i> wert, und der Kredit kostet <i>Q</i><sub>0</sub> · (1 + <i>r</i><sub>CHF</sub> · <i>t</i>) = <i>N</i> · <i>F</i><sub>fair</sub> (Abschnitt 2). Aus dem Forward erhältst du <i>N</i> · <i>F</i><sub>Markt</sub>. Der Gewinn bei Fälligkeit ist darum
+
+<Formula variant="accent">Gewinn = <i>N</i> · (<i>F</i><sub>Markt</sub> − <i>F</i><sub>fair</sub>) = USD 1 Mio. · <Num of="m02.arbGapPips" /> Pips = <Num of="m02.arbProfit" /></Formula>
+
+Ist der Markt-Forward zu billig, läuft alles spiegelbildlich, und der Gewinn ist <i>N</i> · (<i>F</i><sub>fair</sub> − <i>F</i><sub>Markt</sub>).
+
+**Heute ist der Gewinn** um den CHF-Zins abgezinst wert: Gewinn / (1 + <i>r</i><sub>CHF</sub> · <i>t</i>) = <Num of="m02.arbProfitPv" />. Bei einem CHF-Zins von <Num of="ex.rd" /> ist das derselbe Betrag.
+
+**Mit Spreads** gibt es keinen einzelnen fairen Forward mehr, sondern ein Band. Seine Grenzen ergeben sich, wenn du in jedem Schritt auf der schlechteren Seite handelst. Die obere Grenze gilt für den Cash and Carry: Dollars kaufst du zum Ask, Franken leihst du zum höheren Zins, Dollars legst du zum tieferen an. Die untere gilt für die Gegenrichtung: Dollars verkaufst du zum Bid, Dollars leihst du zum höheren Zins, Franken legst du zum tieferen an. Nur ein Markt-Forward ausserhalb dieses Bands lohnt sich.
+
+</Derivation>
+
+<Desk title="Das Cash and Carry der Bank">
+
+Die Bank, die dem Importeur den Forward verkauft, ist danach short USD auf Termin. Sie sichert sich mit genau dem Weg B ab: Dollars heute kaufen und bis zur Fälligkeit parken. In der Praxis macht sie das mit einem Spot-Geschäft und einem FX Swap (Modul 03).
+
+Ihr Ertrag ist die Marge im Kurs, keine Wette auf den Dollar. Die Zinsparität ist für den Forward-Händler darum keine Theorie, sondern der tägliche Ablauf.
+
+</Desk>
+
+<Takeaway>
+
+Weicht der Forward vom fairen Wert ab, bringt Cash and Carry einen Gewinn ohne Kursrisiko und ohne eigenes Geld: Nominal mal Abweichung. Weil das alle sehen, bleibt der Forward nahe beim fairen Wert. Abweichungen wie die Cross-Currency Basis halten sich, solange sie die Kosten der Arbitrage nicht decken.
+
+</Takeaway>

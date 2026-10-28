@@ -1,0 +1,16 @@
+---
+/**
+ * Wrapper for Markdown tables in MDX: a focusable, labelled scroll region so wide tables
+ * stay usable with the keyboard on phones (axe "scrollable-region-focusable").
+ */
+import { pageLang } from './lang';
+
+const lang = pageLang(Astro.currentLocale);
+const label = lang === 'en' ? 'Table (scrolls sideways)' : 'Tabelle (seitlich scrollbar)';
+---
+
+<div class="table-wrap" tabindex="0" role="region" aria-label={label}>
+  <table {...Astro.props}>
+    <slot />
+  </table>
+</div>

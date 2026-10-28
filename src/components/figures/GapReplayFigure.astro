@@ -1,0 +1,47 @@
+---
+/**
+ * GapReplay as an MDX figure (module 07, section 4): <GapReplayFigure caption="…" />.
+ * Reads the ECB raw data at build time (Node), cuts the EUR/CHF window of M07_CONFIG.gap with the
+ * parser of src/lib/data and passes it to the island together with the sourced facts (minimum
+ * rate, its start date, the ECB fixing time) and the Riskometer link.
+ */
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import Figure from '@/components/content/Figure.astro';
+import GapReplay from '@/components/islands/GapReplay';
+import { pageLang } from '@/components/content/lang';
+import { getFact } from '@/content/facts';
+import { riskometerPath } from '@/i18n/routes';
+import { M07_CONFIG } from '@/lib/m07/config';
+import { fixingsWindow, riskometerLink } from '@/lib/m07/gap';
+import M07Styles from './M07Styles.astro';
+
+interface Props {
+  caption?: string;
+}
+const { caption } = Astro.props;
+const lang = pageLang(Astro.currentLocale);
+const G = M07_CONFIG.gap;
+const raw = readFileSync(join(process.cwd(), 'data/raw/ecb-eur-reference.csv'), 'utf8');
+const series = fixingsWindow(raw, G.pair, G.from, G.to);
+const floorFact = getFact('m07-floor');
+const floor = Number(floorFact.en);
+if (!Number.isFinite(floor) || series.length < 2) {
+  throw new Error('GapReplayFigure: floor fact or ECB window missing');
+}
+---
+
+<M07Styles />
+<Figure caption={caption}>
+  <GapReplay
+    client:visible
+    lang={lang}
+    series={series}
+    floor={floor}
+    floorText={floorFact[lang]}
+    floorSince={getFact('m07-floor-start')[lang]}
+    floorEnd={getFact('m07-floor-end')[lang]}
+    ecbTime={getFact('m07-ecb-time')[lang]}
+    riskometerHref={riskometerLink(riskometerPath(lang))}
+  />
+</Figure>

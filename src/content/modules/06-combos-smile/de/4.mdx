@@ -1,0 +1,70 @@
+import SmileBuilderFigure from '@/components/figures/SmileBuilderFigure.astro';
+
+{/* 06 Kombos & Vola-Smile · Abschnitt 4 · Vola-Smile. Zahlen nur über <Num />, Registry src/lib/nums/m06.ts. Smile-Werte sind Beispielwerte, keine Marktdaten. */}
+
+Bis jetzt hatte jede Option im Beispiel dieselbe Vola, <Num of="ex.vol" />. So rechnet Garman-Kohlhagen: eine Zahl für alle Strikes. Der Markt sieht das anders. Optionen weit aus dem Geld kosten meist mehr, als diese eine Zahl erklären würde. Kurse springen manchmal stärker, als die Normalverteilung erwarten lässt, und die Nachfrage nach Schutz ist nicht auf beiden Seiten gleich gross.
+
+Darum hat jeder Strike seine eigene **implizite Vola**: die Vola, mit der das Modell genau den Marktpreis dieser Option trifft. Trägst du sie gegen den Strike auf, entsteht eine Kurve, meist an den Rändern höher als in der Mitte. Das ist der **Vola-Smile**.
+
+Im Devisenmarkt wird der Smile nicht Strike für Strike notiert, sondern mit drei Zahlen an drei Punkten:
+
+- **ATM:** die Vola am Geld, genauer beim delta-neutralen Straddle. Sie gibt die **Höhe**.
+- **25Δ Risk Reversal:** Vola des 25Δ USD Calls minus Vola des 25Δ USD Puts. Er gibt die **Schiefe**.
+- **25Δ Butterfly:** Durchschnitt der beiden Flügel minus ATM. Er gibt die **Krümmung**.
+
+Umgekehrt folgen die Flügel aus den Quotes:
+
+<Formula variant="accent">
+  <span>σ<sub>25C</sub> = ATM + BF + RR/2</span>
+  <span>σ<sub>25P</sub> = ATM + BF − RR/2</span>
+</Formula>
+
+### Warum RR in USD/CHF negativ sein kann
+
+Der Franken gilt als sicherer Hafen. In einem Referat von <Fact id="m06-snb-safe-haven-2009" /> hielt ein Mitglied des Direktoriums der Schweizerischen Nationalbank fest, die Finanzkrise habe gezeigt, dass der Franken diesen Status weiterhin hat. Wer sich gegen einen stärkeren Franken absichern will, kauft **CHF Calls**, und das sind **USD Puts**. Steigt diese Nachfrage, werden USD Puts teurer: Ihre implizite Vola steigt. Dann ist RR = σ<sub>25C</sub> − σ<sub>25P</sub> negativ, und der linke Flügel des Smiles, bei den tiefen Strikes, hebt sich.
+
+Unser Beispiel bildet das ab: ATM <Num of="m06.smAtm" />, RR <Num of="m06.smRr" />, BF <Num of="m06.smBf" />. Das sind Beispielwerte, keine Marktdaten.
+
+<SmileBuilderFigure caption="Zieh am RR-Regler auf null: Beide Flügel werden gleich hoch. Setze BF auf null: Die Flügel liegen im Schnitt auf ATM-Höhe, über dem Delta wird der Smile zur Geraden. Mit «Delta» siehst du denselben Smile über dem Delta, so wie der Markt ihn quotiert. Die Punkte kannst du direkt ziehen." />
+
+### Der Smile in Zahlen
+
+Mit den Beispiel-Quotes liegen die Flügel bei σ<sub>25C</sub> = <Num of="m06.smAtm" /> + <Num of="m06.smBf" /> + (<Num of="m06.smRrHalf" />) = <Num of="m06.sm25c" /> und σ<sub>25P</sub> = <Num of="m06.sm25p" />. Ihr Durchschnitt ist <Num of="m06.smWingAvg" />, also BF über ATM. Zu den drei Punkten gehören die Strikes <Num of="m06.smK25p" /> (25Δ Put), <Num of="m06.smKatm" /> (ATM) und <Num of="m06.smK25c" /> (25Δ Call). Der Strike <Num of="ex.strike" /> aus dem Beispiel liegt fast ATM, seine Vola ist <Num of="m06.smVolAtStrike" />. Die 25Δ-Strikes aus den Abschnitten 2 und 3, <Num of="m06.put25K" /> und <Num of="m06.call25K" />, lagen leicht daneben: Dort galten eine flache Vola, das Spot-Delta ohne Prämienanpassung und ein Raster von <Num of="m06.strikeStepPips" /> Pips.
+
+Was ändert das am Preis? Der 25Δ USD Put kostet mit dem Smile <Num of="m06.put25SmilePips" /> statt <Num of="m06.put25FlatPips" /> Pips, das sind <Num of="m06.put25DiffPips" /> Pips. Der 25Δ USD Call kostet <Num of="m06.call25SmilePips" /> statt <Num of="m06.call25FlatPips" /> Pips (<Num of="m06.call25DiffPips" /> Pips).
+
+Für den Collar des Importeurs aus Abschnitt 2 ist das eine gute Nachricht. Er **kauft** den billigeren Call und **verkauft** den teureren Put. Der Markt bezahlt ihn dafür, ein Risiko zu tragen, gegen das sich andere absichern: einen starken Franken. Mit denselben Strikes <Num of="m06.rrCallK" /> und <Num of="m06.rrPutK" /> erhält er mit dem Smile netto <Num of="m06.rrSmileCreditPips" /> Pips, also <Num of="m06.rrSmileCreditChf" />. Oder er bleibt bei Zero Cost und setzt den Put tiefer, auf <Num of="m06.rrPutKSmile" />.
+
+<Derivation title="Herleitung: der Smile im Delta und der Weg zum Strike">
+
+**1.** Gemessen wird hier im Forward-Delta des USD Calls ohne Prämienanpassung, Δ = <i>N</i>(<i>d</i><sub>1</sub>). Es läuft von 1 (tiefe Strikes) bis 0 (hohe Strikes). Der 25Δ Call liegt bei Δ = 0.25, der 25Δ Put bei Δ = 0.75, denn sein Put-Delta ist Δ − 1 = −0.25. ATM ist Δ = 0.5.
+
+**2.** Zwischen den Punkten wird quadratisch im Delta interpoliert:
+
+<Formula variant="accent"><span>σ(Δ) = ATM − 2 · RR · (Δ − 0.5) + 16 · BF · (Δ − 0.5)²</span></Formula>
+
+**3.** Einsetzen prüft die Formel. Bei Δ = 0.5 bleibt ATM. Bei Δ = 0.25 ist Δ − 0.5 = −0.25: Der lineare Term gibt +RR/2, der quadratische 16 · BF · 0.0625 = BF, also σ<sub>25C</sub> = ATM + BF + RR/2. Bei Δ = 0.75 dreht nur das Vorzeichen des linearen Terms: σ<sub>25P</sub> = ATM + BF − RR/2. Damit ist RR = σ<sub>25C</sub> − σ<sub>25P</sub> und BF = (σ<sub>25C</sub> + σ<sub>25P</sub>)/2 − ATM.
+
+**4.** Zum Strike führt die Delta-Formel, aufgelöst nach <i>K</i>, mit der Vola dieses Deltas:
+
+<Formula><span><i>K</i> = <i>F</i> · <i>e</i><sup>−<i>N</i><sup>−1</sup>(Δ) · σ√<i>T</i> + ½σ²<i>T</i></sup></span></Formula>
+
+Für den 25Δ Call: −<i>N</i><sup>−1</sup>(0.25) = <Num of="m06.ninv25" /> und σ<sub>25C</sub>√<i>T</i> = <Num of="m06.sd25c" /> ergeben <i>K</i> = <Num of="m06.smK25c" />. Bei Δ = 0.5 ist <i>N</i><sup>−1</sup> = 0, also <i>K</i> = <i>F</i> · <i>e</i><sup>½σ²<i>T</i></sup> = <Num of="m06.smKatm" />: der Strike des delta-neutralen Straddles.
+
+**5.** Umgekehrt, für einen gegebenen Strike, hängt das Delta von der Vola ab und die Vola vom Delta. Der Rechner löst das mit einer Fixpunkt-Iteration: Start bei ATM, Delta rechnen, neue Vola ablesen, wiederholen. Nach wenigen Schritten steht die Vola fest.
+
+</Derivation>
+
+<Desk title="Konventionen am Desk">
+
+Der Butterfly hier ist der **Smile-Strangle**: der durchschnittliche Abstand der Flügel-Volas zu ATM. Am Markt wird der 25Δ Butterfly oft als **Broker-Fly** gehandelt. Dort ist er ein Preis: Ein Strangle aus 25Δ-Strikes wird mit einer einzigen Vola, ATM plus Broker-Fly, bewertet. Der Smile muss diesen Strangle zum selben Preis bewerten. Bei kleinem Risk Reversal liegen beide Werte nahe beieinander, bei grossem weichen sie ab.
+
+Auch das Delta hat Konventionen: Spot- oder Forward-Delta, mit oder ohne Prämienanpassung, je nach Währungspaar und Laufzeit. Das verschiebt die Strikes leicht. Wer quotiert, sagt darum immer dazu, welche Konvention gilt. Ein Händler liest den Risk Reversal als Stimmung: Er zeigt, auf welcher Seite der Markt mehr für Schutz bezahlt. Und der Smile bleibt auch danach wichtig: Barrier-Optionen aus [Modul 07](/module/07-barrier-binary/1/) bewertet der Desk nicht mit einer einzigen Vola, sondern im Einklang mit dem Smile.
+
+</Desk>
+
+<Takeaway>
+
+Der Smile gibt jedem Strike seine eigene Vola. Drei Quotes beschreiben ihn: ATM die Höhe, Risk Reversal die Schiefe, Butterfly die Krümmung. Ein negativer RR heisst: Schutz gegen einen starken Franken ist teurer als Schutz gegen einen starken Dollar.
+
+</Takeaway>

@@ -1,0 +1,71 @@
+import GreeksLabFigure from '@/components/figures/GreeksLabFigure.astro';
+
+{/* 05 Greeks · Abschnitt 3 · Vega. Zahlen nur über <Num />, Registry src/lib/nums/ex.ts und m05.ts. */}
+
+Stell dir vor, an den Märkten wird es unruhig. USD/CHF steht noch genau dort, wo er gestern stand, aber alle rechnen mit grösseren Ausschlägen. Der Call des Importeurs wird trotzdem teurer. Warum?
+
+Der Grund ist die Asymmetrie einer gekauften Option. Grössere Ausschläge bringen mehr Chancen nach oben. Nach unten kann der Käufer nie mehr verlieren als die Prämie. Mehr Unsicherheit macht das Recht also wertvoller, beim Call genauso wie beim Put.
+
+Vega misst diesen Effekt: Um wie viel ändert sich die Prämie, wenn die implizite Vola um einen Punkt steigt?
+
+<Formula variant="accent">ν = ∂<i>V</i> / ∂σ</Formula>
+
+Für den Importeur heisst das: Je nervöser der Markt, desto teurer die Absicherung. Wer erst kauft, wenn alle Angst haben, zahlt mehr. Wer den Call schon hat, gewinnt in solchen Phasen, auch wenn sich der Kurs nicht bewegt.
+
+<GreeksLabFigure mode="vega" caption="Zieh an der Vola oder direkt am Punkt: Oben ist die Steigung der Tangente Vega. Unten siehst du Vega über dem Spot; der Ring markiert das Maximum, dort liegt der Forward nahe am Strike. Verlängere die Laufzeit, und die ganze Kurve wächst." />
+
+### Vega im Beispiel
+
+<Formula variant="accent"><span>ν = <i>S</i> · <i>e</i><sup>−<i>r</i><sub>f</sub><i>T</i></sup> · φ(<i>d</i><sub>1</sub>) · √<i>T</i> = <Num of="ex.spot" digits={1} /> · <Num of="m05.dff" /> · <Num of="m05.phiD1" /> · <Num of="m05.sqrtT" /> = <b><Num of="m05.vegaRaw" /></b></span></Formula>
+
+Das ist Vega pro 1.00 Vola, also pro 100 Vola-Punkte. Pro Punkt und auf USD 1 Mio. sind es <Num of="ex.vegaChf" />, in Pips <Num of="m05.vegaPips" /> Pips. Steigt die Vola von <Num of="ex.vol" /> auf <Num of="m05.volUp" />, steigt die Prämie von <Num of="ex.callChf" /> auf <Num of="m05.callChfVolUp" />. Vega allein sagt <Num of="m05.callChfVegaApprox" /> voraus. Am Forward ist der Preis fast linear in der Vola, darum trifft die Schätzung so genau.
+
+<Callout variant="good" title="Numerischer Check">
+
+Prämie bei der Vola plus und minus 0.01 Punkte, Differenz durch 0.02 Punkte: <Num of="m05.vegaNumeric" /> je Vola-Punkt. Die Formel liefert <Num of="ex.vegaChf" digits={2} />. Das Labor zeigt dieselbe Rechnung für jede Einstellung.
+
+</Callout>
+
+### Warum Vega nahe am Forward am grössten ist
+
+Tief im Geld ist so gut wie sicher, dass die Option ausgeübt wird. Sie verhält sich wie ein Forward, und ein Forward kümmert sich nicht um die Vola. Weit aus dem Geld ist so gut wie sicher, dass sie wertlos verfällt. Etwas mehr Vola ändert daran wenig. Am meisten bewirkt die Vola dort, wo das Ergebnis offen ist: wenn der Forward nahe am Strike liegt.
+
+In der Formel steckt das in φ(<i>d</i><sub>1</sub>), einer Glockenkurve. Liegt der Spot zwei Big Figures tiefer, bei <Num of="m05.spotOtm" />, liegt der Forward <Num of="m05.fwdOtmPips" /> Pips unter dem Strike, und Vega fällt auf <Num of="m05.vegaOtm" />. Je weiter der Forward vom Strike weg liegt, desto kleiner wird Vega.
+
+Der zweite Faktor ist √<i>T</i>. Mehr Zeit heisst mehr Raum für Bewegung, aber nicht proportional: Vega wächst mit der Wurzel der Zeit. Ein Jahr hat viermal so viel Zeit wie drei Monate, also rund doppelt so viel Vega. ATMF sind es bei einem Jahr <Num of="m05.vegaAtmf1y" /> je Vola-Punkt, das <Num of="m05.vegaRatio1y" />-Fache. Gemeint ist eine Option mit Strike am 1-Jahres-Forward.
+
+Im Labor bleibt der Strike bei <Num of="ex.strike" />. Schieb dort die Laufzeit auf ein Jahr: Das Maximum wandert nach rechts, zu Spot <Num of="m05.vegaPeakSpot1y" />. Über ein Jahr betragen die Forward Points <Num of="m05.fwdPoints1y" /> Pips. Damit der Forward den Strike trifft, muss der Spot also höher liegen. Vega richtet sich nach dem Forward, nicht nach dem Spot.
+
+<Derivation title="Herleitung: Vega aus dem Garman-Kohlhagen-Preis">
+
+**1.** Im Preis <i>V</i> = <i>e</i><sup>−<i>r</i><sub>d</sub><i>T</i></sup> · [<i>F</i> · <i>N</i>(<i>d</i><sub>1</sub>) − <i>K</i> · <i>N</i>(<i>d</i><sub>2</sub>)] hängen nur <i>d</i><sub>1</sub> und <i>d</i><sub>2</sub> von der Vola ab. Mit der Kettenregel:
+
+<Formula><span>∂<i>V</i> / ∂σ = <i>e</i><sup>−<i>r</i><sub>d</sub><i>T</i></sup> · [<i>F</i> · φ(<i>d</i><sub>1</sub>) · ∂<i>d</i><sub>1</sub>/∂σ − <i>K</i> · φ(<i>d</i><sub>2</sub>) · ∂<i>d</i><sub>2</sub>/∂σ]</span></Formula>
+
+**2.** Wegen <i>d</i><sub>2</sub> = <i>d</i><sub>1</sub> − σ√<i>T</i> gilt φ(<i>d</i><sub>2</sub>) = φ(<i>d</i><sub>1</sub>) · <i>e</i><sup><i>d</i><sub>1</sub>σ√<i>T</i> − ½σ²<i>T</i></sup> = φ(<i>d</i><sub>1</sub>) · <i>F</i> / <i>K</i>. Also ist <i>K</i> · φ(<i>d</i><sub>2</sub>) = <i>F</i> · φ(<i>d</i><sub>1</sub>), und die Klammer vereinfacht sich:
+
+<Formula><span>∂<i>V</i> / ∂σ = <i>e</i><sup>−<i>r</i><sub>d</sub><i>T</i></sup> · <i>F</i> · φ(<i>d</i><sub>1</sub>) · (∂<i>d</i><sub>1</sub>/∂σ − ∂<i>d</i><sub>2</sub>/∂σ)</span></Formula>
+
+**3.** Die Differenz der beiden Ableitungen ist einfach √<i>T</i>, denn <i>d</i><sub>1</sub> − <i>d</i><sub>2</sub> = σ√<i>T</i>. Mit <i>e</i><sup>−<i>r</i><sub>d</sub><i>T</i></sup> · <i>F</i> = <i>S</i> · <i>e</i><sup>−<i>r</i><sub>f</sub><i>T</i></sup> folgt:
+
+<Formula variant="accent"><span>ν = <i>S</i> · <i>e</i><sup>−<i>r</i><sub>f</sub><i>T</i></sup> · φ(<i>d</i><sub>1</sub>) · √<i>T</i></span></Formula>
+
+**4.** Für den Put gilt dasselbe Vega. Die Put-Call-Parität <i>C</i> − <i>P</i> = <i>e</i><sup>−<i>r</i><sub>d</sub><i>T</i></sup> · (<i>F</i> − <i>K</i>) hängt nicht von der Vola ab, also haben Call und Put dieselbe Ableitung nach σ.
+
+Wo genau liegt das Maximum? Über dem Strike betrachtet bei <i>d</i><sub>1</sub> = 0. Über dem Spot betrachtet, wie im Labor, zieht der Faktor <i>S</i> das Maximum etwas nach rechts: ν = <i>S</i> · <i>e</i><sup>−<i>r</i><sub>f</sub><i>T</i></sup> · φ(<i>d</i><sub>1</sub>) · √<i>T</i> ist am grössten bei <i>d</i><sub>1</sub> = +σ√<i>T</i>, also bei <i>d</i><sub>2</sub> = 0, im Beispiel bei Spot <Num of="m05.vegaPeakSpot" />. Beides liegt nur wenige Pips neben ATMF. Bei Gamma steht <i>S</i> dagegen im Nenner, darum liegt sein Maximum in Abhängigkeit vom Spot spiegelbildlich bei <i>d</i><sub>1</sub> = −σ√<i>T</i> (Abschnitt 2).
+
+</Derivation>
+
+<Desk title="Vega am Desk">
+
+Optionen werden in Vola gehandelt, nicht in Franken. Händler quotieren eine implizite Vola, die Prämie folgt aus dem Modell. Vega ist die Brücke zwischen beiden Welten: Ein Vola-Punkt auf dem Call des Importeurs ist <Num of="ex.vegaChf" /> wert.
+
+Mit Spot und Forwards lässt sich Vega nicht absichern, sie haben kein Vega. Am FX-Desk nimmt man dafür andere Optionen, seltener Volatilitäts- oder Varianz-Swaps. Weil kurze und lange Laufzeiten unterschiedlich reagieren, wird Vega meist je Laufzeit getrennt geführt. Wer long Vega ist, gewinnt, wenn der Markt nervös wird. Wie stark die tatsächlichen Schwankungen in Krisen zunehmen, zeigt das [Riskometer](/riskometer/) mit der realisierten Vola.
+
+</Desk>
+
+<Takeaway>
+
+Vega misst, was Unsicherheit wert ist. Am grössten ist es nahe ATMF, wo der Forward beim Strike liegt, und bei langen Laufzeiten, denn Vega wächst mit √<i>T</i>.
+
+</Takeaway>

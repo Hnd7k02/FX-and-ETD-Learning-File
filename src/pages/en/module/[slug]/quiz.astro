@@ -1,0 +1,12 @@
+---
+/** English quiz pages: /en/module/{slug}/quiz/ for every module. */
+import ModuleQuizView from '@/views/ModuleQuizView.astro';
+import { MODULES } from '@/data/modules';
+
+export function getStaticPaths() {
+  return MODULES.map((m) => ({ params: { slug: m.slug } }));
+}
+const { slug } = Astro.params;
+---
+
+<ModuleQuizView lang="en" slug={slug!} />

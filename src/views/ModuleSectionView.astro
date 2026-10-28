@@ -1,0 +1,79 @@
+---
+/**
+ * Module section page (B-Modul), shared by /module/{slug}/{n}/ (de) and /en/module/… (en).
+ * Header band with stepper, the eyebrow "Abschnitt n von 5" and the H2 from src/data/modules.ts,
+ * the MDX text of the section (entry "{slug}/{lang}/{n}" of the "sections" collection) rendered
+ * with the content components, the end-of-section marker (progress), the ungraded check
+ * question of the section (src/content/quiz/{slug}.ts → checks[n]) and the pager.
+ * Without MDX the page shows a calm "coming soon" placeholder so all 9 × 5 pages exist.
+ */
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { mdxComponents } from '@/components/content/mdx-components';
+import ComingSoon from '@/components/module/ComingSoon.astro';
+import ModuleHeader from '@/components/module/ModuleHeader.astro';
+import ModuleMain from '@/components/module/ModuleMain.astro';
+import Pager from '@/components/module/Pager.astro';
+import SectionEnd from '@/components/module/SectionEnd.astro';
+import SectionIntro from '@/components/module/SectionIntro.astro';
+import Quiz from '@/components/islands/Quiz';
+import { getQuiz, viewQuestion } from '@/content/quiz';
+import { getModule } from '@/data/modules';
+import { common } from '@/i18n/dict/common';
+import { modulePath, SECTION_KEYS } from '@/i18n/routes';
+import { translator, type Lang } from '@/i18n/types';
+import type { ContentSection } from '@/lib/progress';
+
+interface Props {
+  lang: Lang;
+  slug: string;
+  section: ContentSection;
+}
+const { lang, slug, section } = Astro.props;
+const t = translator(common, lang);
+const other: Lang = lang === 'de' ? 'en' : 'de';
+const m = getModule(slug);
+const sec = m.sections[Number(section) - 1]!;
+// Looked up in the collection (not getEntry) so unwritten sections do not log a warning per page.
+const entryId = `${slug}/${lang}/${section}`;
+const entry = (await getCollection('sections')).find((e) => e.id === entryId);
+const Content = entry ? (await render(entry)).Content : null;
+const check = getQuiz(slug)?.checks[section];
+const title = `${entry?.data.title ?? sec.title[lang]} · ${m.n} ${m.title[lang]} · ${t('site.name')}`;
+---
+
+<BaseLayout
+  lang={lang}
+  title={title}
+  description={sec.teaser[lang]}
+  nav="modules"
+  family={m.family}
+  altPath={modulePath(other, slug, section)}
+  narrowFooter
+>
+  <ModuleHeader lang={lang} module={m} current={section} />
+  <ModuleMain slug={slug} kind="section" section={section}>
+    <SectionIntro
+      eyebrow={t('module.section', { n: section, total: SECTION_KEYS.length })}
+      title={entry?.data.title ?? sec.title[lang]}
+    />
+    {Content ? (
+      <div class="prose" data-section-content>
+        <Content components={mdxComponents} />
+      </div>
+    ) : (
+      <ComingSoon lang={lang} variant="section" />
+    )}
+    <SectionEnd lang={lang} slug={slug} section={section} />
+    {check && (
+      <Quiz
+        client:visible
+        lang={lang}
+        mode="check"
+        slug={slug}
+        questions={[viewQuestion(check, lang)]}
+      />
+    )}
+    <Pager lang={lang} module={m} current={section} />
+  </ModuleMain>
+</BaseLayout>

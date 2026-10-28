@@ -1,0 +1,29 @@
+---
+/** Full-width hero card that holds the Wow moment (padding 32, radius 28, hero shadow). */
+import WowChart from '@/components/islands/WowChart';
+import { home } from '@/i18n/dict/home';
+import { translator, type Lang } from '@/i18n/types';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const th = translator(home, lang);
+---
+
+<section class="card-hero wow-card" aria-label={th('home.wowSection')}>
+  <WowChart client:load lang={lang} />
+</section>
+
+<style>
+  .wow-card {
+    padding: 32px;
+    min-width: 0;
+  }
+  @media (max-width: 640px) {
+    .wow-card {
+      padding: 20px 16px;
+      border-radius: var(--ff-r-card);
+    }
+  }
+</style>

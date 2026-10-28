@@ -1,0 +1,168 @@
+---
+/** Order demo: market, limit, stop-loss and gap risk (module 01, section 3) for MDX. */
+import OrderDemo from '@/components/islands/OrderDemo';
+import Figure from '@/components/content/Figure.astro';
+import { pageLang } from '@/components/content/lang';
+
+interface Props {
+  caption?: string;
+}
+const { caption } = Astro.props;
+const lang = pageLang(Astro.currentLocale);
+---
+
+<Figure caption={caption}>
+  <OrderDemo client:visible lang={lang} />
+</Figure>
+
+<style is:global>
+  .od {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+  }
+  .od .ff-lab-head {
+    margin-bottom: 0;
+  }
+  .od-head-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+  .od p {
+    margin: 0;
+  }
+  .od-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    font-family: var(--ff-font-ui);
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .od-line {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+  }
+  .od-line--1 {
+    animation: od-draw 700ms ease-out both;
+  }
+  .od-line--2 {
+    animation: od-draw 700ms ease-out 700ms both;
+  }
+  .od-bridge {
+    animation: od-appear 200ms ease-out 650ms both;
+  }
+  @keyframes od-draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  @keyframes od-appear {
+    from {
+      stroke-opacity: 0;
+    }
+    to {
+      stroke-opacity: 1;
+    }
+  }
+  .od-fill {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: od-pop 320ms ease-out both;
+  }
+  @keyframes od-pop {
+    from {
+      transform: scale(0.4);
+    }
+    to {
+      transform: none;
+    }
+  }
+  .od-slip {
+    animation: od-rise 300ms ease-out both;
+  }
+  @keyframes od-rise {
+    from {
+      transform: translateY(4px);
+    }
+    to {
+      transform: none;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .od-line,
+    .od-bridge,
+    .od-fill,
+    .od-slip {
+      animation: none !important;
+    }
+  }
+  .od-grab {
+    cursor: ns-resize;
+    touch-action: none;
+  }
+  .od-handle {
+    cursor: grab;
+    touch-action: none;
+  }
+  .od-handle.is-active {
+    cursor: grabbing;
+  }
+  .od-legend {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 18px;
+    font-size: 13px;
+    color: var(--ff-ink-2);
+  }
+  .od-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .od-swatch {
+    display: inline-block;
+    width: 22px;
+    border-top: 2px solid var(--ff-ink);
+  }
+  .od-swatch--limit {
+    border-top: 2px dashed var(--ff-long);
+  }
+  .od-swatch--stop {
+    border-top: 2px dashed var(--ff-short);
+  }
+  .od-hint {
+    font-size: 12px;
+    color: var(--ff-muted);
+  }
+  .od-control {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .od-control .segmented > button {
+    min-height: 44px;
+  }
+  .od .od-note {
+    padding: 14px 16px;
+    border-radius: var(--ff-r-box);
+    background: var(--ff-surface-2);
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--ff-ink-2);
+  }
+  .od .od-note.is-gap {
+    background: var(--ff-bad-soft);
+    color: var(--ff-bad-text-strong);
+  }
+</style>

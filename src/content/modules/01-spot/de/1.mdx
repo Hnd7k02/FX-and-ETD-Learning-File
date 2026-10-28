@@ -1,0 +1,78 @@
+import SpotExposureFigure from '@/components/figures/SpotExposureFigure.astro';
+
+{/* 01 Spot · Abschnitt 1 · Intuition. Zahlen nur über <Num />, Register src/lib/nums/ex.ts und m01.ts. */}
+
+Ein Wechselkurs ist ein Preis. Er sagt dir, was eine Währung in einer anderen kostet. USD/CHF <Num of="ex.spot" /> heisst: Ein US-Dollar kostet <Num of="ex.spot" /> Franken. Der Dollar ist die Ware, der Franken das Geld, mit dem du bezahlst.
+
+Unser Importeur kauft Maschinen in den USA. In 3 Monaten muss er USD 1 Mio. überweisen. Würde er heute zahlen, kostete ihn das <Num of="m01.costToday" />. Er zahlt aber erst in 3 Monaten, zum Kurs, der dann gilt. Diesen Kurs kennt heute niemand.
+
+Damit hat er ein Problem, obwohl er noch keinen einzigen Dollar gekauft hat. Steigt der Dollar, wird seine Rechnung in Franken teurer. Fällt er, wird sie billiger. Sein Ergebnis hängt an einem Kurs, den er nicht beeinflussen kann. Das nennt man **Währungsrisiko** oder **Exposure**.
+
+<SpotExposureFigure caption="Zieh am Kurs. Jeder Block ist eine Big Figure mehr oder weniger. Das graue Band zeigt, wo der Kurs in 3 Monaten typischerweise liegt." />
+
+### Pips und Big Figures
+
+Kurse wie USD/CHF haben vier Nachkommastellen. Die letzte Stelle heisst **Pip**, also 0.0001. Hundert Pips sind eine **Big Figure**, also 0.0100. Auf USD 1 Mio. ist ein Pip <Num of="m01.pipChf" /> wert, eine Big Figure <Num of="m01.bigFigChf" />.
+
+Drei Szenarien für den Tag der Zahlung:
+
+- **Eine Big Figure höher, <Num of="m01.sBf" />.** Die Dollars kosten <Num of="m01.costBf" />, also <Num of="m01.bigFigChf" /> mehr als heute.
+- **Der Dollar steigt auf <Num of="m01.stUp" />.** Das sind <Num of="m01.bfUp" /> Big Figures oder <Num of="m01.pctUp" sign={false} />. Der Importeur zahlt <Num of="m01.costUp" />, also <Num of="m01.diffUp" sign={false} /> mehr.
+- **Der Dollar fällt auf <Num of="m01.stDown" />.** Er zahlt <Num of="m01.costDown" />, also <Num of="m01.saveDown" /> weniger.
+
+### Wie weit kann der Kurs laufen?
+
+Wie stark ein Kurs schwankt, misst die **Vola** (Volatilität), aufs Jahr gerechnet. Bei einer Vola von <Num of="ex.vol" /> liegt der Kurs in 3 Monaten im Modell in etwa zwei von drei Fällen ([risikoneutral](/glossar/#term-risk-neutral), keine Prognose) zwischen <Num of="m01.rangeLo" /> und <Num of="m01.rangeHi" />. Das ist das graue Band im Chart. Für den Importeur heisst das: Seine Rechnung kann um <Num of="m01.rangeLoSave" /> tiefer oder um <Num of="m01.rangeHiChf" sign={false} /> höher ausfallen als heute. Und das in einem ganz gewöhnlichen Quartal.
+
+Und ein Anstieg auf <Num of="m01.stUp" /> oder höher? Das Modell gibt dafür rund <Num of="m01.probUp" /> Wahrscheinlichkeit (risikoneutral, keine Prognose). Unwahrscheinlich, aber kein Ausnahmefall. Genau gegen solche Fälle will sich der Importeur schützen. Wie das geht, zeigt Modul 02 mit dem Forward.
+
+### Derselbe Kurs, andersherum
+
+Du kannst jeden Kurs auch umgekehrt schreiben. Statt Franken je Dollar nennst du Dollar je Franken: CHF/USD = 1 ÷ <Num of="ex.spot" /> = <Num of="m01.inverse" />. Im Markt gehandelt und gezeigt wird USD/CHF. Die erste Währung heisst **Base**, die zweite **Quote**. Mehr dazu in Abschnitt 3.
+
+Prozente sind dabei nicht symmetrisch. Steigt USD/CHF von <Num of="ex.spot" /> auf <Num of="m01.stUp" />, gewinnt der Dollar <Num of="m01.pctUp" sign={false} />. Der Franken verliert aber nur <Num of="m01.inverseLossUp" />: CHF/USD fällt von <Num of="m01.inverse" /> auf <Num of="m01.inverseUp" />.
+
+<Derivation title="Herleitung: Kosten, Kehrwert, Bandbreite und Wahrscheinlichkeit">
+
+**Kosten.** Mit dem Nominal <i>N</i> = USD 1 Mio. und dem Kurs <i>S</i> in CHF je USD kosten die Dollars <i>C</i> = <i>N</i> · <i>S</i>. Die Kosten sind linear im Kurs:
+
+<Formula>Δ<i>C</i> = <i>N</i> · Δ<i>S</i></Formula>
+
+Ein Pip (Δ<i>S</i> = 0.0001) kostet also <Num of="m01.pipChf" />, eine Big Figure (Δ<i>S</i> = 0.01) <Num of="m01.bigFigChf" />. Die Steigung der orangen Linie im Chart ist genau der Nominalbetrag.
+
+**Kehrwert.** Steigt <i>S</i> um den Anteil <i>x</i>, dann ändert sich 1/<i>S</i> um
+
+<Formula variant="accent">1 / (1 + <i>x</i>) − 1 = −<i>x</i> / (1 + <i>x</i>)</Formula>
+
+Mit <i>x</i> = <Num of="m01.pctUp" /> ergibt das <Num of="m01.inversePctUp" />. Je grösser die Bewegung, desto grösser die Lücke zwischen den beiden Prozentzahlen.
+
+**Bandbreite.** Im Optionsmodell (Modul 04) ist die Log-Rendite des Kurses über die Laufzeit <i>T</i> normalverteilt, mit der Standardabweichung σ√<i>T</i> = <Num of="ex.vol" /> · √<Num of="ex.T" /> = <Num of="m01.sigmaSqrtT" />. Für das Band rechnen wir ohne Drift, die Mitte ist also der heutige Spot. Unter dem risikoneutralen Mass ist der erwartete Kurs dagegen der Forward, <Num of="m01.fwdBelowPips" /> Pips unter dem Spot (Modul 02). Ohne Drift läge der Kurs mit rund <Num of="m01.bandProbNoDrift" /> Wahrscheinlichkeit im Band
+
+<Formula><i>S</i> · e<sup>−σ√<i>T</i></sup> ≤ <i>S</i><sub>T</sub> ≤ <i>S</i> · e<sup>+σ√<i>T</i></sup></Formula>
+
+Das ergibt <Num of="m01.rangeLo" /> bis <Num of="m01.rangeHi" />. Das Band ist auf der Log-Skala symmetrisch, darum liegt es nach oben etwas weiter vom Spot weg als nach unten. Mit der risikoneutralen Drift endet der Kurs in <Num of="m01.bandProb" /> der Fälle im selben Band (risikoneutral, keine Prognose). Für das Band ändert die Drift also wenig.
+
+**Wahrscheinlichkeit.** Wahrscheinlichkeiten rechnet dieses Tool [risikoneutral](/glossar/#term-risk-neutral), wie die Optionsmodelle. Das heisst nur: Der Kurs driftet mit <i>r</i><sub>d</sub> − <i>r</i><sub>f</sub>, sein Erwartungswert bei <i>T</i> ist der Forward <i>F</i>. Für eine Formel braucht es zusätzliche Annahmen des Modells: konstante Vola, ein lognormal verteilter Kurs und keine Sprünge. Mit beidem zusammen ist die Wahrscheinlichkeit, dass der Kurs bei <i>T</i> auf oder über <i>K</i> liegt,
+
+<Formula>
+  <span>P(<i>S</i><sub>T</sub> ≥ <i>K</i>) = N(<i>d</i><sub>2</sub>)</span>
+  <span><i>d</i><sub>2</sub> = [ln(<i>F</i>/<i>K</i>) − ½σ²<i>T</i>] / (σ√<i>T</i>)</span>
+</Formula>
+
+N ist die Verteilungsfunktion der Standardnormalverteilung. Für <i>K</i> = <Num of="m01.stUp" /> ergibt das <Num of="m01.probUp" />, für einen Fall auf <Num of="m01.stDown" /> oder tiefer N(−<i>d</i><sub>2</sub>) = <Num of="m01.probDown" /> (risikoneutral, keine Prognose). Hier zählt die Drift: Der Forward liegt unter dem Spot, darum ist der Fall auf <Num of="m01.stDown" /> wahrscheinlicher als der gleich weite Anstieg auf <Num of="m01.stUp" />.
+
+</Derivation>
+
+<Desk title="Long und Short">
+
+Am Desk sagt man: Der Importeur ist **short USD**. Er schuldet Dollars, die er noch nicht hat, und verliert, wenn der Dollar steigt. Wer Dollars besitzt, ist **long USD** und gewinnt in diesem Fall.
+
+In den Charts dieses Tools ist long blau und short orange. Darum ist die Kostenlinie des Importeurs orange.
+
+</Desk>
+
+<Takeaway>
+
+Ein Wechselkurs ist der Preis einer Währung in einer anderen. Wer in 3 Monaten USD 1 Mio. zahlen muss, ist short USD: Jede Big Figure, die der Dollar steigt, kostet ihn <Num of="m01.bigFigChf" />.
+
+</Takeaway>

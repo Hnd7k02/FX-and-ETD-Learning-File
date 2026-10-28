@@ -1,0 +1,67 @@
+import SwapTripFigure from '@/components/figures/SwapTripFigure.astro';
+
+Unser Importeur muss in 3 Monaten USD 1 Mio. zahlen. Mit dem Forward aus Modul 02 hat er seinen Kurs gesichert. Jetzt geht es um eine verwandte Frage: Was tust du, wenn du eine Währung nicht für immer brauchst, sondern nur **für eine Weile**?
+
+Stell dir eine Schweizer Firma vor. Sie hat Franken auf dem Konto und muss einem Lieferanten USD 1 Mio. zahlen. Kauft sie die Dollar heute per Spot, fliesst das Geld T+2 ([Modul 01](/module/01-spot/3/)): zwei Bankarbeitstage später, nach den Feiertagskalendern beider Währungen. Sie zahlt den Lieferanten darum am Spot-Valutatag, nicht heute. Einen Monat später überweist ihr ein Kunde in den USA genau diesen Betrag. Sie braucht die Dollar also nur für einen Monat.
+
+### Drei Wege zu einem Monat Dollar
+
+- **Spot hin, Spot zurück.** Sie kauft heute USD gegen CHF und verkauft die Dollar des Kunden in einem Monat wieder. Den Rückkurs kennt sie heute nicht. Das ist offenes Kursrisiko.
+- **Dollar leihen.** Sie nimmt einen Kredit in USD auf und zahlt ihn mit dem Geld des Kunden zurück. Dafür braucht sie eine Kreditlinie, und ihre Franken liegen ungenutzt herum.
+- **FX Swap.** Sie kauft heute USD 1 Mio. zum Spot und verkauft sie im selben Geschäft auf Termin in einem Monat zurück. Beide Kurse stehen heute fest.
+
+Der dritte Weg ist ein **FX Swap**: zwei Devisengeschäfte in Gegenrichtung über denselben Betrag. Das frühere heisst **Near Leg**, das spätere **Far Leg**. Die Firma tauscht ihre Franken auf Zeit gegen Dollar und bekommt sie danach zurück. Hier ist das Near Leg ein Spot-Geschäft mit Valuta T+2. Muss das Geld schon heute oder morgen fliessen, nimmst du ein kürzeres Near Leg (Valuta heute oder morgen), zu einem leicht anderen Kurs. Die Laufzeit des Swaps zählt ab der Valuta des Near Leg. Das Tool rechnet sie in Tagen, ohne Feiertagskalender.
+
+Das Far Leg kennst du schon: Es ist ein Forward aus Modul 02. Ein FX Swap ist also ein Spot-Geschäft plus ein Forward in Gegenrichtung, in einem einzigen Abschluss.
+
+<SwapTripFigure caption="Der Spot läuft einen Monat lang auf einem Modellpfad. Ohne Swap (orange) schwankt das Ergebnis mit dem Kurs. Mit Swap (schwarz) steht es seit Tag 0 fest. Mit «Neuer Kurspfad» spielst du einen anderen Monat durch." />
+
+### Was der Swap kostet
+
+Im Near Leg zahlt die Firma <Num of="m03.nearChf" /> und erhält USD 1 Mio. zum Spot <Num of="ex.spot" />. Im Far Leg nach <Num of="m03.tripDays" /> Tagen gibt sie die Dollar zurück, zum Kurs <Num of="m03.tripFar" />. Dafür erhält sie <Num of="m03.tripFarChf" />.
+
+Sie bekommt also <Num of="m03.tripCostChf" /> weniger zurück, als sie bezahlt hat. Das ist kein Kursverlust. Es ist der Preis für einen Monat Dollar. Der Grund ist die Zinsdifferenz: Dollar bringen <Num of="ex.rf" /> Zins, Franken <Num of="ex.rd" />. Wer im Swap die höher verzinste Währung bekommt, gibt den Zinsvorteil über den Kurs des Far Leg wieder ab.
+
+Rechne nach: USD 1 Mio. zu <Num of="ex.rf" /> für <Num of="m03.tripDays" /> Tage ergibt <Num of="m03.tripUsdInterest" /> Zins. Zum Far-Kurs umgerechnet sind das genau <Num of="m03.tripCostChf" />. Der Swap kostet also gleich viel wie ein Dollar-Kredit, für den die Franken als Sicherheit dienen.
+
+Und das Kursrisiko? Steht der Dollar nach dem Monat bei <Num of="m03.tripUp" />, hätte die Firma mit «Spot hin, Spot zurück» <Num of="m03.tripUpGain" /> gewonnen. Steht er bei <Num of="m03.tripDown" />, hätte sie <Num of="m03.tripDownLoss" /> verloren. Mit dem Swap bleibt es in beiden Fällen bei den <Num of="m03.tripCostChf" />.
+
+<Derivation title="Herleitung: Warum der Swap ein besicherter Kredit ist">
+
+Ein Swap über <i>N</i> USD mit Near-Kurs <i>S</i> und Far-Kurs <i>F</i> hat aus Sicht der Firma diese Zahlungen:
+
+<Formula>
+  <span>Spot-Valuta: +<i>N</i> USD und −<i>N</i> · <i>S</i> CHF</span>
+  <span>nach der Laufzeit <i>t</i>: −<i>N</i> USD und +<i>N</i> · <i>F</i> CHF</span>
+</Formula>
+
+Die Firma hält also für die Zeit <i>t</i> Dollar statt Franken. Der Far-Kurs ist fair, wenn kein anderer sicherer Weg billiger ist. Das ist die Zinsparität aus Modul 02, mit einfachen Geldmarktzinsen:
+
+<Formula variant="accent">
+  <i>F</i> = <i>S</i> · (1 + <i>r</i><sub>CHF</sub> · <i>t</i>) / (1 + <i>r</i><sub>USD</sub> · <i>t</i>)
+</Formula>
+
+Daraus folgt, wie viel weniger CHF zurückkommen:
+
+<Formula>
+  <span><i>N</i> · (<i>S</i> − <i>F</i>) = <i>N</i> · <i>S</i> · (<i>r</i><sub>USD</sub> − <i>r</i><sub>CHF</sub>) · <i>t</i> / (1 + <i>r</i><sub>USD</sub> · <i>t</i>)</span>
+  <span>mit <i>r</i><sub>CHF</sub> = 0: = <i>N</i> · <i>r</i><sub>USD</sub> · <i>t</i> · <i>F</i></span>
+</Formula>
+
+Das ist der USD-Zins auf <i>N</i>, umgerechnet zum Far-Kurs. Der Swap ist also ein Kredit in USD, besichert mit CHF; der Zins steckt im Kurs. Weil beide Kurse heute feststehen, trägt die Firma kein Kursrisiko auf dem Nominal.
+
+</Derivation>
+
+<Desk title="Wer FX Swaps braucht">
+
+Banken steuern mit FX Swaps jeden Tag ihre Liquidität in fremden Währungen. Fehlen ihnen Dollar und haben sie Franken übrig, tauschen sie für eine Nacht oder eine Woche.
+
+Firmen nutzen Swaps, wenn sich Zahlungen zeitlich verschieben. Anleger mit Wertschriften in Fremdwährung sichern das Kursrisiko oft mit Forwards ab und verlängern diese Absicherung regelmässig mit einem Swap. Wie das geht, zeigt Abschnitt 3.
+
+</Desk>
+
+<Takeaway>
+
+Ein FX Swap tauscht Währungen auf Zeit: per Spot hin, auf Termin zurück, beide Kurse heute fix. Sein Preis ist die Zinsdifferenz, am Markt samt Cross-Currency Basis; ein Kursrisiko auf dem Nominal bleibt nicht.
+
+</Takeaway>

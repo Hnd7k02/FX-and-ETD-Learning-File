@@ -1,0 +1,15 @@
+---
+/** English section pages: /en/module/{slug}/1/ … /4/ for every module, with or without MDX. */
+import ModuleSectionView from '@/views/ModuleSectionView.astro';
+import { MODULES } from '@/data/modules';
+import { CONTENT_SECTIONS, type ContentSection } from '@/lib/progress';
+
+export function getStaticPaths() {
+  return MODULES.flatMap((m) =>
+    CONTENT_SECTIONS.map((section) => ({ params: { slug: m.slug, section } })),
+  );
+}
+const { slug, section } = Astro.params;
+---
+
+<ModuleSectionView lang="en" slug={slug!} section={section as ContentSection} />

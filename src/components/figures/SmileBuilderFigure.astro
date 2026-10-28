@@ -1,0 +1,140 @@
+---
+/**
+ * Smile builder (module 06, section 4) for MDX: <SmileBuilderFigure caption="…" />.
+ * Props: initialView?: 'strike' | 'delta' (default strike), caption?: string.
+ */
+import SmileBuilder from '@/components/islands/SmileBuilder';
+import Figure from '@/components/content/Figure.astro';
+import { pageLang } from '@/components/content/lang';
+
+interface Props {
+  initialView?: 'strike' | 'delta';
+  caption?: string;
+}
+const { initialView, caption } = Astro.props;
+const lang = pageLang(Astro.currentLocale);
+---
+
+<Figure caption={caption}>
+  <SmileBuilder client:visible lang={lang} initialView={initialView} />
+</Figure>
+
+<style is:global>
+  .sb {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+    color: var(--ff-ink);
+  }
+  .sb .ff-lab-head {
+    margin-bottom: 0;
+  }
+  .sb p {
+    margin: 0;
+  }
+  /* rows without a symbol: text and value only */
+  .sb .ff-stat-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .sb-head-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+  .sb-example {
+    background: var(--ff-warn-soft);
+    color: var(--ff-warn-text);
+    font-weight: 700;
+  }
+  .sb-top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px 16px;
+  }
+  .sb .segmented > button {
+    min-height: 44px;
+  }
+  /* the Legend is a <ul>; keep the .prose list styles away from it */
+  .sb .ff-legend {
+    flex-direction: row;
+    padding-left: 0;
+    gap: 8px 20px;
+  }
+  .sb .ff-legend li {
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--ff-ink-2);
+  }
+  .sb-aha-row {
+    display: flex;
+    align-items: center;
+    min-height: 32px;
+  }
+  .sb-aha {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: var(--ff-r-pill);
+    background: var(--ff-good-soft);
+    color: var(--ff-good-text-strong);
+    font-size: 13px;
+    font-weight: 800;
+    animation: sb-pop 420ms cubic-bezier(0.2, 0.9, 0.3, 1.25) both;
+  }
+  .sb-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    font-family: var(--ff-font-ui);
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .sb-handle {
+    cursor: ns-resize;
+    touch-action: none;
+  }
+  .sb-handle circle {
+    transition: r 160ms ease;
+  }
+  .sb-note {
+    animation: sb-in 320ms ease-out both;
+  }
+  .sb .sb-hint {
+    font-size: 12px;
+    color: var(--ff-muted);
+  }
+  .sb-effect {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .sb .sb-effect-title {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--ff-ink-2);
+  }
+  @keyframes sb-pop {
+    0% {
+      transform: scale(0.7);
+    }
+    70% {
+      transform: scale(1.06);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  @keyframes sb-in {
+    from {
+      transform: translateY(4px);
+    }
+    to {
+      transform: none;
+    }
+  }
+</style>

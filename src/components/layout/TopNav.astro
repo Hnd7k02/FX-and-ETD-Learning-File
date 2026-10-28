@@ -1,0 +1,241 @@
+---
+import Logo from './Logo.astro';
+import ArrowIcon from './ArrowIcon.astro';
+import { common } from '@/i18n/dict/common';
+import { levels, LEVEL_COLORS, LEVEL_KEYS } from '@/i18n/dict/levels';
+import { translator, type Lang } from '@/i18n/types';
+import { glossaryPath, homePath, modulePath, riskometerPath, switchLangPath } from '@/i18n/routes';
+import { getRiskSummary } from '@/lib/risk-summary';
+
+export type NavKey = 'modules' | 'riskometer' | 'glossary' | 'about' | null;
+
+interface Props {
+  lang: Lang;
+  current: NavKey;
+  /** Path of this page in the other language (defaults to the mapped current path). */
+  altPath?: string;
+}
+
+const { lang, current, altPath } = Astro.props;
+const t = translator(common, lang);
+const tl = translator(levels, lang);
+const risk = getRiskSummary();
+const otherLang: Lang = lang === 'de' ? 'en' : 'de';
+const switchHref = altPath ?? switchLangPath(Astro.url.pathname, otherLang);
+const deHref = lang === 'de' ? Astro.url.pathname : switchHref;
+const enHref = lang === 'en' ? Astro.url.pathname : switchHref;
+
+const links = [
+  { key: 'modules', href: homePath(lang) + '#lernpfad', label: t('nav.modules') },
+  { key: 'riskometer', href: riskometerPath(lang), label: t('nav.riskometer'), risk: true },
+  { key: 'glossary', href: glossaryPath(lang), label: t('nav.glossary') },
+] as const;
+const continueHref = modulePath(lang, '01-spot', '1');
+---
+
+<header class="topnav">
+  <a href={homePath(lang)} class="brand" aria-label={t('site.name')}>
+    <Logo />
+    <span class="brand-name">{t('site.name')}</span>
+  </a>
+
+  <nav aria-label={t('a11y.mainNav')} class="links">
+    {links.map((l) => (
+      <a
+        class="top-link"
+        href={l.href}
+        aria-current={current === l.key ? 'page' : undefined}
+        data-active={current === l.key ? 'true' : undefined}
+      >
+        {l.label}
+        {'risk' in l && risk && (
+          <>
+            <span
+              class="risk-dot"
+              style={`background:${LEVEL_COLORS[risk.level]}`}
+              aria-hidden="true"
+            />
+            <span class="sr-only">
+              {' '}
+              ({t('nav.riskLevel', { level: tl(LEVEL_KEYS[risk.level - 1]!) })})
+            </span>
+          </>
+        )}
+      </a>
+    ))}
+  </nav>
+
+  <div class="actions">
+    <div class="lang" role="group" aria-label={t('a11y.language')}>
+      <a
+        href={deHref}
+        hreflang="de"
+        lang="de"
+        data-lang-switch="de"
+        aria-current={lang === 'de' ? 'true' : undefined}
+      >
+        {t('lang.de')}
+      </a>
+      <a
+        href={enHref}
+        hreflang="en"
+        lang="en"
+        data-lang-switch="en"
+        aria-current={lang === 'en' ? 'true' : undefined}
+      >
+        {t('lang.en')}
+      </a>
+    </div>
+    <a class="btn btn-dark continue" href={continueHref} data-continue={lang}>
+      <span class="continue-label">{t('nav.continue')}</span>
+      <ArrowIcon />
+    </a>
+  </div>
+</header>
+
+<script>
+  import '@/client/topnav';
+  import '@/client/svg-touch';
+</script>
+
+<style>
+  .topnav {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 24px;
+    padding: 14px 32px;
+    background: var(--ff-surface);
+    border-bottom: 1px solid var(--ff-line);
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--ff-ink);
+    min-height: var(--ff-touch);
+  }
+  .brand:hover {
+    color: var(--ff-ink);
+  }
+  .brand-name {
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+  }
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .top-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: var(--ff-touch);
+    padding: 0 14px;
+    border-radius: var(--ff-r-pill);
+    color: var(--ff-ink-2);
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .top-link:hover {
+    background: var(--ff-chip);
+    color: var(--ff-ink);
+  }
+  .top-link[data-active='true'] {
+    background: var(--ff-chip);
+    color: var(--ff-ink);
+    font-weight: 800;
+  }
+  .risk-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: var(--ff-r-pill);
+  }
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .lang {
+    display: inline-flex;
+    padding: 3px;
+    border-radius: var(--ff-r-pill);
+    background: var(--ff-chip);
+  }
+  .lang a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    height: 38px;
+    border-radius: var(--ff-r-pill);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ff-muted);
+  }
+  .lang a:hover {
+    color: var(--ff-ink);
+  }
+  .lang a[aria-current='true'] {
+    background: var(--ff-surface);
+    color: var(--ff-ink);
+    font-weight: 800;
+    box-shadow: var(--ff-shadow-control);
+  }
+
+  @media (max-width: 900px) {
+    .topnav {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-areas:
+        'brand actions'
+        'links links';
+      padding: 10px 16px;
+      gap: 8px 12px;
+    }
+    .brand {
+      grid-area: brand;
+    }
+    .actions {
+      grid-area: actions;
+      gap: 8px;
+    }
+    .links {
+      grid-area: links;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      scrollbar-width: none;
+      margin: 0 -16px;
+      padding: 0 16px;
+    }
+    .links::-webkit-scrollbar {
+      display: none;
+    }
+  }
+  @media (max-width: 460px) {
+    .continue {
+      width: var(--ff-touch);
+      padding: 0;
+    }
+    .continue-label {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+    }
+    .brand-name {
+      font-size: 15px;
+    }
+  }
+  @media (max-width: 360px) {
+    .brand-name {
+      display: none;
+    }
+  }
+</style>

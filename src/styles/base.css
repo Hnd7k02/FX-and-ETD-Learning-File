@@ -1,0 +1,706 @@
+/* Forward First – base styles. All values come from tokens.css (design direction B "Lernpfad"). */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-padding-top: 24px;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--ff-plane);
+  color: var(--ff-ink);
+  font-family: var(--ff-font-ui);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+img,
+svg {
+  max-width: 100%;
+}
+
+a {
+  color: var(--ff-linear-text);
+  text-decoration: none;
+}
+a:hover {
+  color: #1e40af;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+summary:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--ff-long);
+  outline-offset: 2px;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  text-wrap: balance;
+}
+p {
+  margin: 0;
+  text-wrap: pretty;
+}
+
+/* ---------- Family theming (module pages and chips) ---------- */
+[data-family='linear'] {
+  --fam: var(--ff-linear);
+  --fam-soft: var(--ff-linear-soft);
+  --fam-text: var(--ff-linear-text);
+}
+[data-family='options'] {
+  --fam: var(--ff-options);
+  --fam-soft: var(--ff-options-soft);
+  --fam-text: var(--ff-options-text);
+}
+[data-family='exotics'] {
+  --fam: var(--ff-exotics);
+  --fam-soft: var(--ff-exotics-soft);
+  --fam-text: var(--ff-exotics-text);
+}
+[data-family='apply'] {
+  --fam: var(--ff-apply);
+  --fam-soft: var(--ff-apply-soft);
+  --fam-text: var(--ff-apply-text);
+}
+
+/* ---------- Layout ---------- */
+.container {
+  max-width: var(--ff-container);
+  margin: 0 auto;
+  padding-left: var(--ff-gutter);
+  padding-right: var(--ff-gutter);
+}
+.container-module {
+  max-width: var(--ff-container-module);
+  margin: 0 auto;
+  padding-left: var(--ff-gutter);
+  padding-right: var(--ff-gutter);
+}
+.measure {
+  max-width: var(--ff-measure);
+}
+
+@media (max-width: 640px) {
+  :root {
+    --ff-gutter: 16px;
+  }
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: var(--ff-touch);
+  padding: 0 20px;
+  border-radius: var(--ff-r-pill);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.2;
+  border: 0;
+  cursor: pointer;
+  text-align: center;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    transform 150ms ease;
+}
+.btn svg {
+  flex: 0 0 auto;
+}
+.btn-dark {
+  background: var(--ff-ink);
+  color: #fff;
+}
+.btn-dark:hover {
+  background: #262b33;
+  color: #fff;
+}
+.btn-light {
+  background: var(--ff-surface);
+  color: var(--ff-ink);
+  border: 1px solid var(--ff-line-strong);
+}
+.btn-light:hover {
+  background: var(--ff-chip);
+  color: var(--ff-ink);
+}
+.btn-lg {
+  min-height: 48px;
+  padding: 0 22px;
+  font-size: 15px;
+}
+.btn:active {
+  transform: translateY(1px);
+}
+
+/* ---------- Chips ---------- */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px;
+  border-radius: var(--ff-r-pill);
+  font-size: var(--ff-label);
+  font-weight: 800;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+.chip-family {
+  background: var(--fam-soft);
+  color: var(--fam-text);
+}
+.chip-outline {
+  border: 1px solid var(--ff-line);
+  color: var(--ff-ink-2);
+  font-weight: 700;
+}
+.chip-neutral {
+  background: var(--ff-chip);
+  color: var(--ff-ink);
+}
+.chip-mono {
+  font-family: var(--ff-font-mono);
+  font-weight: 600;
+}
+.dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--ff-r-pill);
+  flex: 0 0 auto;
+}
+
+/* ---------- Cards ---------- */
+.card {
+  background: var(--ff-surface);
+  border: 1px solid var(--ff-line);
+  border-radius: var(--ff-r-card);
+}
+.card-hero {
+  background: var(--ff-surface);
+  border: 1px solid var(--ff-line);
+  border-radius: var(--ff-r-hero);
+  box-shadow: var(--ff-shadow-hero);
+}
+
+/* ---------- Typography ---------- */
+.h1-hero {
+  font-size: var(--ff-h1);
+  line-height: 1.02;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+.h1-module {
+  font-size: var(--ff-h1-module);
+  line-height: 1.04;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+}
+.h2 {
+  font-size: var(--ff-h2);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.12;
+}
+.h3 {
+  font-size: var(--ff-h3);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+.lead {
+  font-size: var(--ff-lead);
+  line-height: 1.55;
+  color: var(--ff-ink-2);
+}
+.muted {
+  color: var(--ff-muted);
+}
+.mono,
+.num-mono {
+  font-family: var(--ff-font-mono);
+  font-weight: 600;
+  font-feature-settings: 'zero' 0;
+}
+.math {
+  font-family: var(--ff-font-math);
+}
+.math i,
+.math var {
+  font-style: italic;
+}
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.skip-link {
+  position: absolute;
+  left: 16px;
+  top: -100px;
+  z-index: 100;
+  padding: 10px 16px;
+  border-radius: var(--ff-r-control);
+  background: var(--ff-ink);
+  color: #fff;
+  font-weight: 700;
+}
+.skip-link:focus {
+  top: 12px;
+  color: #fff;
+}
+
+/* ---------- Article (module sections) ---------- */
+.prose {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+.prose
+  > :where(
+    p,
+    h2,
+    h3,
+    h4,
+    ul,
+    ol,
+    blockquote,
+    table,
+    details,
+    .formula,
+    .takeaway,
+    .desk,
+    .callout,
+    .measure-block
+  ) {
+  max-width: var(--ff-measure);
+}
+.prose p,
+.prose li {
+  font-size: var(--ff-article);
+  line-height: 1.7;
+  color: var(--ff-body);
+}
+.prose > p + p {
+  margin-top: -16px;
+}
+.prose h2 {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.12;
+}
+.prose h3 {
+  font-size: var(--ff-h3);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+.prose > h3 + p,
+.prose > h2 + p {
+  margin-top: -16px;
+}
+.prose ul,
+.prose ol {
+  margin: 0;
+  padding-left: 1.3em;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.prose li::marker {
+  color: var(--fam, var(--ff-muted));
+  font-weight: 700;
+}
+.prose strong {
+  font-weight: 800;
+  color: var(--ff-ink);
+}
+.prose a {
+  color: var(--ff-linear-text);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+.prose i,
+.prose em {
+  /* italic variables (S, K, H …) otherwise look glued to the next word */
+  padding-right: 0.06em;
+}
+.prose code {
+  font-family: var(--ff-font-mono);
+  font-size: 0.9em;
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: var(--ff-chip);
+}
+
+/* tables in prose */
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+  background: var(--ff-surface);
+  border: 1px solid var(--ff-line);
+  border-radius: var(--ff-r-box);
+  overflow: hidden;
+  display: block;
+  overflow-x: auto;
+}
+.prose th,
+.prose td {
+  padding: 10px 14px;
+  text-align: left;
+  border-top: 1px solid var(--ff-row);
+  vertical-align: top;
+}
+.prose thead th {
+  border-top: 0;
+  background: var(--ff-surface-2);
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--ff-ink-2);
+}
+
+.table-wrap {
+  max-width: var(--ff-measure);
+  overflow-x: auto;
+  border-radius: var(--ff-r-box);
+}
+.table-wrap:focus-visible {
+  outline: 2px solid var(--ff-long);
+  outline-offset: 2px;
+}
+.table-wrap > table {
+  display: table;
+  max-width: none;
+}
+
+/* ---------- Formula boxes ---------- */
+.formula {
+  align-self: flex-start;
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  padding: 12px 20px;
+  border-radius: var(--ff-r-formula);
+  background: var(--ff-surface);
+  border: 1px solid var(--ff-line);
+  font-family: var(--ff-font-math);
+  font-size: var(--ff-formula);
+  line-height: 1.45;
+  overflow-x: auto;
+}
+/* Multi-line formulas: wrap each line in a plain <span> (or <p>). Num/Fact spans stay inline. */
+.formula > span:not(.num):not(.fact),
+.formula > p {
+  display: block;
+  margin: 0;
+}
+.formula > span:not(.num):not(.fact) + span:not(.num):not(.fact),
+.formula > p + p {
+  margin-top: 6px;
+}
+.formula i {
+  font-style: italic;
+}
+.formula--accent {
+  background: var(--fam-soft, var(--ff-linear-soft));
+  border-color: transparent;
+}
+.formula--dark {
+  background: #1b2027;
+  border-color: transparent;
+  color: #fff;
+}
+@media (max-width: 640px) {
+  .formula {
+    font-size: 19px;
+    padding: 12px 16px;
+  }
+}
+
+/* ---------- Derivation (<details>) ---------- */
+details.derivation {
+  border: 1px solid var(--ff-line);
+  border-radius: var(--ff-r-box);
+  background: var(--ff-surface);
+}
+details.derivation > summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 56px;
+  padding: 12px 20px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 800;
+  border-radius: var(--ff-r-box);
+}
+details.derivation > summary::-webkit-details-marker {
+  display: none;
+}
+details.derivation > summary .derivation-icon {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--ff-r-pill);
+  background: var(--ff-chip);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 200ms ease;
+}
+details.derivation[open] > summary .derivation-icon {
+  transform: rotate(45deg);
+}
+details.derivation > .derivation-body {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 4px 20px 24px;
+}
+
+/* ---------- Am Desk ---------- */
+.desk {
+  padding: 28px;
+  border-radius: var(--ff-r-card);
+  background: var(--ff-ink);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.desk .desk-tag {
+  align-self: flex-start;
+  display: inline-flex;
+  padding: 5px 12px;
+  border-radius: var(--ff-r-pill);
+  background: #3a2214;
+  color: #fdba8c;
+  font-size: 12px;
+  font-weight: 800;
+}
+.desk h3,
+.desk .desk-title {
+  margin: 0;
+  font-size: var(--ff-h3);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+.desk p,
+.desk li {
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--ff-on-dark-body);
+}
+.desk strong,
+.desk b {
+  color: #fff;
+}
+.desk .formula {
+  background: #1b2027;
+  border-color: transparent;
+  color: #fff;
+}
+.desk a {
+  color: #93c5fd;
+}
+
+/* ---------- Takeaway (Merksatz) ---------- */
+.takeaway {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 18px 20px;
+  border-radius: var(--ff-r-box);
+  background: var(--fam-soft, var(--ff-linear-soft));
+  color: var(--ff-ink);
+}
+.takeaway .takeaway-label {
+  flex: 0 0 auto;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--fam-text, var(--ff-linear-text));
+  padding-top: 3px;
+}
+.takeaway p {
+  font-size: 17px;
+  line-height: 1.55;
+  font-weight: 700;
+  color: var(--ff-ink);
+}
+
+/* ---------- Callouts ---------- */
+.callout {
+  padding: 16px 20px;
+  border-radius: var(--ff-r-box);
+  background: var(--ff-surface-2);
+  border: 1px solid var(--ff-line);
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ff-ink-2);
+}
+.callout--warn {
+  background: var(--ff-warn-soft);
+  border-color: transparent;
+  color: var(--ff-warn-text);
+}
+.callout--bad {
+  background: var(--ff-bad-soft);
+  border-color: transparent;
+  color: var(--ff-bad-text-strong);
+}
+.callout--good {
+  background: var(--ff-good-soft);
+  border-color: transparent;
+  color: var(--ff-good-text-strong);
+}
+
+/* ---------- Figures (labs, charts) in full container width ---------- */
+.figure {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: none;
+}
+.figure-frame {
+  padding: 28px;
+  background: var(--ff-surface);
+  border: 1px solid var(--ff-line);
+  border-radius: var(--ff-r-hero);
+  box-shadow: var(--ff-shadow-hero);
+  min-width: 0;
+}
+.figure figcaption {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ff-muted);
+  max-width: var(--ff-measure);
+}
+@media (max-width: 640px) {
+  .figure-frame {
+    padding: 16px;
+    border-radius: var(--ff-r-card);
+  }
+}
+
+/* ---------- Form controls shared by islands ---------- */
+.range {
+  width: 100%;
+  height: 28px;
+  margin: 0;
+  accent-color: var(--ff-ink);
+}
+.field-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--ff-ink-2);
+}
+.field-label .field-value {
+  font-family: var(--ff-font-mono);
+  font-weight: 600;
+  color: var(--ff-ink);
+}
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  border-radius: var(--ff-r-box);
+  background: var(--ff-surface-2);
+}
+.segmented {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 4px;
+  border-radius: var(--ff-r-pill);
+  background: var(--ff-chip);
+}
+.segmented > button {
+  min-height: 40px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: var(--ff-r-pill);
+  background: transparent;
+  color: var(--ff-ink-2);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.segmented > button[aria-pressed='true'] {
+  background: var(--ff-ink);
+  color: #fff;
+}
+
+/* ---------- Motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* #main receives programmatic focus after a route change (offline router, ClientRouter);
+   it is a landmark, not a control, so no focus ring. */
+#main:focus {
+  outline: none;
+}
+/* Jump targets made focusable by jumpToId (headings, glossary entries): the highlight or the
+   scroll position shows where focus is; no extra outline on a whole section. */
+[data-jump-focus]:focus {
+  outline: none;
+}

@@ -1,0 +1,79 @@
+import GapReplayFigure from '@/components/figures/GapReplayFigure.astro';
+
+{/* 07 Barrier & Binary · section 4 · Second generation and gap risk. Numbers only via <Num />, facts via <Fact />. */}
+
+You now know the first generation: one barrier, watched throughout the option's life. The second generation changes these building blocks. It moves the time window, sets two barriers or combines barriers with digitals. Market variants differ; here are two typical ones.
+
+### Window barrier: a barrier with an end date
+
+With a window barrier, the barrier applies only during a time window. Take the importer's up-and-out call with strike <Num of="ex.strike" /> and barrier <Num of="m07.barrierUp" />. This time the barrier is only active on days <Num of="m07.windowStart" /> to <Num of="m07.windowEnd" /> and is observed daily. Expiry is after <Num of="m07.windowExpiry" /> days.
+
+The tool has no closed formula for this. The calculation core values the option with <Num of="m07.windowPaths" /> million simulated paths:
+
+| Variant, <Num of="m07.windowExpiry" /> days | Price on USD 1m |
+| --- | --- |
+| Up-and-out, barrier for the whole life (daily) | <Num of="m07.uocFull91Chf" /> |
+| Window barrier, days <Num of="m07.windowStart" /> to <Num of="m07.windowEnd" /> | <Num of="m07.windowPvChf" /> (± <Num of="m07.windowSeChf" />) |
+| Vanilla call | <Num of="m07.windowVanillaChf" /> |
+
+The window is a compromise. It costs <Num of="m07.windowExtraChf" /> more than the barrier for the whole life and saves <Num of="m07.windowSavingChf" /> compared with the vanilla. In <Num of="m07.windowKo" /> of the paths the option is knocked out in the first month ([risk-neutral](/en/glossary/#term-risk-neutral), not a forecast). If it survives the window, it is an ordinary call from then on. For the importer this means: a strong dollar in the first month costs him the hedge, a strong dollar later does not.
+
+<Derivation title="Derivation: how the calculation core values the window barrier">
+
+**1.** Simulate many USD/CHF paths in daily steps (Δ<i>t</i> = 1/365) with the risk-neutral drift <i>r</i><sub>d</sub> − <i>r</i><sub>f</sub>. Constant vol σ and normally distributed log steps without jumps are assumptions of the model:
+
+<Formula>
+  <span><i>S</i><sub><i>t</i>+Δ<i>t</i></sub> = <i>S</i><sub><i>t</i></sub> · exp(ν Δ<i>t</i> + σ √Δ<i>t</i> · <i>Z</i>)</span>
+  <span>ν = <i>r</i><sub>d</sub> − <i>r</i><sub>f</sub> − ½σ², <i>Z</i> ~ <i>N</i>(0, 1)</span>
+</Formula>
+
+**2.** On each path, check the barrier on the window days only. If it is touched, the path pays nothing. Otherwise it pays (<i>S</i><sub><i>T</i></sub> − <i>K</i>)<sup>+</sup> on USD 1m at expiry.
+
+**3.** The price is the average of all payoffs, discounted with <i>e</i><sup>−<i>r</i><sub>d</sub><i>T</i></sup>. The uncertainty shrinks with 1/√<i>n</i>: with <Num of="m07.windowPaths" /> million paths the standard error is <Num of="m07.windowSeChf" />.
+
+**4.** Why Monte Carlo? The reflection principle needs a barrier that applies the whole time. If the window ends before expiry, the simple symmetry breaks. For simple windows there are formulas using the bivariate normal distribution. Monte Carlo, however, is more flexible, observes once a day as the contract does, and can be checked against the closed forms.
+
+</Derivation>
+
+**Double barrier.** Two barriers, one above and one below: the option vanishes (double knock-out) or comes to life (double knock-in) as soon as either is touched. The narrower the corridor, the cheaper the double knock-out and the likelier the end. The double knock-in, by contrast, gets dearer: the same event brings it to life more often. Without a rebate, a double knock-out and a double knock-in with the same barriers, strike and expiry add up to the vanilla (in-out parity, section 2). The digital relative of the double knock-out is the double no-touch from section 3: it, too, gets cheaper the narrower the corridor.
+
+### Gap risk: the franc shock
+
+The pricing formulas in this module and the simulation assume that the rate moves continuously, without jumps. With continuous monitoring it then meets a barrier exactly at its level, never beyond it. Parities such as knock-out + knock-in = vanilla (without a rebate, same terms), by contrast, hold on every path, even across a jump. Like constant vol, the continuous rate is an assumption of the model, not part of the [risk-neutral measure](/en/glossary/#term-risk-neutral). On <Fact id="m07-floor-end" /> it did not hold. Since <Fact id="m07-floor-start" />, the Swiss National Bank had enforced a minimum exchange rate of <Fact id="m07-floor" /> francs per euro. On that day it discontinued it and lowered the interest rate on sight deposits above the exemption threshold to <Fact id="m05-snb-2015-rate" />.
+
+The ECB fixing for EUR/CHF was <Num of="m07.gapBefore" /> the day before and <Num of="m07.gapShock" /> on the day: <Num of="m07.gapDayMove" /> from one fixing to the next. In this series there is not a single rate in between. The ECB publishes its reference rates for information purposes only. They are not tradable prices. The replay below is therefore a hypothetical scenario with daily ECB reference rates. It shows the order of magnitude, not the rates at which trades were done that day. The stop, the put and the barriers in it are assumed examples, not historical trades.
+
+<GapReplayFigure caption="Hypothetical scenario with daily ECB reference rates for EUR/CHF. Below the minimum rate sit an assumed stop-loss and assumed knock-out barriers. On the day the floor was removed, the fixing jumps below every level. Assumption: the stop counts as filled at that fixing, and the knock-outs are extinguished under the assumed terms, with no rebate." />
+
+A stop-loss meant to sell EUR at <Num of="m07.gapStop" /> is filled at the next tradable price. Where that lay on the day depended on the minute and on liquidity. As a simplification, the scenario assumes it is filled at the next fixing: <Num of="m07.gapShock" />, <Num of="m07.gapStopPips" /> pips lower. On <Num of="m07.gapNotionalEur" /> that would be <Num of="m07.gapStopChf" /> less than planned. A stop limits the loss only if there is a market at the stop level.
+
+<Callout variant="bad" title="Loss scenario: the reverse knock-out">
+
+Suppose an exporter with euro income, the mirror image of our importer, fears a strong franc. He buys a EUR put with a strike of <Num of="m07.gapPutStrike" />. To save premium, he adds a knock-out below the minimum rate. That is a reverse knock-out (section 2): the barrier is in the money. Whether it sits at <Num of="m07.gapKoHigh" /> or at <Num of="m07.gapKoLow" /> makes no difference. A knock-out is not a transaction at the barrier rate: the option is extinguished under the assumed terms. In the scenario these are: observation once a day against the ECB fixing, no rebate. Then all <Num of="m07.gapKoCount" /> variants knock out on the same fixing. With continuous observation, the first rate at or beyond the barrier counts, under the rules in the term sheet. After a jump it lies beyond the barrier. Measured at the fixing, the knock-out would wipe out intrinsic value of <Num of="m07.gapPutLostChf" />, at exactly the moment the protection was meant for. If the option had a rebate (section 2), that would be a payment of its own, shown separately next to this amount.
+
+</Callout>
+
+<Callout variant="warn" title="Risk box">
+
+- A barrier is a condition, not protection. Check which scenarios it cuts away.
+- Reverse knock-outs disappear where the option would be worth the most.
+- A stop needs a tradable price at the stop level to be filled there. A barrier needs no price at its level: if the rate jumps past it, it is triggered all the same. In a gap the rate jumps over every level between the last and the next price at once: the stop is filled at the next tradable price, the knock-outs are extinguished under their terms, without any trade. The barrier itself needs no continuous rate. Only its pricing formulas and the hedging based on them assume one. That is why the formulas underestimate gap risk.
+- Read the term sheet: observation period, type of monitoring, reference rate, and who determines the barrier event.
+
+</Callout>
+
+How sharply vol reacted after the shock is shown in the [Riskometer for the franc shock](/en/riskometer/?event=chf-shock-2015&pair=EURCHF).
+
+<Desk title="Barriers in practice">
+
+When many barriers sit at the same level, the rate can behave conspicuously there. The reason is in section 2: near a reverse barrier, delta flips and the hedges have to be adjusted quickly. In a gap no rule helps. The barrier is crossed before anyone can trade.
+
+Structured products build in exactly these building blocks. The accumulator in module 08 contains a knock-out, the TARF a target that ends the structure. The questions from this module stay the same: which scenarios does the condition cut away, and what happens in a jump?
+
+</Desk>
+
+<Takeaway>
+
+A stop needs a tradable price at the stop level to be filled there. In a jump it is only filled at the next tradable price. A barrier needs no such price: if the rate jumps past it, it is triggered all the same. A knock-out trades nothing in the process; the option is extinguished under its terms. The barrier itself needs no continuous rate either. Only its pricing formulas and the hedging based on them assume one. That is why the formulas underestimate gap risk.
+
+</Takeaway>

@@ -1,0 +1,68 @@
+import HedgeOutcomeFigure from '@/components/figures/HedgeOutcomeFigure.astro';
+
+{/* 02 Forward · Section 1 · Intuition. Numbers only via <Num />, registries src/lib/nums/ex.ts and m02.ts; facts via <Fact />, registry src/content/facts/m02.ts. */}
+
+Our importer has to pay USD 1m in 3 months. Today USD/CHF stands at <Num of="ex.spot" />. What the dollars will cost him, he only finds out on payment day. If the dollar rises, his bill in francs goes up. That is his currency risk from module 01.
+
+A **forward** solves the problem. It is a contract the importer agrees with his bank today: in 3 months he buys USD 1m at a rate that is fixed today. No money changes hands today. On the maturity date the bank delivers the dollars and the importer pays the agreed francs. Fix the rate today, deliver later.
+
+Forwards are nothing exotic. In <Fact id="m02-bis-month" /> outright forwards made up <Fact id="m02-bis-fwd-share" /> of global FX trading. Their turnover was <Fact id="m02-bis-fwd-growth" /> higher than three years earlier (preliminary BIS figures).
+
+### What the forward costs
+
+The 3-month forward stands at <Num of="m02.fwd" />. So his dollars cost the importer <Num of="m02.fwdChf" />, wherever the rate ends up on payment day. That is even less than at today's spot (<Num of="m02.spotChf" />): the forward sits <Num of="m02.discountPips" /> pips below spot.
+
+This is not a discount the bank grants, nor a view on the dollar. It is the interest rate gap between the dollar and the franc. Section 2 shows exactly why.
+
+<HedgeOutcomeFigure caption="Drag the rate at maturity. Orange: what the importer pays unhedged. Black: the forward, flat. Play the scenarios and watch how widely the cost spreads without a forward." />
+
+### Two scenarios
+
+- **The dollar rises to <Num of="m02.stUp" />.** Unhedged, the importer pays <Num of="m02.upChf" />. With the forward it stays at <Num of="m02.fwdChf" />. He saves <Num of="m02.saveUpChf" />.
+- **The dollar falls to <Num of="m02.stDown" />.** Unhedged, he would have paid only <Num of="m02.downChf" />. With the forward he still pays <Num of="m02.fwdChf" />, which is <Num of="m02.missDownChf" /> more.
+
+The second scenario feels like a loss. In cash terms it is not one: the importer pays exactly the amount he budgeted for. He has given up an opportunity. That is the price of certainty. With the forward he gives up the good scenarios just as he gives up the bad ones.
+
+### Uncertainty removed, not cost
+
+Play the scenarios in the chart. In the model with a vol of <Num of="ex.vol" />, the unhedged dollars cost between <Num of="m02.scnMin" /> and <Num of="m02.scnMax" />. With the forward they cost <Num of="m02.fwdChf" /> in every scenario. In <Num of="m02.scnCheaper" /> of <Num of="m02.scnCount" /> scenarios the forward was cheaper, in the others dearer.
+
+The scenarios are centred on the forward, [risk-neutrally](/en/glossary/#term-risk-neutral). On average, the unhedged dollars therefore cost about the same as the hedged ones: <Num of="m02.scnMean" />. So the forward makes the dollars neither cheaper nor dearer. It removes the spread of outcomes. The importer can work out his prices today instead of hoping for a good rate.
+
+### What the importer gains and what he gives up
+
+- **He gains predictability.** Costs, selling prices and margin are fixed today. A strong dollar can no longer hurt him.
+- **He gives up the upside.** If the dollar falls, he does not benefit.
+- **He takes on an obligation.** The forward must be settled even if the deal with his supplier falls through. He can then only close it out at its current market value, which may go against him. A right without an obligation is an option, the subject of module 04.
+
+<Derivation title="Derivation: why the forward fixes the cost">
+
+The forward is a contract in its own right. At maturity it is worth as much to the buyer of the dollars as the rate <i>S</i><sub>T</sub> lies above the agreed rate <i>F</i>:
+
+<Formula>Value at maturity = <i>N</i> · (<i>S</i><sub>T</sub> − <i>F</i>)</Formula>
+
+With <i>N</i> = USD 1m it is worth <Num of="m02.fwdValueUp" /> at <i>S</i><sub>T</sub> = <Num of="m02.stUp" />, and <Num of="m02.fwdValueDown" /> at <i>S</i><sub>T</sub> = <Num of="m02.stDown" />. Per dollar, the payoff is a straight line with slope 1: the forward is the linear building block to which module 04 reduces options.
+
+Unhedged, the importer pays <i>N</i> · <i>S</i><sub>T</sub>. Add the value of the forward and the same amount is left in every scenario:
+
+<Formula variant="accent"><i>N</i> · <i>S</i><sub>T</sub> − <i>N</i> · (<i>S</i><sub>T</sub> − <i>F</i>) = <i>N</i> · <i>F</i> = <Num of="m02.fwdChf" /></Formula>
+
+The rate at maturity cancels out. That is why the black line in the chart is flat.
+
+**The scenarios.** The chart draws rates from the same distribution the option models use. That they average out at the forward is what the [risk-neutral](/en/glossary/#term-risk-neutral) pricing measure requires. Lognormal with vol <Num of="ex.vol" /> over the term <i>T</i> = <Num of="ex.T" /> is an extra assumption of the model. Together this is a model, not a forecast. It shows how widely an ordinary quarter can spread.
+
+</Derivation>
+
+<Desk title="A forward costs no premium">
+
+When it is agreed, a fair forward is worth zero to both sides. That is why nobody pays anything today. The bank earns the margin built into the rate.
+
+Because the forward can become valuable later, to one side or the other, the bank checks the client's creditworthiness first. It grants a credit line up to which it will trade forwards with him. On the desk a plain forward is called an **outright forward**, or simply an outright.
+
+</Desk>
+
+<Takeaway>
+
+A forward fixes the rate today for delivery later. It removes the uncertainty, not the cost: the importer pays a certain <Num of="m02.fwdChf" />, wherever the dollar ends up.
+
+</Takeaway>

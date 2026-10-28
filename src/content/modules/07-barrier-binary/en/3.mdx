@@ -1,0 +1,67 @@
+import TouchLabFigure from '@/components/figures/TouchLabFigure.astro';
+
+{/* 07 Barrier & Binary · section 3 · Digital and touch. Numbers only via <Num />, registry src/lib/nums/m07.ts. */}
+
+A digital pays all or nothing: a fixed amount if a condition is met. For the importer that is at best a partial hedge: if the dollar is above the strike at expiry, he receives a fixed amount, whether his extra cost is small or large. It is not a proportional hedge like the USD call, and the premium comes on top. With the digital call from the table below, <Num of="m07.digitalNetChf" /> is left after the premium. If the dollar rises to <Num of="m07.digitalMild" />, his extra cost against the strike is <Num of="m07.digitalMildExtraChf" />, at <Num of="m07.digitalStrong" /> already <Num of="m07.digitalStrongExtraChf" />; the fixed amount stays the same. It is still worth a look: digitals are building blocks of many structures (module 08), and their price reveals which probability the market is pricing in.
+
+All examples pay <Num of="m07.payout" /> and run for three months. The bet is always the same question about USD/CHF, just asked differently:
+
+| Product | Pays if … | Price |
+| --- | --- | --- |
+| Digital call, strike <Num of="ex.strike" /> | USD/CHF is above the strike at expiry | <Num of="m07.digitalChf" /> |
+| One-touch <Num of="m07.barrierUp" /> | the barrier is touched at any time | <Num of="m07.otChf" /> |
+| No-touch <Num of="m07.barrierUp" /> | the barrier is never touched | <Num of="m07.ntChf" /> |
+| Double no-touch <Num of="m07.dntLower" /> / <Num of="m07.dntUpper" /> | the rate always stays inside the corridor | <Num of="m07.dntChf" /> |
+
+### Price equals discounted probability
+
+The digital call costs <Num of="m07.digitalChf" />. That is no coincidence: the probability of ending above the strike is <i>N</i>(<i>d</i><sub>2</sub>) = <Num of="m07.digitalProb" /> ([risk-neutral](/en/glossary/#term-risk-neutral), not a forecast). The price is payout times probability, discounted at the CHF rate. With a CHF rate of <Num of="ex.rd" digits={0} /> there is no discounting.
+
+Why not exactly one half? The strike sits at the forward, and under the risk-neutral measure the forward is the average of all possible rates at expiry. The asymmetry comes from an assumption of the model: the rate is lognormally distributed and can swing further up than down. So the middle of the distribution lies slightly below the average, and USD/CHF ends a little more often below the forward than above it.
+
+The same holds for touch products. The one-touch at <Num of="m07.barrierUp" /> costs <Num of="m07.otChf" />, or <Num of="m07.touchUp1" /> of the payout: exactly the touch probability from section 1 (risk-neutral, not a forecast). The no-touch costs <Num of="m07.ntChf" />. Together they make <Num of="m07.otNtSumChf" />: on every path exactly one of the two pays. Know one price and you know the other.
+
+A rule of thumb from the desk: a one-touch costs about twice as much as a digital struck at the barrier. That is the reflection principle from section 1. In the example it is <Num of="m07.otVsDigitalH" /> times, because the forward lies below spot.
+
+<TouchLabFigure caption="Pick a product and drag the orange handles. The top chart shows which paths pay. Below, the probability (black, dashed) lies exactly on the price (blue) as long as the CHF rate is zero. For the digital, the call spread turns into a step as its width shrinks." />
+
+### At the hit or at expiry?
+
+A one-touch can pay as soon as the barrier is touched or only at expiry. In the interbank market, payment at expiry is the usual convention. With a CHF rate of zero the two are worth the same. With a CHF rate of <Num of="m07.rdExample" />, the one-touch paid at the hit costs <Num of="m07.otHitRdChf" />, paid at expiry <Num of="m07.otExpRdChf" />. Money that arrives earlier is worth more. Both cost more than at 0%: the higher CHF rate lifts the forward, so the upper barrier is more likely to be touched.
+
+### Double no-touch: a bet on calm
+
+The double no-touch pays if USD/CHF stays within a corridor of ±<Num of="m07.dntWidth" /> around spot for three months, between <Num of="m07.dntLower" /> and <Num of="m07.dntUpper" />. It costs <Num of="m07.dntChf" />. Whoever buys it is betting on a quiet market. That is why it depends so much on vol: if vol rises from <Num of="ex.vol" /> to <Num of="m07.volUp" />, the price falls to <Num of="m07.dntVolUpChf" />. If it drops to <Num of="m07.volDown" />, the price rises to <Num of="m07.dntVolDownChf" />. The buyer is short vega.
+
+<Derivation title="Derivation: the digital as the limit of a call spread">
+
+**1.** A call pays (<i>S</i><sub><i>T</i></sub> − <i>K</i>)<sup>+</sup>. Raise the strike by a small ε and it pays exactly ε less in every scenario above the new strike. So the derivative with respect to the strike measures the probability of ending above it:
+
+<Formula>
+  <span>∂<i>C</i> / ∂<i>K</i> = −<i>e</i><sup>−<i>r</i><sub>d</sub><i>T</i></sup> · P(<i>S</i><sub><i>T</i></sub> &gt; <i>K</i>)</span>
+  <span>= −<i>e</i><sup>−<i>r</i><sub>d</sub><i>T</i></sup> · <i>N</i>(<i>d</i><sub>2</sub>)</span>
+</Formula>
+
+**2.** A digital paying 1 is therefore minus this derivative:
+
+<Formula variant="accent">Digital = −∂<i>C</i> / ∂<i>K</i> = <i>e</i><sup>−<i>r</i><sub>d</sub><i>T</i></sup> · <i>N</i>(<i>d</i><sub>2</sub>)</Formula>
+
+**3.** A call spread, long at <i>K</i> − ε/2 and short at <i>K</i> + ε/2, in a size of 1/ε, is the difference quotient of this derivative. Its payoff is a ramp from 0 to 1. With ε = <Num of="m07.spreadPips" /> pips it costs <Num of="m07.spreadChf" />, just <Num of="m07.spreadDiffChf" /> more than the digital.
+
+**4.** For one-touch and no-touch, parity holds when both pay at expiry: one-touch + no-touch = payout · <i>e</i><sup>−<i>r</i><sub>d</sub><i>T</i></sup>. The touch probability comes from section 1. The double no-touch has no short formula: it is computed with an infinite series (Hui, 1996), which the tool truncates automatically once it is accurate enough.
+
+</Derivation>
+
+<Desk title="Digitals on the desk: the tight call spread">
+
+Close to expiry and close to the strike, a digital is almost impossible to hedge. One pip decides between everything and nothing; delta becomes huge. That is why traders value and hedge a digital they have sold as a tight call spread just below the strike: bought at <i>K</i> − ε, sold at <i>K</i>. It pays at least as much as the digital in every scenario. This cushion costs a little more than the digital, and the client pays for it in the price.
+
+The same applies to touch products at the barrier. Monitoring matters as well: the numerical check in the lab values the double no-touch with Monte Carlo and daily fixings. It is then worth more (<Num of="m07.dntMcChf" />) than under continuous monitoring, because no touch counts between two fixings.
+
+</Desk>
+
+<Takeaway>
+
+Digital, one-touch and no-touch cost almost exactly the discounted probability that they pay. See the price and you see the probability the market is pricing in: risk-neutral, not a forecast.
+
+</Takeaway>

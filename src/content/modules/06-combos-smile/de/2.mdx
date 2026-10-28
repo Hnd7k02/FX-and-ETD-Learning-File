@@ -1,0 +1,74 @@
+import PayoffBuilderFigure from '@/components/figures/PayoffBuilderFigure.astro';
+
+{/* 06 Kombos & Vola-Smile · Abschnitt 2 · Spreads und Risk Reversal. Zahlen nur über <Num />, Registry src/lib/nums/m06.ts. */}
+
+Im ersten Abschnitt hast du gesehen, welchen Kurs der Importeur am Ende bezahlt. Jetzt schauen wir dieselben Bausteine so an, wie ein Händler sie sieht: als Optionsposition mit Auszahlung, Prämie und Risiko. Drei Klassiker bestehen aus nur zwei Beinen.
+
+Ein **Call-Spread** ist ein Long Call mit Strike <i>K</i><sub>1</sub> und ein Short Call mit höherem Strike <i>K</i><sub>2</sub>, beide mit gleichem Nominal. Die Auszahlung steigt ab <i>K</i><sub>1</sub> und bleibt ab <i>K</i><sub>2</sub> flach. Mehr als <i>K</i><sub>2</sub> − <i>K</i><sub>1</sub> zahlt er nie aus. Dafür ist er billiger als der Call allein, denn der verkaufte Call holt einen Teil der Prämie zurück.
+
+Ein **Put-Spread** ist das Spiegelbild: Long Put mit <i>K</i><sub>1</sub>, Short Put mit tieferem <i>K</i><sub>2</sub>. Er passt zu jemandem, der einen fallenden Dollar fürchtet. Das ist zum Beispiel ein Exporteur, der in 3 Monaten USD erhält.
+
+Ein **Risk Reversal** kauft eine Option auf der einen Seite und verkauft eine auf der anderen, beide aus dem Geld. Für unseren Importeur heisst das: Long USD Call, Short USD Put. Der USD Call schützt ihn, der verkaufte USD Put finanziert den Call. Je nach Strikes zahlt er netto eine Prämie, zahlt nichts oder erhält sogar Geld. Zwei Fälle musst du trennen:
+
+- Beim **25Δ Risk Reversal** legt die Delta-Konvention beide Strikes fest: den 25Δ Call und den 25Δ Put. So wird er am Markt gehandelt. Die Nettoprämie ist darum selten genau null.
+- Beim **Zero-Cost-Collar** wählst du einen Strike, hier den des Calls. Den anderen löst du so, dass die Nettoprämie null ist.
+
+Die 25Δ-Strikes rechnet das Tool in diesem und im nächsten Abschnitt mit dem [Spot-Delta](/glossar/#term-spot-forward-delta), ohne [Prämienanpassung](/glossar/#term-premium-adjusted-delta), bei flacher Vola. Dann rundet es sie auf ein Raster von <Num of="m06.strikeStepPips" /> Pips. Das Raster gehört hier zur Definition des 25Δ-Strikes. Ohne Raster wären es <Num of="m04.call25" /> für den Call und <Num of="m04.put25" /> für den Put, wie in [Modul 04](/module/04-vanilla-options/3/). Den Smile in Abschnitt 4 misst das Tool dagegen im Forward-Delta.
+
+Der Rest dieses Abschnitts rechnet mit dem Zero-Cost-Collar.
+
+<PayoffBuilderFigure templates={['call-spread', 'put-spread', 'risk-reversal']} initial="risk-reversal" highlightSolved caption="Zieh den Call-Strike K1 an der Achse: Der Put-Strike K2 folgt so, dass die Nettoprämie null bleibt. Der grüne Rahmen markiert den gelösten Strike. Wechsle zu Call- und Put-Spread und vergleiche Prämie und maximalen Gewinn." />
+
+### Call-Spread in Zahlen
+
+Der Importeur startet beim ATMF Call aus Modul 04 mit Strike <Num of="m06.csK1" />. Dazu verkauft er einen Call mit Strike <Num of="m06.csK2" />, dem 25Δ-Strike. Der Call allein kostet <Num of="ex.callPips" digits={1} /> Pips. Der verkaufte Call bringt <Num of="m06.csSoldPips" /> Pips zurück, das sind <Num of="m06.csSavePct" /> der Prämie. Netto zahlt er <Num of="m06.csPips" /> Pips, also <Num of="m06.csChf" />.
+
+- Der **Break-even** liegt bei <i>K</i><sub>1</sub> plus Prämie: <Num of="m06.csBe" />.
+- Der **maximale Gewinn** bei Verfall ist die Breite minus Prämie: <Num of="m06.csWidthPips" /> − <Num of="m06.csPips" /> = <Num of="m06.csMaxGainPips" /> Pips, also <Num of="m06.csMaxGainChf" />. Er wird ab <Num of="m06.csK2" /> erreicht.
+- Der **maximale Verlust** ist die Prämie.
+
+Der **Put-Spread** mit <Num of="m06.psK1" /> und <Num of="m06.psK2" /> kostet <Num of="m06.psPips" /> Pips. Sein Break-even liegt bei <Num of="m06.psBe" />, sein maximaler Gewinn bei <Num of="m06.psMaxGainChf" />.
+
+### Der Zero-Cost-Collar des Importeurs
+
+Der Importeur kauft den 25Δ USD Call mit Strike <Num of="m06.rrCallK" />. Er kostet <Num of="m06.rr25CallPips" /> Pips, also <Num of="m06.rrCallChf" />. Verkauft er dazu den 25Δ USD Put mit Strike <Num of="m06.rr25PutK" />, hat er einen 25Δ Risk Reversal. Dieser Put bringt <Num of="m06.rr25PutPips" /> Pips, also mehr, als der Call kostet. Die Nettoprämie ist <Num of="m06.rr25CallPips" /> − <Num of="m06.rr25PutPips" /> = <Num of="m06.rr25NetShownPips" /> Pips. Das Minus heisst: Der Importeur erhält Geld. Mit den ungerundeten Prämien gerechnet sind es <Num of="m06.rr25NetPips" /> Pips, auf <Num of="ex.notional" /> also <Num of="m06.rr25NetChf" />. Zero Cost ist das nicht.
+
+Für den Zero-Cost-Collar behält er den Call und löst den Put-Strike. Ein tieferer Put bringt weniger Prämie. Genau so viel, wie der Call kostet, bringt der USD Put mit Strike <Num of="m06.rrPutK" digits={6} />, gerundet <Num of="m06.rrPutK" />. Das Tool löst den Strike ungerundet und rundet erst für die Anzeige. Er liegt <Num of="m06.rrPutGapPips" /> Pips unter dem 25Δ Put. Zusammen kostet die Struktur nichts. Bei Verfall gilt:
+
+- Über <Num of="m06.rrCallK" /> übt er den Call aus. Bei <Num of="m06.stUp" /> zahlt er <Num of="m06.upRrChf" />.
+- Zwischen den Strikes kauft er am Markt. Der Forward von <Num of="ex.forward" digits={4} /> liegt in diesem Band, das <Num of="m06.rrBandPips" /> Pips breit ist.
+- Unter <Num of="m06.rrPutK" digits={6} /> wird der Put ausgeübt, er muss zum Strike kaufen. Bei <Num of="m06.stDown" /> zahlt er <Num of="m06.downRrChf" />.
+
+Schau im Payoff-Builder auf die Greeks. Das Delta ist <Num of="m06.rrDelta" />: Der Collar wirkt wie ein halber Forward. Vega ist mit <Num of="m06.rrVegaChf" /> fast null. Der Long Call allein hat <Num of="m06.callVegaChf" /> je Vola-Punkt, der Short Put nimmt fast gleich viel weg. Auf die allgemeine Höhe der Vola reagiert der Collar also kaum. Er reagiert aber darauf, ob Calls oder Puts teurer werden. Das ist das Thema von Abschnitt 4.
+
+<Derivation title="Herleitung: Grenzen eines Spreads und die Zero-Cost-Bedingung">
+
+**1.** Die Auszahlung des Call-Spreads pro USD liegt immer zwischen 0 und <i>K</i><sub>2</sub> − <i>K</i><sub>1</sub>:
+
+<Formula><span>0 ≤ max(<i>S</i><sub>T</sub> − <i>K</i><sub>1</sub>, 0) − max(<i>S</i><sub>T</sub> − <i>K</i><sub>2</sub>, 0) ≤ <i>K</i><sub>2</sub> − <i>K</i><sub>1</sub></span></Formula>
+
+**2.** Was bei Verfall immer zwischen zwei Grenzen liegt, muss auch heute dazwischen liegen. Sonst gäbe es Arbitrage. Mit dem Diskontfaktor <i>DF</i><sub>d</sub> = <i>e</i><sup>−<i>r</i><sub>d</sub><i>T</i></sup> folgt:
+
+<Formula variant="accent"><span>0 ≤ <i>C</i>(<i>K</i><sub>1</sub>) − <i>C</i>(<i>K</i><sub>2</sub>) ≤ <i>DF</i><sub>d</sub> · (<i>K</i><sub>2</sub> − <i>K</i><sub>1</sub>)</span></Formula>
+
+Im Beispiel: <Num of="m06.csPips" /> Pips liegen zwischen 0 und <Num of="m06.csWidthPips" /> Pips (<i>DF</i><sub>d</sub> = <Num of="m06.discountRate" />).
+
+**3.** Bei Long Call und Short Put ist die Nettoprämie <i>C</i>(<i>K</i><sub>C</sub>) − <i>P</i>(<i>K</i><sub>P</sub>). Beim 25Δ Risk Reversal liegen beide Strikes durch die Delta-Konvention fest. Die Nettoprämie ergibt sich daraus und ist selten null: Im Beispiel ist sie negativ, <Num of="m06.rr25NetPips" /> Pips, du erhältst also Geld. Beim Zero-Cost-Collar hältst du <i>K</i><sub>C</sub> fest und verlangst <i>P</i>(<i>K</i><sub>P</sub>) = <i>C</i>(<i>K</i><sub>C</sub>). Weil der Put mit dem Strike steigt, gibt es genau einen Put-Strike, der das erfüllt.
+
+**4.** Ein Grenzfall verbindet das mit Modul 04. Sind beide Strikes gleich <i>K</i>, ist Long Call plus Short Put ein Forward zu <i>K</i>. Nach der Put-Call-Parität ist die Nettoprämie dann <i>DF</i><sub>d</sub> · (<i>F</i> − <i>K</i>), also null genau bei <i>K</i> = <i>F</i>. Ein Collar liegt damit zwischen zwei Extremen: dem Forward (Band null) und dem reinen Call (kein Put).
+
+</Derivation>
+
+<Desk title="Risk Reversal als Markt-Quote">
+
+Am Optionsmarkt ist «25Δ Risk Reversal» nicht nur eine Struktur, sondern auch ein Preis. Er wird in Vola notiert: implizite Vola des 25Δ Calls minus implizite Vola des 25Δ Puts. Händler handeln ihn delta-gehedgt. Sein Vorzeichen zeigt, welche Seite der Markt teurer bezahlt. Mehr dazu in Abschnitt 4.
+
+Firmen kennen die Struktur meist als Collar oder Tunnel. Ob mit Prämie oder Zero Cost: Der verkaufte Put ist eine Pflicht, darum braucht es eine Kreditlinie. Für Exporteure gibt es das Spiegelbild: Long USD Put, Short USD Call.
+
+</Desk>
+
+<Takeaway>
+
+Ein Spread verkauft den Schutz, den du kaum brauchst, und macht die Absicherung billiger. Ein Risk Reversal bezahlt den Call mit einem Put. Beim 25Δ Risk Reversal stehen beide Strikes fest, die Nettoprämie ist selten null. Beim Zero-Cost-Collar wird ein Strike so gelöst, dass sie null ist: keine Prämie, dafür ein festes Band, in dem du kaufst.
+
+</Takeaway>

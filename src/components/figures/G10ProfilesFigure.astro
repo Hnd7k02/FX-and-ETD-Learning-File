@@ -1,0 +1,260 @@
+---
+/** G10 profiles (module 01, section 4) for MDX. Props: caption, initial (currency code). */
+import G10Profiles from '@/components/islands/G10Profiles';
+import Figure from '@/components/content/Figure.astro';
+import { pageLang } from '@/components/content/lang';
+import type { G10Code } from '@/lib/m01/g10';
+
+interface Props {
+  caption?: string;
+  initial?: G10Code;
+}
+const { caption, initial } = Astro.props;
+const lang = pageLang(Astro.currentLocale);
+---
+
+<Figure caption={caption}>
+  <G10Profiles client:visible lang={lang} initial={initial} />
+</Figure>
+
+<style is:global>
+  .g10 {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+  }
+  .g10 .ff-lab-head {
+    margin-bottom: 0;
+  }
+  .g10-head-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+  .g10-chip {
+    background: var(--ff-chip);
+    color: var(--ff-ink-2);
+    font-weight: 800;
+  }
+  .g10 p {
+    margin: 0;
+  }
+  .g10 .ff-lab-main {
+    gap: 14px;
+  }
+  .g10-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .g10-control {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+  }
+  .g10-control .segmented > button {
+    min-height: 44px;
+  }
+  .g10-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+    gap: 8px;
+  }
+  .g10-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    min-height: 112px;
+    min-width: 0;
+    padding: 12px 10px 10px;
+    border: 1px solid var(--ff-line);
+    border-radius: var(--ff-r-control);
+    background: var(--ff-surface);
+    color: var(--ff-ink);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition:
+      background-color 300ms ease,
+      border-color 300ms ease,
+      box-shadow 200ms ease,
+      transform 200ms ease;
+  }
+  .g10-card:hover {
+    border-color: var(--ff-line-strong);
+  }
+  .g10-card[aria-pressed='true'] {
+    border-color: var(--ff-ink);
+    box-shadow:
+      0 0 0 1px var(--ff-ink),
+      var(--ff-shadow-control);
+  }
+  .g10-card.is-dim {
+    background: var(--ff-surface-2);
+    border-style: dashed;
+  }
+  .g10-card.is-dim .g10-code,
+  .g10-card.is-dim .g10-name {
+    color: var(--ff-muted);
+  }
+  .g10-card.is-up {
+    background: var(--ff-linear-soft);
+  }
+  .g10-card.is-down {
+    background: var(--ff-exotics-soft);
+  }
+  .g10-code {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+    transition: color 300ms ease;
+  }
+  .g10-name {
+    font-size: 12px;
+    line-height: 1.3;
+    color: var(--ff-ink-2);
+    transition: color 300ms ease;
+  }
+  .g10-roles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+    margin-top: 2px;
+  }
+  .g10-role {
+    padding: 1px 6px;
+    border-radius: var(--ff-r-pill);
+    background: var(--ff-chip);
+    color: var(--ff-ink-2);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.5;
+  }
+  .g10-tend {
+    margin-top: auto;
+    padding: 1px 7px;
+    border-radius: var(--ff-r-pill);
+    white-space: nowrap;
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1.6;
+    animation: g10-rise 320ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+  .g10-tend--up {
+    background: var(--ff-surface);
+    color: var(--ff-linear-text);
+    box-shadow: inset 0 0 0 1px var(--ff-long);
+  }
+  .g10-tend--down {
+    background: var(--ff-surface);
+    color: var(--ff-exotics-text);
+    box-shadow: inset 0 0 0 1px var(--ff-short);
+  }
+  .g10-tend--flat {
+    background: var(--ff-chip);
+    color: var(--ff-ink-2);
+  }
+  @keyframes g10-rise {
+    from {
+      transform: translateY(8px) scale(0.92);
+    }
+    to {
+      transform: none;
+    }
+  }
+  .g10 .g10-note {
+    padding: 14px 16px;
+    border-radius: var(--ff-r-box);
+    background: var(--ff-surface-2);
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--ff-ink-2);
+  }
+  .g10 .g10-note--riskOff,
+  .g10 .g10-note--riskOn,
+  .g10 .g10-note--commodityBoom {
+    color: var(--ff-ink);
+  }
+  .g10-caveat {
+    color: var(--ff-muted);
+  }
+  .g10-detail {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--ff-line);
+    border-radius: var(--ff-r-box);
+    overflow: hidden;
+    background: var(--ff-surface);
+  }
+  .g10-detail-head {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 14px 16px;
+    background: var(--ff-ink);
+    color: #fff;
+  }
+  .g10-detail-label {
+    font-size: 12px;
+    color: var(--ff-on-dark-muted);
+  }
+  .g10-detail-title {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 4px 10px;
+  }
+  .g10-detail-code {
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+  .g10-detail-name {
+    font-size: 14px;
+    color: var(--ff-on-dark-body);
+  }
+  .g10-detail-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 12px 16px;
+    border-top: 1px solid var(--ff-row);
+  }
+  .g10-detail-key {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ff-muted);
+  }
+  .g10-detail-val {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--ff-ink);
+  }
+  .g10-detail-val b {
+    font-weight: 700;
+  }
+  .g10 .g10-drivers {
+    margin: 0;
+    padding-left: 18px;
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--ff-ink);
+  }
+  .g10 .g10-drivers li {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.45;
+  }
+  .g10 .g10-drivers li + li {
+    margin-top: 3px;
+  }
+</style>

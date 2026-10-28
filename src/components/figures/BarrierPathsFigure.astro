@@ -1,0 +1,21 @@
+---
+/**
+ * BarrierPaths as an MDX figure (module 07, section 1): <BarrierPathsFigure caption="…" />.
+ * Reads the page language and hydrates the island when it scrolls into view.
+ */
+import Figure from '@/components/content/Figure.astro';
+import BarrierPaths from '@/components/islands/BarrierPaths';
+import { pageLang } from '@/components/content/lang';
+import M07Styles from './M07Styles.astro';
+
+interface Props {
+  caption?: string;
+}
+const { caption } = Astro.props;
+const lang = pageLang(Astro.currentLocale);
+---
+
+<M07Styles />
+<Figure caption={caption}>
+  <BarrierPaths client:visible lang={lang} />
+</Figure>

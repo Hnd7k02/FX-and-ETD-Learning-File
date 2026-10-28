@@ -1,0 +1,22 @@
+---
+/** A sourced historical fact: <Fact id="snb-floor" />. Source listed in src/content/sources.md. */
+import { getFact } from '@/content/facts';
+import type { Lang } from '@/i18n/types';
+import { pageLang } from './lang';
+
+interface Props {
+  id: string;
+  lang?: Lang;
+}
+const { id, lang } = Astro.props;
+const l = pageLang(Astro.currentLocale, lang);
+const fact = getFact(id);
+---
+
+<span class="fact" data-fact={id} data-source={fact.source} set:text={fact[l]} />
+
+<style>
+  .fact {
+    white-space: nowrap;
+  }
+</style>

@@ -1,0 +1,44 @@
+---
+/** Eyebrow ("Abschnitt n von 5", family colour), H2 and optional lead of a module page. */
+interface Props {
+  eyebrow: string;
+  title: string;
+  lead?: string;
+}
+const { eyebrow, title, lead } = Astro.props;
+---
+
+<div class="intro measure">
+  <span class="eyebrow">{eyebrow}</span>
+  <h2 class="intro-title">{title}</h2>
+  {lead && <p class="intro-lead">{lead}</p>}
+</div>
+
+<style>
+  .intro {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .eyebrow {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--fam-text, var(--ff-ink-2));
+  }
+  .intro-title {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.12;
+  }
+  .intro-lead {
+    font-size: var(--ff-article);
+    line-height: 1.7;
+    color: var(--ff-body);
+  }
+  @media (max-width: 640px) {
+    .intro-title {
+      font-size: 28px;
+    }
+  }
+</style>

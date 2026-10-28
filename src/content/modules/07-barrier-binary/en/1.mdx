@@ -1,0 +1,69 @@
+import BarrierPathsFigure from '@/components/figures/BarrierPathsFigure.astro';
+
+{/* 07 Barrier & Binary · section 1 · Intuition. Numbers only via <Num />, registry src/lib/nums/ex.ts and m07.ts. */}
+
+The importer knows his hedge from module 04: a USD call struck at the forward, <Num of="ex.strike" />, on <Num of="ex.notional" />. It costs <Num of="ex.callChf" />. That is more than he wants to pay. He asks for something cheaper and gets a proposal: the same call, but with a **barrier**.
+
+A barrier is a rate level that is watched throughout the life of the option. If USD/CHF touches it, something final happens:
+
+- **Knock-out:** the option disappears. Whatever the rate does afterwards no longer matters.
+- **Knock-in:** the option only comes into existence now. Before, you only hold a claim to it, but the contract already has value. Afterwards it is an ordinary vanilla.
+
+Both make the option cheaper. You no longer buy every scenario, only some of them. The more scenarios the barrier cuts away, and the more valuable those scenarios would be, the bigger the discount.
+
+<BarrierPathsFigure caption="Ten random USD/CHF paths over three months. With a knock-out, a path fades as soon as it touches the barrier; with a knock-in, it only lights up then. Drag the barrier closer to spot: the knock-out gets cheaper, the knock-in dearer." />
+
+### Above or below: that is what matters
+
+With the barrier <Num of="m07.barrierPct" /> above spot, at <Num of="m07.barrierUp" />, the **up-and-out call** costs just <Num of="m07.uocPips" /> pips instead of <Num of="m07.vanillaPips" />. It is about <Num of="m07.uocDiscount" /> cheaper. With the barrier the same distance below, at <Num of="m07.barrierDown" />, the **down-and-out call** costs <Num of="m07.docPips" /> pips. That is only <Num of="m07.docDiscount" /> less.
+
+| Option, strike <Num of="ex.strike" /> | Barrier | Price | Touched with |
+| --- | --- | --- | --- |
+| Vanilla call | none | <Num of="m07.vanillaPips" /> pips · <Num of="ex.callChf" /> | – |
+| Up-and-out call | <Num of="m07.barrierUp" /> | <Num of="m07.uocPips" /> pips · <Num of="m07.uocChf" /> | <Num of="m07.touchUp" /> |
+| Down-and-out call | <Num of="m07.barrierDown" /> | <Num of="m07.docPips" /> pips · <Num of="m07.docChf" /> | <Num of="m07.touchDown" /> |
+
+The column ‘Touched with’ shows how likely the rate is to touch the barrier before expiry ([risk-neutral](/en/glossary/#term-risk-neutral), not a forecast).
+
+Why the difference? The lower barrier is actually touched more often than the upper one. What matters is *which* scenarios are lost. The down-and-out call disappears when the dollar falls. It would be worth little then anyway, and the importer buys his dollars more cheaply in the market. The up-and-out call disappears exactly when the dollar rises sharply. Those are the very scenarios the importer is buying protection for.
+
+<Callout variant="bad" title="Loss scenario">
+
+The importer picks the up-and-out call and saves <Num of="m07.uocSavingChf" /> in premium. After a month USD/CHF rises above <Num of="m07.barrierUp" />: the call is gone, even if the rate comes back later. At expiry USD/CHF stands at <Num of="m07.lossSpot" />. The importer pays <Num of="m07.lossChf" /> more for his dollars than at the strike. The premium he saved covers only part of that: all in, he is <Num of="m07.lossNetChf" /> worse off than with the plain call.
+
+</Callout>
+
+<Derivation title="Derivation: why touching is more likely than ending above">
+
+**1.** A path that ends above the barrier <i>H</i> must have touched <i>H</i> on the way. The reverse is not true: many paths touch <i>H</i> and then fall back.
+
+**2.** Reflection principle: without drift, every path that touches <i>H</i> and ends below has a mirrored partner that ends above. Both are equally likely. So without drift:
+
+<Formula variant="accent">P(barrier touched) = 2 · P(<i>S</i><sub><i>T</i></sub> ≥ <i>H</i>)</Formula>
+
+**3.** With the drift ν = <i>r</i><sub>d</sub> − <i>r</i><sub>f</sub> − ½σ² of ln <i>S</i> (<Num of="m07.driftLog" /> a year in the example) and <i>h</i> = ln(<i>H</i>/<i>S</i>), an upper barrier gives:
+
+<Formula>
+  <span>P(touched) = <i>N</i>((−<i>h</i> + ν<i>T</i>) / σ√<i>T</i>)</span>
+  <span>+ <i>e</i><sup>2ν<i>h</i>/σ²</sup> · <i>N</i>((−<i>h</i> − ν<i>T</i>) / σ√<i>T</i>)</span>
+</Formula>
+
+The first term is P(<i>S</i><sub><i>T</i></sub> ≥ <i>H</i>); the second counts the paths that touch and end below. Without drift the two are equal.
+
+**4.** In the example (risk-neutral, not a forecast): <Num of="m07.endAboveUp" /> + <Num of="m07.touchMirrorTerm" /> = <Num of="m07.touchUp1" />. Twice the first term would be only <Num of="m07.endAboveUp2" />. The negative drift (the forward is below spot) pulls the paths down over time. To end above, the rate has to beat the drift of the whole life of the option. For a touch, an early swing is enough, before the drift has done much. That is why the ratio is above 2 here.
+
+</Derivation>
+
+<Desk title="American or European monitoring">
+
+The barriers in this module apply throughout the option's life. In the market they are called "American". There are also "European" barriers, checked only at expiry. Then the option is no longer path-dependent: a European up-and-out call is simply a call spread between strike and barrier minus a digital at the barrier that pays the width <i>H</i> − <i>K</i> (section 3).
+
+That is why every term sheet states when, and against which rate, the barrier is checked. One word in the contract changes the price a lot.
+
+</Desk>
+
+<Takeaway>
+
+A barrier option is a vanilla with a condition. It is cheaper because it does not exist in some scenarios. Always check which scenarios those are.
+
+</Takeaway>

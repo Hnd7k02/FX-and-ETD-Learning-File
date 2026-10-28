@@ -1,0 +1,100 @@
+import TwoWayPriceFigure from '@/components/figures/TwoWayPriceFigure.astro';
+import OrderDemoFigure from '@/components/figures/OrderDemoFigure.astro';
+import TriangularArbitrageFigure from '@/components/figures/TriangularArbitrageFigure.astro';
+
+{/* 01 Spot · Abschnitt 3 · Quotierung, 2-Way Price, Valuta, Orders, Dreiecksarbitrage. Zahlen nur über <Num />. */}
+
+Der Importeur ruft seinen Market Maker an: «USD/CHF, USD 1 Mio., bitte.» Er sagt nicht, ob er kaufen oder verkaufen will. Darum bekommt er zwei Kurse zurück, einen **2-Way Price**: <Num of="m01.bid" /> zu <Num of="m01.ask" />.
+
+Der tiefere Kurs ist der **Bid**. Zu diesem Kurs kauft der Market Maker Dollars, du verkaufst. Der höhere ist der **Ask** (auch Offer). Zu diesem Kurs verkauft er Dollars, du kaufst. Der Importeur braucht Dollars, also zahlt er den Ask. Die Differenz ist der **Spread**. Er ist der Lohn des Market Makers dafür, dass er jederzeit beide Seiten anbietet.
+
+### Base und Quote
+
+Ein Kurs nennt immer zwei Währungen. Die erste ist die **Base**, die gehandelte Ware. Die zweite ist die **Quote**, in ihr wird der Preis genannt. USD/CHF ist der Preis von 1 USD in CHF. Welche Währung vorne steht, ist Konvention: EUR vor GBP vor AUD vor NZD vor USD vor CAD vor CHF vor JPY. Darum heisst es EUR/USD, aber USD/CHF und USD/JPY.
+
+Kurse haben vier Nachkommastellen, Paare mit dem Yen nur zwei. Dort ist ein Pip 0.01. Auf USD 1 Mio. sind das <Num of="m01.pipJpy" />.
+
+<TwoWayPriceFigure caption="Links der Bid, rechts der Ask, beide aufgeteilt in Big Figure und Pips. Schalte die Treiber ein und schau, wie der Spread wächst und was er den Importeur kostet." />
+
+### Was der Spread kostet
+
+Bei einem Spread von <Num of="m01.spreadBase" /> Pips zahlt der Importeur für seine Dollars <Num of="m01.costAsk" />. Gegenüber dem Mittelkurs sind das <Num of="m01.halfCostBase" />, der halbe Spread. Wer kauft und sofort wieder verkauft, verliert den ganzen Spread, <Num of="m01.fullCostBase" />.
+
+Der Spread ist nicht fix. Er wird breiter, wenn der Market Maker mehr Risiko trägt: in einem dünnen Markt, spät am Abend (Abschnitt 2), bei sehr grossen Beträgen, bei hoher Vola und kurz vor Risk Events wie einem Zinsentscheid. Kommt alles zusammen, sind es im Modell <Num of="m01.spreadMax" /> Pips. Der Importeur zahlt dann <Num of="m01.halfCostMax" /> statt <Num of="m01.halfCostBase" /> gegenüber der Mitte.
+
+### Spot heisst nicht sofort
+
+Ein Spot-Geschäft wird zwei Geschäftstage nach dem Abschluss erfüllt: Valuta **T+2**. Erst dann fliessen die Zahlungen. Kauft der Importeur am Montag, hat er die Dollars am Mittwoch. Der Valutatag muss in beiden Währungen ein Bankarbeitstag sein, sonst rückt er weiter. Eine Ausnahme ist USD/CAD mit T+1. Alles, was später erfüllt wird, ist ein Forward (Modul 02).
+
+### Market, Limit, Stop-Loss
+
+Angenommen, der Importeur will die Dollars in den nächsten zwei Wochen kaufen. Er muss nicht sofort handeln. Er kann dem Market Maker einen Auftrag geben:
+
+- **Market Order:** sofort zum aktuellen Ask. Die Ausführung ist sicher, der Kurs nicht.
+- **Limit Order:** kaufen, wenn der Ask auf <Num of="m01.limitLevel" /> oder tiefer fällt. Der Kurs ist sicher, die Ausführung nicht.
+- **Stop-Loss Order:** kaufen, sobald der Ask auf <Num of="m01.stopLevel" /> steigt. Der Stop begrenzt den Schaden, wenn der Dollar davonläuft. Ausgelöst wird er zur Market Order.
+
+<OrderDemoFigure caption="Wähle einen Ordertyp und zieh die gestrichelte Linie. Schalte dann auf «Gap übers Wochenende» und schau, wo der Stop ausgeführt wird." />
+
+Im ruhigen Markt wird der Stop praktisch zu <Num of="m01.stopLevel" /> ausgeführt. Im zweiten Szenario passiert am Wochenende etwas. Am Freitag lag der Ask bei <Num of="m01.gapFriday" />, am Montag öffnet der Markt bei <Num of="m01.gapMonday" />. Dazwischen gab es keinen einzigen Kurs. Der Stop wird ausgelöst und zum ersten verfügbaren Kurs ausgeführt: <Num of="m01.gapFill" />. Das sind <Num of="m01.gapSlipPips" /> Pips oder <Num of="m01.gapSlipChf" /> mehr als geplant. Das Limit dagegen wird in diesem Szenario nie erreicht. Am Ende der zwei Wochen muss der Importeur trotzdem kaufen, zum dann gültigen Ask von <Num of="m01.limitGapEnd" />.
+
+<Callout variant="warn" title="Gap-Risiko">
+
+Ein Stop-Loss ist kein garantierter Kurs. Er schützt nur in einem Markt, der sich stetig bewegt. Springt der Kurs, etwa übers Wochenende oder nach einer Überraschung, wird der Stop zum nächsten verfügbaren Kurs ausgeführt, und der kann weit weg liegen. Wie weit so ein Sprung reichen kann, zeigt [Modul 07](/module/07-barrier-binary/4/) am Frankenschock, als hypothetisches Szenario mit EZB-Referenzkursen.
+
+</Callout>
+
+### Dreiecksarbitrage
+
+EUR/CHF kannst du direkt handeln oder über den Dollar: Euro in Dollar, Dollar in Franken. Beide Wege müssen etwa denselben Kurs ergeben. Der Kurs über den Dollar heisst **Kreuzkurs**: <Num of="m01.eurusd" /> × <Num of="ex.spot" /> = <Num of="m01.implied" />.
+
+Mit Spreads gibt es keinen einzelnen Kreuzkurs, sondern ein Band. Über den Dollar kaufst du einen Euro für <Num of="m01.impliedAsk" /> Franken (Ask mal Ask). Verkaufen kannst du ihn für <Num of="m01.impliedBid" /> (Bid mal Bid). Solange der direkte Mittelkurs weniger als <Num of="m01.triBandPips" /> Pips vom Kreuzkurs abweicht, lohnt sich keine Rundreise.
+
+Angenommen, EUR/CHF steht direkt bei <Num of="m01.eurchfBid" /> zu <Num of="m01.eurchfAsk" />. Der Mittelkurs liegt also <Num of="m01.triGapPips" /> Pips über dem Kreuzkurs, und schon der direkte Bid ist höher als der Kreuz-Ask. Dann lohnt sich die Rundreise:
+
+1. Verkaufe EUR 1 Mio. direkt zum Bid <Num of="m01.eurchfBid" />. Du erhältst <Num of="m01.triLeg1Chf" />.
+2. Kaufe mit den Franken Dollars zum USD/CHF-Ask <Num of="m01.usdchfAsk" />. Du erhältst <Num of="m01.triLeg2Usd" />.
+3. Kaufe mit den Dollars Euro zum EUR/USD-Ask <Num of="m01.eurusdAsk" />. Du erhältst <Num of="m01.triLeg3Eur" />.
+
+Der Gewinn: <Num of="m01.triProfit" />, ohne dass am Ende eine offene Position bleibt. Ohne Spreads wären es <Num of="m01.triProfitFlat" />. Die Spreads fressen einen Teil davon.
+
+<TriangularArbitrageFigure caption="Zieh den direkten EUR/CHF-Kurs aus dem Band des Kreuzkurses. Sobald sich die Rundreise lohnt, fliesst das Geld ums Dreieck." />
+
+<Derivation title="Herleitung: Kreuzkurs, Band und Gewinn">
+
+**Kreuzkurs.** EUR/USD nennt USD je EUR, USD/CHF nennt CHF je USD. Multiplizierst du beide, kürzt sich der Dollar:
+
+<Formula variant="accent">EUR/CHF = EUR/USD · USD/CHF</Formula>
+
+**Bid und Ask über den Dollar.** Verkaufst du Euro über den Dollar, verkaufst du zweimal die Base und bekommst zweimal den Bid. Kaufst du Euro, zahlst du zweimal den Ask:
+
+<Formula>
+  <span>Kreuz-Bid = Bid<sub>EUR/USD</sub> · Bid<sub>USD/CHF</sub></span>
+  <span>Kreuz-Ask = Ask<sub>EUR/USD</sub> · Ask<sub>USD/CHF</sub></span>
+</Formula>
+
+**Keine Arbitrage**, solange sich die Bänder überlappen: direkter Bid ≤ Kreuz-Ask und direkter Ask ≥ Kreuz-Bid.
+
+**Gewinn.** Ist der direkte Bid höher als der Kreuz-Ask, verkaufst du direkt und kaufst über den Dollar zurück:
+
+<Formula><i>G</i> = EUR 1 Mio. · (Bid<sub>direkt</sub> / Kreuz-Ask − 1)</Formula>
+
+Ist der direkte Ask tiefer als der Kreuz-Bid, läuft die Rundreise andersherum: <i>G</i> = EUR 1 Mio. · (Kreuz-Bid / Ask<sub>direkt</sub> − 1).
+
+**Spreadkosten.** Gegenüber der Mitte kostet ein Geschäft den halben Spread mal Nominal: <Num of="m01.spreadBase" /> Pips / 2 · 0.0001 · USD 1 Mio. = <Num of="m01.halfCostBase" />.
+
+</Derivation>
+
+<Desk title="Mine, yours und der Kreuzkurs">
+
+Am Telefon nennt der Händler meist nur die Pips, die Big Figure gilt als bekannt. Wer «mine» sagt, kauft zum Ask. Wer «yours» sagt, verkauft zum Bid. Ein Wort, und das Geschäft gilt.
+
+Viele Paare ohne Dollar werden aus zwei Dollar-Paaren gerechnet. Ihr Spread enthält dann zwei Spreads und ist meist breiter. Echte Dreiecksarbitrage ist Sache von Algorithmen: Solche Lücken schliessen sich in Bruchteilen von Sekunden.
+
+</Desk>
+
+<Takeaway>
+
+Ein Kurs hat zwei Seiten: Wer kauft, zahlt den Ask, wer verkauft, erhält den Bid. Der Spread wird breiter, wenn das Risiko für den Market Maker steigt, und ein Stop-Loss schützt nicht vor einem Gap.
+
+</Takeaway>

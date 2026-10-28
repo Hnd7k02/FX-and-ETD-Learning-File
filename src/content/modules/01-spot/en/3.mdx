@@ -1,0 +1,100 @@
+import TwoWayPriceFigure from '@/components/figures/TwoWayPriceFigure.astro';
+import OrderDemoFigure from '@/components/figures/OrderDemoFigure.astro';
+import TriangularArbitrageFigure from '@/components/figures/TriangularArbitrageFigure.astro';
+
+{/* 01 Spot · Section 3 · Quotes, two-way price, value date, orders, triangular arbitrage. Numbers only via <Num />. */}
+
+The importer calls his market maker: “USD/CHF, USD 1m, please.” He does not say whether he wants to buy or sell. So he gets two rates back, a **two-way price**: <Num of="m01.bid" /> at <Num of="m01.ask" />.
+
+The lower rate is the **bid**. At this rate the market maker buys dollars and you sell. The higher one is the **ask** (also called the offer). At this rate he sells dollars and you buy. The importer needs dollars, so he pays the ask. The difference is the **spread**. It is the market maker's reward for always offering both sides.
+
+### Base and quote
+
+A rate always names two currencies. The first is the **base**, the goods being traded. The second is the **quote**, the currency the price is stated in. USD/CHF is the price of 1 USD in CHF. Which currency comes first is a convention: EUR before GBP before AUD before NZD before USD before CAD before CHF before JPY. That is why it is EUR/USD, but USD/CHF and USD/JPY.
+
+Rates have four decimal places, pairs with the yen only two. There a pip is 0.01. On USD 1m that makes <Num of="m01.pipJpy" />.
+
+<TwoWayPriceFigure caption="Bid on the left, ask on the right, each split into big figure and pips. Switch the drivers on and watch how the spread grows and what it costs the importer." />
+
+### What the spread costs
+
+With a spread of <Num of="m01.spreadBase" /> pips the importer pays <Num of="m01.costAsk" /> for his dollars. Against the mid that is <Num of="m01.halfCostBase" />, half the spread. Anyone who buys and sells straight back loses the whole spread, <Num of="m01.fullCostBase" />.
+
+The spread is not fixed. It widens when the market maker carries more risk: in a thin market, late in the evening (section 2), for very large amounts, in high volatility and just before risk events such as a rate decision. If everything comes together, the model gives <Num of="m01.spreadMax" /> pips. The importer then pays <Num of="m01.halfCostMax" /> instead of <Num of="m01.halfCostBase" /> against the mid.
+
+### Spot does not mean now
+
+A spot deal settles two business days after it is struck: value date **T+2**. Only then do the payments flow. If the importer buys on Monday, he has the dollars on Wednesday. The value date must be a business day in both currencies; otherwise it moves on. One exception is USD/CAD with T+1. Anything that settles later is a forward (module 02).
+
+### Market, limit, stop-loss
+
+Suppose the importer wants to buy the dollars over the next two weeks. He does not have to deal at once. He can leave an order with the market maker:
+
+- **Market order:** buy at once at the current ask. Execution is certain, the rate is not.
+- **Limit order:** buy if the ask falls to <Num of="m01.limitLevel" /> or lower. The rate is certain, execution is not.
+- **Stop-loss order:** buy as soon as the ask rises to <Num of="m01.stopLevel" />. The stop limits the damage if the dollar runs away. Once triggered, it becomes a market order.
+
+<OrderDemoFigure caption="Choose an order type and drag the dashed line. Then switch to “Gap over the weekend” and see where the stop is filled." />
+
+In a calm market the stop is filled practically at <Num of="m01.stopLevel" />. In the second scenario something happens over the weekend. On Friday the ask stood at <Num of="m01.gapFriday" />; on Monday the market opens at <Num of="m01.gapMonday" />. There was not a single price in between. The stop is triggered and filled at the first available rate: <Num of="m01.gapFill" />. That is <Num of="m01.gapSlipPips" /> pips or <Num of="m01.gapSlipChf" /> more than planned. The limit, on the other hand, is never reached in this scenario. At the end of the two weeks the importer has to buy anyway, at the ask of that day, <Num of="m01.limitGapEnd" />.
+
+<Callout variant="warn" title="Gap risk">
+
+A stop-loss is not a guaranteed rate. It only protects you in a market that moves continuously. If the rate jumps, over a weekend or after a surprise, the stop is filled at the next available rate, and that can be far away. How far such a jump can reach is shown in [module 07](/en/module/07-barrier-binary/4/) with the franc shock, as a hypothetical scenario with ECB reference rates.
+
+</Callout>
+
+### Triangular arbitrage
+
+You can trade EUR/CHF directly or via the dollar: euros into dollars, dollars into francs. Both routes must give roughly the same rate. The rate via the dollar is called the **cross rate**: <Num of="m01.eurusd" /> × <Num of="ex.spot" /> = <Num of="m01.implied" />.
+
+With spreads there is no single cross rate but a band. Via the dollar you buy a euro for <Num of="m01.impliedAsk" /> francs (ask times ask). You can sell it for <Num of="m01.impliedBid" /> (bid times bid). As long as the direct mid is less than <Num of="m01.triBandPips" /> pips away from the cross rate, no round trip pays.
+
+Suppose EUR/CHF is quoted directly at <Num of="m01.eurchfBid" /> to <Num of="m01.eurchfAsk" />. The mid is then <Num of="m01.triGapPips" /> pips above the cross rate, and even the direct bid is higher than the cross ask. Then the round trip pays:
+
+1. Sell EUR 1m directly at the bid of <Num of="m01.eurchfBid" />. You receive <Num of="m01.triLeg1Chf" />.
+2. Use the francs to buy dollars at the USD/CHF ask of <Num of="m01.usdchfAsk" />. You receive <Num of="m01.triLeg2Usd" />.
+3. Use the dollars to buy euros at the EUR/USD ask of <Num of="m01.eurusdAsk" />. You receive <Num of="m01.triLeg3Eur" />.
+
+The profit: <Num of="m01.triProfit" />, with no open position left at the end. Without spreads it would be <Num of="m01.triProfitFlat" />. The spreads eat part of it.
+
+<TriangularArbitrageFigure caption="Drag the direct EUR/CHF quote out of the band of the cross rate. As soon as the round trip pays, the money flows around the triangle." />
+
+<Derivation title="Derivation: cross rate, band and profit">
+
+**Cross rate.** EUR/USD states USD per EUR, USD/CHF states CHF per USD. Multiply the two and the dollar cancels out:
+
+<Formula variant="accent">EUR/CHF = EUR/USD · USD/CHF</Formula>
+
+**Bid and ask via the dollar.** If you sell euros via the dollar, you sell the base twice and get the bid twice. If you buy euros, you pay the ask twice:
+
+<Formula>
+  <span>Cross bid = Bid<sub>EUR/USD</sub> · Bid<sub>USD/CHF</sub></span>
+  <span>Cross ask = Ask<sub>EUR/USD</sub> · Ask<sub>USD/CHF</sub></span>
+</Formula>
+
+**No arbitrage** as long as the bands overlap: direct bid ≤ cross ask and direct ask ≥ cross bid.
+
+**Profit.** If the direct bid is above the cross ask, you sell directly and buy back via the dollar:
+
+<Formula><i>P</i> = EUR 1m · (Bid<sub>direct</sub> / Cross ask − 1)</Formula>
+
+If the direct ask is below the cross bid, the round trip runs the other way: <i>P</i> = EUR 1m · (Cross bid / Ask<sub>direct</sub> − 1).
+
+**Cost of the spread.** Against the mid, a deal costs half the spread times the notional: <Num of="m01.spreadBase" /> pips / 2 · 0.0001 · USD 1m = <Num of="m01.halfCostBase" />.
+
+</Derivation>
+
+<Desk title="Mine, yours and the cross rate">
+
+On the phone the dealer usually quotes only the pips; the big figure is taken as known. Saying “mine” means you buy at the ask. Saying “yours” means you sell at the bid. One word, and the deal is done.
+
+Many pairs without the dollar are priced from two dollar pairs. Their spread then contains two spreads and is usually wider. Real triangular arbitrage is a job for algorithms: such gaps close within fractions of a second.
+
+</Desk>
+
+<Takeaway>
+
+A rate has two sides: the buyer pays the ask, the seller receives the bid. The spread widens when the market maker's risk rises, and a stop-loss does not protect you against a gap.
+
+</Takeaway>

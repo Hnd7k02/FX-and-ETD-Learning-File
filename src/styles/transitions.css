@@ -1,0 +1,105 @@
+/* Forward First – view transitions (Astro <ClientRouter />, MASTER_PROMPT §4 "Übergang").
+   Signature move: a learning-path station grows into the module header. The station's title
+   span and node circle (src/components/home/LearningPath.astro) and the module header's H1 and
+   family chip (src/components/module/ModuleHeader.astro) share the names ff-title-{slug} and
+   ff-node-{slug}. The browser morphs the two boxes; the snapshots scale with the box height so
+   the text appears to grow from 14 px to the H1 size. Browsers without View Transitions
+   navigate normally; under prefers-reduced-motion nothing animates. */
+
+:root {
+  --ff-vt-duration: 450ms;
+  --ff-vt-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --ff-vt-page: 220ms;
+}
+
+/* Calm page cross-fade for everything else. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: var(--ff-vt-page);
+  animation-timing-function: ease-out;
+}
+
+/* Station → module header (one pair of names per module slug). */
+::view-transition-group(ff-title-01-spot),
+::view-transition-group(ff-title-02-forward),
+::view-transition-group(ff-title-03-fx-swap),
+::view-transition-group(ff-title-04-vanilla-options),
+::view-transition-group(ff-title-05-greeks),
+::view-transition-group(ff-title-06-combos-smile),
+::view-transition-group(ff-title-07-barrier-binary),
+::view-transition-group(ff-title-08-structured-products),
+::view-transition-group(ff-title-09-hedge-alpha-yield),
+::view-transition-group(ff-node-01-spot),
+::view-transition-group(ff-node-02-forward),
+::view-transition-group(ff-node-03-fx-swap),
+::view-transition-group(ff-node-04-vanilla-options),
+::view-transition-group(ff-node-05-greeks),
+::view-transition-group(ff-node-06-combos-smile),
+::view-transition-group(ff-node-07-barrier-binary),
+::view-transition-group(ff-node-08-structured-products),
+::view-transition-group(ff-node-09-hedge-alpha-yield) {
+  animation-duration: var(--ff-vt-duration);
+  animation-timing-function: var(--ff-vt-ease);
+}
+
+/* The snapshots scale with the morphing box (height-bound, aspect kept): font-size morph look. */
+::view-transition-old(ff-title-01-spot),
+::view-transition-new(ff-title-01-spot),
+::view-transition-old(ff-title-02-forward),
+::view-transition-new(ff-title-02-forward),
+::view-transition-old(ff-title-03-fx-swap),
+::view-transition-new(ff-title-03-fx-swap),
+::view-transition-old(ff-title-04-vanilla-options),
+::view-transition-new(ff-title-04-vanilla-options),
+::view-transition-old(ff-title-05-greeks),
+::view-transition-new(ff-title-05-greeks),
+::view-transition-old(ff-title-06-combos-smile),
+::view-transition-new(ff-title-06-combos-smile),
+::view-transition-old(ff-title-07-barrier-binary),
+::view-transition-new(ff-title-07-barrier-binary),
+::view-transition-old(ff-title-08-structured-products),
+::view-transition-new(ff-title-08-structured-products),
+::view-transition-old(ff-title-09-hedge-alpha-yield),
+::view-transition-new(ff-title-09-hedge-alpha-yield) {
+  animation-duration: var(--ff-vt-duration);
+  animation-timing-function: var(--ff-vt-ease);
+  height: 100%;
+  width: auto;
+  object-fit: contain;
+  object-position: left center;
+}
+
+/* The node circle becomes the family chip: plain cross-fade inside the morphing box. */
+::view-transition-old(ff-node-01-spot),
+::view-transition-new(ff-node-01-spot),
+::view-transition-old(ff-node-02-forward),
+::view-transition-new(ff-node-02-forward),
+::view-transition-old(ff-node-03-fx-swap),
+::view-transition-new(ff-node-03-fx-swap),
+::view-transition-old(ff-node-04-vanilla-options),
+::view-transition-new(ff-node-04-vanilla-options),
+::view-transition-old(ff-node-05-greeks),
+::view-transition-new(ff-node-05-greeks),
+::view-transition-old(ff-node-06-combos-smile),
+::view-transition-new(ff-node-06-combos-smile),
+::view-transition-old(ff-node-07-barrier-binary),
+::view-transition-new(ff-node-07-barrier-binary),
+::view-transition-old(ff-node-08-structured-products),
+::view-transition-new(ff-node-08-structured-products),
+::view-transition-old(ff-node-09-hedge-alpha-yield),
+::view-transition-new(ff-node-09-hedge-alpha-yield) {
+  animation-duration: var(--ff-vt-duration);
+  animation-timing-function: var(--ff-vt-ease);
+  height: 100%;
+  width: 100%;
+  object-fit: contain;
+  object-position: left center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

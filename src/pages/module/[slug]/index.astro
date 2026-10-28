@@ -1,0 +1,11 @@
+---
+/** /module/{slug}/ redirects to section 1 (a meta-refresh page in the static build). */
+import { MODULES } from '@/data/modules';
+import { modulePath } from '@/i18n/routes';
+
+export function getStaticPaths() {
+  return MODULES.map((m) => ({ params: { slug: m.slug } }));
+}
+const { slug } = Astro.params;
+return Astro.redirect(modulePath('de', slug!, '1'));
+---

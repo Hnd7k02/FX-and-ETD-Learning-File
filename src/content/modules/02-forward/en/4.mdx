@@ -1,0 +1,72 @@
+import CashCarryCalculatorFigure from '@/components/figures/CashCarryCalculatorFigure.astro';
+
+{/* 02 Forward · Section 4 · Arbitrage (cash and carry). Numbers only via <Num />, registries src/lib/nums/ex.ts and m02.ts. */}
+
+Suppose a dealer quotes the 3-month forward at <Num of="m02.arbMarket" />. The fair value would be <Num of="m02.fwd" />. So his forward is <Num of="m02.arbGapPips" /> pips too dear. What do you do?
+
+You sell him USD 1m forward at the dear rate. You get the dollars you have to deliver through route B from section 2, and that costs only the fair rate. The difference is yours. You need no money of your own and carry no exchange-rate risk. That is **arbitrage**, more precisely a **cash and carry**: buy the goods today (cash), hold them until delivery (carry), sell them forward.
+
+### Step by step
+
+**Today:**
+
+1. Borrow <Num of="m02.chfLoan" /> at <Num of="ex.rd" />.
+2. Use it to buy exactly <Num of="m02.usdToday" /> at the spot rate of <Num of="ex.spot" />.
+3. Deposit the dollars for 90 days at <Num of="ex.rf" />.
+4. Sell USD 1m forward at <Num of="m02.arbMarket" />. This is a contract; no money moves for it today.
+
+Net, your balance today is zero in both currencies: the loan paid for the purchase, the purchase funded the deposit.
+
+**At maturity:**
+
+5. The deposit pays out USD 1m.
+6. You deliver the USD 1m into the forward and receive <Num of="m02.arbChfIn" />.
+7. You repay the loan with interest: <Num of="m02.chfRepay" />.
+
+What is left is <Num of="m02.arbProfit" />. That is exactly USD 1m times the mispricing of <Num of="m02.arbGapPips" /> pips. The profit is known today. The arbitrage is risk-free as long as every counterparty pays.
+
+<CashCarryCalculatorFigure caption="Type a market forward or drag it on the ruler. To the right of the fair value it is too dear, to the left too cheap. Play the steps, then press “Market reacts”." />
+
+### And if the forward is too cheap?
+
+Then you turn everything round. If the forward stands at <Num of="m02.arbMarketLow" />, you buy the dollars cheaply forward and sell them through the money market at the fair rate: borrow <Num of="m02.usdToday" />, exchange them into <Num of="m02.chfLoan" /> at spot, deposit the francs. At maturity you pay <Num of="m02.arbChfPayLow" /> into the forward, receive USD 1m and use it to repay the dollar loan. The franc deposit pays out <Num of="m02.chfRepay" />. Again <Num of="m02.arbProfit" /> is left.
+
+### Why the forward stays fair
+
+A gap like this is not spotted by one trader alone. Many do the same trade, and each one pushes prices back:
+
+- They **sell** the dear forward. It gets cheaper.
+- They **buy** dollars at spot. Spot rises, and the fair forward with it.
+- They **borrow** francs and **deposit** dollars. The CHF rate rises, the USD rate falls. Both lift the fair forward.
+
+This continues until no profit is left. That is why the market forward sits close to the fair value, and why section 2 could simply assume that the two routes cost the same.
+
+In reality every step costs something: spreads on spot, points and rates, credit lines and capital. Small deviations from the textbook forward can therefore persist as long as they are smaller than these costs. That is one reason why the cross-currency basis from section 2 does not simply disappear.
+
+<Derivation title="Derivation: profit = notional times mispricing">
+
+With <i>N</i> = USD 1m you move <i>B</i><sub>0</sub> = <i>N</i> / (1 + <i>r</i><sub>USD</sub> · <i>t</i>) dollars and <i>Q</i><sub>0</sub> = <i>S</i> · <i>B</i><sub>0</sub> francs today. At maturity the deposit is worth exactly <i>N</i>, and the loan costs <i>Q</i><sub>0</sub> · (1 + <i>r</i><sub>CHF</sub> · <i>t</i>) = <i>N</i> · <i>F</i><sub>fair</sub> (section 2). From the forward you receive <i>N</i> · <i>F</i><sub>market</sub>. The profit at maturity is therefore
+
+<Formula variant="accent">Profit = <i>N</i> · (<i>F</i><sub>market</sub> − <i>F</i><sub>fair</sub>) = USD 1m · <Num of="m02.arbGapPips" /> pips = <Num of="m02.arbProfit" /></Formula>
+
+If the market forward is too cheap, everything runs as a mirror image and the profit is <i>N</i> · (<i>F</i><sub>fair</sub> − <i>F</i><sub>market</sub>).
+
+**Today the profit** is worth its value discounted at the CHF rate: profit / (1 + <i>r</i><sub>CHF</sub> · <i>t</i>) = <Num of="m02.arbProfitPv" />. With a CHF rate of <Num of="ex.rd" /> it is the same amount.
+
+**With spreads** there is no longer a single fair forward but a band. Its limits follow if you deal on the worse side at every step. The upper limit applies to the cash and carry: you buy dollars at the ask, borrow francs at the higher rate and deposit dollars at the lower one. The lower limit applies to the reverse trade: you sell dollars at the bid, borrow dollars at the higher rate and deposit francs at the lower one. Only a market forward outside this band is worth trading.
+
+</Derivation>
+
+<Desk title="The bank's cash and carry">
+
+The bank that sells the importer the forward is then short USD forward. It hedges itself with exactly route B: buy dollars today and park them until maturity. In practice it does this with a spot deal and an FX swap (module 03).
+
+Its income is the margin in the rate, not a bet on the dollar. For the forward dealer, interest rate parity is therefore not theory but the daily routine.
+
+</Desk>
+
+<Takeaway>
+
+If the forward deviates from its fair value, a cash and carry earns a profit without exchange-rate risk and without money of your own: notional times mispricing. Because everybody can see this, the forward stays close to its fair value. Deviations such as the cross-currency basis persist as long as they do not cover the costs of the arbitrage.
+
+</Takeaway>

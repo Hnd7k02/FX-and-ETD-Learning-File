@@ -1,0 +1,15 @@
+---
+/** Full-width figure (labs, charts) with optional caption. */
+interface Props {
+  caption?: string;
+  frame?: boolean;
+}
+const { caption, frame = true } = Astro.props;
+---
+
+<figure class="figure">
+  <div class:list={[frame && 'figure-frame']}>
+    <slot />
+  </div>
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>

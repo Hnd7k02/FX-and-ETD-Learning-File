@@ -1,0 +1,78 @@
+import BarrierLabFigure from '@/components/figures/BarrierLabFigure.astro';
+
+{/* 07 Barrier & Binary · section 2 · Knock-out and knock-in. Numbers only via <Num />, registry src/lib/nums/m07.ts. */}
+
+Three questions define every simple barrier option. Call or put? Is the barrier above spot (up) or below it (down)? Does the option vanish when the barrier is touched (out) or come to life (in)? Two times two times two: there are eight basic types.
+
+| | Barrier above (up) | Barrier below (down) |
+| --- | --- | --- |
+| **Call** | Up-and-out, up-and-in. Barrier in the money: **reverse** | Down-and-out, down-and-in. Barrier out of the money: **regular** |
+| **Put** | Up-and-out, up-and-in. Barrier out of the money: **regular** | Down-and-out, down-and-in. Barrier in the money: **reverse** |
+
+The table holds for a strike close to spot, as in the importer's case. The rule behind it: if the barrier sits where the option is in the money, it is called reverse. Otherwise it is regular.
+
+### In-out parity
+
+Buy a knock-out and a knock-in with the same strike, barrier and expiry. On every path exactly one of the two is alive. If the rate touches the barrier, the knock-out dies and the knock-in wakes up. If it never does, the knock-out lives on and the knock-in never starts. Together you always hold the vanilla.
+
+<Formula variant="accent">Knock-out + knock-in = vanilla (without rebate)</Formula>
+
+In the example with the barrier at <Num of="m07.barrierUp" />: the up-and-out call at <Num of="m07.uocPips" /> pips plus the up-and-in call at <Num of="m07.uicPips" /> pips gives <Num of="m07.paritySumPips" /> pips, exactly the price of the vanilla call. Know two of the three prices and you know the third.
+
+<BarrierLabFigure caption="Choose type, direction and kind. Drag the spot (black dot) towards the barrier and shorten the time to expiry: with a reverse knock-out, delta turns strongly negative. Below, in-out parity appears as two bars of equal length." />
+
+### Reverse knock-out: cheap but nervous
+
+For the regular down-and-out call with its barrier at <Num of="m07.barrierDown" />, the barrier lies below the strike. If it is touched, the call is out of the money anyway. The knock-out takes little away, so it costs almost as much as the vanilla.
+
+For the up-and-out call with its barrier at <Num of="m07.barrierUp" />, the barrier lies above the strike, in the money. Just below the barrier the call has a lot of intrinsic value; at the barrier, none. This cliff shapes the Greeks:
+
+- At spot <Num of="ex.spot" />, delta is <Num of="m07.uocDelta" />; the vanilla's is <Num of="ex.delta" />. The option hardly reacts to the rate.
+- At spot <Num of="m07.nearSpot" />, just below the barrier, delta is <Num of="m07.uocDeltaNear" />. The vanilla has <Num of="m07.vanillaDeltaNear" /> there. If the dollar rises, the option loses.
+- With only <Num of="m07.shortWeeks" /> weeks to expiry, the call is worth more at <Num of="m07.nearSpot" />: <Num of="m07.uocNearShortPips" /> instead of <Num of="m07.uocNearPips" /> pips, because little time is left for a touch. In return, delta is <Num of="m07.uocDeltaNearShort" /> and gamma <Num of="m07.uocGammaNearShort" />; the vanilla's gamma is just <Num of="m07.vanillaGammaNearShort" />. On <Num of="ex.notional" />, the call now behaves like a short position of <Num of="m07.uocDeltaNearShortUsd" />. The importer wanted to be long dollars.
+
+For the hedger this means: near the barrier delta swings wildly, and at the barrier it jumps to zero. A reverse knock-out is hard to hedge cleanly there.
+
+### Rebate: a consolation prize
+
+Some knock-outs pay a fixed compensation when they are knocked out, the rebate. A rebate of <Num of="m07.rebatePips" /> pips lifts the price of the up-and-out call from <Num of="m07.uocPips2" /> to <Num of="m07.uocRebatePips" /> pips. The rebate is worth only <Num of="m07.rebateValuePips" /> pips because it is paid only if the barrier is actually touched. That happens with a probability of <Num of="m07.touchUp" /> (section 1; [risk-neutral](/en/glossary/#term-risk-neutral), not a forecast). For knock-ins the rebate is paid at expiry if the option never came to life.
+
+<Derivation title="Derivation: the method of images">
+
+**1.** Take the regular down-and-out call with barrier <i>H</i> below strike <i>K</i>. We want a price with two properties: at expiry, above the barrier, it pays the same as the vanilla. At the barrier, it is zero.
+
+**2.** The idea comes from physics: next to the vanilla, place a mirrored vanilla whose spot is reflected at the barrier, <i>H</i>²/<i>S</i>. Subtract it with the right weight:
+
+<Formula variant="accent">
+  <span><i>C</i><sub>DO</sub>(<i>S</i>) = <i>C</i>(<i>S</i>) − (<i>H</i>/<i>S</i>)<sup>2μ</sup> · <i>C</i>(<i>H</i>²/<i>S</i>)</span>
+  <span>μ = (<i>r</i><sub>d</sub> − <i>r</i><sub>f</sub> − ½σ²) / σ²</span>
+</Formula>
+
+**3.** Both properties hold. At the barrier <i>S</i> = <i>H</i>, so <i>H</i>²/<i>S</i> = <i>H</i> and the weight is 1: both terms are equal and the difference is zero. At expiry the mirrored spot <i>H</i>²/<i>S</i> lies below <i>H</i> and hence below the strike: the mirror call pays nothing and the vanilla is left. The weight makes sure the mirror term is a fair price too; it satisfies the same pricing equation as the vanilla.
+
+**4.** In the example with <i>H</i> = <Num of="m07.barrierDown" />: μ = <Num of="m07.mirrorMu" />, mirror spot <Num of="m07.mirrorSpot" />, weight <Num of="m07.mirrorWeight" />, mirrored call <Num of="m07.mirrorCallPips" /> pips. The mirror term is <Num of="m07.mirrorPips" /> pips, and <Num of="m07.vanillaPips" /> − <Num of="m07.mirrorPips" /> = <Num of="m07.docPips" /> pips is the down-and-out call.
+
+**5.** The mirror term is exactly the down-and-in call. That is in-out parity again, this time read off the formula. Reiner and Rubinstein derived all eight types this way. The lab uses these formulas; reverse types need several mirror terms.
+
+</Derivation>
+
+<Desk title="Continuous or daily monitoring">
+
+The formulas assume continuous monitoring: every second counts. Some contracts, especially in structured products, check the barrier only once a day against a fixing. Then it is touched less often, and a knock-out is worth more.
+
+Broadie, Glasserman and Kou showed that a barrier observed daily behaves almost like a continuous one placed a little further from spot.
+
+<Formula variant="dark">
+  <span><i>H</i><sub>continuous</sub> ≈ <i>H</i> · <i>e</i><sup>±β · σ · √Δ<i>t</i></sup></span>
+  <span>β = <Num of="m07.bgkBeta" />, Δ<i>t</i> = 1/365</span>
+</Formula>
+
+With σ = <Num of="ex.vol" /> the factor is <Num of="m07.bgkFactor" />. The barrier at <Num of="m07.barrierUp" /> acts like one at <Num of="m07.bgkBarrier" />, about <Num of="m07.bgkShiftPips" /> pips further away. The up-and-out call then costs <Num of="m07.uocDailyPips" /> instead of <Num of="m07.uocPips" /> pips. In the lab, switch to "Daily (BGK)".
+
+</Desk>
+
+<Takeaway>
+
+Knock-out plus knock-in gives the vanilla. With the barrier in the money, the knock-out is cheap, but delta and gamma go haywire at the barrier.
+
+</Takeaway>

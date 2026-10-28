@@ -1,0 +1,62 @@
+import OptionVsForwardFigure from '@/components/figures/OptionVsForwardFigure.astro';
+
+Our importer has to pay USD 1m in 3 months. With the forward from module 02 he fixes the rate today: he buys the dollars at <Num of="m04.fwdDeal" /> CHF per USD. That protects him against a strong dollar. But it also takes away every opportunity. If USD/CHF falls, he still pays the forward rate.
+
+An option separates the good side from the bad one. It gives him the **right, but not the obligation**, to buy USD 1m in 3 months at a **strike** of <Num of="ex.strike" />. If the dollar rises above the strike, he exercises and buys at the strike. If the dollar falls, he lets the option lapse and buys more cheaply in the market.
+
+That right has a price. The seller of the option asks for a **premium** today: <Num of="ex.callPips" /> pips, or <Num of="ex.callChf" /> on USD 1m. As with insurance, you pay the premium up front, whether or not the bad event happens. Section 4 shows where this number comes from.
+
+### A USD call is a CHF put
+
+In the FX market you always exchange two currencies. The right to buy USD against CHF is the same as the right to sell CHF against USD. A **USD call** is therefore also a **CHF put**.
+
+Seen from the franc, the same option looks like this: notional <Num of="m04.chfNotional" />, strike <Num of="m04.strikeInv" /> USD per CHF. Same deal, different lens. That is why the desk always names both currencies.
+
+<OptionVsForwardFigure caption="Drag the rate at expiry. With hindsight the option (blue) is never the cheapest choice. But once the rate moves a lot, it is never the dearest either." />
+
+### Three scenarios in numbers
+
+With the forward the importer pays <Num of="m04.fwdChf" /> whatever happens. With the call he works it out like this: he buys at the lower of the two rates, the rate at expiry or the strike, and adds the premium.
+
+- **The dollar rises to <Num of="m04.stUp" />.** Unhedged he pays <Num of="m04.unhedgedUpChf" />. With the call he exercises and pays <Num of="m04.capChf" />, strike plus premium. He saves <Num of="m04.saveUpChf" />.
+- **The dollar falls to <Num of="m04.stDown" />.** The forward still costs him <Num of="m04.fwdChf" />. With the call he buys in the market and pays <Num of="m04.optionDownChf" /> including the premium: <Num of="m04.saveDownChf" /> less than with the forward.
+- **The rate ends close to the strike.** Then the option is the dearest choice. The premium was the price of insurance that did not pay off this time.
+
+The option caps his rate at <Num of="m04.capRate" />, strike plus premium per USD. Above that rate it beats staying unhedged. Below <Num of="m04.beatFwdRate" /> it even beats the forward. In between it is, with hindsight, the dearest choice. In return, the importer does not need to know today where the rate is heading.
+
+<Derivation title="Derivation: the cost with a call, and the view as a CHF put">
+
+At expiry a call with notional <i>N</i> and strike <i>K</i> pays <i>N</i> · max(<i>S</i><sub>T</sub> − <i>K</i>, 0) in CHF. The importer buys his dollars in the market at <i>S</i><sub>T</sub> and offsets the payoff:
+
+<Formula>
+  <span>Cost = <i>N</i> · <i>S</i><sub>T</sub> − <i>N</i> · max(<i>S</i><sub>T</sub> − <i>K</i>, 0) + premium</span>
+  <span>= <i>N</i> · min(<i>S</i><sub>T</sub>, <i>K</i>) + premium</span>
+</Formula>
+
+The premium is paid today, the cost falls due at expiry. Strictly speaking, the premium therefore counts with interest at the CHF rate, premium · e<sup><i>r</i><sub>d</sub><i>T</i></sup>. In the example the CHF rate is <Num of="ex.rd" />, so the factor is 1.
+
+The same option as a CHF put: notional <i>N</i><sub>CHF</sub> = <i>K</i> · <i>N</i>, strike 1/<i>K</i> in USD per CHF. It pays <i>K</i> · <i>N</i> · max(1/<i>K</i> − 1/<i>S</i><sub>T</sub>, 0) in USD. Converted into CHF at the rate <i>S</i><sub>T</sub> this gives:
+
+<Formula variant="accent">
+  <i>K</i> · <i>N</i> · <i>S</i><sub>T</sub> · max(1/<i>K</i> − 1/<i>S</i><sub>T</sub>, 0) = <i>N</i> · max(<i>S</i><sub>T</sub> − <i>K</i>, 0)
+</Formula>
+
+That is exactly the payoff of the USD call. Two names, one deal.
+
+A note on the forward: option models work with continuous rates, <i>F</i> = <i>S</i> · e<sup>(<i>r</i><sub>d</sub> − <i>r</i><sub>f</sub>)<i>T</i></sup> = <Num of="ex.forward" />. At the same <i>T</i> = <Num of="ex.T" />, that is only <Num of="ex.fwdDiffPips" /> pips below the money-market forward from module 02. So that forward and option stand on the same footing, this module uses the continuous forward throughout.
+
+</Derivation>
+
+<Desk title="How the desk talks">
+
+In the FX options market "call" on its own is ambiguous. So you name the pair, the tenor, the strike and both currencies: "USD/CHF 3 months, strike <Num of="ex.strike" />, USD call / CHF put, USD 1m".
+
+You also agree in which currency the premium is paid and how it is quoted, in CHF pips or as a percentage of notional. Section 3 shows how the two fit together.
+
+</Desk>
+
+<Takeaway>
+
+An option is a right, not an obligation: you pay the premium today, cap your rate and keep the chance of a cheaper dollar. A USD call is always a CHF put as well.
+
+</Takeaway>

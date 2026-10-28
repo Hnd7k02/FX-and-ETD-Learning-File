@@ -1,0 +1,34 @@
+---
+/** Neutral or tinted note box. */
+interface Props {
+  variant?: 'note' | 'warn' | 'bad' | 'good';
+  title?: string;
+}
+const { variant = 'note', title } = Astro.props;
+---
+
+<div
+  class:list={[
+    'callout',
+    variant === 'warn' && 'callout--warn',
+    variant === 'bad' && 'callout--bad',
+    variant === 'good' && 'callout--good',
+  ]}
+>
+  {title && <strong class="callout-title">{title}</strong>}
+  <slot />
+</div>
+
+<style>
+  .callout-title {
+    display: block;
+    margin-bottom: 4px;
+    font-weight: 800;
+    color: inherit;
+  }
+  .callout :global(p) {
+    font-size: 15px;
+    line-height: 1.6;
+    color: inherit;
+  }
+</style>

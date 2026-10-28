@@ -1,0 +1,22 @@
+---
+/**
+ * SwapCompare as an MDX figure (module 03, section 4): <SwapCompareFigure caption="…" />.
+ * Reads the page language and hydrates the island when it scrolls into view.
+ */
+import Figure from '@/components/content/Figure.astro';
+import SwapCompare from '@/components/islands/SwapCompare';
+import { pageLang } from '@/components/content/lang';
+import M03Styles from './M03Styles.astro';
+
+interface Props {
+  caption?: string;
+  tenor?: string;
+}
+const { caption, tenor } = Astro.props;
+const lang = pageLang(Astro.currentLocale);
+---
+
+<M03Styles />
+<Figure caption={caption}>
+  <SwapCompare client:visible lang={lang} tenor={tenor} />
+</Figure>

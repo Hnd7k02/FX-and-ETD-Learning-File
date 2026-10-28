@@ -1,0 +1,38 @@
+---
+/** Collapsible derivation (closed by default). */
+import { common } from '@/i18n/dict/common';
+import { translator } from '@/i18n/types';
+import { pageLang } from './lang';
+
+interface Props {
+  title?: string;
+}
+const t = translator(common, pageLang(Astro.currentLocale));
+const { title = t('module.derivation') } = Astro.props;
+---
+
+<details class="derivation">
+  <summary>
+    <span>{title}</span>
+    <span class="derivation-icon" aria-hidden="true">
+      <svg width="12" height="12" viewBox="0 0 12 12">
+        <path
+          d="M6 1.5V10.5M1.5 6H10.5"
+          style="fill:none;stroke:#0E1116;stroke-width:1.8;stroke-linecap:round"
+        ></path>
+      </svg>
+    </span>
+  </summary>
+  <div class="derivation-body prose-inner">
+    <slot />
+  </div>
+</details>
+
+<style>
+  .prose-inner :global(p),
+  .prose-inner :global(li) {
+    font-size: var(--ff-article);
+    line-height: 1.7;
+    color: var(--ff-body);
+  }
+</style>

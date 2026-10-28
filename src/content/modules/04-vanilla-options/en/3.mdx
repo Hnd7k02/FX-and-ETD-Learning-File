@@ -1,0 +1,114 @@
+import MoneynessExplorerFigure from '@/components/figures/MoneynessExplorerFigure.astro';
+
+The importer is free to choose the strike. A higher strike only starts protecting at a higher rate, but it is cheaper. A lower strike protects sooner and costs more. How far a strike is "in the money" is called **moneyness**.
+
+There are two conventions. **Spot moneyness** measures the strike against spot. **Forward moneyness** measures it against the forward. Both are common in the market, for European options too. This tool has chosen forward moneyness as its convention. That is a choice made by the tool, not a property of European options. It does suit them well, though: a European option is only exercised at expiry, and the fair rate for that day is the forward.
+
+An example: a USD call with a strike of <Num of="m04.kMid" /> sits <Num of="m04.kMidSpotPips" /> pips below spot. In spot moneyness it is in the money (ITM). Against the forward of <Num of="ex.forward" />, however, it sits <Num of="m04.kMidOtmPips" /> pips above. In forward moneyness it is out of the money (OTM). Same strike, two answers. So always say which rate you measure against.
+
+In forward moneyness, as in this tool:
+
+- **ATMF** (at the money forward): strike equal to the forward.
+- **ITM** (in the money): for a call the strike is below the forward, for a put above it.
+- **OTM** (out of the money): for a call the strike is above the forward, for a put below it.
+
+<MoneynessExplorerFigure caption="Drag the strike or pick a desk strike. Grey is the intrinsic value against the forward, the blue area the time value. Switch between USD call and USD put. Delta and the risk-neutral chance in the money appear side by side as two separate values." />
+
+### Premium = intrinsic value + time value
+
+The **intrinsic value against the forward** is what you can already lock in today: you sell the dollars forward and exercise the call at expiry. That makes at least F − K per USD certain. So for a call the intrinsic value is DF · max(F − K, 0). DF is the discount factor that brings it back to today. The classic definition max(S − K, 0) measures the value of immediate exercise, but you cannot exercise a European option immediately. The **time value** is the rest. It pays for the chance that the rate still moves in your favour before expiry.
+
+Three USD calls with 3 months to expiry:
+
+- **ATMF**, strike exactly at the forward (<Num of="ex.forward" />): <Num of="m04.atmfPips" /> pips. That is pure time value.
+- **ITM**, strike <Num of="m04.kItm" />: <Num of="m04.itmPips" /> pips. Of this, <Num of="m04.itmIntrinsicPips" /> pips are intrinsic value against the forward and <Num of="m04.itmTimePips" /> pips time value.
+- **OTM**, strike <Num of="m04.kOtm" />: <Num of="m04.otmPips" /> pips, or <Num of="m04.otmChf" />. Again pure time value.
+
+Against spot, the ITM call would have <Num of="m04.itmSpotIntrinsicPips" /> pips of intrinsic value and a negative time value of <Num of="m04.itmSpotTimePips" /> pips. That is not a negative premium: the call still costs <Num of="m04.itmPips" /> pips. Nor is it an arbitrage. You would only get the <Num of="m04.itmSpotIntrinsicPips" /> pips by exercising immediately, and a European option does not allow that. What you can lock in today is only the value against the forward: you sell the dollars forward and have <Num of="m04.itmIntrinsicPips" /> pips locked in.
+
+The minus comes from the split alone. The USD rate is above the CHF rate, so the forward sits below spot. The intrinsic value against spot is therefore higher by <Num of="m04.itmSpotIntrinsicPips" /> − <Num of="m04.itmIntrinsicPips" /> = <Num of="m04.itmSpotGapPips" /> pips, and the rest shrinks by exactly as much: <Num of="m04.itmTimePips" /> − <Num of="m04.itmSpotGapPips" /> = <Num of="m04.itmSpotTimePips" /> pips. Measured against the forward, the time value is never negative. That is one more reason why the tool chose this convention.
+
+Our call from section 1 has the rounded strike <Num of="ex.strike" />. That sits <Num of="m04.fwdVsStrikePips" /> pips below the forward, so it costs a touch more: <Num of="ex.callPips" /> pips.
+
+Time value is largest at the forward and shrinks towards both wings. Deep in the money the option behaves almost like a forward; far out of the money it is almost worthless.
+
+### Delta instead of a rate: 25Δ and 10Δ
+
+On the desk strikes are often named by their **delta** rather than by a rate. Delta is a price sensitivity: it tells you how strongly the option value reacts to spot. The 25Δ call is the call with a delta of <Num of="m04.call25Delta" />, the 25Δ put the put with a delta of <Num of="m04.put25Delta" />.
+
+In the example the 25Δ call sits at <Num of="m04.call25" />, the 25Δ put at <Num of="m04.put25" />. Further out are the 10Δ strikes, <Num of="m04.call10" /> and <Num of="m04.put10" />. The advantage: "25Δ" means a comparable moneyness in every pair, at every tenor and every vol.
+
+"ATM" also has its own meaning on the desk. It usually refers to the **delta-neutral straddle** (ATM DNS): the strike at which the call delta and the put delta cancel out exactly. It sits at <Num of="m04.dns" />, <Num of="m04.dnsGapPips" /> pips above the forward. The call delta there is <Num of="m04.dnsDelta" />, and the put delta has the same size with a negative sign.
+
+### Delta is not a probability
+
+A rule of thumb you will often hear: delta ≈ the chance that the option expires in the money. That is only an approximation. The [risk-neutral](/en/glossary/#term-risk-neutral) [chance of expiring in the money](/en/glossary/#term-prob-itm) is, in this tool's model ([Garman-Kohlhagen](/en/glossary/#term-garman-kohlhagen), flat vol), N(<i>d</i><sub>2</sub>) for a call and N(−<i>d</i><sub>2</sub>) for a put. It belongs to the price and is not a forecast. With a vol smile (module 06), the chance the market prices in differs from it. At the delta strikes of the example the two values look like this:
+
+| Strike | Delta | Chance in the money (risk-neutral, not a forecast) |
+| --- | --- | --- |
+| 25Δ call <Num of="m04.call25" /> | <Num of="m04.call25Delta" /> | <Num of="m04.call25Prob" /> |
+| 25Δ put <Num of="m04.put25" /> | <Num of="m04.put25Delta" /> | <Num of="m04.put25Prob" /> |
+| 10Δ call <Num of="m04.call10" /> | <Num of="m04.call10Delta" /> | <Num of="m04.call10Prob" /> |
+| 10Δ put <Num of="m04.put10" /> | <Num of="m04.put10Delta" /> | <Num of="m04.put10Prob" /> |
+
+The rule of thumb is close, but not exact. Here, for the call the chance is a little smaller than the delta, for the put a little larger than the size of the delta. You need delta for hedging: per dollar of notional, you sell that many dollars against the call you bought. N(<i>d</i><sub>2</sub>) answers a different question: how often does the option end in the money in the model? N(<i>d</i><sub>2</sub>) comes back in [module 07](/en/module/07-barrier-binary/3/): discounted, it is the price of a digital call that pays 1 franc.
+
+### Pips or per cent
+
+The premium of our call can be written in two ways. In CHF pips: <Num of="ex.callPips" /> pips, which is <Num of="ex.callChf" /> on USD 1m. Or as a percentage of notional: converted into USD the premium is <Num of="m04.callUsd" />, or <Num of="m04.callPctUsd" /> of the USD notional. Same price, different unit. So always ask how a premium is quoted.
+
+### European or American
+
+A **European** option can only be exercised on the expiry date, an **American** one at any time until then. In the OTC FX market the European style is standard. An American option is worth at least as much as a European one, because it gives you an extra right. In this tool all options are European.
+
+<Derivation title="Derivation: intrinsic value, rule of thumb, strike from delta and N(d2)">
+
+**Intrinsic value against the forward.** If you exercise the call at expiry and sell the dollars forward today, you receive at least F − K per USD at expiry for certain. If the rate then sits below the strike, you buy the dollars for the forward even more cheaply in the market. The certain part, discounted to today, is worth:
+
+<Formula>
+  intrinsic value = e<sup>−<i>r</i><sub>d</sub><i>T</i></sup> · max(<i>F</i> − <i>K</i>, 0)
+</Formula>
+
+**Rule of thumb for ATMF.** With <i>K</i> = <i>F</i>, Garman-Kohlhagen becomes approximately
+
+<Formula variant="accent">
+  <span><i>C</i><sub>ATMF</sub> ≈ e<sup>−<i>r</i><sub>d</sub><i>T</i></sup> · <i>F</i> · σ√<i>T</i> / √(2π) ≈ 0.4 · <i>F</i> · σ√<i>T</i></span>
+</Formula>
+
+With σ√<i>T</i> = <Num of="m04.sigmaSqrtT" /> this gives <Num of="m04.atmfApproxPips" /> pips. So the premium grows with the vol and with the square root of time.
+
+**Strike from delta.** The spot delta of the call is e<sup>−<i>r</i><sub>f</sub><i>T</i></sup> · N(<i>d</i><sub>1</sub>). For a target delta you solve for <i>d</i><sub>1</sub> and substitute:
+
+<Formula>
+  <span><i>d</i><sub>1</sub> = N<sup>−1</sup>(Δ · e<sup><i>r</i><sub>f</sub><i>T</i></sup>)</span>
+  <span><i>K</i> = <i>F</i> · e<sup>−<i>d</i><sub>1</sub>σ√<i>T</i> + ½σ²<i>T</i></sup></span>
+</Formula>
+
+**ATM DNS.** The call and put deltas cancel when N(<i>d</i><sub>1</sub>) = ½, so <i>d</i><sub>1</sub> = 0. This gives <i>K</i> = <i>F</i> · e<sup>½σ²<i>T</i></sup>, slightly above the forward.
+
+**Delta or chance?** For the call the two values sit side by side:
+
+<Formula>
+  <span>Δ<sub>call</sub> = e<sup>−<i>r</i><sub>f</sub><i>T</i></sup> · N(<i>d</i><sub>1</sub>)</span>
+  <span>chance<sub>call</sub> = N(<i>d</i><sub>2</sub>) = N(<i>d</i><sub>1</sub> − σ√<i>T</i>)</span>
+</Formula>
+
+Two things set them apart. The factor e<sup>−<i>r</i><sub>f</sub><i>T</i></sup> makes delta a little smaller than N(<i>d</i><sub>1</sub>): at the 25Δ strike, N(<i>d</i><sub>1</sub>) = <Num of="m04.nd1At25" />. And <i>d</i><sub>2</sub> sits σ√<i>T</i> = <Num of="m04.sigmaSqrtT" /> below <i>d</i><sub>1</sub>. That pushes the call's chance down to <Num of="m04.call25Prob" />. For the put everything is mirrored: N(−<i>d</i><sub>1</sub>) is also <Num of="m04.nd1At25" />, and N(−<i>d</i><sub>2</sub>) = N(−<i>d</i><sub>1</sub> + σ√<i>T</i>) lies above it, at <Num of="m04.put25Prob" /> ([risk-neutral](/en/glossary/#term-risk-neutral), not a forecast).
+
+**A neat link.** The time value of the ITM call above, <Num of="m04.itmTimePips" /> pips, is exactly the price of the OTM put with the same strike. This follows from put-call parity in section 4.
+
+</Derivation>
+
+<Desk title="Which ATM do you mean?">
+
+ATM can mean spot, the forward or the delta-neutral straddle. In the interbank market, vol quotes usually refer to ATM DNS. Together with the 25Δ risk reversal and the 25Δ butterfly it describes the shape of the vol smile (module 06).
+
+If the premium is paid in USD, as is usual in USD/CHF, the desk works with a premium-adjusted delta. The strikes then shift slightly. ATM DNS even moves just below the forward, to <Num of="m04.dnsPa" />. For every delta strike, ask which convention applies.
+
+</Desk>
+
+<Takeaway>
+
+Moneyness exists against spot and against the forward. This tool has chosen forward moneyness; it suits exercise at expiry, but it is a convention. The premium is intrinsic value against the forward plus time value; with the strike at the forward it is pure time value. Delta is a price sensitivity, not a probability: the risk-neutral chance of expiring in the money is, in the model, N(d2) for a call and N(−d2) for a put.
+
+</Takeaway>

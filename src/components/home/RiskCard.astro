@@ -1,0 +1,154 @@
+---
+/**
+ * "Riskometer, letzter Stand" card (B-Home): a link to the Riskometer with the mini gauge, the realised
+ * 1-month volatility, the level (always with a label) and the percentile sentence. Data from
+ * src/data/fx/summary.json via getRiskSummary(); a neutral state when it has not been built.
+ * The link has no aria-label: its visible text (title, pair, vol, level, sentence) is the name
+ * (WCAG 2.5.3 label in name).
+ */
+import MiniGauge from '@/components/riskometer/MiniGauge.astro';
+import { common } from '@/i18n/dict/common';
+import { home } from '@/i18n/dict/home';
+import { LEVEL_KEYS, levels } from '@/i18n/dict/levels';
+import { riskometerPath } from '@/i18n/routes';
+import { translator, type Lang } from '@/i18n/types';
+import { fmtDate, fmtNumber, fmtPctValue } from '@/lib/format';
+import { getRiskSummary } from '@/lib/risk-summary';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = translator(common, lang);
+const th = translator(home, lang);
+const tl = translator(levels, lang);
+const risk = getRiskSummary();
+
+const vol = risk ? fmtPctValue(risk.vol, lang, 1) : '–';
+const levelLabel = risk ? tl(LEVEL_KEYS[risk.level - 1]!) : th('home.riskNoDataChip');
+const text = risk
+  ? t('home.riskText', { pct: fmtNumber(Math.round(risk.percentile), lang) })
+  : th('home.riskNoData');
+const trend = risk === null ? 'none' : risk.level >= 3 ? 'up' : risk.level === 1 ? 'down' : 'flat';
+---
+
+<a class="card risk" href={riskometerPath(lang)} data-risk data-level={risk?.level ?? 0}>
+  <span class="risk-head">
+    <span class="risk-label">{t('home.riskTitle')}</span>
+    <span class="chip chip-neutral chip-mono">{risk ? risk.pair : th('home.riskPeriod')}</span>
+  </span>
+  <MiniGauge needle={risk ? risk.needle : null} />
+  <span class="risk-vol">{vol}</span>
+  <span class="chip level" data-level={risk?.level ?? 0}>
+    {trend === 'up' && (
+      <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
+        <path d="M6 10V2M2.5 5.5L6 2L9.5 5.5" />
+      </svg>
+    )}
+    {trend === 'down' && (
+      <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
+        <path d="M6 2V10M2.5 6.5L6 10L9.5 6.5" />
+      </svg>
+    )}
+    {trend === 'flat' && (
+      <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
+        <path d="M2 6H10" />
+      </svg>
+    )}
+    {levelLabel}
+  </span>
+  <span class="risk-text">{text}</span>
+  {risk && <span class="risk-asof">{th('home.riskAsOf', { date: fmtDate(risk.asOf, lang) })}</span>}
+</a>
+
+<style>
+  .risk {
+    flex: 2 1 340px;
+    min-width: 0;
+    padding: 32px;
+    border-radius: var(--ff-r-hero);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: var(--ff-ink);
+    transition:
+      background-color 150ms ease,
+      border-color 150ms ease;
+  }
+  .risk:hover {
+    color: var(--ff-ink);
+    background: var(--ff-chip);
+    border-color: var(--ff-line-strong);
+  }
+  .risk-head {
+    align-self: stretch;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+  .risk-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ff-muted);
+  }
+  .risk-vol {
+    font-size: 44px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .level {
+    gap: 6px;
+    padding: 5px 12px;
+    font-size: 13px;
+    background: var(--ff-chip);
+    color: var(--ff-ink-2);
+  }
+  .level svg path {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .level[data-level='1'] {
+    background: var(--ff-good-soft);
+    color: var(--ff-good-text-strong);
+  }
+  .level[data-level='2'] {
+    background: color-mix(in srgb, var(--ff-level-2) 18%, #fff);
+    color: var(--ff-good-text-strong);
+  }
+  .level[data-level='3'] {
+    background: var(--ff-warn-soft);
+    color: var(--ff-warn-text);
+  }
+  .level[data-level='4'] {
+    background: var(--ff-exotics-soft);
+    color: var(--ff-exotics-text);
+  }
+  .level[data-level='5'] {
+    background: var(--ff-bad-soft);
+    color: var(--ff-bad-text-strong);
+  }
+  .risk-text {
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--ff-ink-2);
+    text-align: center;
+    text-wrap: pretty;
+  }
+  .risk-asof {
+    font-size: 12px;
+    color: var(--ff-muted);
+  }
+  @media (max-width: 640px) {
+    .risk {
+      padding: 24px 20px;
+      border-radius: var(--ff-r-card);
+    }
+  }
+</style>

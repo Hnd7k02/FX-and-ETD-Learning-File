@@ -1,0 +1,71 @@
+---
+import { common } from '@/i18n/dict/common';
+import { translator, type Lang } from '@/i18n/types';
+import { aboutPath, glossaryPath, riskometerPath } from '@/i18n/routes';
+import { getRiskSummary } from '@/lib/risk-summary';
+import { fmtDate } from '@/lib/format';
+
+interface Props {
+  lang: Lang;
+  wide?: boolean;
+}
+const { lang, wide = true } = Astro.props;
+const t = translator(common, lang);
+const risk = getRiskSummary();
+const dataLine = risk ? t('footer.dataAsOf', { date: fmtDate(risk.asOf, lang) }) : t('footer.data');
+---
+
+<footer class:list={['footer', wide ? 'container' : 'container-module']}>
+  <div class="footer-row">
+    <p class="disclaimer">
+      <strong>{t('site.name')}</strong> · {t('footer.disclaimer')}
+    </p>
+    <nav class="footer-links" aria-label={t('footer.methodology')}>
+      <a href={glossaryPath(lang)}>{t('nav.glossary')}</a>
+      <a href={riskometerPath(lang)}>{t('nav.riskometer')}</a>
+      <a href={aboutPath(lang)}>{t('footer.methodology')}</a>
+    </nav>
+  </div>
+  <div class="footer-row">
+    <span>{t('footer.credits')}</span>
+    <span data-data-as-of={risk?.asOf}>{dataLine}</span>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    padding-top: 56px;
+    padding-bottom: 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    font-size: 13px;
+    color: var(--ff-muted);
+  }
+  .footer-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px 24px;
+  }
+  .disclaimer strong {
+    color: var(--ff-ink);
+    font-weight: 800;
+  }
+  .footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 16px;
+  }
+  .footer-links a {
+    color: var(--ff-ink-2);
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    min-height: 32px;
+  }
+  .footer-links a:hover {
+    color: var(--ff-ink);
+    text-decoration: underline;
+  }
+</style>
